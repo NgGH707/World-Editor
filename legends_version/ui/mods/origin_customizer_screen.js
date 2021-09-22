@@ -1632,12 +1632,13 @@ OriginCustomizerScreen.prototype.updateOriginConfig = function () {
 		this.mOriginOptions.BusinessReputationRate,
 		this.mOriginOptions.NegotiationAnnoyanceMult,
 		this.mOriginOptions.RosterSizeAdditionalMin,
-		this.mOriginOptions.RosterSizeAdditionalMax
-		this.mOriginOptions.TaxidermistPriceMult
-		this.mOriginOptions.TryoutPriceMult
-		this.mOriginOptions.RelationDecayGoodMult
-		this.mOriginOptions.RelationDecayBadMult
-	]
+		this.mOriginOptions.RosterSizeAdditionalMax,
+		this.mOriginOptions.TaxidermistPriceMult,
+		this.mOriginOptions.TryoutPriceMult,
+		this.mOriginOptions.RelationDecayGoodMult,
+		this.mOriginOptions.RelationDecayBadMult,
+	];
+	
 	controls.forEach(function (_definition) {
 		_definition.Control.attr('min', _definition.Min);
 		_definition.Control.attr('max', _definition.Max);
