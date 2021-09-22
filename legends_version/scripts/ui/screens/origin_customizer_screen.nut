@@ -105,6 +105,10 @@ this.origin_customizer_screen <- {
 			Name = this.World.Assets.getName(),
 			Difficulty = this.World.Assets.getCombatDifficulty(),
 			EconomicDifficulty = this.World.Assets.getEconomicDifficulty(),
+			IsIronman = this.World.Assets.isIronman(),
+			IsAutosave = this.World.Assets.isAutosave(),
+			ItemScaling = this.LegendsMod.Configs().LegendItemScalingEnabled(),
+			LocationScaling = this.LegendsMod.Configs().LegendLocationScalingEnabled(),
 			AllBlueprint = this.LegendsMod.Configs().LegendAllBlueprintsEnabled(),
 
 			Tier = this.World.Assets.getOrigin().getRosterTier(),
@@ -200,7 +204,7 @@ this.origin_customizer_screen <- {
 	function addStashData( _result )
 	{
 		local stash = this.World.Assets.getStash();
-		local max = this.Math.min(stash.getCapacity(), 400);
+		local max = this.Math.max(stash.getCapacity(), 400);
 		this.m.CurrentStash = stash.getCapacity();
 		_result.Stash <- this.m.CurrentStash;
 		_result.StashMin <- stash.getNumberOfFilledSlots();
@@ -242,6 +246,10 @@ this.origin_customizer_screen <- {
 			"Name",
 			"Difficulty",
 			"EconomicDifficulty",
+			"IsIronman",
+			"IsAutosave",
+			"ItemScaling",
+			"LocationScaling",
 			"AllBlueprint",
 			"Tier",
 			"Stash",
@@ -286,6 +294,10 @@ this.origin_customizer_screen <- {
 		this.World.Assets.m.Name = this.removeFromBeginningOfText("The ", this.removeFromBeginningOfText("the ", _settings.Name));
 		this.World.Assets.m.CombatDifficulty = _settings.Difficulty;
 		this.World.Assets.m.EconomicDifficulty = _settings.EconomicDifficulty;
+		this.World.Assets.IsIronman = _settings.IsIronman;
+		this.World.Assets.IsAutosave = _settings.IsAutosave; 
+		this.LegendsMod.Configs().m.IsItemScaling = _settings.ItemScaling;
+		this.LegendsMod.Configs().m.IsLocationScaling = _settings.LocationScaling;
 		this.LegendsMod.Configs().m.IsBlueprintsVisible = _settings.AllBlueprint;
 
 		if (_settings.Stash != this.m.CurrentStash)
@@ -319,6 +331,7 @@ this.origin_customizer_screen <- {
 		this.World.Flags.set("RelationDecayGoodMult", _settings.RelationDecayGoodMult * 0.01);
 		this.World.Flags.set("RelationDecayBadMult", _settings.RelationDecayBadMult * 0.01);
 		this.World.Retinue.update();
+		this.World.State.getPlayer().updateStrength();
 	}
 
 	function onChangeScenario( _inputScenarioID )

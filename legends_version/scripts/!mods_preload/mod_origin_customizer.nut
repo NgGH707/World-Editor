@@ -171,9 +171,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 				RelationDecayBadMult = this.m.RelationDecayBadMult,
 
 				/*FoodConsumptionMult = this.m.FoodConsumptionMult,
-				
 				TrainingPriceMult = this.m.TrainingPriceMult,
-				
 				AdvancePaymentCap = this.m.AdvancePaymentCap,*/
 			};
 		}
