@@ -200,9 +200,9 @@ this.origin_customizer_screen <- {
 	function addStashData( _result )
 	{
 		local stash = this.World.Assets.getStash();
-		local max = this.Max.min(stash.getCapacity(), 400);
+		local max = this.Math.min(stash.getCapacity(), 400);
 		this.m.CurrentStash = stash.getCapacity();
-		_result.Stash <- stash.getCapacity();
+		_result.Stash <- this.m.CurrentStash;
 		_result.StashMin <- stash.getNumberOfFilledSlots();
 		_result.StashMax <- max;
 	}
