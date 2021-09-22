@@ -81,9 +81,10 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 	::mods_hookNewObjectOnce("states/world/asset_manager", function ( obj )
 	{
-		obj.getBaseAssets <- function()
+		local reset = obj.resetToDefaults;
+		obj.resetToDefaults = function()
 		{
-			this.resetToDefaults();
+			reset();
 
 			if (this.World.Flags.has("UsedOriginCustomizer"))
 			{
@@ -132,11 +133,21 @@ this.getroottable().OriginCustomizerVersion <- version;
 					this.m.RosterSizeAdditionalMax += this.World.Flags.getAsInt("RosterSizeAdditionalMin");
 				}
 
+				if (this.World.Flags.has("RosterTier"))
+				{
+					this.getOrigin().m.RosterTier = this.World.Flags.getAsInt("RosterTier");
+				}
+
 				if (this.World.State.getPlayer() != null && this.World.Flags.has("BaseMovementSpeed"))
 				{
 					this.World.State.getPlayer().m.BaseMovementSpeed = this.World.Flags.getAsInt("BaseMovementSpeed");
 				}
 			}
+		}
+
+		obj.getBaseAssets <- function()
+		{
+			this.resetToDefaults();
 
 			return {
 				XPMult = this.m.XPMult,
@@ -164,7 +175,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 		}
 	});
 
-	::mods_hookNewObject("retinue/retinue_manager", function( obj ) 
+	::mods_hookNewObject("retinue/retinue_manager", function( obj )
 	{
 		local onDeserialize = ::mods_getMember(obj, "onDeserialize");
 		obj.onDeserialize = function( _in )
@@ -172,77 +183,105 @@ this.getroottable().OriginCustomizerVersion <- version;
 			onDeserialize(_in);
 			this.World.State.updateTopbarAssets();
 		}
+	});
 
-		local update = ::mods_getMember(obj, "update");
-		obj.update = function()
+	::mods_hookNewObject("retinue/followers/bounty_hunter_follower", function( obj ) 
+	{
+		obj.onUpdate = function()
 		{
-			update();
-
-			if (this.World.Flags.has("UsedOriginCustomizer"))
+			if ("ChampionChanceAdditional" in this.World.Assets.m)
 			{
-				local mult = [
-					"XPMult",
-					"DailyWageMult",
-					"HiringCostMult",
-					"SellPriceMult",
-					"BuyPriceMult",
-					"ContractPaymentMult",
-					"VisionRadiusMult",
-					"HitpointsPerHourMult",
-					"RepairSpeedMult",
-					"BusinessReputationRate",
-					"NegotiationAnnoyanceMult",
-				];
-				local add = [
-					"ExtraLootChance",
-					"ChampionChanceAdditional"
-				];
+				this.World.Assets.m.ChampionChanceAdditional += 3;
+			}
+		}
+	});
+	::mods_hookNewObject("retinue/followers/cook_follower", function( obj ) 
+	{
+		obj.onUpdate = function()
+		{
+			if ("FoodAdditionalDays" in this.World.Assets.m)
+			{
+				this.World.Assets.m.FoodAdditionalDays += 3;
+			}
 
-				foreach ( key in mult )
+			if ("HitpointsPerHourMult" in this.World.Assets.m)
+			{
+				this.World.Assets.m.HitpointsPerHourMult *= 1.33;
+			}
+		}
+	});
+	::mods_hookNewObject("retinue/followers/lookout_follower", function( obj ) 
+	{
+		obj.onUpdate = function()
+		{
+			if ("VisionRadiusMult" in this.World.Assets.m)
+			{
+				this.World.Assets.m.VisionRadiusMult *= 1.25;
+			}
+
+			if ("IsShowingExtendedFootprints" in this.World.Assets.m)
+			{
+				this.World.Assets.m.IsShowingExtendedFootprints = true;
+			}
+		}
+	});
+	::mods_hookNewObject("retinue/followers/negotiator_follower", function( obj ) 
+	{
+		obj.onUpdate = function()
+		{
+			if ("NegotiationAnnoyanceMult" in this.World.Assets.m)
+			{
+				this.World.Assets.m.NegotiationAnnoyanceMult *= 0.5;
+			}
+
+			if ("AdvancePaymentCap" in this.World.Assets.m)
+			{
+				this.World.Assets.m.AdvancePaymentCap += 0.25;
+			}
+
+			if ("RelationDecayGoodMult" in this.World.Assets.m)
+			{
+				if (this.World.Assets.getOrigin().getID() == "scenario.sato_escaped_slaves")
 				{
-					if (this.World.Flags.has(key))
-					{
-						local value = this.World.Flags.getAsFloat(key);
-						this.World.Assets.m[key] *= value;
-					}
+					this.World.Assets.m.RelationDecayGoodMult *= 1.05;
 				}
-
-				foreach ( key in add )
+				else
 				{
-					local value = this.World.Flags.getAsInt(key);
-
-					if (value != 0)
-					{
-						this.World.Assets.m[key] += value;
-					}
+					this.World.Assets.m.RelationDecayGoodMult *= 0.9;
 				}
+			}
 
-				if (this.World.Flags.has("RosterSizeAdditionalMin"))
+			if ("RelationDecayBadMult" in this.World.Assets.m)
+			{
+				if (this.World.Assets.getOrigin().getID() == "scenario.sato_escaped_slaves")
 				{
-					this.World.Assets.m.RosterSizeAdditionalMin += this.World.Flags.getAsInt("RosterSizeAdditionalMin");
-					this.World.Assets.m.RosterSizeAdditionalMax += this.World.Flags.getAsInt("RosterSizeAdditionalMin");
+					this.World.Assets.m.RelationDecayBadMult *= 0.95;
 				}
-
-				if (this.World.State.getPlayer() != null && this.World.Flags.has("BaseMovementSpeed"))
+				else
 				{
-					this.World.State.getPlayer().m.BaseMovementSpeed = this.World.Flags.getAsInt("BaseMovementSpeed");
+					this.World.Assets.m.RelationDecayBadMult *= 1.1;
 				}
 			}
 		}
 	});
-
-	::mods_hookBaseClass("scenarios/world/starting_scenario", function(obj) 
+	::mods_hookNewObject("retinue/followers/quartermaster_follower", function( obj ) 
 	{
-	    obj = obj[obj.SuperName];
-
-	    obj.getRosterTier = function()
+		obj.onUpdate = function()
 		{
-			if (this.World.Flags.has("RosterTier"))
+			if ("AmmoMaxAdditional" in this.World.Assets.m)
 			{
-				return this.World.Flags.getAsInt("RosterTier");
+				this.World.Assets.m.AmmoMaxAdditional += 100;
 			}
 
-			return this.m.RosterTier;
+			if ("MedicineMaxAdditional" in this.World.Assets.m)
+			{
+				this.World.Assets.m.MedicineMaxAdditional += 50;
+			}
+
+			if ("ArmorPartsMaxAdditional" in this.World.Assets.m)
+			{
+				this.World.Assets.m.ArmorPartsMaxAdditional += 50;
+			}
 		}
 	});
 

@@ -213,8 +213,6 @@ this.origin_customizer_screen <- {
 	{
 		local keys = [
 			"Name",
-			"Banner",
-			"ScenariosID",
 			"Difficulty",
 			"EconomicDifficulty",
 			"AllBlueprint",
@@ -254,28 +252,11 @@ this.origin_customizer_screen <- {
 	function applyChanges( _settings )
 	{
 		this.World.Assets.m.Name = this.removeFromBeginningOfText("The ", this.removeFromBeginningOfText("the ", _settings.Name));
-
-		if (this.m.CurrentBanner != "" && _settings.Banner != this.m.CurrentBanner)
-		{
-			this.World.Assets.m.Banner = _settings.Banner;
-			this.World.Assets.m.BannerID = _settings.Banner.slice(_settings.Banner.find("_") + 1).tointeger();
-			this.changeBanner(this.World.Assets.getBannerID());
-			this.World.State.getPlayer().getSprite("banner").setBrush(this.World.Assets.getBanner());
-			this.World.State.getPlayer().getSprite("zoom_banner").setBrush(this.World.Assets.getBanner());
-		}
-
 		this.World.Assets.m.CombatDifficulty = _settings.Difficulty;
 		this.World.Assets.m.EconomicDifficulty = _settings.EconomicDifficulty;
 		this.LegendsMod.Configs().m.IsBlueprintsVisible = _settings.AllBlueprint;
-		this.World.Flags.set("RosterTier", _settings.Tier);
-
-		if (this.m.CurrentOriginID != "" && _settings.ScenariosID != this.m.CurrentOriginID)
-		{
-			this.World.Assets.m.Origin = _settings.ScenariosID == "scenario.random" ? this.Const.ScenarioManager.getRandomScenario() : this.Const.ScenarioManager.getScenario(_settings.ScenariosID);
-			this.World.Assets.m.Origin.onInit();
-		}
-
 		this.World.Flags.set("UsedOriginCustomizer", this.OriginCustomizerVersion);
+		this.World.Flags.set("RosterTier", _settings.Tier);
 		this.World.Flags.set("XPMult", _settings.XpMult * 0.01);
 		this.World.Flags.set("DailyWageMult", _settings.HiringMult * 0.01);
 		this.World.Flags.set("HiringCostMult", _settings.WageMult * 0.01);
@@ -294,7 +275,41 @@ this.origin_customizer_screen <- {
 		this.World.Retinue.update();
 	}
 
-	function changeBanner( _bannerID )
+	function onChangeScenario( _inputScenarioID )
+	{
+		if (this.m.CurrentOriginID != "" && _inputScenarioID != this.m.CurrentOriginID)
+		{
+			local scenario = _inputScenarioID == "scenario.random" ? this.Const.ScenarioManager.getRandomScenario() : this.Const.ScenarioManager.getScenario(_inputScenarioID);
+			this.World.Assets.m.Origin = scenario;
+			this.m.CurrentOriginID = scenario.getID();
+
+			foreach (i, s in this.m.ScenarioUI ) 
+			{
+			    if (_s.ID == this.m.CurrentOriginID)
+			    {
+			    	this.m.JSHandle.asyncCall("updateScenarioImage", s.Image);
+			    	return i;
+			    }
+			}
+		}
+
+		return null;
+	}
+
+	function onChangeBanner( _inputBanner )
+	{
+		if (this.m.CurrentBanner != "" && _inputBanner != this.m.CurrentBanner)
+		{
+			this.World.Assets.m.Banner = _inputBanner;
+			this.World.Assets.m.BannerID = _inputBanner.slice(_inputBanner.find("_") + 1).tointeger();
+			this.World.State.getPlayer().getSprite("banner").setBrush(_inputBanner);
+			this.World.State.getPlayer().getSprite("zoom_banner").setBrush(_inputBanner);
+			this.m.CurrentBanner = _inputBanner;
+			this.changeAllBanner(this.World.Assets.getBannerID());
+		}
+	}
+
+	function changeAllBanner( _bannerID )
 	{
 		local stash = this.World.Assets.getStash();
 		local banner = stash.getItemByID("weapon.player_banner");

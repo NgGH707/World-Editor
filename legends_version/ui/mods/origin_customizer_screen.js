@@ -553,7 +553,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 	var layout = $('<div class="l-done-button"/>');
 	footerButtonBar.append(layout);
 	this.mDoneButton = layout.createTextButton("Done", function () {
-		self.notifyBackendDoneButtonPressed();
+		self.notifyBackendCloseButtonPressed();
 	}, '', 1);
 
 	var layout = $('<div class="l-ok-button"/>');
@@ -1242,6 +1242,7 @@ OriginCustomizerScreen.prototype.onNextBannerClicked = function ()
 OriginCustomizerScreen.prototype.onAcceptBannerClicked = function () 
 {
 	this.mSelectedBannerIndex = this.mCurrentBannerIndex;
+	this.notifyBackendOnChangingBanner(this.mBanners[this.mSelectedBannerIndex]);
 	this.onUpdateBannerButton();
 };
 
@@ -1405,8 +1406,14 @@ OriginCustomizerScreen.prototype.chooseOrigin = function ()
 	}
 
 	var ScenarioData = this.mScenarios[this.mScenarioCurentIndex];
-	this.updateScenarioImage(ScenarioData.Image);
-	//this.notifyBackendChooseOrigin();
+	this.notifyBackendOnChoosingOrigin(ScenarioData.ID, function(_result) {
+		if (_result === null) {
+			self.updateScenarioImage(ScenarioData.Image);
+		}
+		else {
+			self.mScenarioCurentIndex = result;
+		}
+	});
 }
 
 OriginCustomizerScreen.prototype.loadFromData = function (_data) 
@@ -1591,12 +1598,6 @@ OriginCustomizerScreen.prototype.collectSettings = function () {
 	// company name
 	settings.push(this.mCompanyName.getInputText());
 
-	// banner
-	settings.push(this.mBanners[this.mSelectedBannerIndex]);
-
-	// scenario
-	settings.push(this.mScenarios[this.mScenarioCurentIndex].ID);
-
 	// difficulty
 	settings.push(this.mDifficulty);
 	settings.push(this.mEconomicDifficulty);
@@ -1660,13 +1661,19 @@ OriginCustomizerScreen.prototype.notifyBackendOnAnimating = function ()
     }
 };
 
-OriginCustomizerScreen.prototype.notifyBackendChooseOrigin = function () {
+OriginCustomizerScreen.prototype.notifyBackendOnChangingBanner = function(_inputBanner) {
 	if (this.mSQHandle !== null) {
-		SQ.call(this.mSQHandle, 'onChooseOrigin', this.mScenarioCurentIndex);
+		SQ.call(this.mSQHandle, 'onChangeBanner', _inputBanner);
+	}
+}
+
+OriginCustomizerScreen.prototype.notifyBackendOnChoosingOrigin = function (_inputID, _callback) {
+	if (this.mSQHandle !== null) {
+		SQ.call(this.mSQHandle, 'onChooseOrigin', _inputID, _callback);
 	}
 };
 
-OriginCustomizerScreen.prototype.notifyBackendDoneButtonPressed = function () {
+OriginCustomizerScreen.prototype.notifyBackendCloseButtonPressed = function () {
 	if (this.mSQHandle !== null) {
 		var settings = this.collectSettings();
 		SQ.call(this.mSQHandle, 'onCloseButtonPressed', settings);
