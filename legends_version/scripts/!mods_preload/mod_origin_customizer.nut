@@ -177,6 +177,23 @@ this.getroottable().OriginCustomizerVersion <- version;
 		}
 	});
 
+	::mods_hookExactClass("entity/world/player_party", function( obj )
+	{
+		local Strength = ::mods_getMember(obj, "getStrength");
+		obj.getStrength = function()
+		{
+			this.m.Strength = Strength;
+
+			if (this.World.Flags.has("PartyStrengthMult"))
+			{
+				local value = this.World.Flags.getAsFloat("PartyStrengthMult");
+				this.m.Strength *= value;
+			}
+
+			return this.m.Strength;
+		}
+	});
+
 	::mods_hookNewObject("retinue/retinue_manager", function( obj )
 	{
 		local onDeserialize = ::mods_getMember(obj, "onDeserialize");
