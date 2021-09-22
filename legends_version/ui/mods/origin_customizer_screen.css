@@ -21,6 +21,18 @@
     pointer-events: auto;
 }
 
+/*Origin button*/
+.origin-customizer-origin-button
+{   
+    width: 10.4rem;
+    height: 14.2rem;
+    
+    position: absolute;
+    left: 1.0rem;
+    bottom: 52.5rem;/*59.5*/
+    z-index: 10;
+}
+
 .origin-customizer-screen.is-center
 {
     left: 0;
@@ -37,28 +49,29 @@
     float: left;
 }
 
-.origin-customizer-screen .dialog .content .origin-button-container
+.origin-customizer-screen .dialog .content .below-origin-button-column
 {
-    top: 17.0rem;
-    left: 4.0rem;
+    padding-top: 15.0rem;
+    width: 40.0rem;
+    height: 100%;
+    float: left;
+
+    /*top: 2.0rem;
+    left: 2.0rem;
     right: 2.0rem;
     bottom: 0;
     height: 4.3rem;
     position: absolute;
-    margin: auto;
+    margin: auto;*/
 }
 
-.origin-customizer-screen > .dialog .content .origin-button-container .l-origin-button
+.origin-customizer-screen .below-origin-button-column .row .l-input
 {
-    /*position: absolute;
-    margin-left: auto;
-    margin-right: auto;
-    height: 15.0rem;
-    width: 15.0rem;
-    vertical-align: middle;*/
-    height: 15.0rem;
-    width: 15.0rem;
-    position: absolute;
+    width: 30.0rem;
+    height: 4.0rem;
+    margin-bottom: 2.0rem;
+    float: left;
+    position: relative;
 }
 
 .origin-customizer-screen > .dialog .content .column2

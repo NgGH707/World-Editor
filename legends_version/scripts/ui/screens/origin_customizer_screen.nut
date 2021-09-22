@@ -10,6 +10,7 @@ this.origin_customizer_screen <- {
 		OnClosePressedListener = null,
 		CurrentOriginID = "",
 		CurrentBanner = "",
+		CurrentStash = 0,
 		ScenarioUI = [],
 	},
 	function isVisible()
@@ -169,10 +170,41 @@ this.origin_customizer_screen <- {
 			RosterSizeAdditionalMin = this.Math.floor(data.RosterSizeAdditionalMin),
 			RosterSizeAdditionalMinMin = 0,
 			RosterSizeAdditionalMinMax = 20,
+
+			RosterSizeAdditionalMax = this.Math.floor(data.RosterSizeAdditionalMax),
+			RosterSizeAdditionalMaxMix = 0,
+			RosterSizeAdditionalMaxMax = 20,
+
+			TaxidermistPriceMult = this.Math.floor(data.TaxidermistPriceMult * 100),
+			TaxidermistPriceMultMin = 0,
+			TaxidermistPriceMultMax = 500
+
+			TryoutPriceMult = this.Math.floor(data.TryoutPriceMult * 100),
+			TryoutPriceMultMin = 0,
+			TryoutPriceMultMax = 500,
+			
+			RelationDecayGoodMult = this.Math.floor(data.RelationDecayGoodMult * 100),
+			RelationDecayGoodMultMin = 5,
+			RelationDecayGoodMultMax = 500,
+			
+			RelationDecayBadMult = this.Math.floor(data.RelationDecayBadMult * 100),
+			RelationDecayBadMultMin = 5,
+			RelationDecayBadMultMax = 500,
 		};
+		this.addStashData(ret);
 		this.addOriginData(ret);
 		this.addBannerData(ret);
 		return ret;
+	}
+
+	function addStashData( _result )
+	{
+		local stash = this.World.Assets.getStash();
+		local max = this.Max.min(stash.getCapacity(), 400);
+		this.m.CurrentStash = stash.getCapacity();
+		_result.Stash <- stash.getCapacity();
+		_result.StashMin <- stash.getNumberOfFilledSlots();
+		_result.StashMax <- max;
 	}
 
 	function addBannerData( _result )
@@ -203,20 +235,16 @@ this.origin_customizer_screen <- {
 		_result.StartingScenario <- UI;
 	}
 
-	function onChooseOrigin( _index )
-	{
-		local image = this.m.ScenarioUI[_index].Image;
-		this.m.JSHandle.asyncCall("updateScenarioImage", image);
-	}
-
 	function onCloseButtonPressed( _settings )
 	{
+		local data = {};
 		local keys = [
 			"Name",
 			"Difficulty",
 			"EconomicDifficulty",
 			"AllBlueprint",
 			"Tier",
+			"Stash",
 			"XpMult",
 			"HiringMult",
 			"WageMult",
@@ -232,8 +260,12 @@ this.origin_customizer_screen <- {
 			"BusinessReputationRate",
 			"NegotiationAnnoyanceMult",
 			"RosterSizeAdditionalMin",
+			"RosterSizeAdditionalMax",
+			"TaxidermistPriceMult",
+			"TryoutPriceMult",
+			"RelationDecayGoodMult",
+			"RelationDecayBadMult",
 		];
-		local data = {};
 
 		foreach( i, k in keys )
 		{
@@ -255,6 +287,15 @@ this.origin_customizer_screen <- {
 		this.World.Assets.m.CombatDifficulty = _settings.Difficulty;
 		this.World.Assets.m.EconomicDifficulty = _settings.EconomicDifficulty;
 		this.LegendsMod.Configs().m.IsBlueprintsVisible = _settings.AllBlueprint;
+
+		if (_settings.Stash != this.m.CurrentStash)
+		{
+			local stash = this.World.Assets.getStash();
+			stash.sort();
+			stash.resize(_settings.Stash);
+			this.m.CurrentStash = _settings.Stash;
+		}
+
 		this.World.Flags.set("UsedOriginCustomizer", this.OriginCustomizerVersion);
 		this.World.Flags.set("RosterTier", _settings.Tier);
 		this.World.Flags.set("XPMult", _settings.XpMult * 0.01);
@@ -272,6 +313,11 @@ this.origin_customizer_screen <- {
 		this.World.Flags.set("ChampionChanceAdditional", _settings.BonusChampion);
 		this.World.Flags.set("BaseMovementSpeed", _settings.BonusSpeed);
 		this.World.Flags.set("RosterSizeAdditionalMin", _settings.RosterSizeAdditionalMin);
+		this.World.Flags.set("RosterSizeAdditionalMax", _settings.RosterSizeAdditionalMax);
+		this.World.Flags.set("TaxidermistPriceMult", _settings.TaxidermistPriceMult * 0.01);
+		this.World.Flags.set("TryoutPriceMult", _settings.TryoutPriceMult * 0.01);
+		this.World.Flags.set("RelationDecayGoodMult", _settings.RelationDecayGoodMult * 0.01);
+		this.World.Flags.set("RelationDecayBadMult", _settings.RelationDecayBadMult * 0.01);
 		this.World.Retinue.update();
 	}
 
@@ -285,7 +331,7 @@ this.origin_customizer_screen <- {
 
 			foreach (i, s in this.m.ScenarioUI ) 
 			{
-			    if (_s.ID == this.m.CurrentOriginID)
+			    if (s.ID == this.m.CurrentOriginID)
 			    {
 			    	this.m.JSHandle.asyncCall("updateScenarioImage", s.Image);
 			    	return i;

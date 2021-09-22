@@ -100,10 +100,16 @@ this.getroottable().OriginCustomizerVersion <- version;
 					"RepairSpeedMult",
 					"BusinessReputationRate",
 					"NegotiationAnnoyanceMult",
+					"TaxidermistPriceMult",
+					"TryoutPriceMult",
+					"RelationDecayGoodMult",
+					"RelationDecayBadMult",
 				];
 				local add = [
 					"ExtraLootChance",
-					"ChampionChanceAdditional"
+					"ChampionChanceAdditional",
+					"RosterSizeAdditionalMin",
+					"RosterSizeAdditionalMax",
 				];
 
 				foreach ( key in mult )
@@ -125,12 +131,6 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						this.m[key] += value;
 					}
-				}
-
-				if (this.World.Flags.has("RosterSizeAdditionalMin"))
-				{
-					this.m.RosterSizeAdditionalMin += this.World.Flags.getAsInt("RosterSizeAdditionalMin");
-					this.m.RosterSizeAdditionalMax += this.World.Flags.getAsInt("RosterSizeAdditionalMin");
 				}
 
 				if (this.World.Flags.has("RosterTier"))
@@ -163,13 +163,17 @@ this.getroottable().OriginCustomizerVersion <- version;
 				RepairSpeedMult = this.m.RepairSpeedMult,
 				BusinessReputationRate = this.m.BusinessReputationRate,
 				NegotiationAnnoyanceMult = this.m.NegotiationAnnoyanceMult,
-				RosterSizeAdditionalMin = this.Math.min(this.m.RosterSizeAdditionalMin, this.m.RosterSizeAdditionalMax),
-				/*FoodConsumptionMult = this.m.FoodConsumptionMult,
+				RosterSizeAdditionalMin = this.m.RosterSizeAdditionalMin,
+				RosterSizeAdditionalMax = this.m.RosterSizeAdditionalMax
 				TaxidermistPriceMult = this.m.TaxidermistPriceMult,
-				TrainingPriceMult = this.m.TrainingPriceMult,
 				TryoutPriceMult = this.m.TryoutPriceMult,
 				RelationDecayGoodMult = this.m.RelationDecayGoodMult,
 				RelationDecayBadMult = this.m.RelationDecayBadMult,
+
+				/*FoodConsumptionMult = this.m.FoodConsumptionMult,
+				
+				TrainingPriceMult = this.m.TrainingPriceMult,
+				
 				AdvancePaymentCap = this.m.AdvancePaymentCap,*/
 			};
 		}
@@ -389,7 +393,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Company XP"
+						text = "XP Gained"
 					},
 					{
 						id = 2,
@@ -557,7 +561,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Renown"
+						text = "Renown Gained"
 					},
 					{
 						id = 2,
@@ -580,17 +584,87 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.recruit":
+			case "customeorigin.recruitmin":
 		       	return [
 					{
 						id = 1,
 						type = "title",
-						text = "Additional Recruit"
+						text = "Minimum Recruit"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Increase the amount of recruit in a town, village, city, ect. The number of this value is equal to number of bonus recruit in towns, villages. The default value is 0 which means no additional recruit to total recruit after the town resets its recruit roster."
+						text = "The minimum amount of bonus recruit in a town, village, city, ect. The number of this value is equal to number of bonus recruit in towns, villages. The default value is 0 which means no additional recruit to total recruit after the town resets its recruit roster."
+					},
+				];
+
+			case "customeorigin.recruitmax":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Maximum Recruit"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "The maximun amount of bonus recruit in a town, village, city, ect. The number of this value is equal to number of bonus recruit in towns, villages. The default value is 0 which means no additional recruit to total recruit after the town resets its recruit roster."
+					},
+				];
+
+			case "customeorigin.craft":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Taxidermist Cost"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Affect how much money you pay Taxidermist to craft an item. The default value is 100 which means 100%. The value is calculated in percentage."
+					},
+				];
+
+			case "customeorigin.tryout":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Tryout Price"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Affect how much money you pay to tryout a recruit. The default value is 100 which means 100%. The value is calculated in percentage."
+					},
+				];
+
+			case "customeorigin.badrelation":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Bad Relation Decay"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Affect how slow or fast a friendly/allied faction return to neutral relation with player. The higher the number the faster the decay speed. The default value is 100 which means 100%. The value is calculated in percentage."
+					},
+				];
+
+			case "customeorigin.goodrelation":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Good Relation Recovery"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Affect how slow or fast a hostile/unfriendly faction return to neutral relation with player. The higher the number the faster the recovery speed. The default value is 100 which means 100%. The value is calculated in percentage."
 					},
 				];
 

@@ -22,28 +22,10 @@ var OriginCustomizerScreen = function(_parent)
 	this.mDialogContainer = null;
 
 	this.mOriginPanel = null;
-	this.mConfigPanel = null;
 	this.mDifficultyPanel = null;
+	this.mFirstConfigPanel = null;
+	this.mSecondConfigPanel = null;
 	this.mChooseOriginPanel = null;
-
-	// controls
-	this.mDifficultyEasyCheckbox = null;
-	this.mDifficultyEasyLabel = null;
-	this.mDifficultyNormalCheckbox = null;
-	this.mDifficultyNormalLabel = null;
-	this.mDifficultyHardCheckbox = null;
-	this.mDifficultyHardLabel = null;
-	this.mDifficultyLegendaryCheckbox = null;
-	this.mDifficultyLegendaryLabel = null;
-
-	this.mEconomicDifficultyEasyCheckbox = null;
-	this.mEconomicDifficultyEasyLabel = null;
-	this.mEconomicDifficultyNormalCheckbox = null;
-	this.mEconomicDifficultyNormalLabel = null;
-	this.mEconomicDifficultyHardCheckbox = null;
-	this.mEconomicDifficultyHardLabel = null;
-	this.mEconomicDifficultyLegendaryCheckbox = null;
-	this.mEconomicDifficultyLegendaryLabel = null;
 
 	this.mChooseOriginButton = null;
 	this.mOriginImage = null;
@@ -74,7 +56,29 @@ var OriginCustomizerScreen = function(_parent)
 	this.mScenarioContainer = null;
 	this.mScenarioScrollContainer = null;
 
-	// Map config
+	// controls
+	this.mLegendAllBlueprintsCheckbox = null;
+	this.mLegendAllBlueprintsCheckboxLabel = null;
+
+	this.mDifficultyEasyCheckbox = null;
+	this.mDifficultyEasyLabel = null;
+	this.mDifficultyNormalCheckbox = null;
+	this.mDifficultyNormalLabel = null;
+	this.mDifficultyHardCheckbox = null;
+	this.mDifficultyHardLabel = null;
+	this.mDifficultyLegendaryCheckbox = null;
+	this.mDifficultyLegendaryLabel = null;
+
+	this.mEconomicDifficultyEasyCheckbox = null;
+	this.mEconomicDifficultyEasyLabel = null;
+	this.mEconomicDifficultyNormalCheckbox = null;
+	this.mEconomicDifficultyNormalLabel = null;
+	this.mEconomicDifficultyHardCheckbox = null;
+	this.mEconomicDifficultyHardLabel = null;
+	this.mEconomicDifficultyLegendaryCheckbox = null;
+	this.mEconomicDifficultyLegendaryLabel = null;
+
+	// origin config
 	this.mOriginOptions = {
 		Tier: {
 			Control: null,
@@ -84,6 +88,15 @@ var OriginCustomizerScreen = function(_parent)
 			Max: 6,
 			Value: 0,
 			Step: 1
+		},
+		Stash: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.stash',
+			Min: 100,
+			Max: 400,
+			Value: 100,
+			Step: 2
 		},
 		XpMult: {
 			Control: null,
@@ -214,17 +227,60 @@ var OriginCustomizerScreen = function(_parent)
 		RosterSizeAdditionalMin: {
 			Control: null,
 			Title: null,
-			OptionsKey: 'origin.recruit',
+			OptionsKey: 'origin.recruitmin',
 			Min: 0,
 			Max: 0,
 			Value: 0,
 			Step: 1
 		},
+		RosterSizeAdditionalMax: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.recruitmax',
+			Min: 0,
+			Max: 0,
+			Value: 0,
+			Step: 1
+		},
+		TaxidermistPriceMult: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.craft',
+			Min: 0,
+			Max: 0,
+			Value: 0,
+			Step: 5
+		},
+		TryoutPriceMult: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.tryout',
+			Min: 0,
+			Max: 0,
+			Value: 0,
+			Step: 5
+		},
+		RelationDecayBadMult: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.goodrelation',
+			Min: 0,
+			Max: 0,
+			Value: 0,
+			Step: 5
+		},
+		RelationDecayGoodMult: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.badrelation',
+			Min: 0,
+			Max: 0,
+			Value: 0,
+			Step: 5
+		},	
 	};
 
 	this.mOriginConfigOpts = {};
-	this.mLegendAllBlueprintsCheckbox = null;
-	this.mLegendAllBlueprintsCheckboxLabel = null;
 
 	// generics
 	this.mIsVisible = false;
@@ -247,21 +303,219 @@ OriginCustomizerScreen.prototype.onDisconnection = function ()
 	this.unregister();
 };
 
+OriginCustomizerScreen.prototype.create = function (_parentDiv) 
+{
+	this.createDIV(_parentDiv);
+	this.bindTooltips();
+};
+
+OriginCustomizerScreen.prototype.destroy = function () 
+{
+	this.unbindTooltips();
+	this.destroyDIV();
+};
+
+
+OriginCustomizerScreen.prototype.register = function (_parentDiv) 
+{
+	console.log('OriginCustomizerScreen::REGISTER');
+
+	if (this.mContainer !== null) 
+	{
+		console.error('ERROR: Failed to register New Campaign Menu Module. Reason: New Campaign Menu Module is already initialized.');
+		return;
+	}
+
+	if (_parentDiv !== null && typeof (_parentDiv) == 'object') 
+	{
+		this.create(_parentDiv);
+	}
+};
+
+OriginCustomizerScreen.prototype.unregister = function () 
+{
+	console.log('OriginCustomizerScreen::UNREGISTER');
+
+	if (this.mContainer === null) 
+	{
+		console.error('ERROR: Failed to unregister New Campaign Menu Module. Reason: New Campaign Menu Module is not initialized.');
+		return;
+	}
+
+	this.destroy();
+};
+
+OriginCustomizerScreen.prototype.isRegistered = function () 
+{
+	if (this.mContainer !== null) 
+	{
+		return this.mContainer.parent().length !== 0;
+	}
+
+	return false;
+};
+
+OriginCustomizerScreen.prototype.show = function ( _data ) 
+{
+	// reset panels
+	this.loadFromData(_data);
+
+	this.mOriginPanel.addClass('display-block').removeClass('display-none');
+	this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
+	this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+	this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
+	this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+	this.mStartButton.changeButtonText("Next");
+	this.mCancelButton.changeButtonText("Previous");
+	this.mDoneButton.removeClass('display-none').addClass('display-block');
+
+	var self = this;
+
+	var offset = -(this.mContainer.parent().width() + this.mContainer.width());
+	this.mContainer.css({
+		'left': offset
+	});
+	this.mContainer.velocity("finish", true).velocity({
+		opacity: 1,
+		left: '0',
+		right: '0'
+	}, {
+		duration: Constants.SCREEN_SLIDE_IN_OUT_DELAY,
+		easing: 'swing',
+		begin: function () {
+			$(this).removeClass('display-none').addClass('display-block');
+			self.notifyBackendOnAnimating();
+		},
+		complete: function () {
+			self.mIsVisible = true;
+			self.notifyBackendOnShown();
+		}
+	});
+};
+
+OriginCustomizerScreen.prototype.hide = function () 
+{
+	var self = this;
+	var offset = -(this.mContainer.parent().width() + this.mContainer.width());
+	this.mContainer.velocity("finish", true).velocity({
+		opacity: 0,
+		left: offset
+	}, {
+		duration: Constants.SCREEN_SLIDE_IN_OUT_DELAY,
+		easing: 'swing',
+		begin: function () {
+			self.notifyBackendOnAnimating();
+		},
+		complete: function () {
+			self.mIsVisible = false;
+			$(this).removeClass('display-block').addClass('display-none');
+			self.notifyBackendOnHidden();
+		}
+	});
+};
+
+OriginCustomizerScreen.prototype.isVisible = function () 
+{
+	return this.mIsVisible;
+};
+
+OriginCustomizerScreen.prototype.destroyDIV = function () {
+	// controls
+	this.mDifficultyEasyCheckbox.remove();
+	this.mDifficultyEasyCheckbox = null;
+	this.mDifficultyEasyLabel.remove();
+	this.mDifficultyEasyLabel = null;
+	this.mDifficultyNormalCheckbox.remove();
+	this.mDifficultyNormalCheckbox = null;
+	this.mDifficultyNormalLabel.remove();
+	this.mDifficultyNormalLabel = null;
+	this.mDifficultyHardCheckbox.remove();
+	this.mDifficultyHardCheckbox = null;
+	this.mDifficultyHardLabel.remove();
+	this.mDifficultyHardLabel = null;
+	this.mDifficultyLegendaryCheckbox.remove();
+	this.mDifficultyLegendaryCheckbox = null;
+	this.mDifficultyLegendaryLabel.remove();
+	this.mDifficultyLegendaryLabel = null;
+	this.mCompanyName.remove();
+	this.mCompanyName = null;
+
+	this.mPrevBannerButton.remove();
+	this.mPrevBannerButton = null;
+	this.mNextBannerButton.remove();
+	this.mNextBannerButton = null;
+	this.mAcceptBannerButton.remove();
+	this.mAcceptBannerButton = null;
+	this.mBannerImage.remove();
+	this.mBannerImage = null;
+
+	this.mOriginImage.remove();
+	this.mOriginImage = null;
+
+	// buttons
+	this.mStartButton.remove();
+	this.mStartButton = null;
+	this.mCancelButton.remove();
+	this.mCancelButton = null;
+	this.mDoneButton.remove();
+	this.mDoneButton = null;
+
+	this.mScenarioScrollContainer.empty();
+	this.mScenarioScrollContainer = null;
+	this.mScenarioContainer.destroyList();
+	this.mScenarioContainer.remove();
+	this.mScenarioContainer = null;
+
+	this.mOriginPanel.empty();
+	this.mOriginPanel.remove();
+	this.mOriginPanel = null;
+
+	this.mDifficultyPanel.empty();
+	this.mDifficultyPanel.remove();
+	this.mDifficultyPanel = null;
+
+	this.mFirstConfigPanel.empty();
+	this.mFirstConfigPanel.remove();
+	this.mFirstConfigPanel = null;
+
+	this.mSecondConfigPanel.empty();
+	this.mSecondConfigPanel.remove();
+	this.mSecondConfigPanel = null;
+
+	this.mChooseOriginPanel.empty();
+	this.mChooseOriginPanel.remove();
+	this.mChooseOriginPanel = null;
+
+	this.mDialogContainer.empty();
+	this.mDialogContainer.remove();
+	this.mDialogContainer = null;
+
+	this.mContainer.empty();
+	this.mContainer.remove();
+	this.mContainer = null;
+};
+
 OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 	var self = this;
 
 	// create: dialog container
 	this.mContainer = $('<div class="origin-customizer-screen display-none"/>');
 	_parentDiv.append(this.mContainer);
-	this.mDialogContainer = this.mContainer.createDialog('Origin Customizer', null, null /*Path.GFX + Asset.HEADER_TACTICAL_COMBAT_DIALOG*/ , false, 'dialog-800-720-2');
+	this.mDialogContainer = this.mContainer.createDialog('Origin Customizer', null, null , false, 'dialog-800-720-2');
 
 	// create: content
 	var contentContainer = this.mDialogContainer.findDialogContentContainer();
 
+	this.mOriginImage = $('<div class="origin-customizer-origin-button"/>');
+	this.mDialogContainer.append(this.mOriginImage);
+	this.mOriginImage.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function () {
+		self.switchToOriginScreen();
+	}, 'display-block', 150);
+
 	this.mOriginPanel = $('<div class="display-block"/>');
 	contentContainer.append(this.mOriginPanel); 
 	{
-		var leftColumn = $('<div class="column"/>');
+		var leftColumn = $('<div class="below-origin-button-column"/>');
 		this.mOriginPanel.append(leftColumn);
 		var rightColumn = $('<div class="column"/>');
 		this.mOriginPanel.append(rightColumn);
@@ -279,24 +533,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		}, 'title-font-big font-bold font-color-brother-name');
 		this.mCompanyName.setInputText('Battle Brothers');
 		this.createSliderControlDIV(this.mOriginOptions.Tier, 'Roster Tier', leftColumn);
-
-		// origin
-		var row = $('<div class="row" />');
-		leftColumn.append(row);
-		var title = $('<div class="title title-font-big font-color-title">Company Origin</div>');
-		row.append(title);
-		var hugeImageButton = $('<div class="origin-button-container"></div>');
-		leftColumn.append(hugeImageButton);
-
-		this.mOriginImage = hugeImageButton.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function () {
-			self.switchToOriginScreen();
-		}, 'l-origin-button', 150);
-
-		/*var layout = $('<div class="choose-origin-button"/>');
-		row.append(layout);
-		this.mChooseOriginButton = layout.createTextButton("Choose", function () {
-			self.switchToOriginScreen();
-		}, '', 1);*/
+		this.createSliderControlDIV(this.mOriginOptions.Stash, 'Stash', leftColumn);
 
 		// banner
 		var row = $('<div class="row" />');
@@ -331,35 +568,6 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 			self.onAcceptBannerClicked();
 		}, '', 6);
 
-		/*var row = $('<div class="row map-seed-control" />');
-		leftColumn.append(row);
-		var title = $('<div class="title title-font-big font-color-title">Company Name</div>');
-		row.append(title);
-
-		var inputLayout = $('<div class="l-input"/>');
-		row.append(inputLayout);
-		this.mCompanyName = inputLayout.createInput('', 0, 32, 1, function (_input) {
-			if (self.mDoneButton !== null) self.mDoneButton.enableButton(_input.getInputTextLength() >= 1);
-		}, 'title-font-big font-bold font-color-brother-name');*/
-	}
-
-	this.mConfigPanel = $('<div class="display-none"/>');
-	contentContainer.append(this.mConfigPanel);
-	this.buildConfigPage();
-
-	this.mDifficultyPanel = $('<div class="display-none"/>');
-	contentContainer.append(this.mDifficultyPanel); {
-		var leftColumn = $('<div class="column"/>');
-		this.mDifficultyPanel.append(leftColumn);
-		var rightColumn = $('<div class="column"/>');
-		this.mDifficultyPanel.append(rightColumn);
-
-		this.createSliderControlDIV(this.mOriginOptions.HitpointsPerHourMult, 'Hitpoints Recovery Speed', leftColumn);
-		this.createSliderControlDIV(this.mOriginOptions.RepairSpeedMult, 'Repair Speed', leftColumn);
-		this.createSliderControlDIV(this.mOriginOptions.BusinessReputationRate, 'Renown Gained', leftColumn);
-		this.createSliderControlDIV(this.mOriginOptions.NegotiationAnnoyanceMult, 'Negotiation Annoyance', leftColumn);
-		this.createSliderControlDIV(this.mOriginOptions.RosterSizeAdditionalMin, 'Additional Recruits', leftColumn);
-
 		//blueprint
 		var row = $('<div class="row"></div>');
 		rightColumn.append(row);
@@ -374,6 +582,14 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 			radioClass: 'iradio_flat-orange',
 			increaseArea: '30%'
 		});
+	}
+
+	this.mDifficultyPanel = $('<div class="display-none"/>');
+	contentContainer.append(this.mDifficultyPanel); {
+		var leftColumn = $('<div class="column"/>');
+		this.mDifficultyPanel.append(leftColumn);
+		var rightColumn = $('<div class="column"/>');
+		this.mDifficultyPanel.append(rightColumn);
 
 		// combat difficulty
 		var row = $('<div class="row" />');
@@ -516,6 +732,14 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		});
 	}
 
+	this.mFirstConfigPanel = $('<div class="display-none"/>');
+	contentContainer.append(this.mFirstConfigPanel);
+	this.buildFirstConfigPage();
+
+	this.mSecondConfigPanel = $('<div class="display-none"/>');
+	contentContainer.append(this.mSecondConfigPanel);
+	this.buildSecondConfigPage();
+
 	this.mChooseOriginPanel = $('<div class="display-none"/>');
 	contentContainer.append(this.mChooseOriginPanel); 
 	{
@@ -523,13 +747,6 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		this.mChooseOriginPanel.append(leftColumn);
 		var rightColumn = $('<div class="column3"/>');
 		this.mChooseOriginPanel.append(rightColumn);
-
-		/* starting scenario
-		var row = $('<div class="row" />');
-		leftColumn.append(row);
-		var title = $('<div class="title title-font-big font-color-title">Choose Origin</div>');
-		row.append(title);
-		this.mScenariosRow = row;*/
 
 		var listContainerLayout = $('<div class="l-list-container"/>');
 		this.mChooseOriginPanel.append(listContainerLayout);
@@ -571,183 +788,42 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 	this.mIsVisible = false;
 };
 
-OriginCustomizerScreen.prototype.destroyDIV = function () {
-	// controls
-	this.mDifficultyEasyCheckbox.remove();
-	this.mDifficultyEasyCheckbox = null;
-	this.mDifficultyEasyLabel.remove();
-	this.mDifficultyEasyLabel = null;
-	this.mDifficultyNormalCheckbox.remove();
-	this.mDifficultyNormalCheckbox = null;
-	this.mDifficultyNormalLabel.remove();
-	this.mDifficultyNormalLabel = null;
-	this.mDifficultyHardCheckbox.remove();
-	this.mDifficultyHardCheckbox = null;
-	this.mDifficultyHardLabel.remove();
-	this.mDifficultyHardLabel = null;
-	this.mDifficultyLegendaryCheckbox.remove();
-	this.mDifficultyLegendaryCheckbox = null;
-	this.mDifficultyLegendaryLabel.remove();
-	this.mDifficultyLegendaryLabel = null;
-	this.mCompanyName.remove();
-	this.mCompanyName = null;
+OriginCustomizerScreen.prototype.buildFirstConfigPage = function () {
+	var leftColumn = $('<div class="column"></div>');
+	this.mFirstConfigPanel.append(leftColumn);
+	var rightColumn = $('<div class="column"></div>');
+	this.mFirstConfigPanel.append(rightColumn);
 
-	this.mPrevBannerButton.remove();
-	this.mPrevBannerButton = null;
-	this.mNextBannerButton.remove();
-	this.mNextBannerButton = null;
-	this.mAcceptBannerButton.remove();
-	this.mAcceptBannerButton = null;
-	this.mBannerImage.remove();
-	this.mBannerImage = null;
+	this.createSliderControlDIV(this.mOriginOptions.HiringMult, 'Hiring Cost', leftColumn);
+	this.createSliderControlDIV(this.mOriginOptions.TryoutPriceMult, 'Tryout Price', leftColumn);
+	this.createSliderControlDIV(this.mOriginOptions.WageMult, 'Daily Wage', leftColumn);
+	this.createSliderControlDIV(this.mOriginOptions.RosterSizeAdditionalMax, 'Maximum Recruits', leftColumn);
+	this.createSliderControlDIV(this.mOriginOptions.RosterSizeAdditionalMin, 'Minimum Recruits', leftColumn);
 
-	this.mOriginImage.remove();
-	this.mOriginImage = null;
-
-	// buttons
-	this.mStartButton.remove();
-	this.mStartButton = null;
-	this.mCancelButton.remove();
-	this.mCancelButton = null;
-	this.mDoneButton.remove();
-	this.mDoneButton = null;
-
-	this.mScenarioScrollContainer.empty();
-	this.mScenarioScrollContainer = null;
-	this.mScenarioContainer.destroyList();
-	this.mScenarioContainer.remove();
-	this.mScenarioContainer = null;
-
-	this.mOriginPanel.empty();
-	this.mOriginPanel.remove();
-	this.mOriginPanel = null;
-
-	this.mConfigPanel.empty();
-	this.mConfigPanel.remove();
-	this.mConfigPanel = null;
-
-	this.mDifficultyPanel.empty();
-	this.mDifficultyPanel.remove();
-	this.mDifficultyPanel = null;
-
-	this.mChooseOriginPanel.empty();
-	this.mChooseOriginPanel.remove();
-	this.mChooseOriginPanel = null;
-
-	this.mDialogContainer.empty();
-	this.mDialogContainer.remove();
-	this.mDialogContainer = null;
-
-	this.mContainer.empty();
-	this.mContainer.remove();
-	this.mContainer = null;
+	this.createSliderControlDIV(this.mOriginOptions.SellingMult, 'Selling Price', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.BuyingMult, 'Buying Price', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.TaxidermistPriceMult, 'Taxidermist Cost', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.ContractPayment, 'Contract Payment', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.NegotiationAnnoyanceMult, 'Negotiation Annoyance', rightColumn);
 };
 
-OriginCustomizerScreen.prototype.returnScreen = function () {
-	if (this.mChooseOriginPanel.hasClass('display-block')) {
-		this.cancelChooseOrigin();
-		this.mOriginPanel.removeClass('display-none').addClass('display-block');
-
-		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
-		this.mConfigPanel.removeClass('display-block').addClass('display-none');
-		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
-
-		this.mDoneButton.removeClass('display-none').addClass('display-block');
-		this.mStartButton.changeButtonText("Next");
-		this.mCancelButton.changeButtonText("Previous");
-
-	} else if (this.mOriginPanel.hasClass('display-block')) {
-
-		this.mDifficultyPanel.removeClass('display-none').addClass('display-block');
-
-		this.mOriginPanel.removeClass('display-block').addClass('display-none');
-		this.mConfigPanel.removeClass('display-block').addClass('display-none');
-		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
-
-	} else if (this.mConfigPanel.hasClass('display-block')) {
-
-		this.mOriginPanel.removeClass('display-none').addClass('display-block');
-
-		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
-		this.mConfigPanel.removeClass('display-block').addClass('display-none');
-		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
-
-	} else {
-
-		this.mConfigPanel.removeClass('display-none').addClass('display-block');
-
-		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
-		this.mOriginPanel.removeClass('display-block').addClass('display-none');
-		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
-	}
-}
-
-OriginCustomizerScreen.prototype.advanceScreen = function () {
-	if (this.mChooseOriginPanel.hasClass('display-block')) {
-		this.chooseOrigin();
-		this.mOriginPanel.removeClass('display-none').addClass('display-block');
-
-		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
-		this.mConfigPanel.removeClass('display-block').addClass('display-none');
-		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
-
-		this.mDoneButton.removeClass('display-none').addClass('display-block');
-		this.mStartButton.changeButtonText("Next");
-		this.mCancelButton.changeButtonText("Previous");
-
-	} else if (this.mOriginPanel.hasClass('display-block')) {
-
-		this.mConfigPanel.removeClass('display-none').addClass('display-block');
-
-		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
-		this.mOriginPanel.removeClass('display-block').addClass('display-none');
-		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
-
-	} else if (this.mConfigPanel.hasClass('display-block')) {
-
-		this.mDifficultyPanel.removeClass('display-none').addClass('display-block');
-
-		this.mOriginPanel.removeClass('display-block').addClass('display-none');
-		this.mConfigPanel.removeClass('display-block').addClass('display-none');
-		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
-
-	} else {
-
-		this.mOriginPanel.removeClass('display-none').addClass('display-block');
-
-		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
-		this.mConfigPanel.removeClass('display-block').addClass('display-none');
-		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
-	}
-}
-
-OriginCustomizerScreen.prototype.switchToOriginScreen = function () {
-	this.mChooseOriginPanel.removeClass('display-none').addClass('display-block');
-	this.mOriginPanel.removeClass('display-block').addClass('display-none');
-	this.mConfigPanel.removeClass('display-block').addClass('display-none');
-	this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
-
-	this.mDoneButton.removeClass('display-block').addClass('display-none');
-	this.mStartButton.changeButtonText("Accept");
-	this.mCancelButton.changeButtonText("Cancel");
-}
-
-OriginCustomizerScreen.prototype.buildConfigPage = function () {
+OriginCustomizerScreen.prototype.buildSecondConfigPage = function () {
 	var leftColumn = $('<div class="column"></div>');
-	this.mConfigPanel.append(leftColumn);
+	this.mSecondConfigPanel.append(leftColumn);
 	var rightColumn = $('<div class="column"></div>');
-	this.mConfigPanel.append(rightColumn);
+	this.mSecondConfigPanel.append(rightColumn);
 
 	this.createSliderControlDIV(this.mOriginOptions.XpMult, 'XP Gained', leftColumn);
-	this.createSliderControlDIV(this.mOriginOptions.HiringMult, 'Hiring Cost', leftColumn);
-	this.createSliderControlDIV(this.mOriginOptions.WageMult, 'Daily Wage', leftColumn);
-	this.createSliderControlDIV(this.mOriginOptions.SellingMult, 'Selling Price', leftColumn);
-	this.createSliderControlDIV(this.mOriginOptions.BuyingMult, 'Buying Price', leftColumn);
-	this.createSliderControlDIV(this.mOriginOptions.BonusLoot, 'Chance For Bonus Loot', rightColumn);
-	this.createSliderControlDIV(this.mOriginOptions.BonusChampion, 'Bonus Champion Chance', rightColumn);
-	this.createSliderControlDIV(this.mOriginOptions.BonusSpeed, 'Movement Speed', rightColumn);
-	this.createSliderControlDIV(this.mOriginOptions.ContractPayment, 'Contract Payment', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.BusinessReputationRate, 'Renown Gained', leftColumn);
+	this.createSliderControlDIV(this.mOriginOptions.BonusSpeed, 'Movement Speed', leftColumn);
+	this.createSliderControlDIV(this.mOriginOptions.BonusLoot, 'Chance For Bonus Loot', leftColumn);
+	this.createSliderControlDIV(this.mOriginOptions.BonusChampion, 'Bonus Champion Chance', leftColumn);
+	
 	this.createSliderControlDIV(this.mOriginOptions.VisionRadius, 'Vision Radius', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.HitpointsPerHourMult, 'Hitpoints Recovery Speed', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.RepairSpeedMult, 'Repair Speed', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.RelationDecayGoodMult, 'Good Relation Recovery', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.RelationDecayBadMult, 'Bad Relation Decay', rightColumn);
 };
 
 OriginCustomizerScreen.prototype.createSliderControlDIV = function (_definition, _label, _parentDiv) {
@@ -774,6 +850,132 @@ OriginCustomizerScreen.prototype.createSliderControlDIV = function (_definition,
 		_definition.Label.text('' + _definition.Value);
 	});
 };
+
+OriginCustomizerScreen.prototype.returnScreen = function () {
+	if (this.mChooseOriginPanel.hasClass('display-block')) {
+		this.cancelChooseOrigin();
+		this.mOriginPanel.removeClass('display-none').addClass('display-block');
+
+		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
+
+		this.mDoneButton.removeClass('display-none').addClass('display-block');
+		this.mStartButton.changeButtonText("Next");
+		this.mCancelButton.changeButtonText("Previous");
+		this.mOriginImage.removeClass('display-none').addClass('display-block');
+
+	} else if (this.mOriginPanel.hasClass('display-block')) {
+
+		this.mSecondConfigPanel.removeClass('display-none').addClass('display-block');
+		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginPanel.removeClass('display-block').addClass('display-none');
+
+		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginImage.removeClass('display-block').addClass('display-none');
+
+	} else if (this.mDifficultyPanel.hasClass('display-block')) {
+
+		this.mOriginPanel.removeClass('display-none').addClass('display-block');
+		this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
+		
+		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginImage.removeClass('display-none').addClass('display-block');
+
+	} else if (this.mFirstConfigPanel.hasClass('display-block')) {
+
+		this.mDifficultyPanel.removeClass('display-none').addClass('display-block');
+		this.mOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+		
+		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginImage.removeClass('display-block').addClass('display-none');
+
+	} else {
+
+		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mSecondConfigPanel.removeClass('display-none').addClass('display-block');
+
+		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginImage.removeClass('display-block').addClass('display-none');
+	}
+}
+
+OriginCustomizerScreen.prototype.advanceScreen = function () {
+	if (this.mChooseOriginPanel.hasClass('display-block')) {
+		this.chooseOrigin();
+		this.mOriginPanel.removeClass('display-none').addClass('display-block');
+
+		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
+		this.mDoneButton.removeClass('display-none').addClass('display-block');
+		this.mStartButton.changeButtonText("Next");
+		this.mCancelButton.changeButtonText("Previous");
+		this.mOriginImage.removeClass('display-none').addClass('display-block');
+
+	} else if (this.mOriginPanel.hasClass('display-block')) {
+
+		this.mDifficultyPanel.removeClass('display-none').addClass('display-block');
+		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginPanel.removeClass('display-block').addClass('display-none');
+
+		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginImage.removeClass('display-block').addClass('display-none');
+
+	} else if (this.mDifficultyPanel.hasClass('display-block')) {
+
+		this.mFirstConfigPanel.removeClass('display-none').addClass('display-block');
+		this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
+		
+		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginImage.removeClass('display-block').addClass('display-none');
+
+	} else if (this.mFirstConfigPanel.hasClass('display-block')) {
+
+		this.mSecondConfigPanel.removeClass('display-none').addClass('display-block');
+		this.mOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
+		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+		
+		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginImage.removeClass('display-block').addClass('display-none');
+
+	} else {
+
+		this.mOriginPanel.removeClass('display-none').addClass('display-block');
+		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
+		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+		this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
+
+		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
+		this.mOriginImage.removeClass('display-none').addClass('display-block');
+	}
+}
+
+OriginCustomizerScreen.prototype.switchToOriginScreen = function () {
+	this.mChooseOriginPanel.removeClass('display-none').addClass('display-block');
+	this.mOriginPanel.removeClass('display-block').addClass('display-none');
+	this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
+	this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
+	this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
+
+	this.mOriginImage.removeClass('display-block').addClass('display-none');
+	this.mDoneButton.removeClass('display-block').addClass('display-none');
+	this.mStartButton.changeButtonText("Accept");
+	this.mCancelButton.changeButtonText("Cancel");
+}
 
 OriginCustomizerScreen.prototype.bindTooltips = function () {
 	this.mCompanyName.bindTooltip({
@@ -869,6 +1071,15 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 	this.mOriginOptions.Tier.Title.bindTooltip({
 		contentType: 'ui-element',
 		elementId: 'customeorigin.tier'
+	});
+
+	this.mOriginOptions.Stash.Control.bindTooltip({ 
+		contentType: 'ui-element', 
+		elementId: TooltipIdentifier.Stash.FreeSlots 
+	});
+	this.mOriginOptions.Stash.Title.bindTooltip({ 
+		contentType: 'ui-element', 
+		elementId: TooltipIdentifier.Stash.FreeSlots 
 	});
 
 	this.mOriginOptions.XpMult.Control.bindTooltip({
@@ -1000,11 +1211,56 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 
 	this.mOriginOptions.RosterSizeAdditionalMin.Control.bindTooltip({
 		contentType: 'ui-element',
-		elementId: 'customeorigin.recruit'
+		elementId: 'customeorigin.recruitmin'
 	});
 	this.mOriginOptions.RosterSizeAdditionalMin.Title.bindTooltip({
 		contentType: 'ui-element',
-		elementId: 'customeorigin.recruit'
+		elementId: 'customeorigin.recruitmin'
+	});
+
+	this.mOriginOptions.RosterSizeAdditionalMax.Control.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.recruitmax'
+	});
+	this.mOriginOptions.RosterSizeAdditionalMax.Title.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.recruitmax'
+	});
+
+	this.mOriginOptions.TaxidermistPriceMult.Control.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.craft'
+	});
+	this.mOriginOptions.TaxidermistPriceMult.Title.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.craft'
+	});
+
+	this.mOriginOptions.TryoutPriceMult.Control.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.tryout'
+	});
+	this.mOriginOptions.TryoutPriceMult.Title.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.tryout'
+	});
+
+	this.mOriginOptions.RelationDecayBadMult.Control.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.badrelation'
+	});
+	this.mOriginOptions.RelationDecayBadMult.Title.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.badrelation'
+	});
+
+	this.mOriginOptions.RelationDecayGoodMult.Control.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.goodrelation'
+	});
+	this.mOriginOptions.RelationDecayGoodMult.Title.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.goodrelation'
 	});
 
 	this.mAcceptBannerButton.bindTooltip({
@@ -1096,126 +1352,37 @@ OriginCustomizerScreen.prototype.unbindTooltips = function () {
 	this.mOriginOptions.RosterSizeAdditionalMin.Control.unbindTooltip();
 	this.mOriginOptions.RosterSizeAdditionalMin.Title.unbindTooltip();
 
+	this.mOriginOptions.RosterSizeAdditionalMax.Control.unbindTooltip();
+	this.mOriginOptions.RosterSizeAdditionalMax.Title.unbindTooltip();
+
+	this.mOriginOptions.TaxidermistPriceMult.Control.unbindTooltip();
+	this.mOriginOptions.TaxidermistPriceMult.Title.unbindTooltip();
+
+	this.mOriginOptions.TryoutPriceMult.Control.unbindTooltip();
+	this.mOriginOptions.TryoutPriceMult.Title.unbindTooltip();
+
+	this.mOriginOptions.RelationDecayBadMult.Control.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.badrelation'
+	});
+	this.mOriginOptions.RelationDecayBadMult.Title.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.badrelation'
+	});
+
+	this.mOriginOptions.RelationDecayGoodMult.Control.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.goodrelation'
+	});
+	this.mOriginOptions.RelationDecayGoodMult.Title.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.goodrelation'
+	});
+
 	this.mAcceptBannerButton.unbindTooltip();
 	this.mOriginImage.unbindTooltip();
 };
 
-
-OriginCustomizerScreen.prototype.create = function (_parentDiv) 
-{
-	this.createDIV(_parentDiv);
-	this.bindTooltips();
-};
-
-OriginCustomizerScreen.prototype.destroy = function () 
-{
-	this.unbindTooltips();
-	this.destroyDIV();
-};
-
-
-OriginCustomizerScreen.prototype.register = function (_parentDiv) 
-{
-	console.log('OriginCustomizerScreen::REGISTER');
-
-	if (this.mContainer !== null) 
-	{
-		console.error('ERROR: Failed to register New Campaign Menu Module. Reason: New Campaign Menu Module is already initialized.');
-		return;
-	}
-
-	if (_parentDiv !== null && typeof (_parentDiv) == 'object') 
-	{
-		this.create(_parentDiv);
-	}
-};
-
-OriginCustomizerScreen.prototype.unregister = function () 
-{
-	console.log('OriginCustomizerScreen::UNREGISTER');
-
-	if (this.mContainer === null) 
-	{
-		console.error('ERROR: Failed to unregister New Campaign Menu Module. Reason: New Campaign Menu Module is not initialized.');
-		return;
-	}
-
-	this.destroy();
-};
-
-OriginCustomizerScreen.prototype.isRegistered = function () 
-{
-	if (this.mContainer !== null) 
-	{
-		return this.mContainer.parent().length !== 0;
-	}
-
-	return false;
-};
-
-
-OriginCustomizerScreen.prototype.show = function ( _data ) 
-{
-	// reset panels
-	this.loadFromData(_data);
-
-	this.mOriginPanel.addClass('display-block').removeClass('display-none');
-	this.mConfigPanel.removeClass('display-block').addClass('display-none');
-	this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
-	this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
-	this.mStartButton.changeButtonText("Next");
-	this.mCancelButton.changeButtonText("Previous");
-	this.mDoneButton.removeClass('display-none').addClass('display-block');
-
-	var self = this;
-
-	var offset = -(this.mContainer.parent().width() + this.mContainer.width());
-	this.mContainer.css({
-		'left': offset
-	});
-	this.mContainer.velocity("finish", true).velocity({
-		opacity: 1,
-		left: '0',
-		right: '0'
-	}, {
-		duration: Constants.SCREEN_SLIDE_IN_OUT_DELAY,
-		easing: 'swing',
-		begin: function () {
-			$(this).removeClass('display-none').addClass('display-block');
-			self.notifyBackendOnAnimating();
-		},
-		complete: function () {
-			self.mIsVisible = true;
-			self.notifyBackendOnShown();
-		}
-	});
-};
-
-OriginCustomizerScreen.prototype.hide = function () 
-{
-	var self = this;
-	var offset = -(this.mContainer.parent().width() + this.mContainer.width());
-	this.mContainer.velocity("finish", true).velocity({
-		opacity: 0,
-		left: offset
-	}, {
-		duration: Constants.SCREEN_SLIDE_IN_OUT_DELAY,
-		easing: 'swing',
-		begin: function () {
-			self.notifyBackendOnAnimating();
-		},
-		complete: function () {
-			self.mIsVisible = false;
-			$(this).removeClass('display-block').addClass('display-none');
-			self.notifyBackendOnHidden();
-		}
-	});
-};
-
-OriginCustomizerScreen.prototype.isVisible = function () 
-{
-	return this.mIsVisible;
-};
 
 
 OriginCustomizerScreen.prototype.onPreviousBannerClicked = function () 
@@ -1226,7 +1393,7 @@ OriginCustomizerScreen.prototype.onPreviousBannerClicked = function ()
 		this.mCurrentBannerIndex = this.mBanners.length - 1;
 
 	this.onUpdateBannerButton();
-}
+};
 
 
 OriginCustomizerScreen.prototype.onNextBannerClicked = function () 
@@ -1258,7 +1425,7 @@ OriginCustomizerScreen.prototype.onUpdateBannerButton = function ()
     }
 
     this.mBannerImage.attr('src', Path.GFX + 'ui/banners/' + this.mBanners[this.mCurrentBannerIndex] + '.png');
-}
+};
 
 OriginCustomizerScreen.prototype.setBanners = function (_data, _currentBanner) 
 {
@@ -1279,7 +1446,9 @@ OriginCustomizerScreen.prototype.setBanners = function (_data, _currentBanner)
 	{
 		console.error('ERROR: No banners specified for OriginCustomizerScreen::setBanners');
 	}
-}
+};
+
+
 
 OriginCustomizerScreen.prototype.setStartingScenarios = function (_data, _currentScenario, _image ) 
 {
@@ -1293,7 +1462,7 @@ OriginCustomizerScreen.prototype.setStartingScenarios = function (_data, _curren
 		}
 		this.updateScenarioImage(this.mScenarios[this.mScenarioCurentIndex].Image);
 	}
-}
+};
 
 OriginCustomizerScreen.prototype.addStartingScenario = function (_data, _isChosen)
 {
@@ -1311,7 +1480,7 @@ OriginCustomizerScreen.prototype.addStartingScenario = function (_data, _isChose
 		entry.addClass('is-selected');
 		this.updateStartingScenarioDescription(_data);
 	}
-}
+};
 
 OriginCustomizerScreen.prototype.updateScenarioImage = function (_image) 
 {
@@ -1376,7 +1545,7 @@ OriginCustomizerScreen.prototype.cancelChooseOrigin = function ()
 {
 	var Scenario = this.mScenarios[this.mScenarioCurentIndex];
 	this.updateScenarioImage(Scenario.Image);
-}
+};
 
 OriginCustomizerScreen.prototype.chooseOrigin = function ()
 {
@@ -1405,16 +1574,19 @@ OriginCustomizerScreen.prototype.chooseOrigin = function ()
 		this.mScenarioCurentIndex = 0;
 	}
 
+	var self = this;
 	var ScenarioData = this.mScenarios[this.mScenarioCurentIndex];
 	this.notifyBackendOnChoosingOrigin(ScenarioData.ID, function(_result) {
 		if (_result === null) {
 			self.updateScenarioImage(ScenarioData.Image);
 		}
 		else {
-			self.mScenarioCurentIndex = result;
+			self.mScenarioCurentIndex = _result;
 		}
 	});
-}
+};
+
+
 
 OriginCustomizerScreen.prototype.loadFromData = function (_data) 
 {
@@ -1439,11 +1611,12 @@ OriginCustomizerScreen.prototype.loadFromData = function (_data)
     }
 
     this.setConfigOpts(_data);
-}
+};
 
 OriginCustomizerScreen.prototype.updateOriginConfig = function () {
 	var controls = [
 		this.mOriginOptions.Tier,
+		this.mOriginOptions.Stash,
 		this.mOriginOptions.XpMult,
 		this.mOriginOptions.HiringMult,
 		this.mOriginOptions.WageMult,
@@ -1459,6 +1632,11 @@ OriginCustomizerScreen.prototype.updateOriginConfig = function () {
 		this.mOriginOptions.BusinessReputationRate,
 		this.mOriginOptions.NegotiationAnnoyanceMult,
 		this.mOriginOptions.RosterSizeAdditionalMin,
+		this.mOriginOptions.RosterSizeAdditionalMax
+		this.mOriginOptions.TaxidermistPriceMult
+		this.mOriginOptions.TryoutPriceMult
+		this.mOriginOptions.RelationDecayGoodMult
+		this.mOriginOptions.RelationDecayBadMult
 	]
 	controls.forEach(function (_definition) {
 		_definition.Control.attr('min', _definition.Min);
@@ -1467,7 +1645,7 @@ OriginCustomizerScreen.prototype.updateOriginConfig = function () {
 		_definition.Control.val(_definition.Value);
 		_definition.Label.text('' + _definition.Value);
 	});
-}
+};
 
 OriginCustomizerScreen.prototype.setConfigOpts = function (_data) {
 	if (_data !== null) {
@@ -1508,6 +1686,11 @@ OriginCustomizerScreen.prototype.setConfigOpts = function (_data) {
 			this.mOriginOptions.Tier.Value = _data['Tier'];
 			this.mOriginOptions.Tier.Min = _data['TierMin'];
 			this.mOriginOptions.Tier.Max = _data['TierMax'];
+		}
+		if ('Stash' in _data) {
+			this.mOriginOptions.Stash.Value = _data['Stash'];
+			this.mOriginOptions.Stash.Min = _data['StashMin'];
+			this.mOriginOptions.Stash.Max = _data['StashMax'];
 		}
 		if ('XpMult' in _data) {
 			this.mOriginOptions.XpMult.Value = _data['XpMult'];
@@ -1585,12 +1768,37 @@ OriginCustomizerScreen.prototype.setConfigOpts = function (_data) {
 			this.mOriginOptions.RosterSizeAdditionalMin.Min = _data['RosterSizeAdditionalMinMin'];
 			this.mOriginOptions.RosterSizeAdditionalMin.Max = _data['RosterSizeAdditionalMinMax'];
 		}
+		if ('RosterSizeAdditionalMax' in _data) {
+			this.mOriginOptions.RosterSizeAdditionalMax.Value = _data['RosterSizeAdditionalMax'];
+			this.mOriginOptions.RosterSizeAdditionalMax.Min = _data['RosterSizeAdditionalMaxMin'];
+			this.mOriginOptions.RosterSizeAdditionalMax.Max = _data['RosterSizeAdditionalMaxMax'];
+		}
+		if ('TaxidermistPriceMult' in _data) {
+			this.mOriginOptions.TaxidermistPriceMult.Value = _data['TaxidermistPriceMult'];
+			this.mOriginOptions.TaxidermistPriceMult.Min = _data['TaxidermistPriceMultMin'];
+			this.mOriginOptions.TaxidermistPriceMult.Max = _data['TaxidermistPriceMultMax'];
+		}
+		if ('TryoutPriceMult' in _data) {
+			this.mOriginOptions.TryoutPriceMult.Value = _data['TryoutPriceMult'];
+			this.mOriginOptions.TryoutPriceMult.Min = _data['TryoutPriceMultMin'];
+			this.mOriginOptions.TryoutPriceMult.Max = _data['TryoutPriceMultMax'];
+		}
+		if ('RelationDecayGoodMult' in _data) {
+			this.mOriginOptions.RelationDecayGoodMult.Value = _data['RelationDecayGoodMult'];
+			this.mOriginOptions.RelationDecayGoodMult.Min = _data['RelationDecayGoodMultMin'];
+			this.mOriginOptions.RelationDecayGoodMult.Max = _data['RelationDecayGoodMultMax'];
+		}
+		if ('RelationDecayBadMult' in _data) {
+			this.mOriginOptions.RelationDecayBadMult.Value = _data['RelationDecayBadMult'];
+			this.mOriginOptions.RelationDecayBadMult.Min = _data['RelationDecayBadMultMin'];
+			this.mOriginOptions.RelationDecayBadMult.Max = _data['RelationDecayBadMultMax'];
+		}
+
 	} else {
 		console.error('ERROR: No opts specified for OriginCustomizerScreen::setConfigOpts');
 	}
 	this.updateOriginConfig();
-}
-
+};
 
 OriginCustomizerScreen.prototype.collectSettings = function () {
 	var settings = [];
@@ -1603,6 +1811,7 @@ OriginCustomizerScreen.prototype.collectSettings = function () {
 	settings.push(this.mEconomicDifficulty);
 	settings.push(this.mLegendAllBlueprintsCheckbox.is(":checked"));
 	settings.push(this.mOriginOptions.Tier.Value);
+	settings.push(this.mOriginOptions.Stash.Value);
 	settings.push(this.mOriginOptions.XpMult.Value);
 	settings.push(this.mOriginOptions.HiringMult.Value);
 	settings.push(this.mOriginOptions.WageMult.Value);
@@ -1618,8 +1827,13 @@ OriginCustomizerScreen.prototype.collectSettings = function () {
 	settings.push(this.mOriginOptions.BusinessReputationRate.Value);
 	settings.push(this.mOriginOptions.NegotiationAnnoyanceMult.Value);
 	settings.push(this.mOriginOptions.RosterSizeAdditionalMin.Value);
+	settings.push(this.mOriginOptions.RosterSizeAdditionalMax.Value);
+	settings.push(this.mOriginOptions.TaxidermistPriceMult.Value);
+	settings.push(this.mOriginOptions.TryoutPriceMult.Value);
+	settings.push(this.mOriginOptions.RelationDecayGoodMult.Value);
+	settings.push(this.mOriginOptions.RelationDecayBadMult.Value);
 	return settings;
-}
+};
 
 OriginCustomizerScreen.prototype.notifyBackendOnConnected = function ()
 {
@@ -1665,11 +1879,11 @@ OriginCustomizerScreen.prototype.notifyBackendOnChangingBanner = function(_input
 	if (this.mSQHandle !== null) {
 		SQ.call(this.mSQHandle, 'onChangeBanner', _inputBanner);
 	}
-}
+};
 
 OriginCustomizerScreen.prototype.notifyBackendOnChoosingOrigin = function (_inputID, _callback) {
 	if (this.mSQHandle !== null) {
-		SQ.call(this.mSQHandle, 'onChooseOrigin', _inputID, _callback);
+		SQ.call(this.mSQHandle, 'onChangeScenario', _inputID, _callback);
 	}
 };
 
