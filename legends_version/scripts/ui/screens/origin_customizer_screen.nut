@@ -243,7 +243,6 @@ this.origin_customizer_screen <- {
 	{
 		local data = {};
 		local keys = [
-			"Name",
 			"Difficulty",
 			"EconomicDifficulty",
 			"IsIronman",
@@ -291,7 +290,6 @@ this.origin_customizer_screen <- {
 
 	function applyChanges( _settings )
 	{
-		this.World.Assets.m.Name = this.removeFromBeginningOfText("The ", this.removeFromBeginningOfText("the ", _settings.Name));
 		this.World.Assets.m.CombatDifficulty = _settings.Difficulty;
 		this.World.Assets.m.EconomicDifficulty = _settings.EconomicDifficulty;
 		this.World.Assets.IsIronman = _settings.IsIronman;
@@ -332,6 +330,11 @@ this.origin_customizer_screen <- {
 		this.World.Flags.set("RelationDecayBadMult", _settings.RelationDecayBadMult * 0.01);
 		this.World.Retinue.update();
 		this.World.State.getPlayer().updateStrength();
+	}
+
+	function onChangeName( _name )
+	{
+		this.World.Assets.m.Name = this.removeFromBeginningOfText("The ", this.removeFromBeginningOfText("the ", _name));
 	}
 
 	function onChangeScenario( _inputScenarioID )

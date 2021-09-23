@@ -566,10 +566,17 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 
 		var inputLayout = $('<div class="l-input"/>');
 		row.append(inputLayout);
-		this.mCompanyName = inputLayout.createInput('Battle Brothers', 0, 32, 1, function (_input) {
-			if (self.mDoneButton !== null) self.mDoneButton.enableButton(_input.getInputTextLength() >= 1);
+		this.mCompanyName = inputLayout.createInput('', 0, 32, 1, function (_input) {
+			var valid = _input.getInputTextLength() >= 1;
+			if (valid) {
+				self.notifyBackendOnChangingnName(_input.getInputText());
+			}
+			if (self.mDoneButton !== null) {
+				self.mDoneButton.enableButton(valid);
+			}
 		}, 'title-font-big font-bold font-color-brother-name');
-		this.mCompanyName.setInputText('Battle Brothers');
+		
+
 		this.createSliderControlDIV(this.mOriginOptions.Tier, 'Roster Tier', leftColumn);
 		this.createSliderControlDIV(this.mOriginOptions.Stash, 'Stash', leftColumn);
 
@@ -1970,7 +1977,7 @@ OriginCustomizerScreen.prototype.collectSettings = function () {
 	var settings = [];
 
 	// company name
-	settings.push(this.mCompanyName.getInputText());
+	//settings.push(this.mCompanyName.getInputText());
 
 	// difficulty
 	settings.push(this.mDifficulty);
@@ -2043,6 +2050,12 @@ OriginCustomizerScreen.prototype.notifyBackendOnAnimating = function ()
     {
         SQ.call(this.mSQHandle, 'onScreenAnimating');
     }
+};
+
+OriginCustomizerScreen.prototype.notifyBackendOnChangingnName = function(_inputName) {
+	if (this.mSQHandle !== null) {
+		SQ.call(this.mSQHandle, 'onChangeName', _inputName);
+	}
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnChangingBanner = function(_inputBanner) {
