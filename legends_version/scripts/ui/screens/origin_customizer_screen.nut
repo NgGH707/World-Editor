@@ -111,6 +111,7 @@ this.origin_customizer_screen <- {
 			ItemScaling = this.LegendsMod.Configs().LegendItemScalingEnabled(),
 			LocationScaling = this.LegendsMod.Configs().LegendLocationScalingEnabled(),
 			AllBlueprint = this.LegendsMod.Configs().LegendAllBlueprintsEnabled(),
+			PartyStrength = this.Math.ceil(this.World.State.getPlayer().getStrength()),
 
 			Tier = this.World.Assets.getOrigin().getRosterTier(),
 			TierMin = 0,
@@ -259,6 +260,18 @@ this.origin_customizer_screen <- {
 		_result.OriginIndex <- index;
 		_result.OriginImage <- UI[index].Image;
 		_result.StartingScenario <- UI;
+	}
+
+	function onCalculatingPartyStrength( _settings )
+	{
+		this.World.Assets.m.CombatDifficulty = _settings[0];
+		this.LegendsMod.Configs().m.IsItemScaling = _settings[1];
+		this.LegendsMod.Configs().m.IsLocationScaling = _settings[2];
+		this.World.Flags.set("PartyStrengthMult", _settings[3] * 0.01);
+		this.World.Flags.set("BrothersScaleMax", _settings[4]);
+		this.World.Retinue.update();
+		local result = this.Math.ceil(this.World.State.getPlayer().getStrength());
+		this.m.JSHandle.asyncCall("updateWithCalculationResult", result);
 	}
 
 	function onCloseButtonPressed( _settings )

@@ -29,9 +29,52 @@
     
     position: absolute;
     left: 1.0rem;
-    bottom: 52.5rem;/*59.5*/
+    bottom: 52.5rem;
     z-index: 10;
 }
+/*******************/
+
+
+/*Party Strength Calculator*/
+.strength-calculator-container
+{   
+    top: 4.7rem;
+    left: 0;
+    right: 0;
+    height: 6.6rem;
+    position: absolute;
+    margin: auto;
+}
+
+.strength-calculator-container > .strength-row
+{
+    width: 50%;
+    height: 50%;
+    position: relative;
+}
+
+.strength-calculator-container > .strength-row .calculate-button
+{
+    top: 0px;
+    left: 5px;
+    bottom: 0;
+    width: 17.5rem;
+    z-index: 99;
+    position: absolute;
+}
+
+.strength-calculator-container > .strength-row .result-text
+{
+    top: 0px;
+    left: 5px;
+    bottom: 0;
+    width: 17.5rem;
+    z-index: 99;
+    position: absolute;
+    text-align: center;
+}
+
+/*******************/
 
 .origin-customizer-screen.is-center
 {

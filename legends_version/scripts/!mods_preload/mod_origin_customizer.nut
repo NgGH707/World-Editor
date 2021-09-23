@@ -188,10 +188,10 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 	::mods_hookExactClass("entity/world/player_party", function( obj )
 	{
-		local updateStrength = ::mods_getMember(obj, "getStrength");
+		local wc_getStrength = ::mods_getMember(obj, "getStrength");
 		obj.getStrength = function()
 		{
-			this.m.Strength = updateStrength();
+			this.m.Strength = wc_getStrength();
 
 			if (this.World.Flags.has("PartyStrengthMult"))
 			{
@@ -738,7 +738,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "This value determine how many brothers are used to calculate party strength, from party strength the game will use it as standard to spawn enemy. If you have 25 brothers in roster while this value is 12, that means at most only 12 highest level brothers are used to calculate party strength."
+						text = "This value determine how many brothers are taken in calculating party strength, from party strength the game will use it as standard to spawn enemy. If you have 25 brothers in roster while this value is 12, that means at most only 12 highest level brothers are taken in calculating party strength."
 					},
 				];
 
@@ -801,6 +801,82 @@ this.getroottable().OriginCustomizerVersion <- version;
 						type = "text",
 						icon = "ui/tooltips/warning.png",
 						text = "Do not change to an origin requires a [color=" + this.Const.UI.Color.NegativeValue + "]Player Character[/color] while your current roster does not have a 'Player Character' brother."
+					},
+				];
+
+			case "customeorigin.calculate":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Calculate Party Strength"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Calculating your current party strength based on below settings then displays it on the box above. It also applies below settings without the need to press 'Done' button. Below is the list of what setting affects party strength."
+					},
+					{
+						id = 7,
+						type = "text",
+						icon = "ui/icons/plus.png",
+						text = "Combat Difficulty"
+					},
+					{
+						id = 7,
+						type = "text",
+						icon = "ui/icons/plus.png",
+						text = "Difficulty Scaling"
+					},
+					{
+						id = 7,
+						type = "text",
+						icon = "ui/icons/plus.png",
+						text = "Maximum Brothers Scaling"
+					},
+					{
+						id = 7,
+						type = "text",
+						icon = "ui/icons/plus.png",
+						text = "Equipment Scaling"
+					},
+					{
+						id = 7,
+						type = "text",
+						icon = "ui/icons/plus.png",
+						text = "Distance Scaling"
+					},
+				];
+
+			case "customeorigin.partystrength":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Party Strength"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "This is the value that determine the difficulty. Combat Difficulty determines the equation to calculate party strength while Difficulty Scaling affect the final result of said equation. The higher you party strength the more enemies you can found."
+					},
+					{
+						id = 7,
+						type = "text",
+						icon = "ui/icons/special.png",
+						text = "Affect the number of roaming party troops"
+					},
+					{
+						id = 7,
+						type = "text",
+						icon = "ui/icons/special.png",
+						text = "Affect the number of defenders in a camp"
+					},
+					{
+						id = 7,
+						type = "text",
+						icon = "ui/icons/special.png",
+						text = "Affect possibility to spawn strong enemy"
 					},
 				];
 			}

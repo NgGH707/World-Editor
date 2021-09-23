@@ -339,6 +339,13 @@ var OriginCustomizerScreen = function(_parent)
 
 	this.mOriginConfigOpts = {};
 
+	// party strength calculator
+	this.mCalculator = {
+		Container: null,
+		Button: null,
+		ResultText: null,
+	};
+
 	// generics
 	this.mIsVisible = false;
 };
@@ -427,9 +434,9 @@ OriginCustomizerScreen.prototype.show = function ( _data )
 	this.mCancelButton.changeButtonText("Previous");
 	this.mDoneButton.removeClass('display-none').addClass('display-block');
 	this.mOriginImage.removeClass('display-none').addClass('display-block');
+	this.mCalculator.Container.removeClass('display-block').addClass('display-none');
 
 	var self = this;
-
 	var offset = -(this.mContainer.parent().width() + this.mContainer.width());
 	this.mContainer.css({
 		'left': offset
@@ -545,6 +552,13 @@ OriginCustomizerScreen.prototype.destroyDIV = function () {
 	this.mDoneButton.remove();
 	this.mDoneButton = null;
 
+	this.mCalculator.Button.remove();
+	this.mCalculator.Button = null;
+	this.mCalculator.ResultText.remove();
+	this.mCalculator.ResultText = null;
+	this.mCalculator.Container.remove();
+	this.mCalculator.Container = null;
+
 	this.mScenarioScrollContainer.empty();
 	this.mScenarioScrollContainer = null;
 	this.mScenarioContainer.destroyList();
@@ -588,14 +602,36 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 	_parentDiv.append(this.mContainer);
 	this.mDialogContainer = this.mContainer.createDialog('Origin Customizer', null, null , false, 'dialog-800-720-2');
 
-	// create: content
-	var contentContainer = this.mDialogContainer.findDialogContentContainer();
 
+	// party strength calculator
+	this.mCalculator.Container = $('<div class="strength-calculator-container"/>');
+	this.mDialogContainer.append(this.mCalculator.Container);
+
+	var firstRow = $('<div class="strength-row"/>');
+	this.mCalculator.Container.append(firstRow);
+	var secondRow = $('<div class="strength-row"/>');
+	this.mCalculator.Container.append(secondRow);
+
+	this.mCalculator.ResultText = $('<div class="result-text text-font-big font-color-title"/>');
+	firstRow.append(this.mCalculator.ResultText);
+	this.mCalculator.ResultText.css('background-image', 'url("coui://gfx/ui/skin/panel_result_text_1.png")');
+
+	var Button = $('<div class="calculate-button"/>');
+	secondRow.append(Button);
+	this.mCalculator.Button = Button.createTextButton("Calculate", function () {
+		self.notifyBackendOnCalculatingPartyStrength();
+	}, 'title-font-medium font-bold font-color-brother-name', 1);
+
+
+	// huge origin image button
 	this.mOriginImage = $('<div class="origin-customizer-origin-button"/>');
 	this.mDialogContainer.append(this.mOriginImage);
 	this.mOriginImage.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function () {
 		self.switchToOriginScreen();
 	}, 'display-block', 150);
+
+	// create: content
+	var contentContainer = this.mDialogContainer.findDialogContentContainer();
 
 	this.mOriginPanel = $('<div class="display-block"/>');
 	contentContainer.append(this.mOriginPanel); 
@@ -718,7 +754,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		this.mDifficultyPanel.append(rightColumn);
 
 		// left column
-		this.createSliderControlDIV(this.mOriginOptions.BrothersScaleMax, 'Maximum Brothers Scale', leftColumn);
+		this.createSliderControlDIV(this.mOriginOptions.BrothersScaleMax, 'Maximum Bros Scaling', leftColumn);
 		this.createSliderControlDIV(this.mOriginOptions.BonusChampion, 'Bonus Champion Chance', leftColumn);
 		this.createSliderControlDIV(this.mOriginOptions.EquipmentLootChance, 'Equipment Loot Chance', leftColumn);
 		this.createSliderControlDIV(this.mOriginOptions.BonusLoot, 'Chance For Bonus Loot', leftColumn);
@@ -1057,6 +1093,7 @@ OriginCustomizerScreen.prototype.returnScreen = function () {
 		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
 		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
 		
+		this.mCalculator.Container.removeClass('display-block').addClass('display-none');
 		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
 		this.mOriginImage.removeClass('display-none').addClass('display-block');
 
@@ -1067,6 +1104,7 @@ OriginCustomizerScreen.prototype.returnScreen = function () {
 		this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
 		this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
 		
+		this.mCalculator.Container.removeClass('display-none').addClass('display-block');
 		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
 		this.mOriginImage.removeClass('display-block').addClass('display-none');
 
@@ -1103,6 +1141,7 @@ OriginCustomizerScreen.prototype.advanceScreen = function () {
 		this.mSecondConfigPanel.removeClass('display-block').addClass('display-none');
 		this.mOriginPanel.removeClass('display-block').addClass('display-none');
 
+		this.mCalculator.Container.removeClass('display-none').addClass('display-block');
 		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
 		this.mOriginImage.removeClass('display-block').addClass('display-none');
 
@@ -1113,6 +1152,7 @@ OriginCustomizerScreen.prototype.advanceScreen = function () {
 		this.mOriginPanel.removeClass('display-block').addClass('display-none');
 		this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
 		
+		this.mCalculator.Container.removeClass('display-block').addClass('display-none');
 		this.mChooseOriginPanel.removeClass('display-block').addClass('display-none');
 		this.mOriginImage.removeClass('display-block').addClass('display-none');
 
@@ -1527,6 +1567,16 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 		contentType: 'ui-element',
 		elementId: 'customeorigin.choose_origin'
 	});
+
+	this.mCalculator.Button.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.calculate'
+	});
+	this.mCalculator.ResultText.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.partystrength'
+	});
+	
 };
 
 OriginCustomizerScreen.prototype.unbindTooltips = function () {
@@ -1654,8 +1704,28 @@ OriginCustomizerScreen.prototype.unbindTooltips = function () {
 
 	this.mAcceptBannerButton.unbindTooltip();
 	this.mOriginImage.unbindTooltip();
+
+	this.mCalculator.Button.unbindTooltip();
+	this.mCalculator.ResultText.unbindTooltip();
 };
 
+
+OriginCustomizerScreen.prototype.updateWithCalculationResult = function (_result) 
+{
+	this.mCalculator.ResultText.html(_result);
+};
+
+
+OriginCustomizerScreen.prototype.collectDifficultyScalingSettings = function () {
+	var settings = [];
+
+	settings.push(this.mDifficulty);
+	settings.push(this.mLegendItemScalingCheckbox.is(":checked"));
+	settings.push(this.mLegendLocationScalingCheckbox.is(":checked"));
+	settings.push(this.mOriginOptions.ScalingMult.Value);
+	settings.push(this.mOriginOptions.BrothersScaleMax.Value);
+	return settings;
+};
 
 
 OriginCustomizerScreen.prototype.onPreviousBannerClicked = function () 
@@ -1861,25 +1931,25 @@ OriginCustomizerScreen.prototype.chooseOrigin = function ()
 
 
 
-OriginCustomizerScreen.prototype.loadFromData = function (_data) 
-{
-	if(_data === undefined || _data === null)
-    {
+OriginCustomizerScreen.prototype.loadFromData = function (_data) {
+
+	if(_data === undefined || _data === null) {
         return;
     }
 
-    if ('Name' in _data)
-    {
+    if ('Name' in _data) {
     	this.mCompanyName.setInputText(_data['Name']);
     }
 
-    if ('Banners' in _data)
-    {
+    if ('PartyStrength' in _data) {
+    	this.updateWithCalculationResult(_data['PartyStrength']);
+    }
+
+    if ('Banners' in _data) {
     	this.setBanners(_data['Banners'], _data['BannerIndex']);
     }
 
-    if ('StartingScenario' in _data)
-    {
+    if ('StartingScenario' in _data) {
     	this.setStartingScenarios(_data['StartingScenario'], _data['OriginIndex']);
     }
 
@@ -2210,6 +2280,13 @@ OriginCustomizerScreen.prototype.notifyBackendOnAnimating = function ()
     {
         SQ.call(this.mSQHandle, 'onScreenAnimating');
     }
+};
+
+OriginCustomizerScreen.prototype.notifyBackendOnCalculatingPartyStrength = function() {
+	if (this.mSQHandle !== null) {
+		var settings = this.collectDifficultyScalingSettings();
+		SQ.call(this.mSQHandle, 'onCalculatingPartyStrength', settings);
+	}
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnChangingnName = function(_inputName) {
