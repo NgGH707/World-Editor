@@ -110,6 +110,24 @@ var OriginCustomizerScreen = function(_parent)
 			Value: 100,
 			Step: 2
 		},
+		ScalingMult: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.scaling',
+			Min: 10,
+			Max: 300,
+			Value: 100,
+			Step: 5
+		},
+		EquipmentLootChance: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.equipmentloot',
+			Min: 0,
+			Max: 100,
+			Value: 0,
+			Step: 2
+		},
 		XpMult: {
 			Control: null,
 			Title: null,
@@ -289,7 +307,34 @@ var OriginCustomizerScreen = function(_parent)
 			Max: 0,
 			Value: 0,
 			Step: 5
-		},	
+		},
+		BrothersScaleMax: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.brothersscale',
+			Min: 1,
+			Max: 25,
+			Value: 3,
+			Step: 1
+		},
+		FoodAdditionalDays: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.fooddays',
+			Min: 0,
+			Max: 25,
+			Value: 0,
+			Step: 1
+		},
+		TrainingPriceMult: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.trainingprice',
+			Min: 0,
+			Max: 500,
+			Value: 100,
+			Step: 5
+		},
 	};
 
 	this.mOriginConfigOpts = {};
@@ -369,9 +414,10 @@ OriginCustomizerScreen.prototype.isRegistered = function ()
 
 OriginCustomizerScreen.prototype.show = function ( _data ) 
 {
-	// reset panels
+	// update data
 	this.loadFromData(_data);
 
+	// reset panels
 	this.mOriginPanel.addClass('display-block').removeClass('display-none');
 	this.mDifficultyPanel.removeClass('display-block').addClass('display-none');
 	this.mFirstConfigPanel.removeClass('display-block').addClass('display-none');
@@ -380,6 +426,7 @@ OriginCustomizerScreen.prototype.show = function ( _data )
 	this.mStartButton.changeButtonText("Next");
 	this.mCancelButton.changeButtonText("Previous");
 	this.mDoneButton.removeClass('display-none').addClass('display-block');
+	this.mOriginImage.removeClass('display-none').addClass('display-block');
 
 	var self = this;
 
@@ -558,6 +605,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		var rightColumn = $('<div class="column"/>');
 		this.mOriginPanel.append(rightColumn);
 
+		// left column
 		// name
 		var row = $('<div class="row" />');
 		leftColumn.append(row);
@@ -578,7 +626,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		
 
 		this.createSliderControlDIV(this.mOriginOptions.Tier, 'Roster Tier', leftColumn);
-		this.createSliderControlDIV(this.mOriginOptions.Stash, 'Stash', leftColumn);
+		this.createSliderControlDIV(this.mOriginOptions.Stash, 'Stash Capacity', leftColumn);
 
 
 		// ironman
@@ -612,6 +660,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		});
 
 
+		// right column
 		// banner
 		var row = $('<div class="row" />');
 		rightColumn.append(row);
@@ -646,8 +695,8 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		}, '', 6);
 
 		// blueprint
-		var row = $('<div class="row"></div>');
-		leftColumn.append(row);
+		var row = $('<div class="row-below-banner"></div>');
+		rightColumn.append(row);
 		var control = $('<div class="control"/>');
 		row.append(control);
 		this.mLegendAllBlueprintsCheckbox = $('<input type="checkbox" id="cb-legendallblueprints"/>');
@@ -668,10 +717,50 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		var rightColumn = $('<div class="column"/>');
 		this.mDifficultyPanel.append(rightColumn);
 
+		// left column
+		this.createSliderControlDIV(this.mOriginOptions.BrothersScaleMax, 'Maximum Brothers Scale', leftColumn);
+		this.createSliderControlDIV(this.mOriginOptions.BonusChampion, 'Bonus Champion Chance', leftColumn);
+		this.createSliderControlDIV(this.mOriginOptions.EquipmentLootChance, 'Equipment Loot Chance', leftColumn);
+		this.createSliderControlDIV(this.mOriginOptions.BonusLoot, 'Chance For Bonus Loot', leftColumn);
+
+		// equiment scaling
+		var row = $('<div class="row"></div>');
+		leftColumn.append(row);
+		var control = $('<div class="control"/>');
+		row.append(control);
+		this.mLegendItemScalingCheckbox = $('<input type="checkbox" id="cb-legenditemscaling"/>');
+		control.append(this.mLegendItemScalingCheckbox);
+		this.mLegendItemScalingCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legenditemscaling">Equipment Scaling</label>');
+		control.append(this.mLegendItemScalingCheckboxLabel);
+		this.mLegendItemScalingCheckbox.iCheck({
+			checkboxClass: 'icheckbox_flat-orange',
+			radioClass: 'iradio_flat-orange',
+			increaseArea: '30%'
+		});
+
+		// distance scaling
+		var row = $('<div class="row"></div>');
+		leftColumn.append(row);
+		var control = $('<div class="control"/>');
+		row.append(control);
+		this.mLegendLocationScalingCheckbox = $('<input type="checkbox" id="cb-legendlocationscaling"/>');
+		control.append(this.mLegendLocationScalingCheckbox);
+		this.mLegendLocationScalingCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legendlocationscaling">Distance Scaling</label>');
+		control.append(this.mLegendLocationScalingCheckboxLabel);
+		this.mLegendLocationScalingCheckbox.iCheck({
+			checkboxClass: 'icheckbox_flat-orange',
+			radioClass: 'iradio_flat-orange',
+			increaseArea: '30%'
+		});
+
+
+		// right column
+		// difficulty scaling
+		this.createSliderControlDIV(this.mOriginOptions.ScalingMult, 'Difficulty Scaling', rightColumn);
 
 		// combat difficulty
 		var row = $('<div class="row" />');
-		leftColumn.append(row);
+		rightColumn.append(row);
 		var title = $('<div class="title title-font-big font-color-title">Combat Difficulty</div>');
 		row.append(title);
 
@@ -743,7 +832,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 
 		// economic difficulty
 		var row = $('<div class="row" />');
-		leftColumn.append(row);
+		rightColumn.append(row);
 		var title = $('<div class="title title-font-big font-color-title">Economic Difficulty</div>');
 		row.append(title);
 
@@ -810,47 +899,20 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 			var self = _event.data;
 			self.mEconomicDifficulty = 3;
 		});
-
-
-		// equiment scaling
-		var row = $('<div class="row"></div>');
-		rightColumn.append(row);
-		var control = $('<div class="control"/>');
-		row.append(control);
-		this.mLegendItemScalingCheckbox = $('<input type="checkbox" id="cb-legenditemscaling"/>');
-		control.append(this.mLegendItemScalingCheckbox);
-		this.mLegendItemScalingCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legenditemscaling">Equipment Scaling</label>');
-		control.append(this.mLegendItemScalingCheckboxLabel);
-		this.mLegendItemScalingCheckbox.iCheck({
-			checkboxClass: 'icheckbox_flat-orange',
-			radioClass: 'iradio_flat-orange',
-			increaseArea: '30%'
-		});
-
-		// distance scaling
-		var row = $('<div class="row"></div>');
-		rightColumn.append(row);
-		var control = $('<div class="control"/>');
-		row.append(control);
-		this.mLegendLocationScalingCheckbox = $('<input type="checkbox" id="cb-legendlocationscaling"/>');
-		control.append(this.mLegendLocationScalingCheckbox);
-		this.mLegendLocationScalingCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legendlocationscaling">Distance Scaling</label>');
-		control.append(this.mLegendLocationScalingCheckboxLabel);
-		this.mLegendLocationScalingCheckbox.iCheck({
-			checkboxClass: 'icheckbox_flat-orange',
-			radioClass: 'iradio_flat-orange',
-			increaseArea: '30%'
-		});
 	
 	}
 
 	this.mFirstConfigPanel = $('<div class="display-none"/>');
 	contentContainer.append(this.mFirstConfigPanel);
-	this.buildFirstConfigPage();
+	{	
+		this.buildFirstConfigPage();
+	}
 
 	this.mSecondConfigPanel = $('<div class="display-none"/>');
 	contentContainer.append(this.mSecondConfigPanel);
-	this.buildSecondConfigPage();
+	{
+		this.buildSecondConfigPage();
+	}
 
 	this.mChooseOriginPanel = $('<div class="display-none"/>');
 	contentContainer.append(this.mChooseOriginPanel); 
@@ -862,7 +924,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 
 		var listContainerLayout = $('<div class="l-list-container"/>');
 		this.mChooseOriginPanel.append(listContainerLayout);
-		this.mScenarioContainer = listContainerLayout.createList(18);
+		this.mScenarioContainer = listContainerLayout.createList(15);  //18
 		this.mScenarioScrollContainer = this.mScenarioContainer.findListScrollContainer();
 
 		var row = $('<div class="row3 text-font-medium font-color-description" />');
@@ -912,9 +974,9 @@ OriginCustomizerScreen.prototype.buildFirstConfigPage = function () {
 	this.createSliderControlDIV(this.mOriginOptions.RosterSizeAdditionalMax, 'Maximum Recruits', leftColumn);
 	this.createSliderControlDIV(this.mOriginOptions.RosterSizeAdditionalMin, 'Minimum Recruits', leftColumn);
 
+	this.createSliderControlDIV(this.mOriginOptions.FoodAdditionalDays, 'Extra Expiration Date', rightColumn);
 	this.createSliderControlDIV(this.mOriginOptions.SellingMult, 'Selling Price', rightColumn);
 	this.createSliderControlDIV(this.mOriginOptions.BuyingMult, 'Buying Price', rightColumn);
-	this.createSliderControlDIV(this.mOriginOptions.TaxidermistPriceMult, 'Taxidermist Cost', rightColumn);
 	this.createSliderControlDIV(this.mOriginOptions.ContractPayment, 'Contract Payment', rightColumn);
 	this.createSliderControlDIV(this.mOriginOptions.NegotiationAnnoyanceMult, 'Negotiation Annoyance', rightColumn);
 };
@@ -927,15 +989,15 @@ OriginCustomizerScreen.prototype.buildSecondConfigPage = function () {
 
 	this.createSliderControlDIV(this.mOriginOptions.XpMult, 'XP Gained', leftColumn);
 	this.createSliderControlDIV(this.mOriginOptions.BusinessReputationRate, 'Renown Gained', leftColumn);
-	this.createSliderControlDIV(this.mOriginOptions.BonusSpeed, 'Movement Speed', leftColumn);
-	this.createSliderControlDIV(this.mOriginOptions.BonusLoot, 'Chance For Bonus Loot', leftColumn);
-	this.createSliderControlDIV(this.mOriginOptions.BonusChampion, 'Bonus Champion Chance', leftColumn);
+	this.createSliderControlDIV(this.mOriginOptions.VisionRadius, 'Vision Radius', leftColumn);
+	this.createSliderControlDIV(this.mOriginOptions.TrainingPriceMult, 'Training Price', leftColumn);
+	this.createSliderControlDIV(this.mOriginOptions.TaxidermistPriceMult, 'Taxidermist Price', leftColumn);
 	
-	this.createSliderControlDIV(this.mOriginOptions.VisionRadius, 'Vision Radius', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.RelationDecayGoodMult, 'Relation Recovery Speed', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.RelationDecayBadMult, 'Relation Decay Speed', rightColumn);
+	this.createSliderControlDIV(this.mOriginOptions.BonusSpeed, 'Movement Speed', rightColumn);
 	this.createSliderControlDIV(this.mOriginOptions.HitpointsPerHourMult, 'Hitpoints Recovery Speed', rightColumn);
 	this.createSliderControlDIV(this.mOriginOptions.RepairSpeedMult, 'Repair Speed', rightColumn);
-	this.createSliderControlDIV(this.mOriginOptions.RelationDecayGoodMult, 'Good Relation Recovery', rightColumn);
-	this.createSliderControlDIV(this.mOriginOptions.RelationDecayBadMult, 'Bad Relation Decay', rightColumn);
 };
 
 OriginCustomizerScreen.prototype.createSliderControlDIV = function (_definition, _label, _parentDiv) {
@@ -1230,6 +1292,24 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 		elementId: TooltipIdentifier.Stash.FreeSlots 
 	});
 
+	this.mOriginOptions.ScalingMult.Control.bindTooltip({ 
+		contentType: 'ui-element', 
+		elementId: 'customeorigin.scaling'
+	});
+	this.mOriginOptions.ScalingMult.Title.bindTooltip({ 
+		contentType: 'ui-element', 
+		elementId: 'customeorigin.scaling'
+	});
+
+	this.mOriginOptions.EquipmentLootChance.Control.bindTooltip({ 
+		contentType: 'ui-element', 
+		elementId: 'customeorigin.equipmentloot'
+	});
+	this.mOriginOptions.EquipmentLootChance.Title.bindTooltip({ 
+		contentType: 'ui-element', 
+		elementId: 'customeorigin.equipmentloot'
+	});
+
 	this.mOriginOptions.XpMult.Control.bindTooltip({
 		contentType: 'ui-element',
 		elementId: 'customeorigin.xp'
@@ -1411,6 +1491,33 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 		elementId: 'customeorigin.goodrelation'
 	});
 
+	this.mOriginOptions.BrothersScaleMax.Control.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.brothersscale'
+	});
+	this.mOriginOptions.BrothersScaleMax.Title.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.brothersscale'
+	});
+
+	this.mOriginOptions.FoodAdditionalDays.Control.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.fooddays'
+	});
+	this.mOriginOptions.FoodAdditionalDays.Title.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.fooddays'
+	});
+
+	this.mOriginOptions.TrainingPriceMult.Control.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.trainingprice'
+	});
+	this.mOriginOptions.TrainingPriceMult.Title.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'customeorigin.trainingprice'
+	});
+
 	this.mAcceptBannerButton.bindTooltip({
 		contentType: 'ui-element',
 		elementId: 'customeorigin.accept_banner'
@@ -1466,6 +1573,15 @@ OriginCustomizerScreen.prototype.unbindTooltips = function () {
 
 	this.mOriginOptions.Tier.Control.unbindTooltip();
 	this.mOriginOptions.Tier.Title.unbindTooltip();
+
+	this.mOriginOptions.Stash.Control.unbindTooltip();
+	this.mOriginOptions.Stash.Title.unbindTooltip();
+
+	this.mOriginOptions.ScalingMult.Control.unbindTooltip();
+	this.mOriginOptions.ScalingMult.Title.unbindTooltip();
+
+	this.mOriginOptions.EquipmentLootChance.Control.unbindTooltip();
+	this.mOriginOptions.EquipmentLootChance.Title.unbindTooltip();
 
 	this.mOriginOptions.XpMult.Control.unbindTooltip();
 	this.mOriginOptions.XpMult.Title.unbindTooltip();
@@ -1526,6 +1642,15 @@ OriginCustomizerScreen.prototype.unbindTooltips = function () {
 
 	this.mOriginOptions.RelationDecayGoodMult.Control.unbindTooltip();
 	this.mOriginOptions.RelationDecayGoodMult.Title.unbindTooltip();
+
+	this.mOriginOptions.BrothersScaleMax.Control.unbindTooltip();
+	this.mOriginOptions.BrothersScaleMax.Title.unbindTooltip();
+
+	this.mOriginOptions.FoodAdditionalDays.Control.unbindTooltip();
+	this.mOriginOptions.FoodAdditionalDays.Title.unbindTooltip();
+
+	this.mOriginOptions.TrainingPriceMult.Control.unbindTooltip();
+	this.mOriginOptions.TrainingPriceMult.Title.unbindTooltip();
 
 	this.mAcceptBannerButton.unbindTooltip();
 	this.mOriginImage.unbindTooltip();
@@ -1765,6 +1890,8 @@ OriginCustomizerScreen.prototype.updateOriginConfig = function () {
 	var controls = [
 		this.mOriginOptions.Tier,
 		this.mOriginOptions.Stash,
+		this.mOriginOptions.ScalingMult,
+		this.mOriginOptions.EquipmentLootChance,
 		this.mOriginOptions.XpMult,
 		this.mOriginOptions.HiringMult,
 		this.mOriginOptions.WageMult,
@@ -1785,6 +1912,9 @@ OriginCustomizerScreen.prototype.updateOriginConfig = function () {
 		this.mOriginOptions.TryoutPriceMult,
 		this.mOriginOptions.RelationDecayGoodMult,
 		this.mOriginOptions.RelationDecayBadMult,
+		this.mOriginOptions.BrothersScaleMax,
+		this.mOriginOptions.FoodAdditionalDays,
+		this.mOriginOptions.TrainingPriceMult,
 	];
 
 	controls.forEach(function (_definition) {
@@ -1864,6 +1994,16 @@ OriginCustomizerScreen.prototype.setConfigOpts = function (_data) {
 			this.mOriginOptions.Stash.Value = _data['Stash'];
 			this.mOriginOptions.Stash.Min = _data['StashMin'];
 			this.mOriginOptions.Stash.Max = _data['StashMax'];
+		}
+		if ('ScalingMult' in _data) {
+			this.mOriginOptions.ScalingMult.Value = _data['ScalingMult'];
+			this.mOriginOptions.ScalingMult.Min = _data['ScalingMultMin'];
+			this.mOriginOptions.ScalingMult.Max = _data['ScalingMultMax'];
+		}
+		if ('EquipmentLootChance' in _data) {
+			this.mOriginOptions.EquipmentLootChance.Value = _data['EquipmentLootChance'];
+			this.mOriginOptions.EquipmentLootChance.Min = _data['EquipmentLootChanceMin'];
+			this.mOriginOptions.EquipmentLootChance.Max = _data['EquipmentLootChanceMax'];
 		}
 		if ('XpMult' in _data) {
 			this.mOriginOptions.XpMult.Value = _data['XpMult'];
@@ -1966,6 +2106,21 @@ OriginCustomizerScreen.prototype.setConfigOpts = function (_data) {
 			this.mOriginOptions.RelationDecayBadMult.Min = _data['RelationDecayBadMultMin'];
 			this.mOriginOptions.RelationDecayBadMult.Max = _data['RelationDecayBadMultMax'];
 		}
+		if ('BrothersScaleMax' in _data) {
+			this.mOriginOptions.BrothersScaleMax.Value = _data['BrothersScaleMax'];
+			this.mOriginOptions.BrothersScaleMax.Min = _data['BrothersScaleMaxMin'];
+			this.mOriginOptions.BrothersScaleMax.Max = _data['BrothersScaleMaxMax'];
+		}
+		if ('FoodAdditionalDays' in _data) {
+			this.mOriginOptions.FoodAdditionalDays.Value = _data['FoodAdditionalDays'];
+			this.mOriginOptions.FoodAdditionalDays.Min = _data['FoodAdditionalDaysMin'];
+			this.mOriginOptions.FoodAdditionalDays.Max = _data['FoodAdditionalDaysMax'];
+		}
+		if ('TrainingPriceMult' in _data) {
+			this.mOriginOptions.TrainingPriceMult.Value = _data['TrainingPriceMult'];
+			this.mOriginOptions.TrainingPriceMult.Min = _data['TrainingPriceMultMin'];
+			this.mOriginOptions.TrainingPriceMult.Max = _data['TrainingPriceMultMax'];
+		}
 
 	} else {
 		console.error('ERROR: No opts specified for OriginCustomizerScreen::setConfigOpts');
@@ -1989,6 +2144,8 @@ OriginCustomizerScreen.prototype.collectSettings = function () {
 	settings.push(this.mLegendAllBlueprintsCheckbox.is(":checked"));
 	settings.push(this.mOriginOptions.Tier.Value);
 	settings.push(this.mOriginOptions.Stash.Value);
+	settings.push(this.mOriginOptions.ScalingMult.Value);
+	settings.push(this.mOriginOptions.EquipmentLootChance.Value);
 	settings.push(this.mOriginOptions.XpMult.Value);
 	settings.push(this.mOriginOptions.HiringMult.Value);
 	settings.push(this.mOriginOptions.WageMult.Value);
@@ -2009,6 +2166,9 @@ OriginCustomizerScreen.prototype.collectSettings = function () {
 	settings.push(this.mOriginOptions.TryoutPriceMult.Value);
 	settings.push(this.mOriginOptions.RelationDecayGoodMult.Value);
 	settings.push(this.mOriginOptions.RelationDecayBadMult.Value);
+	settings.push(this.mOriginOptions.BrothersScaleMax.Value);
+	settings.push(this.mOriginOptions.FoodAdditionalDays.Value);
+	settings.push(this.mOriginOptions.TrainingPriceMult.Value);
 	return settings;
 };
 

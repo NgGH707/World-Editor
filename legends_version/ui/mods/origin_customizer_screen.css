@@ -49,6 +49,69 @@
     float: left;
 }
 
+.origin-customizer-screen > .dialog .content .banner-column,
+{
+    padding-top: 4.0rem;
+    width: 40.0rem;
+    height: 100%;
+    float: left;
+}
+
+/*.origin-customizer-screen .banner-column .row .l-input
+{
+    width: 30.0rem;
+    height: 4.0rem;
+    margin-bottom: 2.0rem;
+    float: left;
+    position: relative;
+}*/
+
+.origin-customizer-screen > .dialog .content .row-below-banner
+{
+    width: 36.0rem;
+    float: left;
+    position: relative;
+    padding-top : 8.0rem;
+    padding-left: 2.0rem;
+}
+
+.origin-customizer-screen .column .row .banner-container
+{
+    width: 100%;
+    height: 38.0rem;
+    /*margin-top: 1.0rem;*/
+}
+
+.origin-customizer-screen .column .row .banner-container .prev-banner-button
+{
+    height: 4.1rem;
+    width: 4.5rem;
+    vertical-align: middle;
+}
+
+.origin-customizer-screen .column .row .banner-container .next-banner-button
+{
+    height: 4.1rem;
+    width: 4.5rem;
+    vertical-align: middle;
+}
+
+.origin-customizer-screen .column .row .banner-container .banner-image
+{
+    vertical-align: middle;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.origin-customizer-screen .column .row .banner-container .accept-banner-button
+{
+    height: 4.1rem;
+    width: 4.5rem;
+    vertical-align: middle;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .origin-customizer-screen .dialog .content .below-origin-button-column
 {
     padding-top: 15.0rem;
@@ -172,6 +235,7 @@
     float: left;
 }
 
+.origin-customizer-screen > .dialog .content .row-below-banner .control,
 .origin-customizer-screen > .dialog .content .row .control,
 .origin-customizer-screen > .dialog .content .row4 .control
 {
@@ -199,52 +263,6 @@
 .origin-customizer-screen > .dialog .content .row .map-seed-control
 {
     /*margin-top: 20.0rem;*/
-}
-
-.origin-customizer-screen .column .row .l-input
-{
-    width: 30.0rem;
-    height: 4.0rem;
-    margin-bottom: 2.0rem;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen .column .row .banner-container
-{
-    width: 100%;
-    height: 38.0rem;
-    /*margin-top: 1.0rem;*/
-}
-
-.origin-customizer-screen .column .row .banner-container .prev-banner-button
-{
-	height: 4.1rem;
-	width: 4.5rem;
-	vertical-align: middle;
-}
-
-.origin-customizer-screen .column .row .banner-container .next-banner-button
-{
-	height: 4.1rem;
-	width: 4.5rem;
-	vertical-align: middle;
-}
-
-.origin-customizer-screen .column .row .banner-container .banner-image
-{
-	vertical-align: middle;
-	margin-left: auto;
-    margin-right: auto;
-}
-
-.origin-customizer-screen .column .row .banner-container .accept-banner-button
-{
-    height: 4.1rem;
-    width: 4.5rem;
-    vertical-align: middle;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .origin-customizer-screen > .dialog .content .row .scale-control

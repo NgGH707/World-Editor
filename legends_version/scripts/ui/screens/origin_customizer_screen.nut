@@ -101,6 +101,7 @@ this.origin_customizer_screen <- {
 	function getData()
 	{
 		local data = this.World.Assets.getBaseAssets();
+		local d = this.Math.floor(this.World.Flags.getAsFloat("PartyStrengthMult") * 100);
 		local ret = {
 			Name = this.World.Assets.getName(),
 			Difficulty = this.World.Assets.getCombatDifficulty(),
@@ -114,6 +115,14 @@ this.origin_customizer_screen <- {
 			Tier = this.World.Assets.getOrigin().getRosterTier(),
 			TierMin = 0,
 			TierMax = 6,
+
+			ScalingMult = d == 0 ? 100 : d,
+			ScalingMultMin = 5,
+			ScalingMultMax = 300,
+
+			EquipmentLootChance = this.World.Flags.getAsInt("EquipmentLootChance"),
+			EquipmentLootChanceMin = 0,
+			EquipmentLootChanceMax = 100,
 
 			XpMult = this.Math.floor(data.XPMult * 100),
 			XpMultMin = 0,
@@ -194,6 +203,18 @@ this.origin_customizer_screen <- {
 			RelationDecayBadMult = this.Math.floor(data.RelationDecayBadMult * 100),
 			RelationDecayBadMultMin = 5,
 			RelationDecayBadMultMax = 500,
+
+			BrothersScaleMax = this.Math.floor(data.BrothersScaleMax),
+			BrothersScaleMaxMin = 1,
+			BrothersScaleMaxMax = 25,
+
+			FoodAdditionalDays = this.Math.floor(data.FoodAdditionalDays),
+			FoodAdditionalDaysMin = -10,
+			FoodAdditionalDaysMax = 25,
+
+			TrainingPriceMult = this.Math.floor(data.RelationDecayGoodMult * 100),
+			TrainingPriceMultMin = 0,
+			TrainingPriceMultMax = 500,
 		};
 		this.addStashData(ret);
 		this.addOriginData(ret);
@@ -205,9 +226,10 @@ this.origin_customizer_screen <- {
 	{
 		local stash = this.World.Assets.getStash();
 		local max = this.Math.max(stash.getCapacity(), 400);
+		local min = this.Math.max(stash.getNumberOfFilledSlots(), 20);
 		this.m.CurrentStash = stash.getCapacity();
 		_result.Stash <- this.m.CurrentStash;
-		_result.StashMin <- stash.getNumberOfFilledSlots();
+		_result.StashMin <- min;
 		_result.StashMax <- max;
 	}
 
@@ -252,6 +274,8 @@ this.origin_customizer_screen <- {
 			"AllBlueprint",
 			"Tier",
 			"Stash",
+			"ScalingMult",
+			"EquipmentLootChance",
 			"XpMult",
 			"HiringMult",
 			"WageMult",
@@ -272,6 +296,9 @@ this.origin_customizer_screen <- {
 			"TryoutPriceMult",
 			"RelationDecayGoodMult",
 			"RelationDecayBadMult",
+			"BrothersScaleMax",
+			"FoodAdditionalDays",
+			"TrainingPriceMult",
 		];
 
 		foreach( i, k in keys )
@@ -292,8 +319,8 @@ this.origin_customizer_screen <- {
 	{
 		this.World.Assets.m.CombatDifficulty = _settings.Difficulty;
 		this.World.Assets.m.EconomicDifficulty = _settings.EconomicDifficulty;
-		this.World.Assets.IsIronman = _settings.IsIronman;
-		this.World.Assets.IsAutosave = _settings.IsAutosave; 
+		this.World.Assets.m.IsIronman = _settings.IsIronman;
+		this.World.Assets.m.IsAutosave = _settings.IsAutosave; 
 		this.LegendsMod.Configs().m.IsItemScaling = _settings.ItemScaling;
 		this.LegendsMod.Configs().m.IsLocationScaling = _settings.LocationScaling;
 		this.LegendsMod.Configs().m.IsBlueprintsVisible = _settings.AllBlueprint;
@@ -308,6 +335,8 @@ this.origin_customizer_screen <- {
 
 		this.World.Flags.set("UsedOriginCustomizer", this.OriginCustomizerVersion);
 		this.World.Flags.set("RosterTier", _settings.Tier);
+		this.World.Flags.set("PartyStrengthMult", _settings.ScalingMult * 0.01);
+		this.World.Flags.set("EquipmentLootChance", _settings.EquipmentLootChance);
 		this.World.Flags.set("XPMult", _settings.XpMult * 0.01);
 		this.World.Flags.set("DailyWageMult", _settings.HiringMult * 0.01);
 		this.World.Flags.set("HiringCostMult", _settings.WageMult * 0.01);
@@ -328,6 +357,9 @@ this.origin_customizer_screen <- {
 		this.World.Flags.set("TryoutPriceMult", _settings.TryoutPriceMult * 0.01);
 		this.World.Flags.set("RelationDecayGoodMult", _settings.RelationDecayGoodMult * 0.01);
 		this.World.Flags.set("RelationDecayBadMult", _settings.RelationDecayBadMult * 0.01);
+		this.World.Flags.set("BrothersScaleMax", _settings.BrothersScaleMax);
+		this.World.Flags.set("FoodAdditionalDays", _settings.FoodAdditionalDays);
+		this.World.Flags.set("TrainingPriceMult", _settings.TrainingPriceMult * 0.01);
 		this.World.Retinue.update();
 		this.World.State.getPlayer().updateStrength();
 	}

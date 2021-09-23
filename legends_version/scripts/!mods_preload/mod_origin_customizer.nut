@@ -104,12 +104,14 @@ this.getroottable().OriginCustomizerVersion <- version;
 					"TryoutPriceMult",
 					"RelationDecayGoodMult",
 					"RelationDecayBadMult",
+					"TrainingPriceMult",
 				];
 				local add = [
 					"ExtraLootChance",
 					"ChampionChanceAdditional",
 					"RosterSizeAdditionalMin",
 					"RosterSizeAdditionalMax",
+					"FoodAdditionalDays",
 				];
 
 				foreach ( key in mult )
@@ -136,6 +138,11 @@ this.getroottable().OriginCustomizerVersion <- version;
 				if (this.World.Flags.has("RosterTier"))
 				{
 					this.getOrigin().m.RosterTier = this.World.Flags.getAsInt("RosterTier");
+				}
+
+				if (this.World.Flags.has("BrothersScaleMax"))
+				{
+					this.m.BrothersScaleMax = this.World.Flags.getAsInt("BrothersScaleMax");
 				}
 
 				if (this.World.State.getPlayer() != null && this.World.Flags.has("BaseMovementSpeed"))
@@ -169,9 +176,11 @@ this.getroottable().OriginCustomizerVersion <- version;
 				TryoutPriceMult = this.m.TryoutPriceMult,
 				RelationDecayGoodMult = this.m.RelationDecayGoodMult,
 				RelationDecayBadMult = this.m.RelationDecayBadMult,
+				BrothersScaleMax = this.getBrothersScaleMax(),
+				FoodAdditionalDays = this.m.FoodAdditionalDays,
+				TrainingPriceMult = this.m.TrainingPriceMult,
 
 				/*FoodConsumptionMult = this.m.FoodConsumptionMult,
-				TrainingPriceMult = this.m.TrainingPriceMult,
 				AdvancePaymentCap = this.m.AdvancePaymentCap,*/
 			};
 		}
@@ -179,10 +188,10 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 	::mods_hookExactClass("entity/world/player_party", function( obj )
 	{
-		local Strength = ::mods_getMember(obj, "getStrength");
+		local updateStrength = ::mods_getMember(obj, "getStrength");
 		obj.getStrength = function()
 		{
-			this.m.Strength = Strength;
+			this.m.Strength = updateStrength();
 
 			if (this.World.Flags.has("PartyStrengthMult"))
 			{
@@ -191,6 +200,47 @@ this.getroottable().OriginCustomizerVersion <- version;
 			}
 
 			return this.m.Strength;
+		}
+	});
+
+	::mods_hookBaseClass("scenarios/world/starting_scenario", function( obj )
+	{
+		obj = obj[obj.SuperName];
+		obj.isDroppedAsLoot = function( _item )
+		{
+			return this.Math.rand(1, 100) <= this.World.Flags.getAsInt("EquipmentLootChance");
+		}
+	});
+	::mods_hookNewObjectOnce("scenarios/scenario_manager", function ( obj )
+	{	
+		obj.getOriginImage <- function( _description )
+		{
+			local start = _description.find("events/");
+			local end = _description.find(".png");
+			return _description.slice(start, end);
+		}
+		obj.getScenariosForUI = function()
+		{
+			local ret = [];
+
+			foreach(i, s in this.m.Scenarios )
+			{
+				if (!s.isValid())
+				{
+					continue;
+				}
+
+				local scenario = {
+					ID = s.getID(),
+					Name = s.getName(),
+					Description = s.getDescription(),
+					Difficulty = s.getDifficultyForUI()
+				};
+				scenario.Image <- this.getOriginImage(scenario.Description);
+				ret.push(scenario);
+			}
+
+			return ret;
 		}
 	});
 
@@ -304,39 +354,6 @@ this.getroottable().OriginCustomizerVersion <- version;
 		}
 	});
 
-	::mods_hookNewObjectOnce("scenarios/scenario_manager", function ( obj )
-	{	
-		obj.getOriginImage <- function( _description )
-		{
-			local start = _description.find("events/");
-			local end = _description.find(".png");
-			return _description.slice(start, end);
-		}
-		obj.getScenariosForUI = function()
-		{
-			local ret = [];
-
-			foreach(i, s in this.m.Scenarios )
-			{
-				if (!s.isValid())
-				{
-					continue;
-				}
-
-				local scenario = {
-					ID = s.getID(),
-					Name = s.getName(),
-					Description = s.getDescription(),
-					Difficulty = s.getDifficultyForUI()
-				};
-				scenario.Image <- this.getOriginImage(scenario.Description);
-				ret.push(scenario);
-			}
-
-			return ret;
-		}
-	});
-
 	::mods_hookNewObjectOnce("ui/screens/tooltip/tooltip_events", function( obj ) 
 	{
 	 	local queryTooltipData = ::mods_getMember(obj, "general_queryUIElementTooltipData");
@@ -400,6 +417,34 @@ this.getroottable().OriginCustomizerVersion <- version;
 						type = "text",
 						icon = "ui/icons/special.png",
 						text = "Tier 6: [color=" + this.Const.UI.Color.NegativeValue + "]27[/color] brothers and [color=" + this.Const.UI.Color.NegativeValue + "]25[/color] in battle"
+					},
+				];
+
+			case "customeorigin.scaling":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Difficulty Scaling Percentage"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Party strength value is used as a standard to determine the number of troops/defenders in roaming party or in camp. This percentage is used to modify your party strength so it\'s indirectly change the difficult scaling. Thus, every percentage that is higher than 100 will make the game harder (more enemies) while lowering it will make the game easier (fewer enemies). This is a different value that\'s independent from combat difficulty. The default value is 100 which means 100%."
+					},
+				];
+
+			case "customeorigin.equipmentloot":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Bonus Chance To Loot Equipment"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Bonus chance to the existing chance to loot enemy equipment (armors, weapon, quiver, etc). The chance to loot an equipment of an enemy is based on the durability of said item. With this chance value reaches 100%, you are guaranteed to loot enemy equipment. The default value is 0 which means 0%."
 					},
 				];
 
@@ -483,7 +528,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "The chance to get an additional loot from beast-type enemy. The default value is 0 which means 0%. The value is calculated in percentage."
+						text = "The chance to get an additional loot from [color=" + this.Const.UI.Color.NegativeValue + "]beast-type[/color] enemy, this value don\'t affect the chance to loot equipment from enemy. The default value is 0 which means 0%. The value is calculated in percentage."
 					},
 				];
 
@@ -660,12 +705,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Bad Relation Decay"
+						text = "Relation Decay Speed"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affect how slow or fast a friendly/allied faction return to neutral relation with player. The higher the number the faster the decay speed. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affect how slow or fast allied/friendly factions return to neutral relation with player. The higher the number the faster the decay speed. The default value is 100 which means 100%. The value is calculated in percentage."
 					},
 				];
 
@@ -674,12 +719,54 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Good Relation Recovery"
+						text = "Relation Recovery Speed"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affect how slow or fast a hostile/unfriendly faction return to neutral relation with player. The higher the number the faster the recovery speed. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affect how slow or fast hostile/unfriendly factions return to neutral relation with player. The higher the number the faster the recovery speed. The default value is 100 which means 100%. The value is calculated in percentage."
+					},
+				];
+
+			case "customeorigin.brothersscale":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Maximum Brothers For Scaling Difficulty"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "This value determine how many brothers are used to calculate party strength, from party strength the game will use it as standard to spawn enemy. If you have 25 brothers in roster while this value is 12, that means at most only 12 highest level brothers are used to calculate party strength."
+					},
+				];
+
+			case "customeorigin.fooddays":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Extra Expiration Date For Food"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Increase or decrease the expiration date of food items. The higher the number the longer time for food to spoil. The default value is 0. The value is in days unit."
+					},
+				];
+
+			case "customeorigin.trainingprice":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Training Price"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Affect the cost to train a brother in Training Hall building. The default value is 100 which means 100%. The value is calculated in percentage."
 					},
 				];
 
