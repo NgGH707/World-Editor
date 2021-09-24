@@ -1,9 +1,9 @@
 local version = 2.0.0;
 this.getroottable().OriginCustomizerVersion <- version;
-::mods_registerMod("mod_origin_customizer_legends", version, "NgGH's Hard Work");
+::mods_registerMod("mod_origin_customizer_vanilla", version, "NgGH's Hard Work");
 ::mods_registerJS("origin_customizer_screen.js");
 ::mods_registerCSS("origin_customizer_screen.css");
-::mods_queue("mod_origin_customizer_legends", "mod_legends", function()
+::mods_queue("mod_origin_customizer_vanilla", "!mod_legends", function()
 {	
 	::mods_hookNewObjectOnce("states/world_state", function( obj ) 
 	{
@@ -14,16 +14,14 @@ this.getroottable().OriginCustomizerVersion <- version;
 			this.m.OriginCustomizerScreen <- this.new("scripts/ui/screens/origin_customizer_screen");
 			this.m.OriginCustomizerScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
 			this.initLoadingScreenHandler();
-		}
-
+		};
 		local destroy_ui = ::mods_getMember(obj, "onDestroyUI");
 		obj.onDestroyUI = function()
 		{
 			destroy_ui();
 			this.m.OriginCustomizerScreen.destroy();
 			this.m.OriginCustomizerScreen = null;
-		}
-
+		};
 		obj.showOriginCustomizerScreen <- function()
 		{
 			if (!this.m.OriginCustomizerScreen.isVisible() && !this.m.OriginCustomizerScreen.isAnimating())
@@ -48,8 +46,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					return !this.m.OriginCustomizerScreen.isAnimating();
 				});
 			}
-		}
-
+		};
 		obj.toggleOriginCustomizerScreen <- function()
 		{
 			if (this.m.OriginCustomizerScreen.isVisible())
@@ -60,14 +57,13 @@ this.getroottable().OriginCustomizerVersion <- version;
 			{
 				this.showOriginCustomizerScreen();
 			}
-		}
-
+		};
 		local keyHandler = ::mods_getMember(obj, "helper_handleContextualKeyInput");
 		obj.helper_handleContextualKeyInput = function(key)
 		{
 			if(!keyHandler(key) && key.getState() == 0)
 			{
-				if (key.getModifier() == 2 && key.getKey() == 38)//CTRL + Tab
+				if (key.getModifier() == 2 && key.getKey() == 38) //CTRL + Tab
 				{
 					if (!this.m.CharacterScreen.isVisible() && !this.m.WorldTownScreen.isVisible() && !this.m.EventScreen.isVisible() && !this.m.EventScreen.isAnimating())
 					{
@@ -76,7 +72,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					}
 				}
 			}
-		}
+		};
 	});
 
 	::mods_hookNewObjectOnce("states/world/asset_manager", function ( obj )
@@ -135,9 +131,14 @@ this.getroottable().OriginCustomizerVersion <- version;
 					}
 				}
 
-				if (this.World.Flags.has("RosterTier"))
+				if (this.World.Flags.has("BrothersMax"))
 				{
-					this.getOrigin().m.RosterTier = this.World.Flags.getAsInt("RosterTier");
+					this.m.BrothersMax = this.World.Flags.getAsInt("BrothersMax");
+				}
+
+				if (this.World.Flags.has("BrothersMaxInCombat"))
+				{
+					this.m.BrothersMaxInCombat = this.World.Flags.getAsInt("BrothersMaxInCombat");
 				}
 
 				if (this.World.Flags.has("BrothersScaleMax"))
@@ -157,6 +158,8 @@ this.getroottable().OriginCustomizerVersion <- version;
 			this.resetToDefaults();
 
 			return {
+				BrothersMax = this.m.BrothersMax,
+				BrothersMaxInCombat = this.m.BrothersMaxInCombat,
 				XPMult = this.m.XPMult,
 				DailyWageMult = this.m.DailyWageMult,
 				HiringCostMult = this.m.HiringCostMult,
@@ -200,6 +203,25 @@ this.getroottable().OriginCustomizerVersion <- version;
 			}
 
 			return this.m.Strength;
+		}
+	});
+
+	::mods_hookBaseClass("crafting/blueprint", function( obj )
+	{
+		obj = obj[obj.SuperName];
+		obj.isQualified = function( _item )
+		{
+			if (this.World.Flags.get("AllBlueprint"))
+			{
+				return true;
+			}
+
+			if (this.m.TimesCrafted >= 1)
+			{
+				return true;
+			}
+
+			return this.isCraftable();
 		}
 	});
 
@@ -253,104 +275,52 @@ this.getroottable().OriginCustomizerVersion <- version;
 			this.World.State.updateTopbarAssets();
 		}
 	});
-
+	::mods_hookNewObject("retinue/followers/agent_follower", function( obj ) 
+	{
+		obj.onUpdate = function()
+		{
+			this.World.Assets.m.RelationDecayGoodMult *= 0.9;
+			this.World.Assets.m.RelationDecayBadMult *= 1.1;
+		}
+	});
 	::mods_hookNewObject("retinue/followers/bounty_hunter_follower", function( obj ) 
 	{
 		obj.onUpdate = function()
 		{
-			if ("ChampionChanceAdditional" in this.World.Assets.m)
-			{
-				this.World.Assets.m.ChampionChanceAdditional += 3;
-			}
+			this.World.Assets.m.ChampionChanceAdditional += 3;
 		}
 	});
 	::mods_hookNewObject("retinue/followers/cook_follower", function( obj ) 
 	{
 		obj.onUpdate = function()
 		{
-			if ("FoodAdditionalDays" in this.World.Assets.m)
-			{
-				this.World.Assets.m.FoodAdditionalDays += 3;
-			}
-
-			if ("HitpointsPerHourMult" in this.World.Assets.m)
-			{
-				this.World.Assets.m.HitpointsPerHourMult *= 1.33;
-			}
+			this.World.Assets.m.FoodAdditionalDays += 3;
+			this.World.Assets.m.HitpointsPerHourMult *= 1.33;
 		}
 	});
 	::mods_hookNewObject("retinue/followers/lookout_follower", function( obj ) 
 	{
 		obj.onUpdate = function()
 		{
-			if ("VisionRadiusMult" in this.World.Assets.m)
-			{
-				this.World.Assets.m.VisionRadiusMult *= 1.25;
-			}
-
-			if ("IsShowingExtendedFootprints" in this.World.Assets.m)
-			{
-				this.World.Assets.m.IsShowingExtendedFootprints = true;
-			}
+			this.World.Assets.m.VisionRadiusMult *= 1.25;
+			this.World.Assets.m.IsShowingExtendedFootprints = true;
 		}
 	});
 	::mods_hookNewObject("retinue/followers/negotiator_follower", function( obj ) 
 	{
 		obj.onUpdate = function()
 		{
-			if ("NegotiationAnnoyanceMult" in this.World.Assets.m)
-			{
-				this.World.Assets.m.NegotiationAnnoyanceMult *= 0.5;
-			}
-
-			if ("AdvancePaymentCap" in this.World.Assets.m)
-			{
-				this.World.Assets.m.AdvancePaymentCap += 0.25;
-			}
-
-			if ("RelationDecayGoodMult" in this.World.Assets.m)
-			{
-				if (this.World.Assets.getOrigin().getID() == "scenario.sato_escaped_slaves")
-				{
-					this.World.Assets.m.RelationDecayGoodMult *= 1.05;
-				}
-				else
-				{
-					this.World.Assets.m.RelationDecayGoodMult *= 0.9;
-				}
-			}
-
-			if ("RelationDecayBadMult" in this.World.Assets.m)
-			{
-				if (this.World.Assets.getOrigin().getID() == "scenario.sato_escaped_slaves")
-				{
-					this.World.Assets.m.RelationDecayBadMult *= 0.95;
-				}
-				else
-				{
-					this.World.Assets.m.RelationDecayBadMult *= 1.1;
-				}
-			}
+			this.World.Assets.m.NegotiationAnnoyanceMult *= 0.5;
+			this.World.Assets.m.AdvancePaymentCap += 0.25;
 		}
 	});
 	::mods_hookNewObject("retinue/followers/quartermaster_follower", function( obj ) 
 	{
 		obj.onUpdate = function()
 		{
-			if ("AmmoMaxAdditional" in this.World.Assets.m)
-			{
-				this.World.Assets.m.AmmoMaxAdditional += 100;
-			}
-
-			if ("MedicineMaxAdditional" in this.World.Assets.m)
-			{
-				this.World.Assets.m.MedicineMaxAdditional += 50;
-			}
-
-			if ("ArmorPartsMaxAdditional" in this.World.Assets.m)
-			{
-				this.World.Assets.m.ArmorPartsMaxAdditional += 50;
-			}
+			this.World.Assets.m.AmmoMaxAdditional += 100;
+			this.World.Assets.m.MedicineMaxAdditional += 50;
+			this.World.Assets.m.ArmorPartsMaxAdditional += 50;
 		}
 	});
 
@@ -364,60 +334,46 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 			switch (elementId) 
 			{
-			case "customeorigin.tier":
+			case "customeorigin.bromax":
 		       	return [
 					{
 						id = 1,
 						type = "title",
-						text = "Roster Tier"
+						text = "Maximum Roster Size"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affecting your company roster size and the amount of brother you can bring in battle, this tier has a different value between different origin."
+						text = "The maximun number of brother you can have."
+					},
+				];
+
+			case "customeorigin.brocombat":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Maximum Brothers In Battle"
 					},
 					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 0: [color=" + this.Const.UI.Color.NegativeValue + "]1[/color] brother"
+						id = 2,
+						type = "description",
+						text = "The maximun number of brother you can bring in battle."
+					},
+				];
+
+			case "mapconfig.legendallblueprints":
+				return [
+					{
+						id = 1,
+						type = "title",
+						text = "Unlock all crafting recipes"
 					},
 					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 1: [color=" + this.Const.UI.Color.NegativeValue + "]6[/color] brothers"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 2: [color=" + this.Const.UI.Color.NegativeValue + "]9[/color] brothers"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 3: [color=" + this.Const.UI.Color.NegativeValue + "]13[/color] brothers and [color=" + this.Const.UI.Color.NegativeValue + "]12[/color] in battle"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 4: [color=" + this.Const.UI.Color.NegativeValue + "]19[/color] brothers and [color=" + this.Const.UI.Color.NegativeValue + "]16[/color] in battle"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 5: [color=" + this.Const.UI.Color.NegativeValue + "]21[/color] brothers and [color=" + this.Const.UI.Color.NegativeValue + "]18[/color] in battle"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 6: [color=" + this.Const.UI.Color.NegativeValue + "]27[/color] brothers and [color=" + this.Const.UI.Color.NegativeValue + "]25[/color] in battle"
-					},
+						id = 2,
+						type = "description",
+						text = "If enabled, all crafting recipes will be visible at the taxidermist and camp crafting. If disabled, vanilla behavior of having to discover the ingredients first will be enforced."
+					}
 				];
 
 			case "customeorigin.scaling":

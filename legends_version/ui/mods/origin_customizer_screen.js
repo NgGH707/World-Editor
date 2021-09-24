@@ -504,6 +504,23 @@ OriginCustomizerScreen.prototype.destroyDIV = function () {
 	this.mDifficultyLegendaryLabel.remove();
 	this.mDifficultyLegendaryLabel = null;
 
+	this.mEconomicDifficultyEasyCheckbox.remove();
+	this.mEconomicDifficultyEasyCheckbox = null;
+	this.mEconomicDifficultyEasyLabel.remove();
+	this.mEconomicDifficultyEasyLabel = null;
+	this.mEconomicDifficultyNormalCheckbox.remove();
+	this.mEconomicDifficultyNormalCheckbox = null;
+	this.mEconomicDifficultyNormalLabel.remove();
+	this.mEconomicDifficultyNormalLabel = null;
+	this.mEconomicDifficultyHardCheckbox.remove();
+	this.mEconomicDifficultyHardCheckbox = null;
+	this.mEconomicDifficultyHardLabel.remove();
+	this.mEconomicDifficultyHardLabel = null;
+	this.mEconomicDifficultyLegendaryCheckbox.remove();
+	this.mEconomicDifficultyLegendaryCheckbox = null;
+	this.mEconomicDifficultyLegendaryLabel.remove();
+	this.mEconomicDifficultyLegendaryLabel = null;
+
 	this.mIronmanCheckbox.remove();
 	this.mIronmanCheckbox = null;
 	this.mIronmanCheckboxLabel.remove();

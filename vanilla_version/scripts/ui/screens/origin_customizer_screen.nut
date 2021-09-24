@@ -108,14 +108,8 @@ this.origin_customizer_screen <- {
 			EconomicDifficulty = this.World.Assets.getEconomicDifficulty(),
 			IsIronman = this.World.Assets.isIronman(),
 			IsAutosave = this.World.Assets.isAutosave(),
-			ItemScaling = this.LegendsMod.Configs().LegendItemScalingEnabled(),
-			LocationScaling = this.LegendsMod.Configs().LegendLocationScalingEnabled(),
-			AllBlueprint = this.LegendsMod.Configs().LegendAllBlueprintsEnabled(),
+			AllBlueprint = this.World.Flags.get("AllBlueprint"),
 			PartyStrength = this.Math.ceil(this.World.State.getPlayer().getStrength()),
-
-			Tier = this.World.Assets.getOrigin().getRosterTier(),
-			TierMin = 0,
-			TierMax = 6,
 
 			ScalingMult = d == 0 ? 100 : d,
 			ScalingMultMin = 5,
@@ -217,10 +211,21 @@ this.origin_customizer_screen <- {
 			TrainingPriceMultMin = 0,
 			TrainingPriceMultMax = 500,
 		};
+		this.getRosterData(ret, data);
 		this.addStashData(ret);
 		this.addOriginData(ret);
 		this.addBannerData(ret);
 		return ret;
+	}
+
+	function getRosterData( _result , _data )
+	{
+		_result.BrothersMax <- this.Math.floor(_data.BrothersMax);
+		_result.BrothersMaxMin <- 1;
+		_result.BrothersMaxMax <- 27;
+		_result.BrothersMaxInCombat <- this.Math.floor(_data.BrothersMaxInCombat);
+		_result.BrothersMaxInCombatMin <- this.Math.max(1, this.getBrosInFormation());
+		_result.BrothersMaxInCombatMax <- 18;
 	}
 
 	function addStashData( _result )
@@ -262,11 +267,25 @@ this.origin_customizer_screen <- {
 		_result.StartingScenario <- UI;
 	}
 
+	function getBrosInFormation()
+	{
+		local all_players = this.World.getPlayerRoster().getAll();
+		local num = 0;
+
+		foreach( p in all_players )
+		{
+			if (p.getPlaceInFormation() <= 17)
+			{
+				++num;
+			}
+		}
+
+		return num;
+	}
+
 	function onCalculatingPartyStrength( _settings )
 	{
 		this.World.Assets.m.CombatDifficulty = _settings[0];
-		this.LegendsMod.Configs().m.IsItemScaling = _settings[1];
-		this.LegendsMod.Configs().m.IsLocationScaling = _settings[2];
 		this.World.Flags.set("PartyStrengthMult", _settings[3] * 0.01);
 		this.World.Flags.set("BrothersScaleMax", _settings[4]);
 		this.World.Retinue.update();
@@ -282,10 +301,9 @@ this.origin_customizer_screen <- {
 			"EconomicDifficulty",
 			"IsIronman",
 			"IsAutosave",
-			"ItemScaling",
-			"LocationScaling",
 			"AllBlueprint",
-			"Tier",
+			"BrothersMax",
+			"BrothersMaxInCombat",
 			"Stash",
 			"ScalingMult",
 			"EquipmentLootChance",
@@ -334,9 +352,6 @@ this.origin_customizer_screen <- {
 		this.World.Assets.m.EconomicDifficulty = _settings.EconomicDifficulty;
 		this.World.Assets.m.IsIronman = _settings.IsIronman;
 		this.World.Assets.m.IsAutosave = _settings.IsAutosave; 
-		this.LegendsMod.Configs().m.IsItemScaling = _settings.ItemScaling;
-		this.LegendsMod.Configs().m.IsLocationScaling = _settings.LocationScaling;
-		this.LegendsMod.Configs().m.IsBlueprintsVisible = _settings.AllBlueprint;
 
 		if (_settings.Stash != this.m.CurrentStash)
 		{
@@ -346,8 +361,10 @@ this.origin_customizer_screen <- {
 			this.m.CurrentStash = _settings.Stash;
 		}
 
+		this.World.Flags.set("AllBlueprint", _settings.AllBlueprint);
 		this.World.Flags.set("UsedOriginCustomizer", this.OriginCustomizerVersion);
-		this.World.Flags.set("RosterTier", _settings.Tier);
+		this.World.Flags.set("BrothersMax", _settings.BrothersMax);
+		this.World.Flags.set("BrothersMaxInCombat", _settings.BrothersMaxInCombat);
 		this.World.Flags.set("PartyStrengthMult", _settings.ScalingMult * 0.01);
 		this.World.Flags.set("EquipmentLootChance", _settings.EquipmentLootChance);
 		this.World.Flags.set("XPMult", _settings.XpMult * 0.01);

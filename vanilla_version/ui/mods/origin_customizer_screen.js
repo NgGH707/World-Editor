@@ -66,20 +66,14 @@ var OriginCustomizerScreen = function(_parent)
 	this.mAutosaveCheckbox = null;
 	this.mAutosaveCheckboxLabel = null;
 
-	this.mLegendItemScalingCheckbox = null;
-	this.mLegendItemScalingCheckboxLabel = null;
-
-	this.mLegendLocationScalingCheckbox = null;
-	this.mLegendLocationScalingCheckboxLabel = null;
-
 	this.mDifficultyEasyCheckbox = null;
 	this.mDifficultyEasyLabel = null;
 	this.mDifficultyNormalCheckbox = null;
 	this.mDifficultyNormalLabel = null;
 	this.mDifficultyHardCheckbox = null;
 	this.mDifficultyHardLabel = null;
-	this.mDifficultyLegendaryCheckbox = null;
-	this.mDifficultyLegendaryLabel = null;
+	//this.mDifficultyLegendaryCheckbox = null;
+	//this.mDifficultyLegendaryLabel = null;
 
 	this.mEconomicDifficultyEasyCheckbox = null;
 	this.mEconomicDifficultyEasyLabel = null;
@@ -87,15 +81,24 @@ var OriginCustomizerScreen = function(_parent)
 	this.mEconomicDifficultyNormalLabel = null;
 	this.mEconomicDifficultyHardCheckbox = null;
 	this.mEconomicDifficultyHardLabel = null;
-	this.mEconomicDifficultyLegendaryCheckbox = null;
-	this.mEconomicDifficultyLegendaryLabel = null;
+	//this.mEconomicDifficultyLegendaryCheckbox = null;
+	//this.mEconomicDifficultyLegendaryLabel = null;
 
 	// origin config
 	this.mOriginOptions = {
-		Tier: {
+		BrothersMax: {
 			Control: null,
 			Title: null,
-			OptionsKey: 'origin.tier',
+			OptionsKey: 'origin.bromax',
+			Min: 0,
+			Max: 6,
+			Value: 0,
+			Step: 1
+		},
+		BrothersMaxInCombat: {
+			Control: null,
+			Title: null,
+			OptionsKey: 'origin.brocombat',
 			Min: 0,
 			Max: 6,
 			Value: 0,
@@ -499,10 +502,19 @@ OriginCustomizerScreen.prototype.destroyDIV = function () {
 	this.mDifficultyHardCheckbox = null;
 	this.mDifficultyHardLabel.remove();
 	this.mDifficultyHardLabel = null;
-	this.mDifficultyLegendaryCheckbox.remove();
-	this.mDifficultyLegendaryCheckbox = null;
-	this.mDifficultyLegendaryLabel.remove();
-	this.mDifficultyLegendaryLabel = null;
+
+	this.mEconomicDifficultyEasyCheckbox.remove();
+	this.mEconomicDifficultyEasyCheckbox = null;
+	this.mEconomicDifficultyEasyLabel.remove();
+	this.mEconomicDifficultyEasyLabel = null;
+	this.mEconomicDifficultyNormalCheckbox.remove();
+	this.mEconomicDifficultyNormalCheckbox = null;
+	this.mEconomicDifficultyNormalLabel.remove();
+	this.mEconomicDifficultyNormalLabel = null;
+	this.mEconomicDifficultyHardCheckbox.remove();
+	this.mEconomicDifficultyHardCheckbox = null;
+	this.mEconomicDifficultyHardLabel.remove();
+	this.mEconomicDifficultyHardLabel = null;
 
 	this.mIronmanCheckbox.remove();
 	this.mIronmanCheckbox = null;
@@ -513,16 +525,6 @@ OriginCustomizerScreen.prototype.destroyDIV = function () {
 	this.mAutosaveCheckbox = null;
 	this.mAutosaveCheckboxLabel.remove();
 	this.mAutosaveCheckboxLabel = null;
-
-	this.mLegendItemScalingCheckbox.remove();
-	this.mLegendItemScalingCheckbox = null;
-	this.mLegendItemScalingCheckboxLabel.remove();
-	this.mLegendItemScalingCheckboxLabel = null;
-	
-	this.mLegendLocationScalingCheckbox.remove();
-	this.mLegendLocationScalingCheckbox = null;
-	this.mLegendLocationScalingCheckboxLabel.remove();
-	this.mLegendLocationScalingCheckboxLabel = null;
 
 	this.mLegendAllBlueprintsCheckbox.remove();
 	this.mLegendAllBlueprintsCheckbox = null;
@@ -661,40 +663,9 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		}, 'title-font-big font-bold font-color-brother-name');
 		
 
-		this.createSliderControlDIV(this.mOriginOptions.Tier, 'Roster Tier', leftColumn);
+		this.createSliderControlDIV(this.mOriginOptions.BrothersMax, 'Maximum Roster Size', leftColumn);
+		this.createSliderControlDIV(this.mOriginOptions.BrothersMaxInCombat, 'Maximum Combat Brothers', leftColumn);
 		this.createSliderControlDIV(this.mOriginOptions.Stash, 'Stash Capacity', leftColumn);
-
-
-		// ironman
-		var row = $('<div class="row"></div>');
-		leftColumn.append(row);
-		var control = $('<div class="control"/>');
-		row.append(control);
-		this.mIronmanCheckbox = $('<input type="checkbox" id="cb-iron-man"/>');
-		control.append(this.mIronmanCheckbox);
-		this.mIronmanCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-iron-man">Ironman</label>');
-		control.append(this.mIronmanCheckboxLabel);
-		this.mIronmanCheckbox.iCheck({
-			checkboxClass: 'icheckbox_flat-orange',
-			radioClass: 'iradio_flat-orange',
-			increaseArea: '30%'
-		});
-
-		// autosave
-		var row = $('<div class="row"></div>');
-		leftColumn.append(row);
-		var control = $('<div class="control"/>');
-		row.append(control);
-		this.mAutosaveCheckbox = $('<input type="checkbox" id="cb-autosave"/>');
-		control.append(this.mAutosaveCheckbox);
-		this.mAutosaveCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-autosave">Autosave Off</label>');
-		control.append(this.mAutosaveCheckboxLabel);
-		this.mAutosaveCheckbox.iCheck({
-			checkboxClass: 'icheckbox_flat-orange',
-			radioClass: 'iradio_flat-orange',
-			increaseArea: '30%'
-		});
-
 
 		// right column
 		// banner
@@ -759,7 +730,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		this.createSliderControlDIV(this.mOriginOptions.EquipmentLootChance, 'Equipment Loot Chance', leftColumn);
 		this.createSliderControlDIV(this.mOriginOptions.BonusLoot, 'Chance For Bonus Loot', leftColumn);
 
-		// equiment scaling
+		/* equiment scaling
 		var row = $('<div class="row"></div>');
 		leftColumn.append(row);
 		var control = $('<div class="control"/>');
@@ -784,6 +755,36 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		this.mLegendLocationScalingCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legendlocationscaling">Distance Scaling</label>');
 		control.append(this.mLegendLocationScalingCheckboxLabel);
 		this.mLegendLocationScalingCheckbox.iCheck({
+			checkboxClass: 'icheckbox_flat-orange',
+			radioClass: 'iradio_flat-orange',
+			increaseArea: '30%'
+		});*/
+
+		// ironman
+		var row = $('<div class="row"></div>');
+		leftColumn.append(row);
+		var control = $('<div class="control"/>');
+		row.append(control);
+		this.mIronmanCheckbox = $('<input type="checkbox" id="cb-iron-man"/>');
+		control.append(this.mIronmanCheckbox);
+		this.mIronmanCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-iron-man">Ironman</label>');
+		control.append(this.mIronmanCheckboxLabel);
+		this.mIronmanCheckbox.iCheck({
+			checkboxClass: 'icheckbox_flat-orange',
+			radioClass: 'iradio_flat-orange',
+			increaseArea: '30%'
+		});
+
+		// autosave
+		var row = $('<div class="row"></div>');
+		leftColumn.append(row);
+		var control = $('<div class="control"/>');
+		row.append(control);
+		this.mAutosaveCheckbox = $('<input type="checkbox" id="cb-autosave"/>');
+		control.append(this.mAutosaveCheckbox);
+		this.mAutosaveCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-autosave">Autosave Off</label>');
+		control.append(this.mAutosaveCheckboxLabel);
+		this.mAutosaveCheckbox.iCheck({
 			checkboxClass: 'icheckbox_flat-orange',
 			radioClass: 'iradio_flat-orange',
 			increaseArea: '30%'
@@ -848,7 +849,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 			self.mDifficulty = 2;
 		});
 
-		var LegendaryDifficultyControl = $('<div class="control"></div>');
+		/*var LegendaryDifficultyControl = $('<div class="control"></div>');
 		row.append(LegendaryDifficultyControl);
 		this.mDifficultyLegendaryCheckbox = $('<input type="radio" id="cb-difficulty-Legendary" name="difficulty" />');
 		LegendaryDifficultyControl.append(this.mDifficultyLegendaryCheckbox);
@@ -862,7 +863,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		this.mDifficultyLegendaryCheckbox.on('ifChecked', null, this, function (_event) {
 			var self = _event.data;
 			self.mDifficulty = 3;
-		});
+		});*/
 
 
 
@@ -920,7 +921,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 			self.mEconomicDifficulty = 2;
 		});
 
-		var LegendaryDifficultyControl = $('<div class="control"></div>');
+		/*var LegendaryDifficultyControl = $('<div class="control"></div>');
 		row.append(LegendaryDifficultyControl);
 		this.mEconomicDifficultyLegendaryCheckbox = $('<input type="radio" id="cb-economic-difficulty-Legendary" name="economic-difficulty" />');
 		LegendaryDifficultyControl.append(this.mEconomicDifficultyLegendaryCheckbox);
@@ -934,7 +935,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		this.mEconomicDifficultyLegendaryCheckbox.on('ifChecked', null, this, function (_event) {
 			var self = _event.data;
 			self.mEconomicDifficulty = 3;
-		});
+		});*/
 	
 	}
 
@@ -1224,15 +1225,6 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 		elementId: TooltipIdentifier.MenuScreen.NewCampaign.DifficultyHard
 	});
 
-	this.mDifficultyLegendaryLabel.bindTooltip({
-		contentType: 'ui-element',
-		elementId: TooltipIdentifier.MenuScreen.NewCampaign.DifficultyLegendary
-	});
-	this.mDifficultyLegendaryCheckbox.bindTooltip({
-		contentType: 'ui-element',
-		elementId: TooltipIdentifier.MenuScreen.NewCampaign.DifficultyLegendary
-	});
-
 	this.mEconomicDifficultyEasyLabel.bindTooltip({
 		contentType: 'ui-element',
 		elementId: TooltipIdentifier.MenuScreen.NewCampaign.EconomicDifficultyEasy
@@ -1258,15 +1250,6 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 	this.mEconomicDifficultyHardCheckbox.bindTooltip({
 		contentType: 'ui-element',
 		elementId: TooltipIdentifier.MenuScreen.NewCampaign.EconomicDifficultyHard
-	});
-
-	this.mEconomicDifficultyLegendaryLabel.bindTooltip({
-		contentType: 'ui-element',
-		elementId: TooltipIdentifier.MenuScreen.NewCampaign.EconomicDifficultyLegendary
-	});
-	this.mEconomicDifficultyLegendaryCheckbox.bindTooltip({
-		contentType: 'ui-element',
-		elementId: TooltipIdentifier.MenuScreen.NewCampaign.EconomicDifficultyLegendary
 	});
 
 	this.mLegendAllBlueprintsCheckbox.bindTooltip({
@@ -1296,31 +1279,22 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 		elementId: TooltipIdentifier.MenuScreen.NewCampaign.Autosave 
 	});
 
-	this.mLegendItemScalingCheckbox.bindTooltip({
+	this.mOriginOptions.BrothersMax.Control.bindTooltip({
 		contentType: 'ui-element',
-		elementId: 'mapconfig.legenditemscaling'
+		elementId: 'customeorigin.bromax'
 	});
-	this.mLegendItemScalingCheckboxLabel.bindTooltip({
+	this.mOriginOptions.BrothersMax.Title.bindTooltip({
 		contentType: 'ui-element',
-		elementId: 'mapconfig.legenditemscaling'
-	});
-
-	this.mLegendLocationScalingCheckbox.bindTooltip({
-		contentType: 'ui-element',
-		elementId: 'mapconfig.legendlocationscaling'
-	});
-	this.mLegendLocationScalingCheckboxLabel.bindTooltip({
-		contentType: 'ui-element',
-		elementId: 'mapconfig.legendlocationscaling'
+		elementId: 'customeorigin.bromax'
 	});
 
-	this.mOriginOptions.Tier.Control.bindTooltip({
+	this.mOriginOptions.BrothersMaxInCombat.Control.bindTooltip({
 		contentType: 'ui-element',
-		elementId: 'customeorigin.tier'
+		elementId: 'customeorigin.brocombat'
 	});
-	this.mOriginOptions.Tier.Title.bindTooltip({
+	this.mOriginOptions.BrothersMaxInCombat.Title.bindTooltip({
 		contentType: 'ui-element',
-		elementId: 'customeorigin.tier'
+		elementId: 'customeorigin.brocombat'
 	});
 
 	this.mOriginOptions.Stash.Control.bindTooltip({ 
@@ -1591,9 +1565,6 @@ OriginCustomizerScreen.prototype.unbindTooltips = function () {
 	this.mDifficultyHardLabel.unbindTooltip();
 	this.mDifficultyHardCheckbox.unbindTooltip();
 
-	this.mDifficultyLegendaryLabel.unbindTooltip();
-	this.mDifficultyLegendaryCheckbox.unbindTooltip();
-
 	this.mEconomicDifficultyEasyLabel.unbindTooltip();
 	this.mEconomicDifficultyEasyCheckbox.unbindTooltip();
 
@@ -1602,9 +1573,6 @@ OriginCustomizerScreen.prototype.unbindTooltips = function () {
 
 	this.mEconomicDifficultyHardLabel.unbindTooltip();
 	this.mEconomicDifficultyHardCheckbox.unbindTooltip();
-
-	this.mEconomicDifficultyLegendaryLabel.unbindTooltip();
-	this.mEconomicDifficultyLegendaryCheckbox.unbindTooltip();
 
 	this.mLegendAllBlueprintsCheckbox.unbindTooltip();
 	this.mLegendAllBlueprintsCheckboxLabel.unbindTooltip();
@@ -1615,14 +1583,11 @@ OriginCustomizerScreen.prototype.unbindTooltips = function () {
 	this.mAutosaveCheckboxLabel.unbindTooltip();
 	this.mAutosaveCheckbox.unbindTooltip();
 
-	this.mLegendItemScalingCheckbox.unbindTooltip();
-	this.mLegendItemScalingCheckboxLabel.unbindTooltip();
+	this.mOriginOptions.BrothersMax.Control.unbindTooltip();
+	this.mOriginOptions.BrothersMax.Title.unbindTooltip();
 
-	this.mLegendLocationScalingCheckbox.unbindTooltip();
-	this.mLegendLocationScalingCheckboxLabel.unbindTooltip();
-
-	this.mOriginOptions.Tier.Control.unbindTooltip();
-	this.mOriginOptions.Tier.Title.unbindTooltip();
+	this.mOriginOptions.BrothersMaxInCombat.Control.unbindTooltip();
+	this.mOriginOptions.BrothersMaxInCombat.Title.unbindTooltip();
 
 	this.mOriginOptions.Stash.Control.unbindTooltip();
 	this.mOriginOptions.Stash.Title.unbindTooltip();
@@ -1720,8 +1685,6 @@ OriginCustomizerScreen.prototype.collectDifficultyScalingSettings = function () 
 	var settings = [];
 
 	settings.push(this.mDifficulty);
-	settings.push(this.mLegendItemScalingCheckbox.is(":checked"));
-	settings.push(this.mLegendLocationScalingCheckbox.is(":checked"));
 	settings.push(this.mOriginOptions.ScalingMult.Value);
 	settings.push(this.mOriginOptions.BrothersScaleMax.Value);
 	return settings;
@@ -1958,7 +1921,8 @@ OriginCustomizerScreen.prototype.loadFromData = function (_data) {
 
 OriginCustomizerScreen.prototype.updateOriginConfig = function () {
 	var controls = [
-		this.mOriginOptions.Tier,
+		this.mOriginOptions.BrothersMax,
+		this.mOriginOptions.BrothersMaxInCombat,
 		this.mOriginOptions.Stash,
 		this.mOriginOptions.ScalingMult,
 		this.mOriginOptions.EquipmentLootChance,
@@ -1995,28 +1959,18 @@ OriginCustomizerScreen.prototype.updateOriginConfig = function () {
 		_definition.Label.text('' + _definition.Value);
 	});
 
-	if (this.mDifficulty !== 0) {
-		if (this.mDifficulty === 1) {
-		this.mDifficultyNormalCheckbox.iCheck('check');
-		}
-		else if (this.mDifficulty === 2) {
-			this.mDifficultyHardCheckbox.iCheck('check');
-		}
-		else {
-			this.mDifficultyLegendaryCheckbox.iCheck('check');
-		}
+	if (this.mDifficulty === 1) {
+	this.mDifficultyNormalCheckbox.iCheck('check');
 	}
-	
-	if (this.mEconomicDifficulty !== 0) {
-		if (this.mEconomicDifficulty === 1) {
-			this.mEconomicDifficultyNormalCheckbox.iCheck('check');
-		}
-		else if (this.mEconomicDifficulty === 2) {
-			this.mEconomicDifficultyHardCheckbox.iCheck('check');
-		}
-		else {
-			this.mEconomicDifficultyLegendaryCheckbox.iCheck('check');
-		}
+	else if (this.mDifficulty === 2) {
+		this.mDifficultyHardCheckbox.iCheck('check');
+	}
+
+	if (this.mEconomicDifficulty === 1) {
+		this.mEconomicDifficultyNormalCheckbox.iCheck('check');
+	}
+	else if (this.mEconomicDifficulty === 2) {
+		this.mEconomicDifficultyHardCheckbox.iCheck('check');
 	}
 };
 
@@ -2040,25 +1994,20 @@ OriginCustomizerScreen.prototype.setConfigOpts = function (_data) {
 				this.mAutosaveCheckbox.iCheck('check');
 			}
 		}
-		if ('ItemScaling' in _data) {
-			if (_data['ItemScaling']) {
-				this.mLegendItemScalingCheckbox.iCheck('check');
-			}
-		}
-		if ('LocationScaling' in _data) {
-			if (_data['LocationScaling']) {
-				this.mLegendLocationScalingCheckbox.iCheck('check');
-			}
-		}
 		if ('AllBlueprint' in _data) {
 			if (_data['AllBlueprint']) {
 				this.mLegendAllBlueprintsCheckbox.iCheck('check');
 			}
 		}
-		if ('Tier' in _data) {
-			this.mOriginOptions.Tier.Value = _data['Tier'];
-			this.mOriginOptions.Tier.Min = _data['TierMin'];
-			this.mOriginOptions.Tier.Max = _data['TierMax'];
+		if ('BrothersMax' in _data) {
+			this.mOriginOptions.BrothersMax.Value = _data['BrothersMax'];
+			this.mOriginOptions.BrothersMax.Min = _data['BrothersMaxMin'];
+			this.mOriginOptions.BrothersMax.Max = _data['BrothersMaxMax'];
+		}
+		if ('BrothersMaxInCombat' in _data) {
+			this.mOriginOptions.BrothersMaxInCombat.Value = _data['BrothersMaxInCombat'];
+			this.mOriginOptions.BrothersMaxInCombat.Min = _data['BrothersMaxInCombatMin'];
+			this.mOriginOptions.BrothersMaxInCombat.Max = _data['BrothersMaxInCombatMax'];
 		}
 		if ('Stash' in _data) {
 			this.mOriginOptions.Stash.Value = _data['Stash'];
@@ -2209,10 +2158,9 @@ OriginCustomizerScreen.prototype.collectSettings = function () {
 	settings.push(this.mEconomicDifficulty);
 	settings.push(this.mIronmanCheckbox.is(":checked"));
 	settings.push(this.mAutosaveCheckbox.is(":checked"));
-	settings.push(this.mLegendItemScalingCheckbox.is(":checked"));
-	settings.push(this.mLegendLocationScalingCheckbox.is(":checked"));
 	settings.push(this.mLegendAllBlueprintsCheckbox.is(":checked"));
-	settings.push(this.mOriginOptions.Tier.Value);
+	settings.push(this.mOriginOptions.BrothersMax.Value);
+	settings.push(this.mOriginOptions.BrothersMaxInCombat.Value);
 	settings.push(this.mOriginOptions.Stash.Value);
 	settings.push(this.mOriginOptions.ScalingMult.Value);
 	settings.push(this.mOriginOptions.EquipmentLootChance.Value);
