@@ -107,7 +107,7 @@ this.origin_customizer_screen <- {
 			Difficulty = this.World.Assets.getCombatDifficulty(),
 			EconomicDifficulty = this.World.Assets.getEconomicDifficulty(),
 			IsIronman = this.World.Assets.isIronman(),
-			IsAutosave = this.World.Assets.isAutosave(),
+			//IsAutosave = this.World.Assets.isAutosave(),
 			AllBlueprint = this.World.Flags.get("AllBlueprint"),
 			PartyStrength = this.Math.ceil(this.World.State.getPlayer().getStrength()),
 
@@ -286,8 +286,8 @@ this.origin_customizer_screen <- {
 	function onCalculatingPartyStrength( _settings )
 	{
 		this.World.Assets.m.CombatDifficulty = _settings[0];
-		this.World.Flags.set("PartyStrengthMult", _settings[3] * 0.01);
-		this.World.Flags.set("BrothersScaleMax", _settings[4]);
+		this.World.Flags.set("PartyStrengthMult", _settings[1] * 0.01);
+		this.World.Flags.set("BrothersScaleMax", _settings[2]);
 		this.World.Retinue.update();
 		local result = this.Math.ceil(this.World.State.getPlayer().getStrength());
 		this.m.JSHandle.asyncCall("updateWithCalculationResult", result);
@@ -300,7 +300,6 @@ this.origin_customizer_screen <- {
 			"Difficulty",
 			"EconomicDifficulty",
 			"IsIronman",
-			"IsAutosave",
 			"AllBlueprint",
 			"BrothersMax",
 			"BrothersMaxInCombat",
@@ -351,7 +350,7 @@ this.origin_customizer_screen <- {
 		this.World.Assets.m.CombatDifficulty = _settings.Difficulty;
 		this.World.Assets.m.EconomicDifficulty = _settings.EconomicDifficulty;
 		this.World.Assets.m.IsIronman = _settings.IsIronman;
-		this.World.Assets.m.IsAutosave = _settings.IsAutosave; 
+		//this.World.Assets.m.IsAutosave = _settings.IsAutosave; 
 
 		if (_settings.Stash != this.m.CurrentStash)
 		{

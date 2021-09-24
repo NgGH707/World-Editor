@@ -191,10 +191,9 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 	::mods_hookExactClass("entity/world/player_party", function( obj )
 	{
-		local wc_getStrength = ::mods_getMember(obj, "getStrength");
 		obj.getStrength = function()
 		{
-			this.m.Strength = wc_getStrength();
+			this.updateStrength();
 
 			if (this.World.Flags.has("PartyStrengthMult"))
 			{
@@ -209,7 +208,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 	::mods_hookBaseClass("crafting/blueprint", function( obj )
 	{
 		obj = obj[obj.SuperName];
-		obj.isQualified = function( _item )
+		obj.isQualified = function()
 		{
 			if (this.World.Flags.get("AllBlueprint"))
 			{

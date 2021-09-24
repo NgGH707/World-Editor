@@ -63,8 +63,8 @@ var OriginCustomizerScreen = function(_parent)
 	this.mIronmanCheckbox = null;
 	this.mIronmanCheckboxLabel = null;
 
-	this.mAutosaveCheckbox = null;
-	this.mAutosaveCheckboxLabel = null;
+	//this.mAutosaveCheckbox = null;
+	//this.mAutosaveCheckboxLabel = null;
 
 	this.mDifficultyEasyCheckbox = null;
 	this.mDifficultyEasyLabel = null;
@@ -521,10 +521,10 @@ OriginCustomizerScreen.prototype.destroyDIV = function () {
 	this.mIronmanCheckboxLabel.remove();
 	this.mIronmanCheckboxLabel = null;
 
-	this.mAutosaveCheckbox.remove();
-	this.mAutosaveCheckbox = null;
-	this.mAutosaveCheckboxLabel.remove();
-	this.mAutosaveCheckboxLabel = null;
+	//this.mAutosaveCheckbox.remove();
+	//this.mAutosaveCheckbox = null;
+	//this.mAutosaveCheckboxLabel.remove();
+	//this.mAutosaveCheckboxLabel = null;
 
 	this.mLegendAllBlueprintsCheckbox.remove();
 	this.mLegendAllBlueprintsCheckbox = null;
@@ -664,7 +664,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		
 
 		this.createSliderControlDIV(this.mOriginOptions.BrothersMax, 'Maximum Roster Size', leftColumn);
-		this.createSliderControlDIV(this.mOriginOptions.BrothersMaxInCombat, 'Maximum Combat Brothers', leftColumn);
+		this.createSliderControlDIV(this.mOriginOptions.BrothersMaxInCombat, 'Brothers In Combat', leftColumn);
 		this.createSliderControlDIV(this.mOriginOptions.Stash, 'Stash Capacity', leftColumn);
 
 		// right column
@@ -725,6 +725,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		this.mDifficultyPanel.append(rightColumn);
 
 		// left column
+		this.createSliderControlDIV(this.mOriginOptions.ScalingMult, 'Difficulty Scaling', leftColumn);
 		this.createSliderControlDIV(this.mOriginOptions.BrothersScaleMax, 'Maximum Bros Scaling', leftColumn);
 		this.createSliderControlDIV(this.mOriginOptions.BonusChampion, 'Bonus Champion Chance', leftColumn);
 		this.createSliderControlDIV(this.mOriginOptions.EquipmentLootChance, 'Equipment Loot Chance', leftColumn);
@@ -760,22 +761,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 			increaseArea: '30%'
 		});*/
 
-		// ironman
-		var row = $('<div class="row"></div>');
-		leftColumn.append(row);
-		var control = $('<div class="control"/>');
-		row.append(control);
-		this.mIronmanCheckbox = $('<input type="checkbox" id="cb-iron-man"/>');
-		control.append(this.mIronmanCheckbox);
-		this.mIronmanCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-iron-man">Ironman</label>');
-		control.append(this.mIronmanCheckboxLabel);
-		this.mIronmanCheckbox.iCheck({
-			checkboxClass: 'icheckbox_flat-orange',
-			radioClass: 'iradio_flat-orange',
-			increaseArea: '30%'
-		});
-
-		// autosave
+		/* autosave
 		var row = $('<div class="row"></div>');
 		leftColumn.append(row);
 		var control = $('<div class="control"/>');
@@ -788,12 +774,29 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 			checkboxClass: 'icheckbox_flat-orange',
 			radioClass: 'iradio_flat-orange',
 			increaseArea: '30%'
-		});
+		});*/
 
 
 		// right column
 		// difficulty scaling
-		this.createSliderControlDIV(this.mOriginOptions.ScalingMult, 'Difficulty Scaling', rightColumn);
+		
+
+		// ironman
+		var row = $('<div class="row"></div>');
+		rightColumn.append(row);
+		var title = $('<div class="title title-font-big font-color-title">Ironman Mode</div>');
+		row.append(title);
+		var control = $('<div class="control"/>');
+		row.append(control);
+		this.mIronmanCheckbox = $('<input type="checkbox" id="cb-iron-man"/>');
+		control.append(this.mIronmanCheckbox);
+		this.mIronmanCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-iron-man">Ironman</label>');
+		control.append(this.mIronmanCheckboxLabel);
+		this.mIronmanCheckbox.iCheck({
+			checkboxClass: 'icheckbox_flat-orange',
+			radioClass: 'iradio_flat-orange',
+			increaseArea: '30%'
+		});
 
 		// combat difficulty
 		var row = $('<div class="row" />');
@@ -1270,14 +1273,14 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 		elementId: TooltipIdentifier.MenuScreen.NewCampaign.Ironman
 	});
 
-	this.mAutosaveCheckboxLabel.bindTooltip(
+	/*this.mAutosaveCheckboxLabel.bindTooltip(
 		{ contentType: 'ui-element', 
 		elementId: TooltipIdentifier.MenuScreen.NewCampaign.Autosave 
 	});
 	this.mAutosaveCheckbox.bindTooltip({ 
 		contentType: 'ui-element', 
 		elementId: TooltipIdentifier.MenuScreen.NewCampaign.Autosave 
-	});
+	});*/
 
 	this.mOriginOptions.BrothersMax.Control.bindTooltip({
 		contentType: 'ui-element',
@@ -1580,8 +1583,8 @@ OriginCustomizerScreen.prototype.unbindTooltips = function () {
 	this.mIronmanCheckboxLabel.unbindTooltip();
 	this.mIronmanCheckbox.unbindTooltip();
 
-	this.mAutosaveCheckboxLabel.unbindTooltip();
-	this.mAutosaveCheckbox.unbindTooltip();
+	/*this.mAutosaveCheckboxLabel.unbindTooltip();
+	this.mAutosaveCheckbox.unbindTooltip();*/
 
 	this.mOriginOptions.BrothersMax.Control.unbindTooltip();
 	this.mOriginOptions.BrothersMax.Title.unbindTooltip();
@@ -1989,11 +1992,11 @@ OriginCustomizerScreen.prototype.setConfigOpts = function (_data) {
 				this.mIronmanCheckbox.iCheck('check');
 			}
 		}
-		if ('IsAutosave' in _data) {
+		/*if ('IsAutosave' in _data) {
 			if (_data['IsAutosave']) {
 				this.mAutosaveCheckbox.iCheck('check');
 			}
-		}
+		}*/
 		if ('AllBlueprint' in _data) {
 			if (_data['AllBlueprint']) {
 				this.mLegendAllBlueprintsCheckbox.iCheck('check');
@@ -2157,7 +2160,7 @@ OriginCustomizerScreen.prototype.collectSettings = function () {
 	settings.push(this.mDifficulty);
 	settings.push(this.mEconomicDifficulty);
 	settings.push(this.mIronmanCheckbox.is(":checked"));
-	settings.push(this.mAutosaveCheckbox.is(":checked"));
+	//settings.push(this.mAutosaveCheckbox.is(":checked"));
 	settings.push(this.mLegendAllBlueprintsCheckbox.is(":checked"));
 	settings.push(this.mOriginOptions.BrothersMax.Value);
 	settings.push(this.mOriginOptions.BrothersMaxInCombat.Value);
