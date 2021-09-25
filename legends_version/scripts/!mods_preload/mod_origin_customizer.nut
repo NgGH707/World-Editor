@@ -3,7 +3,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 ::mods_registerMod("mod_origin_customizer_legends", version, "NgGH's Hard Work");
 ::mods_registerJS("origin_customizer_screen.js");
 ::mods_registerCSS("origin_customizer_screen.css");
-::mods_queue("mod_origin_customizer_legends", "mod_legends", function()
+::mods_queue("mod_origin_customizer_legends", "mod_legends,>mod_nggh_assets", function()
 {	
 	::mods_hookNewObjectOnce("states/world_state", function( obj ) 
 	{
@@ -81,6 +81,28 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 	::mods_hookNewObjectOnce("states/world/asset_manager", function ( obj )
 	{
+		local updateLook = obj.updateLook;
+		obj.updateLook = function( _updateTo = -1 )
+		{
+			if (this.World.Flags.has("AvatarSprite"))
+			{
+				if (this.World.State.getPlayer() != null)
+				{
+					local player = this.World.State.getPlayer();
+					local body = this.World.Flags.get("AvatarSprite");
+					local socket = this.World.Flags.get("AvatarSocket");
+					local flip = this.World.Flags.get("AvatarIsFlippedHorizontally");
+					player.getSprite("body").setBrush(body);
+					player.getSprite("body").setHorizontalFlipping(flip);
+					player.getSprite("base").setBrush(socket);
+					player.getSprite("base").setHorizontalFlipping(flip);
+					return;
+				}
+			}
+
+			updateLook(_updateTo);
+		}
+
 		local reset = obj.resetToDefaults;
 		obj.resetToDefaults = function()
 		{
@@ -417,6 +439,20 @@ this.getroottable().OriginCustomizerVersion <- version;
 						type = "text",
 						icon = "ui/icons/special.png",
 						text = "Tier 6: [color=" + this.Const.UI.Color.NegativeValue + "]27[/color] brothers and [color=" + this.Const.UI.Color.NegativeValue + "]25[/color] in battle"
+					},
+				];
+
+			case "customeorigin.avatarbutton":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Change Avatar Sprite"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Let you change your world map avatar sprite to the one you want."
 					},
 				];
 
@@ -884,5 +920,185 @@ this.getroottable().OriginCustomizerVersion <- version;
 			return null;
 		}
 	});
+	
+	local gt = this.getroottable();
+	gt.Const.WorldSprites <- [];
+	gt.Const.WorldSockets <- [
+		"world_base_01",
+		"world_base_02",
+		"world_base_03",
+		"world_base_05",
+		"world_base_07",
+		"world_base_08",
+		"world_base_09",
+		"world_base_10",
+		"world_base_11",
+		"world_base_12",
+		"world_base_13",
+		"world_base_14",
+	];
+	gt.Const.WorldSpritesNames <- [
+		"Player",
+		"Civilian",
+		"Noble",
+		"Raider",
+		"Southern",
+		"Undead",
+		"Greenskin",
+		"Misc"
+	];
+	gt.Const.WorldSprites.push([
+		"figure_player_01",
+		"figure_player_02",
+		"figure_player_03",
+		"figure_player_04",
+		"figure_player_05",
+		"figure_player_06",
+		"figure_player_07",
+		"figure_player_08",
+		"figure_player_09",
+		"figure_player_10",
+		"figure_player_11",
+		"figure_player_12",
+		"figure_player_13",
+		"figure_player_14",
+		"figure_player_15",
+		"figure_player_16",
+		"figure_player_17",
+		"figure_player_18",
+	]);
 
-})
+	if (::mods_getRegisteredMod("mod_nggh_magic_concept") != null)
+	{
+		gt.Const.WorldSprites[0].extend([
+			"figure_player_9991",
+			"figure_player_9992",
+			"figure_player_9993",
+			"figure_player_9994",
+			"figure_player_9995",
+			"figure_player_9996",
+			"figure_player_9997",
+			"figure_player_9998",
+			"figure_player_9999",
+		]);
+	}
+
+	gt.Const.WorldSprites.push([
+		"figure_civilian_01",
+		"figure_civilian_02",
+		"figure_civilian_03",
+		"figure_civilian_04",
+		"figure_civilian_05",
+		"figure_civilian_06",
+		"figure_mercenary_01",
+		"figure_mercenary_02",
+		"figure_militia_01",
+		"figure_militia_02",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_noble_01",
+		"figure_noble_02",
+		"figure_noble_03",
+		"figure_noble_01_01",
+		"figure_noble_01_02",
+		"figure_noble_01_03",
+		"figure_noble_01_04",
+		"figure_noble_01_05",
+		"figure_noble_01_06",
+		"figure_noble_01_07",
+		"figure_noble_01_08",
+		"figure_noble_01_09",
+		"figure_noble_01_10",
+		"figure_noble_02_01",
+		"figure_noble_02_02",
+		"figure_noble_02_03",
+		"figure_noble_02_04",
+		"figure_noble_02_05",
+		"figure_noble_02_06",
+		"figure_noble_02_07",
+		"figure_noble_02_08",
+		"figure_noble_02_09",
+		"figure_noble_02_10",
+		"figure_noble_03_01",
+		"figure_noble_03_02",
+		"figure_noble_03_03",
+		"figure_noble_03_04",
+		"figure_noble_03_05",
+		"figure_noble_03_06",
+		"figure_noble_03_07",
+		"figure_noble_03_08",
+		"figure_noble_03_09",
+		"figure_noble_03_10",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_bandit_01",
+		"figure_bandit_02",
+		"figure_bandit_03",
+		"figure_bandit_04",
+		"figure_wildman_01",
+		"figure_wildman_02",
+		"figure_wildman_03",
+		"figure_wildman_04",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_refugee_01",
+		"figure_refugee_02",
+		"figure_slave_01",
+		"figure_southern_01",
+		"figure_southern_01_12",
+		"figure_southern_01_13",
+		"figure_southern_01_14",
+		"figure_southern_02",
+		"figure_nomad_01",
+		"figure_nomad_02",
+		"figure_nomad_03",
+		"figure_nomad_04",
+		"figure_nomad_05",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_necromancer_01",
+		"figure_necromancer_02",
+		"figure_ghost_01",
+		"figure_zombie_01",
+		"figure_zombie_02",
+		"figure_zombie_03",
+		"figure_zombie_04",
+		"figure_vampire_01",
+		"figure_vampire_02",
+		"figure_skeleton_01",
+		"figure_skeleton_02",
+		"figure_skeleton_03",
+		"figure_skeleton_04",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_goblin_01",
+		"figure_goblin_02",
+		"figure_goblin_03",
+		"figure_goblin_04",
+		"figure_goblin_05",
+		"figure_orc_01",
+		"figure_orc_02",
+		"figure_orc_03",
+		"figure_orc_04",
+		"figure_orc_05",
+		"figure_orc_06",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_hexe_01",
+		"figure_alp_01",
+		"figure_ghoul_01",
+		"figure_ghoul_02",
+		"figure_golem_01",
+		"figure_golem_02",
+		"figure_hyena_01",
+		"figure_kraken_01",
+		"figure_lindwurm_01",
+		"figure_schrat_01",
+		"figure_serpent_01",
+		"figure_spider_01",
+		"figure_unhold_01",
+		"figure_unhold_02",
+		"figure_unhold_03",
+		"figure_werewolf_01",
+	]);
+});
