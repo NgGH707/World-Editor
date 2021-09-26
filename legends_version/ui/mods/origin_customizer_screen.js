@@ -6,7 +6,6 @@
  *
  *  @Author:		Overhype Studios
  *  @Date:			03.03.2015
- *  @Description:	New Campaign Menu Module JS
  */
 "use strict";
 
@@ -516,7 +515,7 @@ OriginCustomizerScreen.prototype.destroyDIV = function () {
 		this.mCurrentPopupDialog = null;
 	}
 
-	this.mAvatar.ToggleButton.destroy();
+	this.mAvatar.ToggleButton.remove();
 	this.mAvatar.ToggleButton = null;
 
 	// controls
