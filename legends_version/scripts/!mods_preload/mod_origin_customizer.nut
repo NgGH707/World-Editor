@@ -1,4 +1,4 @@
-local version = 2.1.1;
+local version = 2.1.2;
 this.getroottable().OriginCustomizerVersion <- version;
 ::mods_registerMod("mod_origin_customizer_legends", version, "NgGH's Hard Work");
 ::mods_registerJS("origin_customizer_screen.js");
