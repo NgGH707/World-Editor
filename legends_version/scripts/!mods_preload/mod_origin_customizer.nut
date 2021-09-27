@@ -142,8 +142,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 					if (this.World.Flags.has(key))
 					{
-						local value = this.World.Flags.getAsFloat(key);
-						this.m[key] *= value;
+						this.m[key] = this.World.Flags.getAsFloat(key);
 					}
 				}
 
