@@ -77,6 +77,28 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 	::mods_hookNewObjectOnce("states/world/asset_manager", function ( obj )
 	{
+		local updateLook = obj.updateLook;
+		obj.updateLook = function( _updateTo = -1 )
+		{
+			if (this.World.Flags.has("AvatarSprite"))
+			{
+				if (this.World.State.getPlayer() != null)
+				{
+					local player = this.World.State.getPlayer();
+					local body = this.World.Flags.get("AvatarSprite");
+					local socket = this.World.Flags.get("AvatarSocket");
+					local flip = this.World.Flags.get("AvatarIsFlippedHorizontally");
+					player.getSprite("body").setBrush(body);
+					player.getSprite("body").setHorizontalFlipping(flip);
+					player.getSprite("base").setBrush(socket);
+					player.getSprite("base").setHorizontalFlipping(flip);
+					return;
+				}
+			}
+
+			updateLook(_updateTo);
+		}
+
 		local reset = obj.resetToDefaults;
 		obj.resetToDefaults = function()
 		{
@@ -116,8 +138,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 					if (this.World.Flags.has(key))
 					{
-						local value = this.World.Flags.getAsFloat(key);
-						this.m[key] *= value;
+						this.m[key] = this.World.Flags.getAsFloat(key);
 					}
 				}
 
@@ -323,6 +344,144 @@ this.getroottable().OriginCustomizerVersion <- version;
 		}
 	});
 
+	::mods_hookNewObject("ui/screens/world/modules/world_town_screen/town_training_dialog_module", function( obj ) 
+	{
+		obj.queryRosterInformation = function()
+		{
+			local settlement = this.World.State.getCurrentTown();
+			local brothers = this.World.getPlayerRoster().getAll();
+			local roster = [];
+			local mult = this.World.Assets.m.TrainingPriceMult;
+
+			foreach( b in brothers )
+			{
+				if (b.getLevel() >= 11)
+				{
+					continue;
+				}
+
+				if (b.getLevel() >= 7 && this.World.Assets.getOrigin().getID() == "scenario.manhunters" && b.getBackground().getID() == "background.slave")
+				{
+					continue;
+				}
+
+				if (b.getSkills().hasSkill("effects.trained"))
+				{
+					continue;
+				}
+
+				local background = b.getBackground();
+				local e = {
+					ID = b.getID(),
+					Name = b.getName(),
+					Level = b.getLevel(),
+					ImagePath = b.getImagePath(),
+					ImageOffsetX = b.getImageOffsetX(),
+					ImageOffsetY = b.getImageOffsetY(),
+					BackgroundImagePath = background.getIconColored(),
+					BackgroundText = background.getDescription(),
+					Training = [],
+					Effects = []
+				};
+				e.Training.push({
+					id = 0,
+					icon = "skills/status_effect_75.png",
+					name = "Sparring Fight",
+					tooltip = "world-town-screen.training-dialog-module.Train1",
+					price = this.Math.round((80 + 50 * b.getLevel()) * mult)
+				});
+				e.Training.push({
+					id = 1,
+					icon = "skills/status_effect_76.png",
+					name = "Veteran\'s Lessons",
+					tooltip = "world-town-screen.training-dialog-module.Train2",
+					price = this.Math.round((100 + 60 * b.getLevel()) * mult)
+				});
+				e.Training.push({
+					id = 2,
+					icon = "skills/status_effect_77.png",
+					name = "Rigorous Schooling",
+					tooltip = "world-town-screen.training-dialog-module.Train3",
+					price = this.Math.round((90 + 55 * b.getLevel()) * mult)
+				});
+				roster.push(e);
+			}
+
+			return {
+				Title = "Training Hall",
+				SubTitle = "Have your company train for combat and learn from veterans",
+				Roster = roster,
+				Assets = this.m.Parent.queryAssetsInformation()
+			};
+		}
+
+		obj.onTrain = function( _data )
+		{
+			local entityID = _data[0];
+			local trainingID = _data[1];
+			local settlement = this.World.State.getCurrentTown();
+			local entity = this.Tactical.getEntityByID(entityID);
+
+			if (entity.getSkills().hasSkill("effects.trained"))
+			{
+				return null;
+			}
+
+			local price = 0;
+			local mult = this.World.Assets.m.TrainingPriceMult;
+			local effect = this.new("scripts/skills/effects_world/new_trained_effect");
+
+			switch(trainingID)
+			{
+			case 0:
+				price = this.Math.round((80 + 50 * entity.getLevel()) * mult);
+				effect.m.Duration = 1;
+				effect.m.XPGainMult = 1.5;
+				effect.m.Icon = "skills/status_effect_75.png";
+				break;
+
+			case 1:
+				price = this.Math.round((100 + 60 * entity.getLevel()) * mult);
+				effect.m.Duration = 3;
+				effect.m.XPGainMult = 1.35;
+				effect.m.Icon = "skills/status_effect_76.png";
+				break;
+
+			case 2:
+				price = this.Math.round((90 + 55 * entity.getLevel()) * mult);
+				effect.m.Duration = 5;
+				effect.m.XPGainMult = 1.2;
+				effect.m.Icon = "skills/status_effect_77.png";
+				break;
+			}
+
+			this.World.Assets.addMoney(-price);
+			entity.getSkills().add(effect);
+			local background = entity.getBackground();
+			local e = {
+				ID = entity.getID(),
+				Name = entity.getName(),
+				Level = entity.getLevel(),
+				ImagePath = entity.getImagePath(),
+				ImageOffsetX = entity.getImageOffsetX(),
+				ImageOffsetY = entity.getImageOffsetY(),
+				BackgroundImagePath = background.getIconColored(),
+				BackgroundText = background.getDescription(),
+				Training = [],
+				Effects = []
+			};
+			e.Effects.push({
+				id = effect.getID(),
+				icon = effect.getIcon()
+			});
+			local r = {
+				Entity = e,
+				Assets = this.m.Parent.queryAssetsInformation()
+			};
+			return r;
+		}
+	});
+
 	::mods_hookNewObjectOnce("ui/screens/tooltip/tooltip_events", function( obj ) 
 	{
 	 	local queryTooltipData = ::mods_getMember(obj, "general_queryUIElementTooltipData");
@@ -344,6 +503,20 @@ this.getroottable().OriginCustomizerVersion <- version;
 						id = 2,
 						type = "description",
 						text = "The maximun number of brother you can have."
+					},
+				];
+
+			case "customeorigin.avatarbutton":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Change Avatar Sprite"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Let you change your world map avatar sprite to the one you want."
 					},
 				];
 
@@ -839,5 +1012,171 @@ this.getroottable().OriginCustomizerVersion <- version;
 			return null;
 		}
 	});
+
+	local gt = this.getroottable();
+	gt.Const.WorldSprites <- [];
+	gt.Const.WorldSockets <- [
+		"world_base_01",
+		"world_base_02",
+		"world_base_03",
+		"world_base_05",
+		"world_base_07",
+		"world_base_08",
+		"world_base_09",
+		"world_base_10",
+		"world_base_11",
+		"world_base_12",
+		"world_base_13",
+		"world_base_14",
+	];
+	gt.Const.WorldSpritesNames <- [
+		"Player",
+		"Civilian",
+		"Noble",
+		"Raider",
+		"Southern",
+		"Undead",
+		"Greenskin",
+		"Misc"
+	];
+	gt.Const.WorldSprites.push([
+		"figure_player_01",
+		"figure_player_02",
+		"figure_player_03",
+		"figure_player_04",
+		"figure_player_05",
+		"figure_player_06",
+		"figure_player_07",
+		"figure_player_08",
+		"figure_player_09",
+		"figure_player_10",
+		"figure_player_11",
+		"figure_player_12",
+		"figure_player_13",
+		"figure_player_14",
+		"figure_player_15",
+		"figure_player_16",
+		"figure_player_17",
+		"figure_player_18",
+	]);
+
+	gt.Const.WorldSprites.push([
+		"figure_civilian_01",
+		"figure_civilian_02",
+		"figure_civilian_03",
+		"figure_civilian_04",
+		"figure_civilian_05",
+		"figure_civilian_06",
+		"figure_mercenary_01",
+		"figure_mercenary_02",
+		"figure_militia_01",
+		"figure_militia_02",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_noble_01",
+		"figure_noble_02",
+		"figure_noble_03",
+		"figure_noble_01_01",
+		"figure_noble_01_02",
+		"figure_noble_01_03",
+		"figure_noble_01_04",
+		"figure_noble_01_05",
+		"figure_noble_01_06",
+		"figure_noble_01_07",
+		"figure_noble_01_08",
+		"figure_noble_01_09",
+		"figure_noble_01_10",
+		"figure_noble_02_01",
+		"figure_noble_02_02",
+		"figure_noble_02_03",
+		"figure_noble_02_04",
+		"figure_noble_02_05",
+		"figure_noble_02_06",
+		"figure_noble_02_07",
+		"figure_noble_02_08",
+		"figure_noble_02_09",
+		"figure_noble_02_10",
+		"figure_noble_03_01",
+		"figure_noble_03_02",
+		"figure_noble_03_03",
+		"figure_noble_03_04",
+		"figure_noble_03_05",
+		"figure_noble_03_06",
+		"figure_noble_03_07",
+		"figure_noble_03_08",
+		"figure_noble_03_09",
+		"figure_noble_03_10",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_bandit_01",
+		"figure_bandit_02",
+		"figure_bandit_03",
+		"figure_bandit_04",
+		"figure_wildman_01",
+		"figure_wildman_02",
+		"figure_wildman_03",
+		"figure_wildman_04",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_refugee_01",
+		"figure_refugee_02",
+		"figure_slave_01",
+		"figure_southern_01",
+		"figure_southern_01_12",
+		"figure_southern_01_13",
+		"figure_southern_01_14",
+		"figure_southern_02",
+		"figure_nomad_01",
+		"figure_nomad_02",
+		"figure_nomad_03",
+		"figure_nomad_04",
+		"figure_nomad_05",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_necromancer_01",
+		"figure_necromancer_02",
+		"figure_ghost_01",
+		"figure_zombie_01",
+		"figure_zombie_02",
+		"figure_zombie_03",
+		"figure_zombie_04",
+		"figure_vampire_01",
+		"figure_vampire_02",
+		"figure_skeleton_01",
+		"figure_skeleton_02",
+		"figure_skeleton_03",
+		"figure_skeleton_04",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_goblin_01",
+		"figure_goblin_02",
+		"figure_goblin_03",
+		"figure_goblin_04",
+		"figure_goblin_05",
+		"figure_orc_01",
+		"figure_orc_02",
+		"figure_orc_03",
+		"figure_orc_04",
+		"figure_orc_05",
+		"figure_orc_06",
+	]);
+	gt.Const.WorldSprites.push([
+		"figure_hexe_01",
+		"figure_alp_01",
+		"figure_ghoul_01",
+		"figure_ghoul_02",
+		"figure_golem_01",
+		"figure_golem_02",
+		"figure_hyena_01",
+		"figure_kraken_01",
+		"figure_lindwurm_01",
+		"figure_schrat_01",
+		"figure_serpent_01",
+		"figure_spider_01",
+		"figure_unhold_01",
+		"figure_unhold_02",
+		"figure_unhold_03",
+		"figure_werewolf_01",
+	]);
 
 })

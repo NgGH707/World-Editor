@@ -1102,6 +1102,21 @@ this.getroottable().OriginCustomizerVersion <- version;
 		"figure_player_16",
 		"figure_player_17",
 		"figure_player_18",
+		"figure_player_crusader",
+		"figure_player_ranger",
+		"figure_player_beggar",
+		"figure_player_legion",
+		"figure_player_noble",
+		"figure_player_seer",
+		"figure_player_warlock",
+		"figure_player_trader",
+		"figure_player_party",
+		"figure_player_vala",
+		"figure_player_assassin",
+		"figure_player_inquisition",
+		"figure_player_druid",
+		"figure_player_troupe",
+		"figure_player_slave",
 	]);
 
 	if (::mods_getRegisteredMod("mod_nggh_magic_concept") != null)
@@ -1205,6 +1220,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 		"figure_skeleton_02",
 		"figure_skeleton_03",
 		"figure_skeleton_04",
+		"figure_mummy_01",
 	]);
 	gt.Const.WorldSprites.push([
 		"figure_goblin_01",
@@ -1221,20 +1237,29 @@ this.getroottable().OriginCustomizerVersion <- version;
 	]);
 	gt.Const.WorldSprites.push([
 		"figure_hexe_01",
+		"figure_hexe_leader_01",
 		"figure_alp_01",
+		"figure_demonalp_01",
 		"figure_ghoul_01",
 		"figure_ghoul_02",
+		"figure_skin_ghoul_01",
+		"figure_skin_ghoul_02",
 		"figure_golem_01",
 		"figure_golem_02",
 		"figure_hyena_01",
 		"figure_kraken_01",
 		"figure_lindwurm_01",
+		"figure_stollwurm_01",
 		"figure_schrat_01",
+		"figure_greenwood_schrat_01",
 		"figure_serpent_01",
 		"figure_spider_01",
+		"figure_redback_spider_01",
 		"figure_unhold_01",
 		"figure_unhold_02",
 		"figure_unhold_03",
+		"figure_rock_unhold_01",
 		"figure_werewolf_01",
+		"figure_white_direwolf_01",
 	]);
 });

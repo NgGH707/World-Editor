@@ -12,6 +12,7 @@ this.origin_customizer_screen <- {
 		CurrentBanner = "",
 		CurrentStash = 0,
 		ScenarioUI = [],
+		TempModel = null,
 	},
 	function isVisible()
 	{
@@ -215,6 +216,7 @@ this.origin_customizer_screen <- {
 		this.addStashData(ret);
 		this.addOriginData(ret);
 		this.addBannerData(ret);
+		this.creatingTemporaryModel(ret);
 		return ret;
 	}
 
@@ -265,6 +267,56 @@ this.origin_customizer_screen <- {
 		_result.OriginIndex <- index;
 		_result.OriginImage <- UI[index].Image;
 		_result.StartingScenario <- UI;
+	}
+
+	function creatingTemporaryModel( _result )
+	{
+		this.World.Assets.updateLook();
+		local roster = this.World.getTemporaryRoster();
+		local player = this.World.State.getPlayer();
+		local socket = player.getSprite("base").getBrush().Name;
+		local body = player.getSprite("body").getBrush().Name;
+		local flip = player.getSprite("body").isFlippedHorizontally();
+		roster.clear();
+		this.m.TempModel = roster.create("scripts/entity/tactical/temp_model");
+		this.m.TempModel.getSprite("base").setBrush(socket);
+		this.m.TempModel.getSprite("body").setBrush(body);
+		this.m.TempModel.setFlipped(flip);
+		this.m.TempModel.setDirty(true);
+		_result.Avatar <- {
+			IsFlipping = flip,
+			Sprites = [],
+			SpriteNames = [],
+			Current = {
+				Row = 0,
+				Index = 0,
+			},
+			Sockets = [],
+			SocketIndex = 0,
+		};
+
+		foreach (i, row in this.Const.WorldSprites) 
+		{
+			local index = row.find(body);
+
+			if (index != null)
+			{
+				_result.Avatar.Current.Row = i;
+				_result.Avatar.Current.Index = index;
+			}
+
+			_result.Avatar.SpriteNames.push(this.Const.WorldSpritesNames[i]);
+			_result.Avatar.Sprites.push(row);
+		}
+		
+		local index = this.Const.WorldSockets.find(socket);
+
+		if (index != null)
+		{
+			_result.Avatar.SocketIndex = index;
+		}
+
+		_result.Avatar.Sockets.extend(this.Const.WorldSockets);
 	}
 
 	function getBrosInFormation()
@@ -338,11 +390,30 @@ this.origin_customizer_screen <- {
 
 		this.applyChanges(data);
 		this.World.State.updateTopbarAssets();
+		this.m.TempModel = null;
+		this.World.getTemporaryRoster().clear();
 
 		if (this.m.OnClosePressedListener != null)
 		{
 			this.m.OnClosePressedListener();
 		}
+	}
+
+	function onApplyAvatar( _data )
+	{
+		this.World.Flags.set("AvatarSprite", _data.Avatar);
+		this.World.Flags.set("AvatarSocket", _data.Socket);
+		this.World.Flags.set("AvatarIsFlippedHorizontally", _data.IsFlipping);
+		this.World.Assets.updateLook();
+	}
+
+	function onUpdateAvatarModel( _data )
+	{
+		this.m.TempModel.getSprite("base").setBrush(_data.Socket);
+		this.m.TempModel.getSprite("body").setBrush(_data.Avatar);
+		this.m.TempModel.setFlipped(_data.IsFlipping);
+		this.m.TempModel.setDirty(true);
+		this.m.JSHandle.asyncCall("updateAvatarImage", this.m.TempModel.getImagePath());
 	}
 
 	function applyChanges( _settings )
@@ -367,8 +438,8 @@ this.origin_customizer_screen <- {
 		this.World.Flags.set("PartyStrengthMult", _settings.ScalingMult * 0.01);
 		this.World.Flags.set("EquipmentLootChance", _settings.EquipmentLootChance);
 		this.World.Flags.set("XPMult", _settings.XpMult * 0.01);
-		this.World.Flags.set("DailyWageMult", _settings.HiringMult * 0.01);
-		this.World.Flags.set("HiringCostMult", _settings.WageMult * 0.01);
+		this.World.Flags.set("DailyWageMult", _settings.WageMult * 0.01);
+		this.World.Flags.set("HiringCostMult", _settings.HiringMult * 0.01);
 		this.World.Flags.set("SellPriceMult", _settings.SellingMult * 0.01);
 		this.World.Flags.set("BuyPriceMult", _settings.BuyingMult * 0.01);
 		this.World.Flags.set("ContractPaymentMult", _settings.ContractPaymentMult * 0.01);

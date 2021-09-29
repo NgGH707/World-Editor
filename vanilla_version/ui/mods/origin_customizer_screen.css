@@ -35,13 +35,15 @@
 /*******************/
 
 
-/*Party Strength Calculator*/
+/****************************
+**Party Strength Calculator**
+****************************/
 .strength-calculator-container
 {   
     top: 4.7rem;
     left: 0;
     right: 0;
-    height: 6.6rem;
+    height: 7.4rem;
     position: absolute;
     margin: auto;
 }
@@ -74,7 +76,111 @@
     text-align: center;
 }
 
-/*******************/
+.open-avatar-popup-button
+{
+    /*top: 0;
+    left: 70.0rem;
+    bottom: 0.0rem;
+    width: 7.4rem;
+    height: 7.4rem;
+    z-index: 99;
+    padding-bottom: 15.0rem;
+    position: absolute;
+    float: right;*/
+
+    width: 7.4rem;
+    height: 7.4rem;
+    
+    position: absolute;
+    left: 71.0rem;
+    bottom: 62.0rem;
+    z-index: 10;
+}
+/*************************/
+
+
+
+/******************************
+**Avatar Popup Dialog Content**
+******************************/
+.origin-customizer-screen .ui-control.popup-dialog.party-avatar-popup
+{
+    width: 60.0rem; /*60.0*/
+    height: 30.0rem; /*30.0*/
+
+    background-image: url("coui://gfx/ui/skin/popup_background_600x300.png");
+    background-size: 60.0rem 30.0rem;
+    background-repeat: no-repeat;
+}
+
+.origin-customizer-screen .ui-control.popup-dialog .avatar-screen-container
+{
+    width: 100%; /* 46.0rem */
+    padding: 0.6rem;
+    padding-left: 5.0rem;
+    padding-right: 0.0rem;
+    margin-bottom: 1.0rem;
+    position: relative;
+    float: left;
+}
+
+.origin-customizer-screen .ui-control.popup-dialog .avatar-screen-container .popup-column
+{
+    width: 22.4rem;
+    position: relative;
+    float: left;
+}
+
+.origin-customizer-screen .ui-control.popup-dialog .avatar-screen-container .popup-row
+{
+    width: 100%;
+    height: 3.5rem;
+    position: relative;
+    float: left;
+}
+
+.origin-customizer-screen .ui-control.popup-dialog .popup-column .popup-row .avatar-sprite-container
+{
+    width: 100%;
+    height: 20.0rem;
+    margin-bottom: 1.0rem;
+}
+
+.origin-customizer-screen .ui-control.popup-dialog .popup-column .popup-row .avatar-sprite-container .prev-avatar-button
+{
+    height: 4.1rem;
+    width: 4.5rem;
+    vertical-align: top;
+}
+
+.origin-customizer-screen .ui-control.popup-dialog .popup-column .popup-row .avatar-sprite-container .next-avatar-button
+{
+    height: 4.1rem;
+    width: 4.5rem;
+    vertical-align: top;
+}
+
+.origin-customizer-screen .ui-control.popup-dialog .popup-column .popup-row .avatar-sprite-container .avatar-image
+{
+    vertical-align: top;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.origin-customizer-screen .ui-control.popup-dialog .popup-column .popup-row .l-avatar-button
+{
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 17.5rem;
+    position: absolute;
+    margin: auto;
+    line-height: 3.0rem;
+}
+
+/*********************/
+
 
 .origin-customizer-screen.is-center
 {
@@ -408,16 +514,16 @@
 }
 
 
-
-
-
-.ui-control.button-10
+/******************* 
+***Big Button 150***
+*******************/
+.ui-control.button-150
 {
     width: 100%;
     height: 100%;
     position: relative;
 
-    background-image: url("coui://gfx/ui/skin/button_round_default.png");
+    background-image: url("coui://gfx/ui/skin/inventory_bag_slot.png");
     background-size: 3.9rem 3.9rem;
     text-shadow: 1px 1px 1px #000;
 
@@ -503,6 +609,106 @@
 }
 
 .ui-control.button-150.is-selected > img
+{
+    top: 0.2rem;
+    left: 0.3rem;
+}
+
+/***************
+***Button 101***
+***************/
+.ui-control.button-101
+{
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    background-image: url("coui://gfx/ui/skin/sprite_changer_slot.png");
+    background-size: 7.4rem 7.4rem;
+    text-shadow: 1px 1px 1px #000;
+
+    color: #dda21f;
+}
+
+.ui-control.button-101:hover,
+.ui-control.button-101.is-selected
+{
+    background-image: url("coui://gfx/ui/skin/sprite_changer_slot_selected.png");
+    background-size: 7.4rem 7.4rem;
+    color: #f0b121;
+}
+
+.ui-control.button-101.is-selected
+{
+    text-shadow: 1px 1px #A36426, -1px -1px #000;
+    color: #f0b121;
+}
+
+.ui-control.button-101.is-active
+{
+    background-image: url("coui://gfx/ui/skin/sprite_changer_slot.png");
+    background-size: 7.4rem 7.4rem;
+    color: #f0b121;
+}
+
+.ui-control.button-101[disabled]
+{
+    color : #a7a7a7;
+    background-image: url("coui://gfx/ui/skin/sprite_changer_slot_disable.png");
+    background-size: 7.4rem 7.4rem;
+}
+
+.ui-control.button-101[disabled]:hover
+{
+    background-image: url("coui://gfx/ui/skin/sprite_changer_slot_disable.png");
+    background-size: 7.4rem 7.4rem;
+}
+
+.ui-control.button-101[disabled]:active
+{
+    background-image: url("coui://gfx/ui/skin/sprite_changer_slot_disable.png");
+    background-size: 7.4rem 7.4rem;
+}
+
+.ui-control.button-101 > .label
+{
+    top: 0.3rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    position: absolute;
+
+    margin-top: 0.4rem;
+    text-align : center;
+
+    overflow: hidden;
+}
+
+.ui-control.button-101.is-selected > .label
+{
+    top: 0.4rem;
+    left: 0.1rem;
+}
+
+.ui-control.button-101 > img
+{
+    top: 0.0rem;
+    left: 0.2rem;
+    right: 0;
+    bottom: 0;
+    /*width: 80%;
+    height: 80%;*/
+    position: absolute;
+    margin: auto;
+}
+
+.ui-control.button-101[disabled] > img
+{
+    -webkit-filter: grayscale(100%);
+}
+
+.ui-control.button-101.is-selected > img
 {
     top: 0.2rem;
     left: 0.3rem;

@@ -422,8 +422,8 @@ this.origin_customizer_screen <- {
 		this.World.Flags.set("PartyStrengthMult", _settings.ScalingMult * 0.01);
 		this.World.Flags.set("EquipmentLootChance", _settings.EquipmentLootChance);
 		this.World.Flags.set("XPMult", _settings.XpMult * 0.01);
-		this.World.Flags.set("DailyWageMult", _settings.HiringMult * 0.01);
-		this.World.Flags.set("HiringCostMult", _settings.WageMult * 0.01);
+		this.World.Flags.set("DailyWageMult", _settings.WageMult * 0.01);
+		this.World.Flags.set("HiringCostMult", _settings.HiringMult * 0.01);
 		this.World.Flags.set("SellPriceMult", _settings.SellingMult * 0.01);
 		this.World.Flags.set("BuyPriceMult", _settings.BuyingMult * 0.01);
 		this.World.Flags.set("ContractPaymentMult", _settings.ContractPaymentMult * 0.01);
