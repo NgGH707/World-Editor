@@ -114,9 +114,9 @@ this.origin_customizer_screen <- {
 			AllBlueprint = this.LegendsMod.Configs().LegendAllBlueprintsEnabled(),
 			PartyStrength = this.Math.ceil(this.World.State.getPlayer().getStrength()),
 
-			Tier = this.World.Assets.getOrigin().getRosterTier(),
+			Tier = this.World.Assets.getOrigin().getStartingRosterTier(),
 			TierMin = 0,
-			TierMax = 6,
+			TierMax = this.Const.Roster.Tier[this.Const.Roster.Tier.len() - 1],
 
 			ScalingMult = d == 0 ? 100 : d,
 			ScalingMultMin = 5,
@@ -422,8 +422,8 @@ this.origin_customizer_screen <- {
 		this.World.Flags.set("PartyStrengthMult", _settings.ScalingMult * 0.01);
 		this.World.Flags.set("EquipmentLootChance", _settings.EquipmentLootChance);
 		this.World.Flags.set("XPMult", _settings.XpMult * 0.01);
-		this.World.Flags.set("DailyWageMult", _settings.WageMult * 0.01);
 		this.World.Flags.set("HiringCostMult", _settings.HiringMult * 0.01);
+		this.World.Flags.set("DailyWageMult", _settings.WageMult * 0.01);
 		this.World.Flags.set("SellPriceMult", _settings.SellingMult * 0.01);
 		this.World.Flags.set("BuyPriceMult", _settings.BuyingMult * 0.01);
 		this.World.Flags.set("ContractPaymentMult", _settings.ContractPaymentMult * 0.01);
@@ -512,8 +512,13 @@ this.origin_customizer_screen <- {
 				{
 					i.setVariant(_bannerID);
 					i.updateVariant();
-					items.unequip(i);
-					items.equip(i);
+
+					if (!i.isInBag())
+					{
+						items.unequip(i);
+						items.equip(i);
+					}
+
 					return;
 				}
 			}

@@ -152,13 +152,13 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 					if (value != 0)
 					{
-						this.m[key] += value;
+						this.m[key] = value;
 					}
 				}
 
 				if (this.World.Flags.has("RosterTier"))
 				{
-					this.getOrigin().m.RosterTier = this.World.Flags.getAsInt("RosterTier");
+					this.getOrigin().m.StartingRosterTier = this.World.Flags.getAsInt("RosterTier");
 				}
 
 				if (this.World.Flags.has("BrothersScaleMax"))
@@ -523,60 +523,28 @@ this.getroottable().OriginCustomizerVersion <- version;
 			switch (elementId) 
 			{
 			case "customeorigin.tier":
-		       	return [
+		       	local ret = [
 					{
 						id = 1,
 						type = "title",
-						text = "Roster Tier"
+						text = "Starting Roster Tier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affecting your company roster size and the amount of brother you can bring in battle, this tier has a different value between different origin."
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 0: [color=" + this.Const.UI.Color.NegativeValue + "]1[/color] brother"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 1: [color=" + this.Const.UI.Color.NegativeValue + "]6[/color] brothers"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 2: [color=" + this.Const.UI.Color.NegativeValue + "]9[/color] brothers"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 3: [color=" + this.Const.UI.Color.NegativeValue + "]13[/color] brothers and [color=" + this.Const.UI.Color.NegativeValue + "]12[/color] in battle"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 4: [color=" + this.Const.UI.Color.NegativeValue + "]19[/color] brothers and [color=" + this.Const.UI.Color.NegativeValue + "]16[/color] in battle"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 5: [color=" + this.Const.UI.Color.NegativeValue + "]21[/color] brothers and [color=" + this.Const.UI.Color.NegativeValue + "]18[/color] in battle"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Tier 6: [color=" + this.Const.UI.Color.NegativeValue + "]27[/color] brothers and [color=" + this.Const.UI.Color.NegativeValue + "]25[/color] in battle"
+						text = "Affecting your company default roster tier without considering the bonus tier from reputation, this tier determines the size of your roster and how many brother can be brought in battle, this tier may have a different value in different origins."
 					},
 				];
+				foreach ( tier in this.Const.Roster.Tier )
+				{
+					ret.push({
+						id = 7,
+						type = "text",
+						icon = "ui/icons/special.png",
+						text = "Tier " + tier + ": [color=" + this.Const.UI.Color.NegativeValue + "]" + this.Const.Roster.Size[tier] + "[/color] brother(s) and [color=" + this.Const.UI.Color.NegativeValue + "]" + this.Const.Roster.InCombatSize[tier] + "[/color] brother(s) in battle"
+					});
+				}
+				return ret;
 
 			case "customeorigin.avatarbutton":
 		       	return [
@@ -602,7 +570,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "Party strength value is used as a standard to determine the number of troops/defenders in roaming party or in camp. This percentage is used to modify your party strength so it\'s indirectly change the difficult scaling. Thus, every percentage that is higher than 100 will make the game harder (more enemies) while lowering it will make the game easier (fewer enemies). This is a different value that\'s independent from combat difficulty. The default value is 100 which means 100%."
+						text = "Company strength value is used as a standard to determine the number of troops/defenders in roaming party or in camp. This percentage is used to modify your Company strength so it\'s indirectly change the difficult scaling. Thus, every percentage that is higher than 100 will make the game harder (more enemies) while lowering it will make the game easier (fewer enemies). This is a different value that\'s independent from combat difficulty. The default value is 100 which means 100%."
 					},
 				];
 
@@ -910,7 +878,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "This value determine how many brothers are taken in calculating party strength, from party strength the game will use it as standard to spawn enemy. If you have 25 brothers in roster while this value is 12, that means at most only 12 highest level brothers are taken in calculating party strength."
+						text = "This value determine how many brothers are taken in calculating company strength, from company strength the game will use it as standard to spawn enemy. If you have 25 brothers in roster while this value is 12, that means at most only 12 highest level brothers are taken in calculating company strength."
 					},
 				];
 
@@ -981,12 +949,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Calculate Party Strength"
+						text = "Calculate Company Strength"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Calculating your current party strength based on below settings then displays it on the box above. It also applies below settings without the need to press 'Done' button. Below is the list of what setting affects party strength."
+						text = "Calculating your current company strength based on below settings then displays it on the box above. It also applies below settings without the need to press 'Done' button. Below is the list of what setting affects company strength."
 					},
 					{
 						id = 7,
@@ -1025,12 +993,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Party Strength"
+						text = "Company Strength"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "This is the value that determine the difficulty. Combat Difficulty determines the equation to calculate party strength while Difficulty Scaling affect the final result of said equation. The higher you party strength the more enemies you can found."
+						text = "This is the value that determine the difficulty. Combat Difficulty determines the equation to calculate company strength while Difficulty Scaling affect the final result of said equation. The higher you company strength the more enemies you can found."
 					},
 					{
 						id = 7,
