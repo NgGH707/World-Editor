@@ -31,7 +31,7 @@ var OriginCustomizerScreen = function(_parent)
 	this.mOriginImage = null;
 	this.mCompanyName = null;
 
-	this.mAcceptBannerButton = null;
+	//this.mAcceptBannerButton = null;
 	this.mPrevBannerButton = null;
 	this.mNextBannerButton = null;
 	this.mBannerImage = null;
@@ -571,8 +571,8 @@ OriginCustomizerScreen.prototype.destroyDIV = function () {
 	this.mPrevBannerButton = null;
 	this.mNextBannerButton.remove();
 	this.mNextBannerButton = null;
-	this.mAcceptBannerButton.remove();
-	this.mAcceptBannerButton = null;
+	//this.mAcceptBannerButton.remove();
+	//this.mAcceptBannerButton = null;
 	this.mBannerImage.remove();
 	this.mBannerImage = null;
 
@@ -733,7 +733,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		var bannerContainer = $('<div class="banner-container" />');
 		row.append(bannerContainer);
 
-		var table = $('<table width="100%" height="100%"><tr><td width="10%"><div class="l-button prev-banner-button" /></td><td width="80%" class="banner-image-container"></td><td width="10%"><div class="l-button next-banner-button" /></td></tr><tr><td></td><td width="100%"><div class="l-button accept-banner-button" /></td><td></td></tr></table>');
+		var table = $('<table width="100%" height="100%"><tr><td width="10%"><div class="l-button prev-banner-button" /></td><td width="80%" class="banner-image-container"></td><td width="10%"><div class="l-button next-banner-button" /></td></tr></table>');
 		bannerContainer.append(table);
 
 		var prevBanner = table.find('.prev-banner-button:first');
@@ -752,10 +752,10 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 			//_image.centerImageWithinParent();
 		}, null, 'display-none banner-image');
 
-		var acceptBanner = table.find('.accept-banner-button:first');
+		/*var acceptBanner = table.find('.accept-banner-button:first');
 		this.mAcceptBannerButton = acceptBanner.createImageButton(Path.GFX + Asset.BUTTON_END_TURN, function () {
 			self.onAcceptBannerClicked();
-		}, '', 6);
+		}, '', 6);*/
 
 		// blueprint
 		var row = $('<div class="row-below-banner"></div>');
@@ -1774,10 +1774,10 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 		elementId: 'customeorigin.trainingprice'
 	});
 
-	this.mAcceptBannerButton.bindTooltip({
+	/*this.mAcceptBannerButton.bindTooltip({
 		contentType: 'ui-element',
 		elementId: 'customeorigin.accept_banner'
-	});
+	});*/
 
 	this.mOriginImage.bindTooltip({
 		contentType: 'ui-element',
@@ -1914,7 +1914,7 @@ OriginCustomizerScreen.prototype.unbindTooltips = function () {
 	this.mOriginOptions.TrainingPriceMult.Control.unbindTooltip();
 	this.mOriginOptions.TrainingPriceMult.Title.unbindTooltip();
 
-	this.mAcceptBannerButton.unbindTooltip();
+	//this.mAcceptBannerButton.unbindTooltip();
 	this.mOriginImage.unbindTooltip();
 
 	this.mCalculator.Button.unbindTooltip();
@@ -1947,7 +1947,7 @@ OriginCustomizerScreen.prototype.onPreviousBannerClicked = function ()
 	if (this.mCurrentBannerIndex < 0)
 		this.mCurrentBannerIndex = this.mBanners.length - 1;
 
-	this.onUpdateBannerButton();
+	this.onAcceptBannerClicked();
 };
 
 
@@ -1958,7 +1958,7 @@ OriginCustomizerScreen.prototype.onNextBannerClicked = function ()
 	if (this.mCurrentBannerIndex >= this.mBanners.length)
 		this.mCurrentBannerIndex = 0;
 
-	this.onUpdateBannerButton();
+	this.onAcceptBannerClicked();
 };
 
 OriginCustomizerScreen.prototype.onAcceptBannerClicked = function () 
@@ -1970,14 +1970,14 @@ OriginCustomizerScreen.prototype.onAcceptBannerClicked = function ()
 
 OriginCustomizerScreen.prototype.onUpdateBannerButton = function () 
 {
-	if(this.mCurrentBannerIndex === this.mSelectedBannerIndex)
+	/*if(this.mCurrentBannerIndex === this.mSelectedBannerIndex)
     {
         this.mAcceptBannerButton.enableButton(false);
     }
     else
     {
         this.mAcceptBannerButton.enableButton(true);
-    }
+    }*/
 
     this.mBannerImage.attr('src', Path.GFX + 'ui/banners/' + this.mBanners[this.mCurrentBannerIndex] + '.png');
 };

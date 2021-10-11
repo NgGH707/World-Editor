@@ -134,12 +134,11 @@ this.getroottable().OriginCustomizerVersion <- version;
 					"RosterSizeAdditionalMin",
 					"RosterSizeAdditionalMax",
 					"FoodAdditionalDays",
+					"BrothersScaleMax",
 				];
 
 				foreach ( key in mult )
 				{
-					local value = this.World.Flags.getAsFloat(key);
-
 					if (this.World.Flags.has(key))
 					{
 						this.m[key] = this.World.Flags.getAsFloat(key);
@@ -159,11 +158,6 @@ this.getroottable().OriginCustomizerVersion <- version;
 				if (this.World.Flags.has("RosterTier"))
 				{
 					this.getOrigin().m.StartingRosterTier = this.World.Flags.getAsInt("RosterTier");
-				}
-
-				if (this.World.Flags.has("BrothersScaleMax"))
-				{
-					this.m.BrothersScaleMax = this.World.Flags.getAsInt("BrothersScaleMax");
 				}
 
 				if (this.World.State.getPlayer() != null && this.World.Flags.has("BaseMovementSpeed"))

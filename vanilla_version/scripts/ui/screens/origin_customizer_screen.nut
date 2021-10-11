@@ -208,7 +208,7 @@ this.origin_customizer_screen <- {
 			FoodAdditionalDaysMin = -10,
 			FoodAdditionalDaysMax = 25,
 
-			TrainingPriceMult = this.Math.floor(data.RelationDecayGoodMult * 100),
+			TrainingPriceMult = this.Math.floor(data.TrainingPriceMult * 100),
 			TrainingPriceMultMin = 0,
 			TrainingPriceMultMax = 500,
 		};
@@ -528,8 +528,13 @@ this.origin_customizer_screen <- {
 				{
 					i.setVariant(_bannerID);
 					i.updateVariant();
-					items.unequip(i);
-					items.equip(i);
+
+					if (!i.isInBag())
+					{
+						items.unequip(i);
+						items.equip(i);
+					}
+					
 					return;
 				}
 			}

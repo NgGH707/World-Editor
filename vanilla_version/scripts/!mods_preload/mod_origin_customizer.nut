@@ -130,12 +130,13 @@ this.getroottable().OriginCustomizerVersion <- version;
 					"RosterSizeAdditionalMin",
 					"RosterSizeAdditionalMax",
 					"FoodAdditionalDays",
+					"BrothersMax",
+					"BrothersMaxInCombat",
+					"BrothersScaleMax",
 				];
 
 				foreach ( key in mult )
 				{
-					local value = this.World.Flags.getAsFloat(key);
-
 					if (this.World.Flags.has(key))
 					{
 						this.m[key] = this.World.Flags.getAsFloat(key);
@@ -148,23 +149,8 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 					if (value != 0)
 					{
-						this.m[key] += value;
+						this.m[key] = value;
 					}
-				}
-
-				if (this.World.Flags.has("BrothersMax"))
-				{
-					this.m.BrothersMax = this.World.Flags.getAsInt("BrothersMax");
-				}
-
-				if (this.World.Flags.has("BrothersMaxInCombat"))
-				{
-					this.m.BrothersMaxInCombat = this.World.Flags.getAsInt("BrothersMaxInCombat");
-				}
-
-				if (this.World.Flags.has("BrothersScaleMax"))
-				{
-					this.m.BrothersScaleMax = this.World.Flags.getAsInt("BrothersScaleMax");
 				}
 
 				if (this.World.State.getPlayer() != null && this.World.Flags.has("BaseMovementSpeed"))
@@ -558,7 +544,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "Party strength value is used as a standard to determine the number of troops/defenders in roaming party or in camp. This percentage is used to modify your party strength so it\'s indirectly change the difficult scaling. Thus, every percentage that is higher than 100 will make the game harder (more enemies) while lowering it will make the game easier (fewer enemies). This is a different value that\'s independent from combat difficulty. The default value is 100 which means 100%."
+						text = "Company Strength value is used as a standard to determine the number of troops/defenders in roaming party or in camp. This percentage is used to modify your company strength so it\'s indirectly change the difficult scaling. Thus, every percentage that is higher than 100 will make the game harder (more enemies) while lowering it will make the game easier (fewer enemies). This is a different value that\'s independent from combat difficulty. The default value is 100 which means 100%."
 					},
 				];
 
@@ -866,7 +852,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "This value determine how many brothers are taken in calculating party strength, from party strength the game will use it as standard to spawn enemy. If you have 25 brothers in roster while this value is 12, that means at most only 12 highest level brothers are taken in calculating party strength."
+						text = "This value determine how many brothers are taken in calculating company strength, from company strength the game will use it as standard to spawn enemy. If you have 25 brothers in roster while this value is 12, that means at most only 12 highest level brothers are taken in calculating company strength."
 					},
 				];
 
@@ -937,12 +923,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Calculate Party Strength"
+						text = "Calculate Company Strength"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Calculating your current party strength based on below settings then displays it on the box above. It also applies below settings without the need to press 'Done' button. Below is the list of what setting affects party strength."
+						text = "Calculating your current company strength based on below settings then displays it on the box above. It also applies below settings without the need to press 'Done' button. Below is the list of what setting affects company strength."
 					},
 					{
 						id = 7,
@@ -981,12 +967,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Party Strength"
+						text = "Company Strength"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "This is the value that determine the difficulty. Combat Difficulty determines the equation to calculate party strength while Difficulty Scaling affect the final result of said equation. The higher you party strength the more enemies you can found."
+						text = "This is the value that determine the difficulty. Combat Difficulty determines the equation to calculate company strength while Difficulty Scaling affect the final result of said equation. The higher you Company Strength the more enemies you can found."
 					},
 					{
 						id = 7,
