@@ -158,6 +158,11 @@ this.getroottable().OriginCustomizerVersion <- version;
 				if (this.World.Flags.has("RosterTier"))
 				{
 					this.getOrigin().m.StartingRosterTier = this.World.Flags.getAsInt("RosterTier");
+
+					if (this.getOrigin().m.StartingRosterTier > this.getOrigin().m.RosterTierMax)
+					{
+						this.getOrigin().m.RosterTierMax = this.getOrigin().m.StartingRosterTier;
+					}
 				}
 
 				if (this.World.State.getPlayer() != null && this.World.Flags.has("BaseMovementSpeed"))
