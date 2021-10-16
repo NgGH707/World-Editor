@@ -1,4 +1,4 @@
-local version = 2.1.2;
+local version = 2.1.4;
 this.getroottable().OriginCustomizerVersion <- version;
 ::mods_registerMod("mod_origin_customizer_legends", version, "NgGH's Hard Work");
 ::mods_registerJS("origin_customizer_screen.js");
@@ -67,7 +67,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 		{
 			if(!keyHandler(key) && key.getState() == 0)
 			{
-				if (key.getModifier() == 2 && key.getKey() == 38)//CTRL + Tab
+				if (key.getModifier() == 2 && key.getKey() == 38) //CTRL + Tab
 				{
 					if (!this.m.CharacterScreen.isVisible() && !this.m.WorldTownScreen.isVisible() && !this.m.EventScreen.isVisible() && !this.m.EventScreen.isAnimating())
 					{
@@ -229,7 +229,16 @@ this.getroottable().OriginCustomizerVersion <- version;
 		obj.isDroppedAsLoot = function( _item )
 		{
 			return this.Math.rand(1, 100) <= this.World.Flags.getAsInt("EquipmentLootChance");
-		}
+		};
+		obj.getStashModifier = function()
+		{
+			if (this.World.Flags.has("StashModifier"))
+			{
+				return this.World.Flags.getAsInt("StashModifier");
+			}
+
+			return this.m.StashModifier;
+		};
 	});
 	::mods_hookNewObjectOnce("scenarios/scenario_manager", function ( obj )
 	{	

@@ -81,6 +81,9 @@ var OriginCustomizerScreen = function(_parent)
 	this.mLegendAllBlueprintsCheckbox = null;
 	this.mLegendAllBlueprintsCheckboxLabel = null;
 
+	this.mLegendWorldEconomyCheckbox = null;
+	this.mLegendWorldEconomyCheckboxLabel = null;
+
 	this.mIronmanCheckbox = null;
 	this.mIronmanCheckboxLabel = null;
 
@@ -129,7 +132,7 @@ var OriginCustomizerScreen = function(_parent)
 			Min: 100,
 			Max: 400,
 			Value: 100,
-			Step: 2
+			Step: 5
 		},
 		ScalingMult: {
 			Control: null,
@@ -578,6 +581,11 @@ OriginCustomizerScreen.prototype.destroyDIV = function () {
 	this.mLegendAllBlueprintsCheckboxLabel.remove();
 	this.mLegendAllBlueprintsCheckboxLabel = null;
 
+	this.mLegendWorldEconomyCheckbox.remove();
+	this.mLegendWorldEconomyCheckbox = null;
+	this.mLegendWorldEconomyCheckboxLabel.remove();
+	this.mLegendWorldEconomyCheckboxLabel = null;
+
 	this.mCompanyName.remove();
 	this.mCompanyName = null;
 
@@ -812,6 +820,21 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		this.mLegendAllBlueprintsCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legendallblueprints">All Crafting Recipes Unlocked</label>');
 		control.append(this.mLegendAllBlueprintsCheckboxLabel);
 		this.mLegendAllBlueprintsCheckbox.iCheck({
+			checkboxClass: 'icheckbox_flat-orange',
+			radioClass: 'iradio_flat-orange',
+			increaseArea: '30%'
+		});
+
+		// world economy
+		var row = $('<div class="row"></div>');
+		rightColumn.append(row);
+		var control = $('<div class="control"/>');
+		row.append(control);
+		this.mLegendWorldEconomyCheckbox = $('<input type="checkbox" id="cb-legendworldeconomy"/>');
+		control.append(this.mLegendWorldEconomyCheckbox);
+		this.mLegendWorldEconomyCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legendworldeconomy">World Economy</label>');
+		control.append(this.mLegendWorldEconomyCheckboxLabel);
+		this.mLegendWorldEconomyCheckbox.iCheck({
 			checkboxClass: 'icheckbox_flat-orange',
 			radioClass: 'iradio_flat-orange',
 			increaseArea: '30%'
@@ -1533,6 +1556,15 @@ OriginCustomizerScreen.prototype.bindTooltips = function () {
 		elementId: 'mapconfig.legendallblueprints'
 	});
 
+	this.mLegendWorldEconomyCheckbox.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'mapconfig.legendworldeconomy'
+	});
+	this.mLegendWorldEconomyCheckboxLabel.bindTooltip({
+		contentType: 'ui-element',
+		elementId: 'mapconfig.legendworldeconomy'
+	});
+
 	this.mIronmanCheckboxLabel.bindTooltip({
 		contentType: 'ui-element',
 		elementId: TooltipIdentifier.MenuScreen.NewCampaign.Ironman
@@ -1868,6 +1900,9 @@ OriginCustomizerScreen.prototype.unbindTooltips = function () {
 
 	this.mLegendAllBlueprintsCheckbox.unbindTooltip();
 	this.mLegendAllBlueprintsCheckboxLabel.unbindTooltip();
+
+	this.mLegendWorldEconomyCheckbox.unbindTooltip();
+	this.mLegendWorldEconomyCheckboxLabel.unbindTooltip();
 
 	this.mIronmanCheckboxLabel.unbindTooltip();
 	this.mIronmanCheckbox.unbindTooltip();
@@ -2321,6 +2356,11 @@ OriginCustomizerScreen.prototype.setConfigOpts = function (_data) {
 				this.mLegendAllBlueprintsCheckbox.iCheck('check');
 			}
 		}
+		if ('WorldEconomy' in _data) {
+			if (_data['WorldEconomy']) {
+				this.mLegendWorldEconomyCheckbox.iCheck('check');
+			}
+		}
 		if ('Tier' in _data) {
 			this.mOriginOptions.Tier.Value = _data['Tier'];
 			this.mOriginOptions.Tier.Min = _data['TierMin'];
@@ -2478,6 +2518,7 @@ OriginCustomizerScreen.prototype.collectSettings = function () {
 	settings.push(this.mLegendItemScalingCheckbox.is(":checked"));
 	settings.push(this.mLegendLocationScalingCheckbox.is(":checked"));
 	settings.push(this.mLegendAllBlueprintsCheckbox.is(":checked"));
+	settings.push(this.mLegendWorldEconomyCheckbox.is(":checked"));
 	settings.push(this.mOriginOptions.Tier.Value);
 	settings.push(this.mOriginOptions.Stash.Value);
 	settings.push(this.mOriginOptions.ScalingMult.Value);

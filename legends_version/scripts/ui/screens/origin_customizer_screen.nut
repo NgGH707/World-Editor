@@ -112,6 +112,7 @@ this.origin_customizer_screen <- {
 			ItemScaling = this.LegendsMod.Configs().LegendItemScalingEnabled(),
 			LocationScaling = this.LegendsMod.Configs().LegendLocationScalingEnabled(),
 			AllBlueprint = this.LegendsMod.Configs().LegendAllBlueprintsEnabled(),
+			WorldEconomy = this.LegendsMod.Configs().LegendWorldEconomyEnabled(),
 			PartyStrength = this.Math.ceil(this.World.State.getPlayer().getStrength()),
 
 			Tier = this.World.Assets.getOrigin().getStartingRosterTier(),
@@ -228,8 +229,8 @@ this.origin_customizer_screen <- {
 	function addStashData( _result )
 	{
 		local stash = this.World.Assets.getStash();
-		local max = this.Math.max(stash.getCapacity(), 400);
-		local min = this.Math.max(stash.getNumberOfFilledSlots(), 20);
+		local max = this.Math.min(1000, this.Math.floor(stash.getCapacity() / 100 + 2) * 100);
+		local min = this.Math.max(stash.getNumberOfFilledSlots(), this.Math.floor(this.Math.maxf(1.0, stash.getCapacity() / 100 - 1)) * 100);
 		this.m.CurrentStash = stash.getCapacity();
 		_result.Stash <- this.m.CurrentStash;
 		_result.StashMin <- min;
@@ -258,7 +259,6 @@ this.origin_customizer_screen <- {
 			}
 		}
 
-		local description = UI[index].Description;
 		_result.OriginIndex <- index;
 		_result.OriginImage <- UI[index].Image;
 		_result.StartingScenario <- UI;
@@ -337,6 +337,7 @@ this.origin_customizer_screen <- {
 			"ItemScaling",
 			"LocationScaling",
 			"AllBlueprint",
+			"WorldEconomy",
 			"Tier",
 			"Stash",
 			"ScalingMult",
@@ -408,13 +409,17 @@ this.origin_customizer_screen <- {
 		this.LegendsMod.Configs().m.IsItemScaling = _settings.ItemScaling;
 		this.LegendsMod.Configs().m.IsLocationScaling = _settings.LocationScaling;
 		this.LegendsMod.Configs().m.IsBlueprintsVisible = _settings.AllBlueprint;
+		this.LegendsMod.Configs().m.IsWorldEconomy = _settings.WorldEconomy;
 
 		if (_settings.Stash != this.m.CurrentStash)
 		{
 			local stash = this.World.Assets.getStash();
+			local different = _settings.Stash - stash.getCapacity();
+			local modifier = this.World.Assets.getOrigin().getStashModifier() + different;
 			stash.sort();
-			stash.resize(_settings.Stash);
-			this.m.CurrentStash = _settings.Stash;
+			this.World.Flags.set("StashModifier", modifier);
+			this.World.State.getPlayer().calculateStashModifier();
+			this.m.CurrentStash = stash.getCapacity();
 		}
 
 		this.World.Flags.set("UsedOriginCustomizer", this.OriginCustomizerVersion);
