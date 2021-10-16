@@ -11,6 +11,7 @@ this.origin_customizer_screen <- {
 		CurrentOriginID = "",
 		CurrentBanner = "",
 		CurrentStash = 0,
+		CurrentEconomicSetting = false,
 		ScenarioUI = [],
 		TempModel = null,
 	},
@@ -223,6 +224,7 @@ this.origin_customizer_screen <- {
 		this.addOriginData(ret);
 		this.addBannerData(ret);
 		this.creatingTemporaryModel(ret);
+		this.m.CurrentEconomicSetting = this.LegendsMod.Configs().LegendWorldEconomyEnabled();
 		return ret;
 	}
 
@@ -410,6 +412,23 @@ this.origin_customizer_screen <- {
 		this.LegendsMod.Configs().m.IsLocationScaling = _settings.LocationScaling;
 		this.LegendsMod.Configs().m.IsBlueprintsVisible = _settings.AllBlueprint;
 		this.LegendsMod.Configs().m.IsWorldEconomy = _settings.WorldEconomy;
+
+		if (this.m.CurrentEconomicSetting != _settings.WorldEconomy)
+		{
+			local allSettlements = this.World.EntityManager.getSettlements();
+
+			foreach ( s in allSettlements ) 
+			{
+				if (!_settings.WorldEconomy)
+				{
+					s.setUpgrading(false);
+				}
+				
+			    s.updateSprites();
+			}
+
+			this.m.CurrentEconomicSetting = _settings.WorldEconomy;
+		}
 
 		if (_settings.Stash != this.m.CurrentStash)
 		{

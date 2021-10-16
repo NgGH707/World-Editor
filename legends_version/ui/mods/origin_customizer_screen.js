@@ -744,31 +744,31 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		this.createSliderControlDIV(this.mOriginOptions.Stash, 'Stash Capacity', leftColumn);
 
 
-		// ironman
+		// world economy
 		var row = $('<div class="row"></div>');
 		leftColumn.append(row);
 		var control = $('<div class="control"/>');
 		row.append(control);
-		this.mIronmanCheckbox = $('<input type="checkbox" id="cb-iron-man"/>');
-		control.append(this.mIronmanCheckbox);
-		this.mIronmanCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-iron-man">Ironman</label>');
-		control.append(this.mIronmanCheckboxLabel);
-		this.mIronmanCheckbox.iCheck({
+		this.mLegendWorldEconomyCheckbox = $('<input type="checkbox" id="cb-legendworldeconomy"/>');
+		control.append(this.mLegendWorldEconomyCheckbox);
+		this.mLegendWorldEconomyCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legendworldeconomy">World Economy</label>');
+		control.append(this.mLegendWorldEconomyCheckboxLabel);
+		this.mLegendWorldEconomyCheckbox.iCheck({
 			checkboxClass: 'icheckbox_flat-orange',
 			radioClass: 'iradio_flat-orange',
 			increaseArea: '30%'
 		});
 
-		// autosave
+		// blueprint
 		var row = $('<div class="row"></div>');
 		leftColumn.append(row);
 		var control = $('<div class="control"/>');
 		row.append(control);
-		this.mAutosaveCheckbox = $('<input type="checkbox" id="cb-autosave"/>');
-		control.append(this.mAutosaveCheckbox);
-		this.mAutosaveCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-autosave">Autosave Off</label>');
-		control.append(this.mAutosaveCheckboxLabel);
-		this.mAutosaveCheckbox.iCheck({
+		this.mLegendAllBlueprintsCheckbox = $('<input type="checkbox" id="cb-legendallblueprints"/>');
+		control.append(this.mLegendAllBlueprintsCheckbox);
+		this.mLegendAllBlueprintsCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legendallblueprints">All Crafting Recipes Unlocked</label>');
+		control.append(this.mLegendAllBlueprintsCheckboxLabel);
+		this.mLegendAllBlueprintsCheckbox.iCheck({
 			checkboxClass: 'icheckbox_flat-orange',
 			radioClass: 'iradio_flat-orange',
 			increaseArea: '30%'
@@ -778,6 +778,7 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 		// right column
 		// banner
 		var row = $('<div class="row" />');
+		row.css('padding-top', '0.0rem');
 		rightColumn.append(row);
 		//var title = $('<div class="title title-font-big font-color-title">Banner</div>');
 		//row.append(title);
@@ -810,35 +811,36 @@ OriginCustomizerScreen.prototype.createDIV = function (_parentDiv) {
 			self.onAcceptBannerClicked();
 		}, '', 6);*/
 
-		// blueprint
+		// ironman
 		var row = $('<div class="row-below-banner"></div>');
 		rightColumn.append(row);
 		var control = $('<div class="control"/>');
 		row.append(control);
-		this.mLegendAllBlueprintsCheckbox = $('<input type="checkbox" id="cb-legendallblueprints"/>');
-		control.append(this.mLegendAllBlueprintsCheckbox);
-		this.mLegendAllBlueprintsCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legendallblueprints">All Crafting Recipes Unlocked</label>');
-		control.append(this.mLegendAllBlueprintsCheckboxLabel);
-		this.mLegendAllBlueprintsCheckbox.iCheck({
+		this.mIronmanCheckbox = $('<input type="checkbox" id="cb-iron-man"/>');
+		control.append(this.mIronmanCheckbox);
+		this.mIronmanCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-iron-man">Ironman</label>');
+		control.append(this.mIronmanCheckboxLabel);
+		this.mIronmanCheckbox.iCheck({
 			checkboxClass: 'icheckbox_flat-orange',
 			radioClass: 'iradio_flat-orange',
 			increaseArea: '30%'
 		});
 
-		// world economy
+		// autosave
 		var row = $('<div class="row"></div>');
 		rightColumn.append(row);
 		var control = $('<div class="control"/>');
 		row.append(control);
-		this.mLegendWorldEconomyCheckbox = $('<input type="checkbox" id="cb-legendworldeconomy"/>');
-		control.append(this.mLegendWorldEconomyCheckbox);
-		this.mLegendWorldEconomyCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-legendworldeconomy">World Economy</label>');
-		control.append(this.mLegendWorldEconomyCheckboxLabel);
-		this.mLegendWorldEconomyCheckbox.iCheck({
+		this.mAutosaveCheckbox = $('<input type="checkbox" id="cb-autosave"/>');
+		control.append(this.mAutosaveCheckbox);
+		this.mAutosaveCheckboxLabel = $('<label class="text-font-normal font-color-subtitle" for="cb-autosave">Autosave Off</label>');
+		control.append(this.mAutosaveCheckboxLabel);
+		this.mAutosaveCheckbox.iCheck({
 			checkboxClass: 'icheckbox_flat-orange',
 			radioClass: 'iradio_flat-orange',
 			increaseArea: '30%'
 		});
+		
 	}
 
 	this.mDifficultyPanel = $('<div class="display-none"/>');

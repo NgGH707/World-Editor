@@ -220,7 +220,7 @@
     width: 36.0rem;
     float: left;
     position: relative;
-    padding-top : 5.0rem;
+    padding-top : 4.0rem; /*5*/
     padding-left: 2.0rem;
 }
 
