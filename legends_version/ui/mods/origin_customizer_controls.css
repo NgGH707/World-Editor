@@ -1,0 +1,19 @@
+
+/*
+	Dialog Specific
+*/
+.ui-control.dialog-1280-768
+{
+    background-image: url("coui://gfx/ui/skin/dialog_background_1280x768.png");
+    background-size: 128.0rem 76.8rem;
+    background-repeat: no-repeat;
+}
+
+.ui-control.dialog-600-458
+{
+    background-image: url("coui://gfx/ui/skin/popup_background_600x458.png");
+    background-size: 60.0rem 45.8rem;
+    background-repeat: no-repeat;
+}
+
+

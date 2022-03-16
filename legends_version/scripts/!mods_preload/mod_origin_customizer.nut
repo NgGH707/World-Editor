@@ -1,15 +1,12 @@
-local version = 2.1;
+local version = 3.0;
 this.getroottable().OriginCustomizerVersion <- version;
 ::mods_registerMod("mod_origin_customizer_legends", version, "NgGH's Hard Work");
 
 // register CSS
-::mods_registerCSS("origin_customizer_modules/customizer_screen_main_dialog_module.css");
 ::mods_registerCSS("origin_customizer_controls.css");
 ::mods_registerCSS("origin_customizer_screen.css");
 
 // register JS
-
-::mods_registerJS("origin_customizer_modules/customizer_screen_main_dialog_module.js");
 ::mods_registerJS("origin_customizer_controls.js");
 ::mods_registerJS("origin_customizer_screen.js");
 
@@ -22,7 +19,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 		{
 			init_ui();
 			this.m.OriginCustomizerScreen <- this.new("scripts/ui/screens/mods/origin_customizer_screen");
-			this.m.OriginCustomizerScreen.setOnModuleClosedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
+			this.m.ObituaryScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
 			this.initLoadingScreenHandler();
 		}
 
@@ -65,10 +62,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 			if (this.m.OriginCustomizerScreen.isVisible())
 			{
 				this.m.MenuStack.pop();
+				return false;
 			}
 			else
 			{
 				this.showOriginCustomizerScreen();
+				return true;
 			}
 		}
 
@@ -81,8 +80,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 				{
 					if (!this.m.CharacterScreen.isVisible() && !this.m.WorldTownScreen.isVisible() && !this.m.EventScreen.isVisible() && !this.m.EventScreen.isAnimating())
 					{
-						this.toggleOriginCustomizerScreen();
-						return true;
+						return this.toggleOriginCustomizerScreen();
 					}
 				}
 			}
