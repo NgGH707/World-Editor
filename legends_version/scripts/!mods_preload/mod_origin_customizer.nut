@@ -1,8 +1,18 @@
-local version = 2.1.4;
+local version = 2.1;
 this.getroottable().OriginCustomizerVersion <- version;
 ::mods_registerMod("mod_origin_customizer_legends", version, "NgGH's Hard Work");
-::mods_registerJS("origin_customizer_screen.js");
+
+// register CSS
+::mods_registerCSS("origin_customizer_modules/customizer_screen_main_dialog_module.css");
+::mods_registerCSS("origin_customizer_controls.css");
 ::mods_registerCSS("origin_customizer_screen.css");
+
+// register JS
+
+::mods_registerJS("origin_customizer_modules/customizer_screen_main_dialog_module.js");
+::mods_registerJS("origin_customizer_controls.js");
+::mods_registerJS("origin_customizer_screen.js");
+
 ::mods_queue("mod_origin_customizer_legends", "mod_legends,>mod_nggh_assets", function()
 {	
 	::mods_hookNewObjectOnce("states/world_state", function( obj ) 
@@ -11,8 +21,8 @@ this.getroottable().OriginCustomizerVersion <- version;
 		obj.onInitUI = function()
 		{
 			init_ui();
-			this.m.OriginCustomizerScreen <- this.new("scripts/ui/screens/origin_customizer_screen");
-			this.m.OriginCustomizerScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
+			this.m.OriginCustomizerScreen <- this.new("scripts/ui/screens/mods/origin_customizer_screen");
+			this.m.OriginCustomizerScreen.setOnModuleClosedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
 			this.initLoadingScreenHandler();
 		}
 
@@ -78,7 +88,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 			}
 		}
 	});
-
+/*
 	::mods_hookNewObjectOnce("states/world/asset_manager", function ( obj )
 	{
 		local updateLook = obj.updateLook;
@@ -200,8 +210,8 @@ this.getroottable().OriginCustomizerVersion <- version;
 				FoodAdditionalDays = this.m.FoodAdditionalDays,
 				TrainingPriceMult = this.m.TrainingPriceMult,
 
-				/*FoodConsumptionMult = this.m.FoodConsumptionMult,
-				AdvancePaymentCap = this.m.AdvancePaymentCap,*/
+				FoodConsumptionMult = this.m.FoodConsumptionMult,
+				AdvancePaymentCap = this.m.AdvancePaymentCap,
 			};
 		}
 	});
@@ -240,6 +250,23 @@ this.getroottable().OriginCustomizerVersion <- version;
 			return this.m.StashModifier;
 		};
 	});
+
+	::mods_hookNewObject("contracts/contract_manager", function ( obj )
+	{
+		local ws_addContract = obj.addContract;
+		obj.addContract = function( _contract, _isNewContract = true )
+		{
+			local keyName = "disable_" + _contract.getType();
+
+		    if (this.World.Flags.get(keyName))
+		    {
+		    	return;
+		   	}
+
+			ws_addContract(_contract, _isNewContract);
+		}
+	});
+
 	::mods_hookNewObjectOnce("scenarios/scenario_manager", function ( obj )
 	{	
 		obj.getOriginImage <- function( _description )
@@ -275,6 +302,24 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 	::mods_hookNewObject("retinue/retinue_manager", function( obj )
 	{
+		local ws_onNewDay = obj.onNewDay
+		obj.onNewDay = function()
+		{
+			local hasMet = this.World.Flags.get("SpecialEvent_whatever");
+			local condition = this.World.getTime().Days >= 150;
+
+			if (!hasMet && condition)
+			{
+				local ritual = this.World.Events.fire("event.hexe_origin_ritual");
+			
+				if (ritual)
+				{
+					this.World.Flags.set("SpecialEvent_whatever", true);
+				}
+			}
+		}
+
+
 		local onDeserialize = ::mods_getMember(obj, "onDeserialize");
 		obj.onDeserialize = function( _in )
 		{
@@ -519,7 +564,8 @@ this.getroottable().OriginCustomizerVersion <- version;
 			};
 			return r;
 		}
-	});
+	});*/
+
 	::mods_hookNewObjectOnce("ui/screens/tooltip/tooltip_events", function( obj ) 
 	{
 	 	local queryTooltipData = ::mods_getMember(obj, "general_queryUIElementTooltipData");
@@ -530,7 +576,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 
 			switch (elementId) 
 			{
-			case "customeorigin.tier":
+			case "origincustomizer.rostertier":
 		       	local ret = [
 					{
 						id = 1,
@@ -568,7 +614,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.scaling":
+			/*case "customeorigin.scaling":
 		       	return [
 					{
 						id = 1,
@@ -1027,6 +1073,20 @@ this.getroottable().OriginCustomizerVersion <- version;
 						text = "Affect possibility to spawn strong enemy"
 					},
 				];
+
+			case "customeorigin.contractdisablebutton":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Disable Contract"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Open a checklist that allows you to allow certain contracts to be generated or not. Unchecked to remove said contract from generated."
+					},
+				]*/
 			}
 			
 			return null;
