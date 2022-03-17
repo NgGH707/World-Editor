@@ -66,7 +66,7 @@ this.origin_customizer_screen <- {
 		if (this.m.JSHandle != null)
 		{
 			this.Tooltip.hide();
-			this.m.JSHandle.asyncCall("show", /*this.convertToUIData()*/ null);
+			this.m.JSHandle.asyncCall("show", this.convertToUIData());
 		}
 	}
 
@@ -119,12 +119,22 @@ this.origin_customizer_screen <- {
 		this.m.PopupDialogVisible = _data[0];
 	}
 
-	function onClose()
+	function onCloseButtonPressed()
 	{
 		if (this.m.OnClosePressedListener != null)
 		{
 			this.m.OnClosePressedListener();
 		}
+	}
+
+	function convertToUIData()
+	{
+		local result = {
+			Scenarios = this.Const.ScenarioManager.getScenariosForUI()
+		};
+		result.Scenarios.remove(0);
+
+		return result;
 	}
 };	
 

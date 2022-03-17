@@ -14,11 +14,12 @@ var OriginCustomizerScreen = function(_parent)
     // scenarios
     this.mScenario = 
     {
-        Data           : null,
-        Image          : null,
-        Container      : null,
-        ScrollContainer: null,
-        Selected       : 0
+        Data               : null,
+        Image              : null,
+        Selected           : null,
+        Description        : null,
+        ListContainer      : null,
+        ListScrollContainer: null,
     };
 
     // screens
@@ -852,7 +853,7 @@ OriginCustomizerScreen.prototype.isRegistered = function()
 
 OriginCustomizerScreen.prototype.show = function(_data)
 {
-    //this.loadFromData(_data);
+    this.loadFromData(_data);
     this.switchScreen('Properties');
 
     if(!this.mIsVisible)
@@ -908,15 +909,12 @@ OriginCustomizerScreen.prototype.hide = function(_withSlideAnimation)
         {
             duration: Constants.SCREEN_SLIDE_IN_OUT_DELAY,
             easing: 'swing',
-            begin: function ()
-            {
+            begin: function() {
                 $(this).removeClass('is-center');
                 self.notifyBackendOnAnimating();
             },
-            complete: function ()
-            {
+            complete: function() {
                 self.mIsVisible = false;
-                self.mListScrollContainer.empty();
                 $(this).removeClass('display-block').addClass('display-none');
                 self.notifyBackendOnHidden();
             }
@@ -928,15 +926,12 @@ OriginCustomizerScreen.prototype.hide = function(_withSlideAnimation)
         {
             duration: Constants.SCREEN_SLIDE_IN_OUT_DELAY,
             easing: 'swing',
-            begin: function ()
-            {
+            begin: function() {
                 $(this).removeClass('is-center');
                 self.notifyBackendOnAnimating();
             },
-            complete: function ()
-            {
+            complete: function() {
                 self.mIsVisible = false;
-                self.mListScrollContainer.empty();
                 $(this).removeClass('display-block').addClass('display-none');
                 self.notifyBackendOnHidden();
             }
@@ -964,6 +959,12 @@ OriginCustomizerScreen.prototype.switchScreen = function(_screen)
 OriginCustomizerScreen.prototype.isVisible = function()
 {
     return this.mIsVisible;
+};
+
+OriginCustomizerScreen.prototype.loadFromData = function(_data) 
+{
+    if ('Scenarios' in _data && _data.Scenarios !== null && typeof _data.Scenarios === 'object')
+        this.mScenario.Data = _data.Scenarios;
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnConnected = function()
