@@ -1,5 +1,15 @@
+.origin-customizer-screen
+{
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
 
-.origin-customizer-screen > .l-main-dialog-container
+    overflow: hidden;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container
 {
     top: 0;
     left: 0;
@@ -13,7 +23,7 @@
 }
 
 /****Tab Button Bar****/
-.origin-customizer-screen > .l-main-dialog-container .l-tab-container
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container
 {
     width: 100%;
     height: 4.3rem;
@@ -24,12 +34,12 @@
 
     /*border: 4px solid pink;*/
 }
-.origin-customizer-screen > .l-main-dialog-container .l-tab-container .tab-button-panel
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel
 {
     /*top: 20%;*/
     position: absolute;
 }
-.origin-customizer-screen > .l-main-dialog-container .l-tab-container .tab-button-panel .l-tab-button
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button
 {
     width: 17.4rem;
     height: 4.3rem;
@@ -37,34 +47,51 @@
 
     line-height: 3.0rem;
 }
-.origin-customizer-screen > .l-main-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-general
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-general
 {
     left: 0;
 }
-.origin-customizer-screen > .l-main-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-properties
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-properties
 {
     left: 16.5rem;
 }
-.origin-customizer-screen > .l-main-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-factions
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-factions
 {
     left: 33.0rem;
 }
-.origin-customizer-screen > .l-main-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-contracts
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-contracts
 {
     left: 49.5rem;
 }
-.origin-customizer-screen > .l-main-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-save
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-save
 {
     left: 123.0rem;
     width: 4.5rem;
     height: 4.1rem;
 }
 
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column25
+{
+    width: 25%;
+    height: 100%;
+    position: relative;
+    float : left;
 
+    /*border: 4px solid green;*/
+}
 
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column50
+{
+    width: 50%;
+    height: 100%;
+    position: relative;
+    float : left;
 
-.origin-customizer-screen > .l-main-dialog-container .content .sub-column2,
-.origin-customizer-screen > .l-main-dialog-container .content .column-left
+    /*border: 4px solid green;*/
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column65,
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column-left
 {
     width: 65%;
     height: 100%;
@@ -74,8 +101,8 @@
     /*border: 4px solid red;*/
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .sub-column1,
-.origin-customizer-screen > .l-main-dialog-container .content .column-right
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column35,
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column-right
 {
     width: 35%;
     height: 100%;
@@ -85,7 +112,7 @@
     /*border: 4px solid yellow;*/
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .sub-column-left 
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column26
 {
     width: 26%;
     height: 100%;
@@ -95,7 +122,7 @@
     /*border: 4px solid green;*/
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .sub-column-right 
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column74
 {
     width: 74%;
     height: 100%;
@@ -103,13 +130,52 @@
     float : left;
 
     /*border: 4px solid blue;*/
+}
 
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row80
+{
+    height: 80%;
+    width: 100%;
+    float: left;
+    position: relative;
+
+    /*border: 4px solid yellow;*/
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row20
+{
+    height: 20%;
+    width: 100%;
+    float: left;
+    position: relative;
+
+    /*border: 4px solid yellow;*/
+}
+
+
+/*.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column50.with-background,
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column74.with-background
+{
+    background-image: url("coui://gfx/ui/skin/dialog_panel_508x536.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}*/
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-scroll-background
+{
+    background-image: url("coui://gfx/ui/skin/tooltip_background.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-dialog-background
+{
     background-image: url("coui://gfx/ui/skin/dialog_panel_508x536.png");
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .row
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row
 {
     width: 95%;
     float: left;
@@ -118,9 +184,8 @@
     padding-left: 2.0rem;
 }
 
-
-.origin-customizer-screen > .l-main-dialog-container .content .input-row .title,
-.origin-customizer-screen > .l-main-dialog-container .content .row .title
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .input-row .title,
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row .title
 {
     width: 96%;
     height: 2.0rem;
@@ -133,20 +198,34 @@
     border-image-outset: 0 0 0.5rem 0;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .row .scale-control
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .input-row .title-black,
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row .title-black
+{
+    width: 96%;
+    height: 2.0rem;
+    float: left;
+    margin-bottom: 2.0rem;
+
+    line-height: 2.0rem;
+
+    border-image: url("coui://gfx/ui/skin/line_metal.png") 0% 0% 100% 0%;
+    border-image-outset: 0 0 0.5rem 0;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row .scale-control
 {
     width: 36.0rem;
     height: 3.0rem;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .scale-label
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .scale-label
 {
     top: 5.5rem;
     left: 32.5rem;
     position: absolute;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .scale-slider
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .scale-slider
 {
     top: -1.5rem;
     width: 30.0rem;
@@ -155,17 +234,15 @@
     margin-bottom: 0.0rem;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .input-row
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row.input-row
 {
-    /*top: 2.8rem;*/
-    width: 100%;
-    height: 4.0rem; /*9%*/
-    position: relative;
+    height: 4.0rem;
 
     padding-top : 1.0rem;
+    padding-left: -1.0rem;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .input-row > .l-input-row
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row.input-row > .l-input-row
 {
     left: 0;
     right: 0;
@@ -177,7 +254,7 @@
     margin: auto;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .l-input-row > .l-input-row-icon
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-input-row > .l-input-row-icon
 {
     width: 3.0rem;
     height: 2.6rem;
@@ -185,7 +262,7 @@
     float: left;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .l-input-row-icon .input-row-icon-img
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-input-row-icon .input-row-icon-img
 {
     top: 0.1rem;
     left: 1.0rem;
@@ -196,7 +273,7 @@
     position: absolute;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .input-row .l-input
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row.input-row .l-input
 {
     left: 4.8rem;
     width: 14.2rem;
@@ -204,7 +281,7 @@
     position: absolute;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .row .control
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row .control
 {
     float: left;
     clear: left;
@@ -213,7 +290,7 @@
     margin-bottom: 2.0rem;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .content .control label
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .control label
 {
     top: 0;
     bottom: 0;
@@ -226,7 +303,7 @@
     line-height: 2.0rem;
 }
 
-.origin-customizer-screen .l-main-dialog-container .content .row .l-input-big
+.origin-customizer-screen .l-origin-customizer-dialog-container .content .row .l-input-big
 {
     width: 30.0rem;
     height: 4.0rem;
@@ -237,7 +314,7 @@
 
 
 /****Footer****/
-.origin-customizer-screen > .l-main-dialog-container .footer .l-button-bar
+.origin-customizer-screen > .l-origin-customizer-dialog-container .footer .l-button-bar
 {
     top: 0;
     left: 0;
@@ -249,7 +326,7 @@
     margin: auto;
 }
 
-.origin-customizer-screen > .l-main-dialog-container .footer .l-leave-button
+.origin-customizer-screen > .l-origin-customizer-dialog-container .footer .l-leave-button
 {
     top: 0;
     right: 0;
@@ -265,7 +342,7 @@
 
 
 /*****Configure Options*****/
-.origin-customizer-screen > .l-main-dialog-container .content .configure-container
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .configure-container
 {
     height: 30.0rem;
     width: 100%;
@@ -273,14 +350,14 @@
     position: relative;
     /*padding-top : 1.0rem;*/
 }
-.origin-customizer-screen > .l-main-dialog-container .content .column45
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column45
 {
     width: 45%;
     height: 100%;
     position: relative;
     float : left;
 }
-.origin-customizer-screen > .l-main-dialog-container .content .column55
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column55
 {
     width: 55%;
     height: 100%;
@@ -293,14 +370,14 @@
 
 
 /****Origin Image****/
-.origin-customizer-screen > .l-main-dialog-container .content .column-left .sub-column-left .origin-image-container
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .origin-image-container
 {
     width: 98%;
     height: 21.0rem;
 
     padding-top: 1.0rem;
 }
-.origin-customizer-screen > .l-main-dialog-container .content .column-left .sub-column-left .origin-image-container > img
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .origin-image-container > img
 {
     top: 0;
     left: 0;
@@ -316,21 +393,21 @@
 
 
 /****Banner****/
-.origin-customizer-screen > .l-main-dialog-container .column-right .row .banner-container
+.origin-customizer-screen > .l-origin-customizer-dialog-container .column-right .row .banner-container
 {
     width: 100%;
     height: 38.0rem;
 
-    margin-bottom: 6.0rem;
+    margin-bottom: 6.5rem;
 }
-.origin-customizer-screen > .l-main-dialog-container .column-right .row .banner-container .prev-banner-button,
-.origin-customizer-screen > .l-main-dialog-container .column-right .row .banner-container .next-banner-button
+.origin-customizer-screen > .l-origin-customizer-dialog-container .column-right .row .banner-container .prev-banner-button,
+.origin-customizer-screen > .l-origin-customizer-dialog-container .column-right .row .banner-container .next-banner-button
 {
     height: 4.1rem;
     width: 4.5rem;
     vertical-align: middle;
 }
-.origin-customizer-screen > .l-main-dialog-container .column-right .row .banner-container .banner-image
+.origin-customizer-screen > .l-origin-customizer-dialog-container .column-right .row .banner-container .banner-image
 {
     vertical-align: middle;
     margin-left: auto;
@@ -342,7 +419,7 @@
 
 
 /****Company Avatar****/
-.origin-customizer-screen > .l-main-dialog-container .content .avatar-changer-container
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container
 {
     width: 100%;
     height: 17.0rem;
@@ -351,20 +428,20 @@
 
     /*border: 4px solid purple;*/
 }
-.origin-customizer-screen > .l-main-dialog-container .content .avatar-changer-container .avatar-row
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-row
 {
     width: 100%;
     height: 3.5rem;
     position: relative;
     float: left;
 }
-.origin-customizer-screen > .l-main-dialog-container .content .avatar-changer-container .avatar-container
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container
 {
     width: 100%;
     height: 100%;
     margin-bottom: 1.0rem;
 }
-.origin-customizer-screen > .l-main-dialog-container .content .avatar-changer-container .avatar-container .avatar-column
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-column
 {
     width: 25%;
     height: 100%;
@@ -373,7 +450,7 @@
     position: relative;
     /*border: 4px solid brown;*/
 }
-.origin-customizer-screen > .l-main-dialog-container .content .avatar-changer-container .avatar-container .avatar-column-mid
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-column-mid
 {
     width: 50%;
     height: 100%;
@@ -386,7 +463,7 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
-.origin-customizer-screen > .l-main-dialog-container .content .avatar-changer-container .avatar-container .avatar-column .avatar-button
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-column .avatar-button
 {
     height: 4.1rem;
     width: 4.5rem;
@@ -399,7 +476,7 @@
 
     position: absolute;    
 }
-.origin-customizer-screen > .l-main-dialog-container .content .avatar-changer-container .avatar-container .avatar-column-mid .avatar-image-container
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-column-mid .avatar-image-container
 {
     width: 13.0rem;
     height: 16.0rem;
@@ -413,7 +490,7 @@
     position: absolute;
     /*border: 4px solid red;*/
 }
-.origin-customizer-screen > .l-main-dialog-container .content .avatar-changer-container .avatar-container .avatar-column-mid .avatar-image-container > img
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-column-mid .avatar-image-container > img
 {
     max-height: 100%;
     max-width: 100%;
@@ -428,7 +505,7 @@
 
     display: block;
 }
-.origin-customizer-screen > .l-main-dialog-container .content .l-avatar-button
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-avatar-button
 {
     top: 0;
     left: 0;
@@ -437,4 +514,18 @@
     position: absolute;
     margin: auto;
     line-height: 3.0rem;
-} 
+}
+
+
+
+
+/*****************************
+    Properties Screen
+*****************************/
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .asset-properties-container
+{
+    width: 100%;
+    height: 35.0rem;
+
+    border: 4px solid blue; /*this element is unused for now*/
+}

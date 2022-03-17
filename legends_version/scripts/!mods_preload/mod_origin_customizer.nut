@@ -5,13 +5,18 @@ this.getroottable().OriginCustomizerVersion <- version;
 // register CSS
 ::mods_registerCSS("origin_customizer_controls.css");
 ::mods_registerCSS("origin_customizer_screen.css");
+::mods_registerCSS("origin_customizer_popup_dialogs.css");
 
 // register JS
 ::mods_registerJS("origin_customizer_controls.js");
 ::mods_registerJS("origin_customizer_screen.js");
+::mods_registerJS("origin_customizer_popup_dialogs.js");
 
 ::mods_queue("mod_origin_customizer_legends", "mod_legends,>mod_nggh_assets", function()
 {	
+	local gt = this.getroottable();
+	gt.Const.PercentageNoteString <- " The value is calculated in percentage. The default value is 100 which means 100%."
+
 	::mods_hookNewObjectOnce("states/world_state", function( obj ) 
 	{
 		local init_ui = ::mods_getMember(obj, "onInitUI");
@@ -19,7 +24,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 		{
 			init_ui();
 			this.m.OriginCustomizerScreen <- this.new("scripts/ui/screens/mods/origin_customizer_screen");
-			this.m.ObituaryScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
+			this.m.OriginCustomizerScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
 			this.initLoadingScreenHandler();
 		}
 
@@ -584,7 +589,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "Affecting your company default roster tier without considering the bonus tier from reputation, this tier determines the size of your roster and how many brother can be brought in battle, this tier may have a different value in different origins."
+						text = "Determines your company default roster tier without considering the bonus tier from reputation, affects the size of your roster and how many brothers can be brought in battle, this tier may have different values in different origins."
 					},
 				];
 				foreach ( tier in this.Const.Roster.Tier )
@@ -598,26 +603,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 				}
 				return ret;
 
-			case "customeorigin.avatarbutton":
+			case "customeorigin.difficultymult":
 		       	return [
 					{
 						id = 1,
 						type = "title",
-						text = "Change Avatar Sprite"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Let you change your world map avatar sprite to the one you want."
-					},
-				];
-
-			/*case "customeorigin.scaling":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Difficulty Scaling Percentage"
+						text = "Difficulty Multiplier"
 					},
 					{
 						id = 2,
@@ -636,7 +627,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "Bonus chance to the existing chance to loot enemy equipment (armors, weapon, quiver, etc). The chance to loot an equipment of an enemy is based on the durability of said item. With this chance value reaches 100%, you are guaranteed to loot enemy equipment. The default value is 0 which means 0%."
+						text = "Bonus chance to the existing chance to loot enemy equipment (armors, weapon, quiver, etc). The chance to loot an equipment of an enemy is based on the durability of said item. With this chance value reaches 100, you are guaranteed to loot enemy equipment. The default value is 0 which means 0%."
 					},
 				];
 
@@ -645,12 +636,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "XP Gained"
+						text = "Gained XP Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affecting the xp of all brothers. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects the gained xp of all brothers." + this.Const.PercentageNoteString
 					},
 				];
 			
@@ -659,12 +650,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Hiring Cost"
+						text = "Hiring Cost Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affecting the cost to hiring new brother in towns, cities. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects the cost to hiring new brothers." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -673,12 +664,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Daily Wage"
+						text = "Daily Wage Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affecting the daily wage of all brothers. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects the daily wage of all brothers." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -687,12 +678,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Selling Price"
+						text = "Selling Price Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affecting the amount of money you get when selling item to the market. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects the amount of money you get when selling any item." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -701,12 +692,40 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Buying Price"
+						text = "Buying Price Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affecting the price of items in shops, marets. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects the price of all items in shops, markets." + this.Const.PercentageNoteString
+					},
+				];
+
+			case "customeorigin.selling_trade":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Trade Goods Selling Price Multiplier"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Affects the amount of money you get when selling any trade goods (e.g. silk, dye, etc)." + this.Const.PercentageNoteString
+					},
+				];
+
+			case "customeorigin.buying_trade":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Trade Goods Buying Price Multiplier"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Affects the price of all trade goods (e.g. silk, dye, etc) in shops, markets." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -720,7 +739,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "The chance to get an additional loot from [color=" + this.Const.UI.Color.NegativeValue + "]beast-type[/color] enemy, this value don\'t affect the chance to loot equipment from enemy. The default value is 0 which means 0%. The value is calculated in percentage."
+						text = "The chance to get an additional loot from [color=" + this.Const.UI.Color.NegativeValue + "]beast-type[/color] enemy, this value don\'t affect the chance to loot equipment from enemy. The value is calculated in percentage. The default value is 0 which means 0%."
 					},
 				];
 
@@ -734,7 +753,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "The additional chance to turn an enemy into a champion. If you bring this value to 100, you will always find champion enemies in roaming party. If you bring this value to 200, all champion-able enemy will turn into a champion even in a 1 skull contract. The base value is 0 which means 0%.  The value is calculated in percentage."
+						text = "The additional chance to turn a champion-able enemy into a champion. If you bring this value to 100, you will always find champion enemies in roaming party. If you bring this value to 200, all champion-able enemy will turn into a champion even in a 1 skull contract. The value is calculated in percentage. The default value is 0 which means 0%."
 					},
 				];
 
@@ -743,12 +762,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "World Map Movement Speed"
+						text = "Movement Speed Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "The base speed of your company on world map without any modifier from background and terrain. The default value is 105."
+						text = "Affects the speed of your company on world map without considering any modifier from background or terrain." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -757,12 +776,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Contract Payment"
+						text = "Contract Payment Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affect the reward money of a contract. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects the payment by completing a contract." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -771,12 +790,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Vision Radius"
+						text = "Vision Radius Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Determine how far your vision allows you to see. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects wide the your vision radius on world map." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -785,12 +804,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Hitpoints Recovery Speed"
+						text = "Hitpoints Recovery Speed Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Determine how fast or slow your injured brothers restore their hitpoints. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects how fast or slow your injured brothers restore their hitpoints. Does not affect the speed to recover from a status effect injury." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -799,12 +818,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Repair Speed"
+						text = "Repair Speed Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Determine how far your vision allows you to see. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects the speed of repairing your equipment." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -813,12 +832,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Renown Gained"
+						text = "Renown Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Determine how much renow you gain or lost. The higher the percentage, the more renown you gain while also causes you to lost more renown when it happens. The default value is 100 which means 100%."
+						text = "Affects the amount of gained renown or loss renown." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -827,12 +846,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Negotiation Annoyance"
+						text = "Negotiation Annoyance Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affecting the chance to ask for advance payment, negotiate for higer payment. The higher this percentage the more likely you will fail the negotiate. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects the successful chance to ask for advance payment, negotiate for higher payment. The higher this percentage the more likely you will fail to negotiate." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -841,12 +860,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Minimum Recruit"
+						text = "Minimum Additional Recruit"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "The minimum amount of bonus recruit in a town, village, city, ect. The number of this value is equal to number of bonus recruit in towns, villages. The default value is 0 which means no additional recruit to total recruit after the town resets its recruit roster."
+						text = "The minimum number of bonus recruit added to the default number recruit when the town/city/village reset its recruit roster. The higher the number the more recruits can be found in any town. The bonus recruit is a randomly chosen number between the Minimum Additional Recruit and Maximum Additional Recruit."
 					},
 				];
 
@@ -855,12 +874,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Maximum Recruit"
+						text = "Maximum Additional Recruit"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "The maximun amount of bonus recruit in a town, village, city, ect. The number of this value is equal to number of bonus recruit in towns, villages. The default value is 0 which means no additional recruit to total recruit after the town resets its recruit roster."
+						text = "The maximum number of bonus recruit added to the default number recruit when the town/city/village reset its recruit roster. The higher the number the more recruits can be found in any town. The bonus recruit is a randomly chosen number between the Minimum Additional Recruit and Maximum Additional Recruit"
 					},
 				];
 
@@ -869,12 +888,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Taxidermist Cost"
+						text = "Taxidermist Cost Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affect how much money you pay Taxidermist to craft an item. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects the cost to craft an item in Taxidermist." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -883,26 +902,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Tryout Price"
+						text = "Tryout Price Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affect how much money you pay to tryout a recruit. The default value is 100 which means 100%. The value is calculated in percentage."
-					},
-				];
-
-			case "customeorigin.badrelation":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Relation Decay Speed"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Affect how slow or fast allied/friendly factions return to neutral relation with player. The higher the number the faster the decay speed. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects the fee to tryout a recruit." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -911,16 +916,30 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Relation Recovery Speed"
+						text = "Relation Decay Speed Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affect how slow or fast hostile/unfriendly factions return to neutral relation with player. The higher the number the faster the recovery speed. The default value is 100 which means 100%. The value is calculated in percentage."
+						text = "Affects how slow or fast a good relation return to neutral relation. The higher the number the faster the decay speed." + this.Const.PercentageNoteString
 					},
 				];
 
-			case "customeorigin.brothersscale":
+			case "customeorigin.badrelation":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Relation Recovery Speed Multiplier"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Affect how slow or fast a bad relation return to neutral relation. The higher the number the faster the recovery speed." + this.Const.PercentageNoteString
+					},
+				];
+
+			case "customeorigin.brotherscalemax":
 		       	return [
 					{
 						id = 1,
@@ -930,7 +949,21 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 2,
 						type = "description",
-						text = "This value determine how many brothers are taken in calculating company strength, from company strength the game will use it as standard to spawn enemy. If you have 25 brothers in roster while this value is 12, that means at most only 12 highest level brothers are taken in calculating company strength."
+						text = "This value determines the maximum number of brothers are taken to scale difficulty. The default value is your maximum number of brother in battle."
+					},
+				];
+
+			case "customeorigin.brotherscalemin":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Minimum Brothers For Scaling Difficulty"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "This value determines the minimum number of brothers are taken to scale difficulty."
 					},
 				];
 
@@ -939,12 +972,40 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Extra Expiration Date For Food"
+						text = "Extra Expiration Date"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Increase or decrease the expiration date of food items. The higher the number the longer time for food to spoil. The default value is 0. The value is in days unit."
+						text = "Increases or decreases the expiration date of food items. The higher the number the longer for your food to spoil. The default value is 0. The value is count in day."
+					},
+				];
+
+			case "customeorigin.footprint":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Footprint Vision Multiplier"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Affects the radius for you to see footprint of roaming party." + this.Const.PercentageNoteString
+					},
+				];
+
+			case "customeorigin.advancepaymentcap":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Advance Payment Cap"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Affects the percentage of contract payment that is paid in advance. Normally the maximum percentage of payment paid in advance is 50%."
 					},
 				];
 
@@ -953,26 +1014,12 @@ this.getroottable().OriginCustomizerVersion <- version;
 					{
 						id = 1,
 						type = "title",
-						text = "Training Price"
+						text = "Training Price Multiplier"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Affect the cost to train a brother in Training Hall building. The default value is 100 which means 100%. The value is calculated in percentage."
-					},
-				];
-
-			case "customeorigin.accept_banner":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Select This Banner"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Confirm your choice of changing to this banner."
+						text = "Affects the cost to train a brother in Training Hall." + this.Const.PercentageNoteString
 					},
 				];
 
@@ -992,99 +1039,9 @@ this.getroottable().OriginCustomizerVersion <- version;
 						id = 7,
 						type = "text",
 						icon = "ui/tooltips/warning.png",
-						text = "Do not change to an origin requires a [color=" + this.Const.UI.Color.NegativeValue + "]Player Character[/color] while your current roster does not have a 'Player Character' brother."
+						text = "Please do not change to an origin requires a [color=" + this.Const.UI.Color.NegativeValue + "]Player Character[/color] while your current roster does not have a 'Player Character' brother."
 					},
 				];
-
-			case "customeorigin.calculate":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Calculate Company Strength"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Calculating your current company strength based on below settings then displays it on the box above. It also applies below settings without the need to press 'Done' button. Below is the list of what setting affects company strength."
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/plus.png",
-						text = "Combat Difficulty"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/plus.png",
-						text = "Difficulty Scaling"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/plus.png",
-						text = "Maximum Brothers Scaling"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/plus.png",
-						text = "Equipment Scaling"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/plus.png",
-						text = "Distance Scaling"
-					},
-				];
-
-			case "customeorigin.partystrength":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Company Strength"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "This is the value that determine the difficulty. Combat Difficulty determines the equation to calculate company strength while Difficulty Scaling affect the final result of said equation. The higher you company strength the more enemies you can found."
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Affect the number of roaming party troops"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Affect the number of defenders in a camp"
-					},
-					{
-						id = 7,
-						type = "text",
-						icon = "ui/icons/special.png",
-						text = "Affect possibility to spawn strong enemy"
-					},
-				];
-
-			case "customeorigin.contractdisablebutton":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Disable Contract"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Open a checklist that allows you to allow certain contracts to be generated or not. Unchecked to remove said contract from generated."
-					},
-				]*/
 			}
 			
 			return null;

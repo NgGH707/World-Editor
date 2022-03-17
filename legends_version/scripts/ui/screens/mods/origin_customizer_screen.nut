@@ -3,6 +3,7 @@ this.origin_customizer_screen <- {
 		JSHandle = null,
 		Visible = null,
 		Animating = null,
+		PopupDialogVisible = false,
 		OnConnectedListener = null,
 		OnDisconnectedListener = null,
 		OnClosePressedListener = null
@@ -16,7 +17,7 @@ this.origin_customizer_screen <- {
 	{
 		if (this.m.Animating != null)
 		{
-			return this.m.Animating == true;
+			return this.m.Animating == true || this.m.PopupDialogVisible == true;
 		}
 		else
 		{
@@ -50,6 +51,7 @@ this.origin_customizer_screen <- {
 	{
 		this.m.Visible = false;
 		this.m.Animating = false;
+		this.m.PopupDialogVisible = false;
 		this.m.JSHandle = this.UI.connect("OriginCustomizerScreen", this);
 	}
 
@@ -97,17 +99,24 @@ this.origin_customizer_screen <- {
 	{
 		this.m.Visible = true;
 		this.m.Animating = false;
+		this.m.PopupDialogVisible = false;
 	}
 
 	function onScreenHidden()
 	{
 		this.m.Visible = false;
 		this.m.Animating = false;
+		this.m.PopupDialogVisible = false;
 	}
 
 	function onScreenAnimating()
 	{
 		this.m.Animating = true;
+	}
+
+	function onPopupDialogIsVisible( _data )
+	{
+		this.m.PopupDialogVisible = _data[0];
 	}
 
 	function onClose()
