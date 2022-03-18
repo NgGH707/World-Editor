@@ -131,9 +131,31 @@ this.origin_customizer_screen <- {
 	{
 		local result = {};
 		result.Factions <- this.convertFactionsToUIData();
+		result.Settlements <- this.convertSettlementsToUIData();
 		result.Scenarios <- this.Const.ScenarioManager.getScenariosForUI();
 		result.Scenarios.remove(2);
 		result.Scenarios.remove(0);
+		return result;
+	}
+
+	function convertSettlementsToUIData()
+	{
+		local result = [];
+
+		foreach(i, settlement in this.World.EntityManager.getSettlements())
+		{
+			result.push({
+				Name = settlement.getName(),
+				Size = settlement.getSize(),
+				Faction = null,
+				Owner = null,
+				ImagePath = settlement.getImagePath(),
+				IsCoastal = settlement.isCoastal(),
+				IsMilitary = settlement.isMilitary(),
+				IsSouthern = settlement.isSouthern(),
+			});
+		}
+
 		return result;
 	}
 
@@ -196,11 +218,19 @@ this.origin_customizer_screen <- {
 			{
 				faction.ImagePath <- f.getUIBanner();
 				faction.Contracts <- this.getContractsUI(f);
+				faction.NoChangeName <- false;
+
+				if (f.getType() == this.Const.FactionType.Settlement)
+				{
+					faction.Landlord <- f.getSettlements()[0].getOwner().getUIBanner();
+					faction.NoChangeName = true;
+				}
 			}
 			else
 			{
 			    faction.ImagePath <- "ui/banners/banner_unknow.png";
 			    faction.Contracts <- [];
+			    faction.NoChangeName <- true;
 			}
 
 			result.push(faction);
@@ -211,6 +241,11 @@ this.origin_customizer_screen <- {
 
 	function getContractsUI( _faction )
 	{
+		if (_faction.getType() == this.Const.FactionType.Player)
+		{
+			return [];
+		}
+
 		local contracts = _faction.getContracts();
 		local result = [];
 

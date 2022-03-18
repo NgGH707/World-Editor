@@ -1,0 +1,64 @@
+/**********************
+  Settlements Screen
+**********************/
+
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .scroll-container .l-settlement-row
+{
+    width: 25.0rem;
+    height: 17.5rem;
+    position: relative;
+    margin-bottom: -0.1rem;
+    margin-left: 1.0rem;
+
+    overflow: hidden;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .scroll-container .l-settlement-row:last-child
+{
+    margin-bottom: 0;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .scroll-container .l-settlement-row .l-settlement-image-container
+{
+    width: 20.0rem;
+    height: 15.0rem;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+    position: absolute;
+
+    border: 1px solid green;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .scroll-container .l-settlement-row .l-settlement-image-container > img
+{
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+
+    display: block;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-settlement-row .name
+{
+    top: 50%;
+    width: 100%;
+    position: relative;
+
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+
+    white-space: nowrap;
+    text-align: center;
+    overflow: hidden;
+
+    line-height: 3.5rem;
+}

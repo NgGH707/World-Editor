@@ -1,5 +1,5 @@
-// simple function to help bind event listener to a input
 
+// simple function to help bind event listener to a input
 $.fn.assignInputEventListener = function(_type, _callback)
 {
     if (_type === undefined || _type === null || typeof _type !== 'string')

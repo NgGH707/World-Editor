@@ -96,3 +96,91 @@
 }
 
 
+/*
+    List entry fat boy
+*/
+.ui-control.list .list-entry-fat
+{
+/*
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 96%;
+    height: 100%;
+    position: relative;
+    margin : auto;
+*/
+    top: 0;
+    left: 0.3rem;
+    right: 0.3rem;
+    bottom: 0;
+    position: absolute;
+    margin : auto;
+
+    background-image: url("coui://gfx/ui/skin/list_item_custom_250x175.png");
+    background-size: 25.0rem 17.5rem;
+    background-repeat: no-repeat;
+
+    text-shadow: 1px 1px 1px #000;
+
+    color: #d7a54e;
+}
+
+.ui-control.list .list-entry-fat:hover,
+.ui-control.list .list-entry-fat.is-selected
+{
+    background-image: url("coui://gfx/ui/skin/list_item_custom_250x175_hovered.png");
+    background-size: 25.0rem 17.5rem;
+}
+
+.ui-control.list .list-entry-fat.is-selected
+{
+    text-shadow: 1px 1px #000000, -1px -1px #000;
+}
+
+.ui-control.list .list-entry-fat[disabled]
+{
+    background-image: url("coui://gfx/ui/skin/list_item_custom_250x175_inactive.png");
+    background-size: 25.0rem 17.5rem;
+}
+
+.ui-control.list .list-entry-fat[disabled]:hover
+{
+    background-image: url("coui://gfx/ui/skin/list_item_custom_250x175_hovered_inactive.png");
+    background-size: 25.0rem 17.5rem;
+}
+
+.ui-control.list .list-entry-fat[disabled]:active
+{
+    background-image: url("coui://gfx/ui/skin/list_item_custom_250x175_hovered_inactive.png");
+    background-size: 25.0rem 17.5rem;
+}
+
+.ui-control.list .list-entry-fat > .label
+{
+    top: 0;
+    bottom: 0;
+    left: -0.3rem;
+    right: 0;
+    width: 90%;
+    height: 90%;
+    margin: auto;
+    position: absolute;
+
+    text-align : center;
+}
+
+.ui-control.list .list-entry-fat > img
+{
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 90%;
+    height: 90%;
+    position: absolute;
+    margin: auto;
+}
+
+

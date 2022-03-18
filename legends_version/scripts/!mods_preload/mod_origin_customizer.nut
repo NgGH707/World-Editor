@@ -6,12 +6,14 @@ this.getroottable().OriginCustomizerVersion <- version;
 ::mods_registerCSS("origin_customizer_controls.css");
 ::mods_registerCSS("origin_customizer_screen.css");
 ::mods_registerCSS("origin_customizer_factions.css");
+::mods_registerCSS("origin_customizer_settlements.css");
 ::mods_registerCSS("origin_customizer_popup_dialogs.css");
 
 // register JS
 ::mods_registerJS("origin_customizer_controls.js");
 ::mods_registerJS("origin_customizer_screen.js");
 ::mods_registerJS("origin_customizer_factions.js");
+::mods_registerJS("origin_customizer_settlements.js");
 ::mods_registerJS("origin_customizer_popup_dialogs.js");
 
 ::mods_queue("mod_origin_customizer_legends", "mod_legends,>mod_nggh_assets", function()
@@ -620,8 +622,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 				else
 				{
 					local faction = this.World.FactionManager.getFaction(contract.getFaction());
-
-					return [
+					local ret = [
 						{
 							id = 1,
 							type = "title",
@@ -645,6 +646,8 @@ this.getroottable().OriginCustomizerVersion <- version;
 							text = "Payment Multiplier: [color=" + this.Const.UI.Color.NegativeValue + "]" + (this.Math.floor(contract.getPaymentMult() * 100) / 100) + "[/color]"
 						},
 					];
+					this.Const.AddContractHints(ret);
+					return ret;
 				}
 	 		}
 
@@ -1128,6 +1131,20 @@ this.getroottable().OriginCustomizerVersion <- version;
 						id = 2,
 						type = "description",
 						text = "Some changes may not automatically save, thus, require you to manually save them by pressing this button or \'Close\' button."
+					},
+				];
+
+			case "origincustomizer.fixedrelation":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Stop Relation Deterioration"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Prevent the relation of the current faction with player from deteriorating or returning back to neutral relation."
 					},
 				];
 			}

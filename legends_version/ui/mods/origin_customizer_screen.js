@@ -1,5 +1,11 @@
 "use strict";
 
+var OriginCustomizer =
+{
+    Screens: ['General'   , 'Properties'   , 'Factions'   , 'Settlements'   , 'Contracts'   ],
+    Classes: ['is-general', 'is-properties', 'is-factions', 'is-settlements', 'is-contracts'],
+};
+
 var OriginCustomizerScreen = function(_parent)
 {
 	this.mSQHandle = null;
@@ -11,47 +17,24 @@ var OriginCustomizerScreen = function(_parent)
     // popup dialog
     this.mCurrentPopupDialog = null;
 
-    // scenarios
-    this.mScenario = 
-    {
-        Data               : null,
-        Image              : null,
-        Selected           : null,
-        Description        : null,
-        ListContainer      : null,
-        ListScrollContainer: null,
-    };
-
-    // factions
-    this.mFaction =
-    {
-        Data               : null,
-        Name               : null,
-        Banner             : null,
-        Selected           : null,
-        Contracts          : null, 
-        ListContainer      : null,
-        ListScrollContainer: null,
-    };
-
     // screens
     this.mScreens = 
     {
-        General   : null,
-        Properties: null,
-        Factions  : null,
-        Contracts : null,
-        Settlement: null,
+        General    : null,
+        Properties : null,
+        Factions   : null,
+        Settlements: null,
+        Contracts  : null,
     };
 
     // switch-to buttons
     this.mSwitchToButton = 
     {
-        General   : null,
-        Properties: null,
-        Factions  : null,
-        Contracts : null,
-        Settlement: null,
+        General    : null,
+        Properties : null,
+        Factions   : null,
+        Settlements: null,
+        Contracts  : null,
     };
 
     // inputs
@@ -150,6 +133,42 @@ var OriginCustomizerScreen = function(_parent)
         SocketIndex : 0,
     };
 
+    // scenarios
+    this.mScenario = 
+    {
+        Data               : null,
+        Image              : null,
+        Selected           : null,
+        Description        : null,
+        ListContainer      : null,
+        ListScrollContainer: null,
+    };
+
+    // factions
+    this.mFaction =
+    {
+        Data               : null,
+        Name               : null,
+        Banner             : null,
+        //Landlord           : null,
+        //LandlordContainer  : null,
+        Selected           : null,
+        Contracts          : null,
+        NextButton         : null,
+        PrevButton         : null,
+        Settlement         : null,
+        ListContainer      : null,
+        ListScrollContainer: null,
+    };
+
+    this.mSettlement =
+    {
+        Data               : null,
+        Selected           : null,
+        ListContainer      : null,
+        ListScrollContainer: null,
+    }
+
     // configure options
     this.mCompanyName = null;
     this.mGenderLevel = 0;
@@ -186,9 +205,10 @@ var OriginCustomizerScreen = function(_parent)
     };
 
     // sliders
-    this.mRosterTier      = {Control: null, Title: null, Min: 1, Max:  10, Value:   2, Step: 1, TooltipId: 'origincustomizer.rostertier', Postfix: ''};
-    this.mDifficultyMult  = {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'origincustomizer.difficultymult', Postfix: '%'};
-    this.mFactionRelation = {Control: null, Title: null, Min: 0, Max: 100, Value:  50, Step: 5, TooltipId: TooltipIdentifier.RelationsScreen.Relations, Postfix: ''};
+    this.mRosterTier           = {Control: null, Title: null, Min: 1, Max:  10, Value:   2, Step: 1, TooltipId: 'origincustomizer.rostertier', Postfix: ''};
+    this.mDifficultyMult       = {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'origincustomizer.difficultymult', Postfix: '%'};
+    this.mFactionRelation      = {Control: null, Title: null, Min: 0, Max: 100, Value:  50, Step: 5, TooltipId: TooltipIdentifier.RelationsScreen.Relations, Postfix: ''};
+    this.mFactionFixedRelation = {Checkbox: null, Label: null, Name: 'Stop Relation Deterioration', TooltipId: 'origincustomizer.fixedrelation'},
 
     // buttons
     this.mSaveButton  = null;
@@ -221,48 +241,22 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
         var buttonPanel = $('<div class="tab-button-panel"/>');
         tabContainer.append(buttonPanel);
 
-        // button 1st
-        var buttonLayout = $('<div class="l-tab-button is-general"/>');
-        buttonPanel.append(buttonLayout);
-        this.mSwitchToButton.General = buttonLayout.createTabTextButton('General', function() {
-            self.switchScreen('General');
-        }, null, 'tab-button', 7);
-        this.mSwitchToButton.General.enableButton(false);
-
-        // button 2nd
-        buttonLayout = $('<div class="l-tab-button is-properties"/>');
-        buttonPanel.append(buttonLayout);
-        this.mSwitchToButton.Properties = buttonLayout.createTabTextButton('Properties', function() {
-            self.switchScreen('Properties');
-        }, null, 'tab-button', 7);
-
-        // button 3rd
-        buttonLayout = $('<div class="l-tab-button is-factions"/>');
-        buttonPanel.append(buttonLayout);
-        this.mSwitchToButton.Factions = buttonLayout.createTabTextButton('Factions', function() {
-            self.switchScreen('Factions');
-        }, null, 'tab-button', 7);
-
-        // button 4th
-        buttonLayout = $('<div class="l-tab-button is-contracts"/>');
-        buttonPanel.append(buttonLayout);
-        this.mSwitchToButton.Contracts = buttonLayout.createTabTextButton('Contracts', function() {
-            self.switchScreen('Contracts');
-        }, null, 'tab-button', 7);
-
-        // button 5th
-        buttonLayout = $('<div class="l-tab-button is-settlement"/>');
-        buttonPanel.append(buttonLayout);
-        this.mSwitchToButton.Settlement = buttonLayout.createTabTextButton('Settlement', function() {
-            self.switchScreen('Settlement');
-        }, null, 'tab-button', 7);
+        // create the buttons to switch to other screens
+        var index = 0;
+        $.each(this.mSwitchToButton, function(_key, _definition) {
+            var buttonLayout = $('<div class="l-tab-button ' + OriginCustomizer.Classes[index] + '"/>');
+            buttonPanel.append(buttonLayout);
+            self.mSwitchToButton[_key] = buttonLayout.createTabTextButton(_key, function() {
+                self.switchScreen(_key);
+            }, null, 'tab-button', 7);
+            index++;
+        });
 
 
         // save changes button
-        buttonLayout = $('<div class="l-tab-button is-save"/>');
+        var buttonLayout = $('<div class="l-tab-button is-save"/>');
         buttonPanel.append(buttonLayout);
-        this.mSaveButton = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/save_settings.png'/*Path.GFX + Asset.BUTTON_QUIT*/, function ()
-        {
+        this.mSaveButton = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/save_settings.png', function () {
             //self.mDataSource.notifyBackendCloseButtonClicked();
         }, '', 6);
         this.mSaveButton.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.save_button' });
@@ -278,26 +272,6 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
             content.append(self.mScreens[_key]);
             self['create' + _key + 'PanelDIV'](self.mScreens[_key]);
         });
-
-
-        /*this.mScreens.General = $('<div class="display-none"/>'); // display-none display-block
-        content.append(this.mScreens.General);
-        this.createGeneralPanelDIV(this.mScreens.General);
-
-
-        this.mScreens.Properties = $('<div class="display-none"/>');
-        content.append(this.mScreens.Properties);
-        this.createPropertiesPanelDIV(this.mScreens.Properties);
-
-
-        this.mScreens.Factions = $('<div class="display-none"/>');
-        content.append(this.mScreens.Factions);
-        this.createFactionsPanelDIV(this.mScreens.Factions);
-
-
-        this.mScreens.Contracts = $('<div class="display-none"/>');
-        content.append(this.mScreens.Contracts);
-        this.createContractsPanelDIV(this.mScreens.Contracts);*/
     }
 
     // create footer button bar
@@ -315,14 +289,28 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
     this.mIsVisible = false;
 };
 
-OriginCustomizerScreen.prototype.createSettlementPanelDIV = function(_parentDiv) 
+OriginCustomizerScreen.prototype.createContractsPanelDIV = function(_parentDiv) 
 {
     var self = this;
 };
 
-OriginCustomizerScreen.prototype.createContractsPanelDIV = function(_parentDiv) 
+OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv) 
 {
     var self = this;
+
+    var column = $('<div class="column25 with-dialog-background"/>');
+    _parentDiv.append(column);
+    {
+        var listContainerLayout = $('<div class="l-list-container"/>');
+        column.append(listContainerLayout);
+        this.mSettlement.ListContainer = listContainerLayout.createList(2);
+        this.mSettlement.ListScrollContainer = this.mSettlement.ListContainer.findListScrollContainer();
+    }
+
+    var column = $('<div class="column75 with-dialog-background"/>');
+    _parentDiv.append(column);
+    {
+    }
 };
 
 OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv) 
@@ -334,7 +322,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
     {
         var listContainerLayout = $('<div class="l-list-container"/>');
         column40.append(listContainerLayout);
-        this.mFaction.ListContainer = listContainerLayout.createList(1.77);
+        this.mFaction.ListContainer = listContainerLayout.createList(2);
         this.mFaction.ListScrollContainer = this.mFaction.ListContainer.findListScrollContainer();
     }
 
@@ -347,26 +335,146 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
             var column = $('<div class="column50"/>');
             row80.append(column);
             {
-                var row = $('<div class="row"/>');
-                column.append(row);
-                var title = $('<div class="title title-font-big font-color-title">Faction Name</div>');
-                row.append(title);
-                var inputLayout = $('<div class="l-input-big"/>');
-                row.append(inputLayout);
-                this.mFaction.Name = inputLayout.createInput('', 0, 32, 1, function (_input) {
+                var row90 = $('<div class="row90"/>');
+                column.append(row90);
+                {
+                    var row = $('<div class="row"/>');
+                    row90.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Faction Name</div>');
+                    row.append(title);
+                    var inputLayout = $('<div class="l-input-big"/>');
+                    row.append(inputLayout);
+                    this.mFaction.Name = inputLayout.createInput('', 0, 32, 1, function (_input) {
+                        
+                    }, 'title-font-big font-bold font-color-brother-name');
                     
-                }, 'title-font-big font-bold font-color-brother-name');
+                    this.createSliderControlDIV(this.mFactionRelation, 'Relation', row90);
+                    this.createCheckBoxControlDIV(this.mFactionFixedRelation, row90);
+
+                    /*this.mFaction.LandlordContainer = $('<div class="row"/>');
+                    row90.append(this.mFaction.LandlordContainer);
+                    var title = $('<div class="title title-font-big font-color-title">Landlord</div>');
+                    this.mFaction.LandlordContainer.append(title);
+
+                    var landlordContainer = $('<div class="faction-landlord-container"/>');
+                    this.mFaction.LandlordContainer.append(landlordContainer);
+                    this.mFaction.Landlord = landlordContainer.createImage(null, function(_image) {
+                        _image.fitImageToParent(0, 0);
+                    }, null, '');*/
+                }
                 
-                this.createSliderControlDIV(this.mFactionRelation, 'Relation', column);
+
+                var row10 = $('<div class="row10"/>');
+                column.append(row10);
+                {
+                    var row = $('<div class="row"/>');
+                    row10.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Available Contracts</div>');
+                    title.css('margin-top', '1.0rem');
+                    title.css('margin-bottom', '0');
+                    row.append(title);
+                }
             }
 
             var column = $('<div class="column50"/>');
             row80.append(column);
             {
+                var row40 = $('<div class="row40 with-small-dialog-background"/>');
+                column.append(row40);
+                {
+                    var leftColumn = $('<div class="column30"/>');
+                    row40.append(leftColumn);
+                    var prevButtonLayout = $('<div class="faction-banner-button"/>');
+                    leftColumn.append(prevButtonLayout);
+                    this.mFaction.PrevButton = prevButtonLayout.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function() {
+                        //self.onPreviousBannerClicked();
+                    }, '', 6);
 
+                    var midColumn = $('<div class="column40"/>');
+                    row40.append(midColumn);
+                    var bannerContainer = $('<div class="faction-banner-container"/>');
+                    midColumn.append(bannerContainer);
+                    this.mFaction.Banner = bannerContainer.createImage(null, function(_image) {
+                        _image.centerImageWithinParent(0, 0, 1.0);
+                        _image.removeClass('display-none').addClass('display-block');
+                    }, null, 'display-none');
+
+                    var rightColumn = $('<div class="column30"/>');
+                    row40.append(rightColumn);
+                    var nextButtonLayout = $('<div class="faction-banner-button"/>');
+                    rightColumn.append(nextButtonLayout);
+                    this.mFaction.NextButton = nextButtonLayout.createImageButton(Path.GFX + Asset.BUTTON_NEXT_BANNER, function() {
+                        //self.onPreviousBannerClicked();
+                    }, '', 6);
+                }
+
+                var row60 = $('<div class="row60 with-scroll-tooltip-background"/>'); //
+                column.append(row60);
+                {
+                    // 1st button
+                    var row = $('<div class="faction-button-row"></div>');
+                    row60.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("View Settlements", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
+
+                    // 2nd button
+                    var row = $('<div class="faction-button-row"></div>');
+                    row60.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("View Alliance", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
+
+                    // 3rd button
+                    var row = $('<div class="faction-button-row"></div>');
+                    row60.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Despawn Troops", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
+
+                    // 4th button
+                    var row = $('<div class="faction-button-row"></div>');
+                    row60.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Refresh Roster", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
+
+                    // 5th button
+                    var row = $('<div class="faction-button-row"></div>');
+                    row60.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Refresh Actions", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
+
+                    // 6th button
+                    var row = $('<div class="faction-button-row"></div>');
+                    row60.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Refresh Contracts", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
+                }
             }
         }
 
+        // contract panel
         var row20 = $('<div class="row20 with-small-dialog-background"/>');
         column60.append(row20);
         {
@@ -508,7 +616,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
             var originImageContainer = $('<div class="origin-image-container"/>');
             subLeftColumn.append(originImageContainer);
 
-            this.mScenario.Image = originImageContainer.createImage(Path.GFX + 'ui/events/event_99.png', function (_image) {
+            this.mScenario.Image = originImageContainer.createImage(Path.GFX + 'ui/events/event_99.png', function(_image) {
                 _image.removeClass('opacity-none');
             }, null, 'opacity-none');
             this.mScenario.Image.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.choose_origin' });
@@ -583,7 +691,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
                     avatarContainer.append(left);
                     var prevAvatar = $('<div class="avatar-button"/>');
                     left.append(prevAvatar);
-                    this.mAvatar.PrevButton = prevAvatar.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function () {
+                    this.mAvatar.PrevButton = prevAvatar.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function() {
                         //self.onPreviousBannerClicked();
                     }, '', 6);
 
@@ -591,7 +699,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
                     avatarContainer.append(mid);
                     var avatarImage = $('<div class="avatar-image-container"/>');
                     mid.append(avatarImage);
-                    this.mAvatar.Image = avatarImage.createImage(Path.GFX + 'ui/icons/legends_party.png', function (_image) {
+                    this.mAvatar.Image = avatarImage.createImage(Path.GFX + 'ui/icons/legends_party.png', function(_image) {
                         _image.centerImageWithinParent(0, 0, 1.0);
                         _image.removeClass('display-none').addClass('display-block');
                     }, null, 'display-none');
@@ -600,7 +708,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
                     avatarContainer.append(right);
                     var nextAvatar = $('<div class="avatar-button"/>');
                     right.append(nextAvatar);
-                    this.mAvatar.NextButton = nextAvatar.createImageButton(Path.GFX + Asset.BUTTON_NEXT_BANNER, function () {
+                    this.mAvatar.NextButton = nextAvatar.createImageButton(Path.GFX + Asset.BUTTON_NEXT_BANNER, function() {
                         //self.onNextBannerClicked();
                     }, '', 6);
                 }
@@ -1031,11 +1139,14 @@ OriginCustomizerScreen.prototype.isVisible = function()
 
 OriginCustomizerScreen.prototype.loadFromData = function(_data) 
 {
-    if ('Scenarios' in _data && _data.Scenarios !== null && typeof _data.Scenarios === 'object')
+    if ('Scenarios' in _data && _data.Scenarios !== undefined && _data.Scenarios !== null && jQuery.isArray(Scenarios))
         this.mScenario.Data = _data.Scenarios;
 
-    if ('Factions' in _data && _data.Factions !== null && typeof _data.Factions === 'object')
-        this.addFactionsData(_data.Factions)
+    if ('Factions' in _data && _data.Factions !== undefined && _data.Factions !== null && jQuery.isArray(Factions))
+        this.addFactionsData(_data.Factions);
+
+    if ('Settlements' in _data && _data.Settlements !== undefined && _data.Settlements !== null && jQuery.isArray(Settlements))
+        this.addSettlementsData(_data.Settlements);
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnConnected = function()

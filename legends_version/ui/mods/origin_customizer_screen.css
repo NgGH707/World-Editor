@@ -57,11 +57,11 @@
 {
     left: 33.0rem;
 }
-.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-contracts
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-settlements
 {
     left: 49.5rem;
 }
-.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-settlement
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-contracts
 {
     left: 66.0rem;
 }
@@ -81,6 +81,14 @@
     float : left;
 }
 
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column30
+{
+    width: 30%;
+    height: 100%;
+    position: relative;
+    float : left;
+}
+
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .column40
 {
     width: 40%;
@@ -95,8 +103,6 @@
     height: 100%;
     position: relative;
     float : left;
-
-    border: 2px solid yellow;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .column60
@@ -141,6 +147,14 @@
     float : left;
 }
 
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row90
+{
+    height: 90%;
+    width: 100%;
+    float: left;
+    position: relative;
+}
+
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .row80
 {
     height: 80%;
@@ -155,8 +169,22 @@
     width: 100%;
     float: left;
     position: relative;
+}
 
-    border: 2px solid red;
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row60
+{
+    height: 60%;
+    width: 100%;
+    float: left;
+    position: relative;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row40
+{
+    height: 40%;
+    width: 100%;
+    float: left;
+    position: relative;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .row25
@@ -165,8 +193,6 @@
     width: 100%;
     float: left;
     position: relative;
-
-    border: 2px solid blue;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .row20
@@ -177,9 +203,31 @@
     position: relative;
 }
 
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row10
+{
+    height: 10%;
+    width: 100%;
+    float: left;
+    position: relative;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-banner-background
+{
+    background-image: url("coui://gfx/ui/skin/banner_350x288.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-small-dialog-background
 {
     background-image: url("coui://gfx/ui/skin/tactical_character_background.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-scroll-tooltip-background
+{
+    background-image: url("coui://gfx/ui/skin/tooltip_315_bottom.png");
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
@@ -547,5 +595,20 @@
     line-height: 3.0rem;
 }
 
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-list-container
+{
+    width: 100%;
+    height: 100%;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-list-container .ui-control.list .list-entry.is-selected
+{
+    text-shadow: 1px 1px 1px #000;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-list-container .scroll-container
+{
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+}
 
 

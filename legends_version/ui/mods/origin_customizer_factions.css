@@ -1,45 +1,7 @@
 /*****************************
     Factions Screen
 *****************************/
-/*.origin-customizer-screen > .l-origin-customizer-dialog-container .content > .faction-column
-{
-    width: 50%;
-    height: 100%;
-    padding-top: 0.9rem;
-    padding-bottom: 0.9rem;
-    position: relative;
-    float : left;
 
-    background-image: url("coui://gfx/ui/skin/dialog_panel_01.png");
-    background-size: 50.8rem 56.8rem;
-    background-repeat: no-repeat;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content > .faction-column.is-left
-{
-    padding-left: 1.0rem;
-    padding-right: 1.6rem;
-    padding-bottom: 3.5rem;
-}
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content > .faction-column.is-right
-{
-    padding-left: 0.5rem;
-    padding-right: 1.0rem;
-}*/
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-list-container
-{
-    width: 100%;
-    height: 100%;
-}
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-list-container .ui-control.list .list-entry.is-selected
-{
-    text-shadow: 1px 1px 1px #000;
-}
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-list-container .scroll-container
-{
-    margin-top: 0.4rem;
-    margin-bottom: 0.4rem;
-}
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .scroll-container .l-row
 {
     width: 46.5rem;
@@ -106,9 +68,23 @@
 
     display: block;
 }
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-row .faction-row.is-top .f-landlord-container
+{
+    left: 32.5rem;
+    width: 3.0rem;
+    height: 5.0rem;
+    position: absolute;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-row .faction-row.is-top .f-landlord-container img
+{
+    width: 3.0rem;
+    height: 5.0rem;
+    position: absolute;
+
+    display: block;
+}
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .l-row .faction-row.is-top .name
 {
-    /*left: 3.4rem;*/
     left: 0.0rem;
     right: 4.5rem;
     bottom: 0.2rem;
@@ -213,7 +189,81 @@
     margin: auto;
 
     position: absolute;
-    border: 2px solid lime;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .faction-banner-button
+{
+    height: 4.1rem;
+    width: 4.5rem;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+
+    position: absolute;    
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .faction-banner-container
+{
+    width: 15.0rem;
+    height: 20.0rem;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+    position: absolute;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .faction-banner-container > img
+{
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+
+    display: block;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .faction-button-row
+{
+    width: 100%;
+    height: 4.6rem;
+    position: relative;
+    float: left;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .faction-button-row .f-button-center
+{
+    top: 0;
+    left: 0.7rem;
+    right: 0;
+    bottom: 0;
+    width: 23.0rem;
+    height: 4.6rem;
+    position: absolute;
+    margin: auto;
+
+    line-height: 3.0rem;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .faction-landlord-container
+{
+    top: 4.0rem;
+    left: 2.5rem;
+    width: 7.0rem;
+    height: 11.0rem;
+
+    position: absolute;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .faction-landlord-container > img
+{
+    position: absolute;
+    display: block;
 }
 
 

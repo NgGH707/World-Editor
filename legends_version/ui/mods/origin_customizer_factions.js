@@ -50,6 +50,15 @@ OriginCustomizerScreen.prototype.addFactionListEntry = function (_data)
     var name = $('<div class="name title-font-normal font-bold font-color-brother-name">' + _data['Name'] + '</div>');
     row.append(name);
 
+    if('Landlord' in _data && _data.Landlord !== undefined && _data.Landlord !== null)
+    {
+        var landlordImageContainer = $('<div class="f-landlord-container"/>');
+        row.append(landlordImageContainer);
+        var landlordImage = landlordImageContainer.createImage(Path.GFX + _data.Landlord, function(_image) {
+            _image.fitImageToParent(0, 0);
+        }, null,'');
+    }
+
     // bottom row
     row = $('<div class="faction-row is-bottom"/>');
     column.append(row);
@@ -102,27 +111,36 @@ OriginCustomizerScreen.prototype.updateFactionDetailsPanel = function(_element)
     if(_element !== null && _element.length > 0)
     {
         var data = _element.data('entry');
+        
+        this.mFaction.Banner.attr('src', Path.GFX + data.ImagePath);
+        this.mFaction.Name.setInputText(data.Name);
+        this.mFaction.PrevButton.enableButton(data.NoChangeName !== true);
+        this.mFaction.NextButton.enableButton(data.NoChangeName !== true);
         this.addContractToFactionDetail(data.Contracts);
-        //this.mDetailsPanel.Container.removeClass('display-none').addClass('display-block');
-    }
-    else
-    {
-        //this.mDetailsPanel.Container.removeClass('display-block').addClass('display-none');
+
+        /*if ('Landlord' in data && data.Landlord !== undefined && data.Landlord !== null)
+        {
+            this.mFaction.Landlord.attr('src', Path.GFX + data.Landlord);
+            this.mFaction.LandlordContainer.removeClass('display-none').addClass('display-block');
+        }
+        else
+        {
+            this.mFaction.LandlordContainer.removeClass('display-block').addClass('display-none');
+        }*/
     }
 };
 
 OriginCustomizerScreen.prototype.addContractToFactionDetail = function(_data) 
 {
     var self = this;
+    this.mFaction.Contracts.empty();
 
     if (_data !== undefined && _data !== null && jQuery.isArray(_data))
     {
-        this.mFaction.Contracts.empty();
-
         for (var i = 0; i < _data.length; ++i)
         {
             var entry = _data[i];
-            var classes = 'display-block is-contract contract' + i; //+ (entry.IsNegotiated ? ' is-negotiated' : '')
+            var classes = 'display-block is-contract contract' + i;
             var contract = this.mFaction.Contracts.createImage(Path.GFX + entry.Icon + '.png', null, null, classes);
             var scroll = this.mFaction.Contracts.createImage(Path.GFX + 'ui/icons/scroll_0' + (_data.IsNegotiated ? 1 : 2) + '.png', null, null, 'display-block is-scroll contract' + i);
             var difficulty = this.mFaction.Contracts.createImage(Path.GFX + entry.DifficultyIcon + '.png', null, null, 'display-block is-difficulty contract' + i);
@@ -130,9 +148,9 @@ OriginCustomizerScreen.prototype.addContractToFactionDetail = function(_data)
             // set up event listeners
             contract.click(function(_event)
             {
-                if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+                //if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
                     //self.notifyBackendContractRemoved(_data.ID);
-                else
+                //else
                     //self.notifyBackendContractClicked(_data.ID);
             });
             contract.mouseover(function()
