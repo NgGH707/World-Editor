@@ -31,8 +31,6 @@
     float: left;
     position: relative;
     margin: auto;
-
-    /*border: 4px solid pink;*/
 }
 .origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel
 {
@@ -63,6 +61,11 @@
 {
     left: 49.5rem;
 }
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-settlement
+{
+    left: 66.0rem;
+}
+
 .origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-save
 {
     left: 123.0rem;
@@ -76,8 +79,14 @@
     height: 100%;
     position: relative;
     float : left;
+}
 
-    /*border: 4px solid green;*/
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column40
+{
+    width: 40%;
+    height: 100%;
+    position: relative;
+    float : left;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .column50
@@ -87,7 +96,31 @@
     position: relative;
     float : left;
 
-    /*border: 4px solid green;*/
+    border: 2px solid yellow;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column60
+{
+    width: 60%;
+    height: 100%;
+    position: relative;
+    float : left;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column26
+{
+    width: 26%;
+    height: 100%;
+    position: relative;
+    float : left;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column74
+{
+    width: 74%;
+    height: 100%;
+    position: relative;
+    float : left;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .column65,
@@ -97,8 +130,6 @@
     height: 100%;
     position: relative;
     float : left;
-
-    /*border: 4px solid red;*/
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .column35,
@@ -108,28 +139,6 @@
     height: 100%;
     position: relative;
     float : left;
-
-    /*border: 4px solid yellow;*/
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column26
-{
-    width: 26%;
-    height: 100%;
-    position: relative;
-    float : left;
-
-    /*border: 4px solid green;*/
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column74
-{
-    width: 74%;
-    height: 100%;
-    position: relative;
-    float : left;
-
-    /*border: 4px solid blue;*/
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .row80
@@ -138,8 +147,26 @@
     width: 100%;
     float: left;
     position: relative;
+}
 
-    /*border: 4px solid yellow;*/
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row75
+{
+    height: 75%;
+    width: 100%;
+    float: left;
+    position: relative;
+
+    border: 2px solid red;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row25
+{
+    height: 25%;
+    width: 100%;
+    float: left;
+    position: relative;
+
+    border: 2px solid blue;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .row20
@@ -148,18 +175,14 @@
     width: 100%;
     float: left;
     position: relative;
-
-    /*border: 4px solid yellow;*/
 }
 
-
-/*.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column50.with-background,
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column74.with-background
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-small-dialog-background
 {
-    background-image: url("coui://gfx/ui/skin/dialog_panel_508x536.png");
+    background-image: url("coui://gfx/ui/skin/tactical_character_background.png");
     background-size: 100% 100%;
     background-repeat: no-repeat;
-}*/
+}
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-scroll-background
 {
@@ -171,6 +194,13 @@
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-dialog-background
 {
     background-image: url("coui://gfx/ui/skin/dialog_panel_508x536.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-dialog-background2
+{
+    background-image: url("coui://gfx/ui/skin/dialog_panel_02.png");
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
@@ -220,7 +250,7 @@
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .scale-label
 {
-    top: 5.5rem;
+    top: 5.0rem;
     left: 32.5rem;
     position: absolute;
 }
@@ -236,6 +266,7 @@
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .row.input-row
 {
+    right: 1.0rem;
     height: 4.0rem;
 
     padding-top : 1.0rem;
@@ -518,14 +549,3 @@
 
 
 
-
-/*****************************
-    Properties Screen
-*****************************/
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .asset-properties-container
-{
-    width: 100%;
-    height: 35.0rem;
-
-    border: 4px solid blue; /*this element is unused for now*/
-}

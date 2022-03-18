@@ -28,11 +28,13 @@ OriginCustomizerScreen.prototype.createScenarioPopupDialog = function()
         self.notifyBackendPopupDialogIsVisible(false);
     });
 
-    this.mCurrentPopupDialog.findPopupDialogOkButton().addClass('move-to-left');
-    this.mCurrentPopupDialog.findPopupDialogCancelButton().addClass('move-to-right');
+    this.mCurrentPopupDialog.findPopupDialogCancelButton().addClass('move-to-left');
+    this.mCurrentPopupDialog.findPopupDialogOkButton().addClass('move-to-right');
     this.mCurrentPopupDialog.addPopupDialogContent(this.createScenarioDialogContent(this.mCurrentPopupDialog));
-    this.mScenario.ListContainer.aciScrollBar({delta: 18, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    this.mScenario.ListContainer.aciScrollBar({delta: 1.77, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
     this.mScenario.ListScrollContainer = this.mScenario.ListContainer.findListScrollContainer();
+    var descriptionContainer = this.mScenario.Description.createList(10, 'description-font-medium font-color-description');
+    this.mScenario.Description = descriptionContainer.findListScrollContainer();
     this.addScenariosToList(this.mScenario.Data);
 };
 OriginCustomizerScreen.prototype.createScenarioDialogContent = function(_dialog) 
@@ -48,10 +50,8 @@ OriginCustomizerScreen.prototype.createScenarioDialogContent = function(_dialog)
     var scrollContainer = $('<div class="scroll-container"/>');
     this.mScenario.ListContainer.append(scrollContainer);
 
-    var descriptionContainerLayout = $('<div class="l-description-container"></div>');
-    content.append(descriptionContainerLayout);
-    var descriptionContainer = descriptionContainerLayout.createList(10, 'description-font-medium font-color-description');
-    this.mScenario.Description = descriptionContainer.findListScrollContainer();
+    this.mScenario.Description = $('<div class="l-description-container"></div>');
+    content.append(this.mScenario.Description);
 
     return content;
 };
@@ -59,7 +59,7 @@ OriginCustomizerScreen.prototype.createScenarioDialogContent = function(_dialog)
 OriginCustomizerScreen.prototype.addScenarioEntryToList = function (_data)
 {
     var row = $('<div class="l-row"/>');
-    var entry = $('<div class="list-entry list-entry-small"><span class="label text-font-normal font-color-label">' + _data.Name + '</span></div></div>');
+    var entry = $('<div class="list-entry list-entry-small-fit"><span class="label text-font-normal font-color-label">' + _data.Name + '</span></div></div>');
     entry.data('scenario', _data);
 
     entry.click(this, function(_event) {

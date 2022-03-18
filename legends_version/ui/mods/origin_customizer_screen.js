@@ -22,13 +22,26 @@ var OriginCustomizerScreen = function(_parent)
         ListScrollContainer: null,
     };
 
+    // factions
+    this.mFaction =
+    {
+        Data               : null,
+        Name               : null,
+        Banner             : null,
+        Selected           : null,
+        Contracts          : null, 
+        ListContainer      : null,
+        ListScrollContainer: null,
+    };
+
     // screens
     this.mScreens = 
     {
         General   : null,
         Properties: null,
         Factions  : null,
-        Contracts : null
+        Contracts : null,
+        Settlement: null,
     };
 
     // switch-to buttons
@@ -37,7 +50,8 @@ var OriginCustomizerScreen = function(_parent)
         General   : null,
         Properties: null,
         Factions  : null,
-        Contracts : null
+        Contracts : null,
+        Settlement: null,
     };
 
     // inputs
@@ -57,65 +71,65 @@ var OriginCustomizerScreen = function(_parent)
         // general properties
         General:
         {
-            BusinessReputationRate  : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/asset_business_reputation.png', TooltipId: 'customeorigin.renown'},
-            XPMult                  : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/xp_received.png', TooltipId: 'customeorigin.xp'},
-            HitpointsPerHourMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/days_wounded.png', TooltipId: 'customeorigin.hp'},
-            RepairSpeedMult         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/repair_item.png', TooltipId: 'customeorigin.repair'},
-            VisionRadiusMult        : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/vision.png', TooltipId: 'customeorigin.vision'},
-            FootprintVision         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/tracking_disabled.png', TooltipId: 'customeorigin.footprint'},
-            MovementSpeedMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/boot.png', TooltipId: 'customeorigin.speed'},
-            FoodAdditionalDays      : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/asset_daily_food.png', TooltipId: 'customeorigin.fooddays'},
+            BusinessReputationRate  : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/asset_business_reputation.png', TooltipId: 'origincustomizer.renown'},
+            XPMult                  : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/xp_received.png', TooltipId: 'origincustomizer.xp'},
+            HitpointsPerHourMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/days_wounded.png', TooltipId: 'origincustomizer.hp'},
+            RepairSpeedMult         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/repair_item.png', TooltipId: 'origincustomizer.repair'},
+            VisionRadiusMult        : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/vision.png', TooltipId: 'origincustomizer.vision'},
+            FootprintVision         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/tracking_disabled.png', TooltipId: 'origincustomizer.footprint'},
+            MovementSpeedMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/boot.png', TooltipId: 'origincustomizer.speed'},
+            FoodAdditionalDays      : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/asset_daily_food.png', TooltipId: 'origincustomizer.fooddays'},
         },
 
         // relation properties
         Relation:
         {
-            RelationDecayGoodMult   : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/relation_good.png', TooltipId: 'customeorigin.goodrelation'},
-            RelationDecayBadMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/relation_bad.png', TooltipId: 'customeorigin.badrelation'},
+            RelationDecayGoodMult   : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/relation_good.png', TooltipId: 'origincustomizer.goodrelation'},
+            RelationDecayBadMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/relation_bad.png', TooltipId: 'origincustomizer.badrelation'},
         },
 
         // contract properties
         Contract:
         {
-            NegotiationAnnoyanceMult: {Input: null, Value: 100, ValueMin: 1, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/contract_annoyance.png', TooltipId: 'customeorigin.negotiation'},
-            ContractPaymentMult     : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/contract_payment.png', TooltipId: 'customeorigin.contractpayment'},
-            AdvancePaymentCap       : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scroll_01.png', TooltipId: 'customeorigin.advancepaymentcap'},
+            NegotiationAnnoyanceMult: {Input: null, Value: 100, ValueMin: 1, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/contract_annoyance.png', TooltipId: 'origincustomizer.negotiation'},
+            ContractPaymentMult     : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/contract_payment.png', TooltipId: 'origincustomizer.contractpayment'},
+            AdvancePaymentCap       : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scroll_01.png', TooltipId: 'origincustomizer.advancepaymentcap'},
         },
 
         // scaling properties
         Scaling:
         {
-            BrothersScaleMax        : {Input: null, Value:   0, ValueMin: 1, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scaling_max.png', TooltipId: 'customeorigin.brotherscalemax'},
-            BrothersScaleMin        : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scaling_min.png', TooltipId: 'customeorigin.brotherscalemin'},
+            BrothersScaleMax        : {Input: null, Value:   0, ValueMin: 1, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scaling_max.png', TooltipId: 'origincustomizer.brotherscalemax'},
+            BrothersScaleMin        : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scaling_min.png', TooltipId: 'origincustomizer.brotherscalemin'},
         },
 
         // recruit properties
         Recruit:
         {
-            RosterSizeAdditionalMax : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/recruit_max.png', TooltipId: 'customeorigin.recruitmax'},
-            RosterSizeAdditionalMin : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/recruit_min.png', TooltipId: 'customeorigin.recruitmin'},
-            HiringCostMult          : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/hiring_cost.png', TooltipId: 'customeorigin.hiring'},
-            TryoutPriceMult         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/tryout_cost.png', TooltipId: 'customeorigin.tryout'},
-            DailyWageMult           : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/asset_daily_money.png', TooltipId: 'customeorigin.wage'},
-            TrainingPriceMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/training_cost.png', TooltipId: 'customeorigin.trainingprice'},
+            RosterSizeAdditionalMax : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/recruit_max.png', TooltipId: 'origincustomizer.recruitmax'},
+            RosterSizeAdditionalMin : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/recruit_min.png', TooltipId: 'origincustomizer.recruitmin'},
+            HiringCostMult          : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/hiring_cost.png', TooltipId: 'origincustomizer.hiring'},
+            TryoutPriceMult         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/tryout_cost.png', TooltipId: 'origincustomizer.tryout'},
+            DailyWageMult           : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/asset_daily_money.png', TooltipId: 'origincustomizer.wage'},
+            TrainingPriceMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/training_cost.png', TooltipId: 'origincustomizer.trainingprice'},
         },
 
         // economy properties
         Economy:
         {
-            TaxidermistPriceMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/crafting_cost.png', TooltipId: 'customeorigin.craft'},
-            BuyPriceMult            : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/buying.png', TooltipId: 'customeorigin.buying'},
-            SellPriceMult           : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/selling.png', TooltipId: 'customeorigin.selling'},
-            BuyPriceTradeMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/buying_player.png', TooltipId: 'customeorigin.buying_trade'},
-            SellPriceTradeMult      : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/selling_player.png', TooltipId: 'customeorigin.selling_trade'},
+            TaxidermistPriceMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/crafting_cost.png', TooltipId: 'origincustomizer.craft'},
+            BuyPriceMult            : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/buying.png', TooltipId: 'origincustomizer.buying'},
+            SellPriceMult           : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/selling.png', TooltipId: 'origincustomizer.selling'},
+            BuyPriceTradeMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/buying_player.png', TooltipId: 'origincustomizer.buying_trade'},
+            SellPriceTradeMult      : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/selling_player.png', TooltipId: 'origincustomizer.selling_trade'},
         },
 
         // combat properties
         Combat:
         {
-            ChampionChanceAdditional: {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/miniboss.png', TooltipId: 'customeorigin.champion'},
-            ExtraLootChance         : {Input: null, Value:   0, ValueMin: 0, ValueMax:  100, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/bag.png', TooltipId: 'customeorigin.loot'},
-            EquipmentLootChance     : {Input: null, Value:   0, ValueMin: 0, ValueMax:  100, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/grab.png', TooltipId: 'customeorigin.equipmentloot'},
+            ChampionChanceAdditional: {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/miniboss.png', TooltipId: 'origincustomizer.champion'},
+            ExtraLootChance         : {Input: null, Value:   0, ValueMin: 0, ValueMax:  100, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/bag.png', TooltipId: 'origincustomizer.loot'},
+            EquipmentLootChance     : {Input: null, Value:   0, ValueMin: 0, ValueMax:  100, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/grab.png', TooltipId: 'origincustomizer.equipmentloot'},
         }
     }
 
@@ -171,22 +185,18 @@ var OriginCustomizerScreen = function(_parent)
         Legendary: {Checkbox: null, Label: null, Name: 'Legendary', TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.EconomicDifficultyLegendary}
     };
 
-    // roster tier slider
-    this.mRosterTier = 
-    {
-        Control: null, Title: null, Min: 1, Max:  10, Value:   2, Step: 1, TooltipId: 'origincustomizer.rostertier', IsPercentage: false
-    };
-    this.mDifficultyMult = 
-    {
-        Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'origincustomizer.difficultymult', IsPercentage: true
-    };
+    // sliders
+    this.mRosterTier      = {Control: null, Title: null, Min: 1, Max:  10, Value:   2, Step: 1, TooltipId: 'origincustomizer.rostertier', Postfix: ''};
+    this.mDifficultyMult  = {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'origincustomizer.difficultymult', Postfix: '%'};
+    this.mFactionRelation = {Control: null, Title: null, Min: 0, Max: 100, Value:  50, Step: 5, TooltipId: TooltipIdentifier.RelationsScreen.Relations, Postfix: ''};
 
     // buttons
     this.mSaveButton  = null;
     this.mCloseButton = null;
 
     // generics
-    this.mIsVisible = false;
+    this.mLastScreen = null;
+    this.mIsVisible  = false;
 };
 
 OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
@@ -240,6 +250,13 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
             self.switchScreen('Contracts');
         }, null, 'tab-button', 7);
 
+        // button 5th
+        buttonLayout = $('<div class="l-tab-button is-settlement"/>');
+        buttonPanel.append(buttonLayout);
+        this.mSwitchToButton.Settlement = buttonLayout.createTabTextButton('Settlement', function() {
+            self.switchScreen('Settlement');
+        }, null, 'tab-button', 7);
+
 
         // save changes button
         buttonLayout = $('<div class="l-tab-button is-save"/>');
@@ -248,19 +265,27 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
         {
             //self.mDataSource.notifyBackendCloseButtonClicked();
         }, '', 6);
+        this.mSaveButton.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.save_button' });
     }
 
 
     // create content
     var content = this.mDialogContainer.findDialogContentContainer();
     {
-        // create the 4 content screens
-        this.mScreens.General = $('<div class="display-none"/>'); // display-none display-block
+        // create content screens
+        $.each(this.mScreens, function(_key, _definition) {
+            self.mScreens[_key] = $('<div class="display-none"/>'); // display-none display-block
+            content.append(self.mScreens[_key]);
+            self['create' + _key + 'PanelDIV'](self.mScreens[_key]);
+        });
+
+
+        /*this.mScreens.General = $('<div class="display-none"/>'); // display-none display-block
         content.append(this.mScreens.General);
         this.createGeneralPanelDIV(this.mScreens.General);
 
 
-        this.mScreens.Properties = $('<div class="display-block"/>');
+        this.mScreens.Properties = $('<div class="display-none"/>');
         content.append(this.mScreens.Properties);
         this.createPropertiesPanelDIV(this.mScreens.Properties);
 
@@ -272,7 +297,7 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
 
         this.mScreens.Contracts = $('<div class="display-none"/>');
         content.append(this.mScreens.Contracts);
-        this.createContractsPanelDIV(this.mScreens.Contracts);
+        this.createContractsPanelDIV(this.mScreens.Contracts);*/
     }
 
     // create footer button bar
@@ -290,6 +315,11 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
     this.mIsVisible = false;
 };
 
+OriginCustomizerScreen.prototype.createSettlementPanelDIV = function(_parentDiv) 
+{
+    var self = this;
+};
+
 OriginCustomizerScreen.prototype.createContractsPanelDIV = function(_parentDiv) 
 {
     var self = this;
@@ -298,6 +328,52 @@ OriginCustomizerScreen.prototype.createContractsPanelDIV = function(_parentDiv)
 OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv) 
 {
     var self = this;
+
+    var column40 = $('<div class="column40 with-dialog-background"/>');
+    _parentDiv.append(column40);
+    {
+        var listContainerLayout = $('<div class="l-list-container"/>');
+        column40.append(listContainerLayout);
+        this.mFaction.ListContainer = listContainerLayout.createList(1.77);
+        this.mFaction.ListScrollContainer = this.mFaction.ListContainer.findListScrollContainer();
+    }
+
+    var column60 = $('<div class="column60"/>');
+    _parentDiv.append(column60);
+    {
+        var row80 = $('<div class="row80"/>');
+        column60.append(row80);
+        {
+            var column = $('<div class="column50"/>');
+            row80.append(column);
+            {
+                var row = $('<div class="row"/>');
+                column.append(row);
+                var title = $('<div class="title title-font-big font-color-title">Faction Name</div>');
+                row.append(title);
+                var inputLayout = $('<div class="l-input-big"/>');
+                row.append(inputLayout);
+                this.mFaction.Name = inputLayout.createInput('', 0, 32, 1, function (_input) {
+                    
+                }, 'title-font-big font-bold font-color-brother-name');
+                
+                this.createSliderControlDIV(this.mFactionRelation, 'Relation', column);
+            }
+
+            var column = $('<div class="column50"/>');
+            row80.append(column);
+            {
+
+            }
+        }
+
+        var row20 = $('<div class="row20 with-small-dialog-background"/>');
+        column60.append(row20);
+        {
+            this.mFaction.Contracts = $('<div class="f-contracts-container"/>');
+            row20.append(this.mFaction.Contracts);
+        }
+    }
 };
 
 OriginCustomizerScreen.prototype.createPropertiesPanelDIV = function(_parentDiv) 
@@ -435,7 +511,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
             this.mScenario.Image = originImageContainer.createImage(Path.GFX + 'ui/events/event_99.png', function (_image) {
                 _image.removeClass('opacity-none');
             }, null, 'opacity-none');
-            this.mScenario.Image.bindTooltip({ contentType: 'ui-element', elementId: 'customeorigin.choose_origin' });
+            this.mScenario.Image.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.choose_origin' });
             this.mScenario.Image.click(function ()
             {
                 self.createScenarioPopupDialog();
@@ -659,11 +735,11 @@ OriginCustomizerScreen.prototype.createCheckBoxControlDIV = function(_definition
     _definition.Checkbox.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
 };
 
-OriginCustomizerScreen.prototype.createSliderControlDIV = function(_definition, _label, _parentDiv) 
+OriginCustomizerScreen.prototype.createSliderControlDIV = function(_definition, _title, _parentDiv) 
 {
     var row = $('<div class="row"></div>');
     _parentDiv.append(row);
-    _definition.Title = $('<div class="title title-font-big font-bold font-color-title">' + _label + '</div>');
+    _definition.Title = $('<div class="title title-font-big font-bold font-color-title">' + _title + '</div>');
     _definition.Title.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
     row.append(_definition.Title);
 
@@ -677,26 +753,14 @@ OriginCustomizerScreen.prototype.createSliderControlDIV = function(_definition, 
     _definition.Control.val(_definition.Value);
     control.append(_definition.Control);
 
-    _definition.Label = $('<div class="scale-label text-font-normal font-color-subtitle">' + _definition.Value + '</div>');
+    _definition.Label = $('<div class="scale-label text-font-normal font-color-subtitle">' + _definition.Value + _definition.Postfix + '</div>');
     _definition.Label.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
     control.append(_definition.Label);
-
-    if (_definition.IsPercentage === true)
-    {
-        _definition.Control.on("change", function () {
-            _definition.Value = parseInt(_definition.Control.val());
-            _definition.Label.text('' + _definition.Value + '%');
-        });
-    }
-    else
-    {
-        _definition.Control.on("change", function () {
-            _definition.Value = parseInt(_definition.Control.val());
-            _definition.Label.text('' + _definition.Value);
-        });
-    }
-
-    return row;
+    
+    _definition.Control.on("change", function () {
+        _definition.Value = parseInt(_definition.Control.val());
+        _definition.Label.text('' + _definition.Value + _definition.Postfix);
+    });
 };
 
 OriginCustomizerScreen.prototype.createInputDIV = function(_key, _definition, _parentDiv)
@@ -853,8 +917,10 @@ OriginCustomizerScreen.prototype.isRegistered = function()
 
 OriginCustomizerScreen.prototype.show = function(_data)
 {
+    var screen = this.mLastScreen !== null && this.mLastScreen !== undefined ? this.mLastScreen : 'General';
+
     this.loadFromData(_data);
-    this.switchScreen('Properties');
+    this.switchScreen(screen);
 
     if(!this.mIsVisible)
     {
@@ -954,6 +1020,8 @@ OriginCustomizerScreen.prototype.switchScreen = function(_screen)
         else
             _definition.enableButton(true);
     });
+
+    this.mLastScreen = _screen;
 };
 
 OriginCustomizerScreen.prototype.isVisible = function()
@@ -965,6 +1033,9 @@ OriginCustomizerScreen.prototype.loadFromData = function(_data)
 {
     if ('Scenarios' in _data && _data.Scenarios !== null && typeof _data.Scenarios === 'object')
         this.mScenario.Data = _data.Scenarios;
+
+    if ('Factions' in _data && _data.Factions !== null && typeof _data.Factions === 'object')
+        this.addFactionsData(_data.Factions)
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnConnected = function()

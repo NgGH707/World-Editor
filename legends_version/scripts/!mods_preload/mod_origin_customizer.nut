@@ -5,17 +5,36 @@ this.getroottable().OriginCustomizerVersion <- version;
 // register CSS
 ::mods_registerCSS("origin_customizer_controls.css");
 ::mods_registerCSS("origin_customizer_screen.css");
+::mods_registerCSS("origin_customizer_factions.css");
 ::mods_registerCSS("origin_customizer_popup_dialogs.css");
 
 // register JS
 ::mods_registerJS("origin_customizer_controls.js");
 ::mods_registerJS("origin_customizer_screen.js");
+::mods_registerJS("origin_customizer_factions.js");
 ::mods_registerJS("origin_customizer_popup_dialogs.js");
 
 ::mods_queue("mod_origin_customizer_legends", "mod_legends,>mod_nggh_assets", function()
 {	
 	local gt = this.getroottable();
 	gt.Const.PercentageNoteString <- " The value is calculated in percentage. The default value is 100 which means 100%."
+	gt.Const.AddContractHints <- function( _tooltips )
+	{
+		_tooltips.extend([
+			{
+				id = 10,
+				type = "hint",
+				icon = "ui/icons/mouse_left_button.png",
+				text = "Open in \'Contracts\' tab"
+			},
+			{
+				id = 11,
+				type = "hint",
+				icon = "ui/icons/mouse_left_button_ctrl.png",
+				text = "Discard contract"
+			}
+		]);
+	};
 
 	::mods_hookNewObjectOnce("states/world_state", function( obj ) 
 	{
@@ -569,15 +588,70 @@ this.getroottable().OriginCustomizerVersion <- version;
 		}
 	});*/
 
+	::mods_hookNewObject("contracts/contract_manager", function( obj ) 
+	{
+		obj.getContractsByID <- function( _id )
+		{
+			foreach( contract in this.m.Open )
+			{
+				if (contract.getID() == _id)
+				{
+					return contract;
+				}
+			}
+
+			return null;
+		}
+	});
+
 	::mods_hookNewObjectOnce("ui/screens/tooltip/tooltip_events", function( obj ) 
 	{
 	 	local queryTooltipData = ::mods_getMember(obj, "general_queryUIElementTooltipData");
-	 	obj.general_queryUIElementTooltipData = function(entityId, elementId, elementOwner)
+	 	obj.general_queryUIElementTooltipData = function(_entityId, _elementId, _elementOwner)
 	 	{
-			local tooltip = queryTooltipData(entityId, elementId, elementOwner);
+	 		if (_elementOwner != null && _elementOwner == "origincustomizer.faction_contracts")
+	 		{
+	 			local contract = this.World.Contracts.getContractsByID(_elementId);
+
+				if (contract == null)
+				{
+					return null;
+				}
+				else
+				{
+					local faction = this.World.FactionManager.getFaction(contract.getFaction());
+
+					return [
+						{
+							id = 1,
+							type = "title",
+							text = contract.getName()
+						},
+						{
+							id = 2,
+							type = "description",
+							text = "The employer is [color=#0b0084]" + contract.getCharacter().getName() + "[/color] of [color=#0b0084]" + faction.getName() + "[/color]. Expires in [color=" + this.Const.UI.Color.NegativeValue + "]" + (this.Math.round(this.Math.abs(this.Time.getVirtualTimeF() - contract.m.TimeOut) / this.World.getTime().SecondsPerDay)) + "[/color] days."
+						},
+						{
+							id = 3,
+							type = "text",
+							icon = "ui/icons/miniboss.png",
+							text = "Difficulty Multiplier: [color=" + this.Const.UI.Color.NegativeValue + "]" + (this.Math.floor(contract.getDifficultyMult() * 100) / 100) + "[/color]"
+						},
+						{
+							id = 4,
+							type = "text",
+							icon = "ui/icons/asset_money.png",
+							text = "Payment Multiplier: [color=" + this.Const.UI.Color.NegativeValue + "]" + (this.Math.floor(contract.getPaymentMult() * 100) / 100) + "[/color]"
+						},
+					];
+				}
+	 		}
+
+			local tooltip = queryTooltipData(_entityId, _elementId, _elementOwner);
 			if(tooltip != null) return tooltip;
 
-			switch (elementId) 
+			switch (_elementId) 
 			{
 			case "origincustomizer.rostertier":
 		       	local ret = [
@@ -603,7 +677,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 				}
 				return ret;
 
-			case "customeorigin.difficultymult":
+			case "origincustomizer.difficultymult":
 		       	return [
 					{
 						id = 1,
@@ -617,7 +691,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.equipmentloot":
+			case "origincustomizer.equipmentloot":
 		       	return [
 					{
 						id = 1,
@@ -631,7 +705,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-		    case "customeorigin.xp":
+		    case "origincustomizer.xp":
 		       	return [
 					{
 						id = 1,
@@ -645,7 +719,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 			
-		    case "customeorigin.hiring":
+		    case "origincustomizer.hiring":
 		       	return [
 					{
 						id = 1,
@@ -659,7 +733,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.wage":
+			case "origincustomizer.wage":
 		       	return [
 					{
 						id = 1,
@@ -673,7 +747,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.selling":
+			case "origincustomizer.selling":
 		       	return [
 					{
 						id = 1,
@@ -687,7 +761,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.buying":
+			case "origincustomizer.buying":
 		       	return [
 					{
 						id = 1,
@@ -701,7 +775,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.selling_trade":
+			case "origincustomizer.selling_trade":
 		       	return [
 					{
 						id = 1,
@@ -715,7 +789,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.buying_trade":
+			case "origincustomizer.buying_trade":
 		       	return [
 					{
 						id = 1,
@@ -729,7 +803,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.loot":
+			case "origincustomizer.loot":
 		       	return [
 					{
 						id = 1,
@@ -743,7 +817,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.champion":
+			case "origincustomizer.champion":
 		       	return [
 					{
 						id = 1,
@@ -757,7 +831,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.speed":
+			case "origincustomizer.speed":
 		       	return [
 					{
 						id = 1,
@@ -771,7 +845,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.contractpayment":
+			case "origincustomizer.contractpayment":
 		       	return [
 					{
 						id = 1,
@@ -785,7 +859,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.vision":
+			case "origincustomizer.vision":
 		       	return [
 					{
 						id = 1,
@@ -799,7 +873,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.hp":
+			case "origincustomizer.hp":
 		       	return [
 					{
 						id = 1,
@@ -813,7 +887,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.repair":
+			case "origincustomizer.repair":
 		       	return [
 					{
 						id = 1,
@@ -827,7 +901,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.renown":
+			case "origincustomizer.renown":
 		       	return [
 					{
 						id = 1,
@@ -841,7 +915,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.negotiation":
+			case "origincustomizer.negotiation":
 		       	return [
 					{
 						id = 1,
@@ -855,7 +929,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.recruitmin":
+			case "origincustomizer.recruitmin":
 		       	return [
 					{
 						id = 1,
@@ -869,7 +943,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.recruitmax":
+			case "origincustomizer.recruitmax":
 		       	return [
 					{
 						id = 1,
@@ -883,7 +957,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.craft":
+			case "origincustomizer.craft":
 		       	return [
 					{
 						id = 1,
@@ -897,7 +971,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.tryout":
+			case "origincustomizer.tryout":
 		       	return [
 					{
 						id = 1,
@@ -911,7 +985,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.goodrelation":
+			case "origincustomizer.goodrelation":
 		       	return [
 					{
 						id = 1,
@@ -925,7 +999,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.badrelation":
+			case "origincustomizer.badrelation":
 		       	return [
 					{
 						id = 1,
@@ -939,7 +1013,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.brotherscalemax":
+			case "origincustomizer.brotherscalemax":
 		       	return [
 					{
 						id = 1,
@@ -953,7 +1027,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.brotherscalemin":
+			case "origincustomizer.brotherscalemin":
 		       	return [
 					{
 						id = 1,
@@ -967,7 +1041,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.fooddays":
+			case "origincustomizer.fooddays":
 		       	return [
 					{
 						id = 1,
@@ -981,7 +1055,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.footprint":
+			case "origincustomizer.footprint":
 		       	return [
 					{
 						id = 1,
@@ -995,7 +1069,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.advancepaymentcap":
+			case "origincustomizer.advancepaymentcap":
 		       	return [
 					{
 						id = 1,
@@ -1009,7 +1083,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.trainingprice":
+			case "origincustomizer.trainingprice":
 		       	return [
 					{
 						id = 1,
@@ -1023,7 +1097,7 @@ this.getroottable().OriginCustomizerVersion <- version;
 					},
 				];
 
-			case "customeorigin.choose_origin":
+			case "origincustomizer.choose_origin":
 		       	return [
 					{
 						id = 1,
@@ -1040,6 +1114,20 @@ this.getroottable().OriginCustomizerVersion <- version;
 						type = "text",
 						icon = "ui/tooltips/warning.png",
 						text = "Please do not change to an origin requires a [color=" + this.Const.UI.Color.NegativeValue + "]Player Character[/color] while your current roster does not have a 'Player Character' brother."
+					},
+				];
+
+			case "origincustomizer.save_button":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Save Changes"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Some changes may not automatically save, thus, require you to manually save them by pressing this button or \'Close\' button."
 					},
 				];
 			}

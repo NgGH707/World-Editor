@@ -17,3 +17,82 @@
 }
 
 
+
+/*
+    List Entry Small Fit within parent
+*/
+.ui-control.list .list-entry-small-fit
+{
+    top: 0;
+    left: 0.3rem;
+    right: 0.3rem;
+    bottom: 0;
+    position: absolute;
+    margin : auto;
+
+    background-image: url("coui://gfx/ui/skin/list_item_02.png");
+    background-size: 100% 3.9rem;
+    background-repeat: no-repeat;
+
+    text-shadow: 1px 1px 1px #000;
+
+    color: #d7a54e;
+}
+
+.ui-control.list .list-entry-small-fit:hover,
+.ui-control.list .list-entry-small-fit.is-selected
+{
+    background-image: url("coui://gfx/ui/skin/list_item_02_hovered.png");
+    background-size: 100% 3.9rem;
+}
+
+.ui-control.list .list-entry-small-fit.is-selected
+{
+    text-shadow: 1px 1px #000000, -1px -1px #000;
+}
+
+.ui-control.list .list-entry-small-fit[disabled]
+{
+    background-image: url("coui://gfx/ui/skin/list_item_02_inactive.png");
+    background-size: 100% 3.9rem;
+}
+
+.ui-control.list .list-entry-small-fit[disabled]:hover
+{
+    background-image: url("coui://gfx/ui/skin/list_item_02_hovered.png");
+    background-size: 100% 3.9rem;
+}
+
+.ui-control.list .list-entry-small-fit[disabled]:active
+{
+    background-image: url("coui://gfx/ui/skin/list_item_02_hovered.png");
+    background-size: 100% 3.9rem;
+}
+
+.ui-control.list .list-entry-small-fit > .label
+{
+    top: 0;
+    bottom: 0;
+    left: -0.3rem;
+    right: 0;
+    width: 90%;
+    height: 90%;
+    margin: auto;
+    position: absolute;
+
+    text-align : center;
+}
+
+.ui-control.list .list-entry-small-fit > img
+{
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 90%;
+    height: 90%;
+    position: absolute;
+    margin: auto;
+}
+
+

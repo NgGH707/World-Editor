@@ -23,7 +23,7 @@
 .origin-customizer-screen .ui-control.popup-dialog.scenarios-popup .scenarios-content-container .l-list-container
 {
     top: 1.0rem;
-    left: 2.0rem;
+    left: 1.0rem;/*2.0*/
     bottom: 1.0rem;
     width: 31.0rem;
     position: absolute;
@@ -69,10 +69,10 @@
 
 .origin-customizer-screen .ui-control.popup-dialog.scenarios-popup .move-to-left
 {
-    right: 40.0rem;
+    right: 20.0rem;
 }
 
 .origin-customizer-screen .ui-control.popup-dialog.scenarios-popup .move-to-right
 {
-    left: 40.0rem;
+    left: 20.0rem;
 }
