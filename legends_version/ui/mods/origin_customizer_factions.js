@@ -8,15 +8,19 @@ OriginCustomizerScreen.prototype.addFactionsData = function (_data)
     for(var i = 0; i < _data.length; ++i)
     {
         var entry = _data[i];
-        this.addFactionListEntry(entry);
+        this.addFactionListEntry(entry, i);
     }
 
     this.selectFactionListEntry(this.mFaction.ListContainer.findListEntryByIndex(0), true);
 };
 
-OriginCustomizerScreen.prototype.addFactionListEntry = function (_data)
+OriginCustomizerScreen.prototype.addFactionListEntry = function (_data, _index)
 {
     var result = $('<div class="l-row"/>');
+
+    if (_index === 0)
+        result.css('margin-top', '0.3rem');
+
     this.mFaction.ListScrollContainer.append(result);
 
     var entry = $('<div class="ui-control list-entry"/>');
@@ -31,11 +35,9 @@ OriginCustomizerScreen.prototype.addFactionListEntry = function (_data)
     var column = $('<div class="faction-column is-left"/>');
     entry.append(column);
 
-    var imageOffsetX = ('ImageOffsetX' in _data ? _data['ImageOffsetX'] : 0);
-    var imageOffsetY = ('ImageOffsetY' in _data ? _data['ImageOffsetY'] : 0);
     column.createImage(Path.GFX + _data['ImagePath'], function (_image)
     {
-        _image.centerImageWithinParent(imageOffsetX, imageOffsetY, 0.5);
+        _image.centerImageWithinParent(0, 0, 0.5);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
 

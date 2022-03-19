@@ -131,24 +131,85 @@ this.origin_customizer_screen <- {
 	{
 		local result = {};
 		result.Factions <- this.convertFactionsToUIData();
-		result.Settlements <- this.convertSettlementsToUIData();
+		result.Settlements <- this.convertSettlementsToUIData(result.Factions);
 		result.Scenarios <- this.Const.ScenarioManager.getScenariosForUI();
 		result.Scenarios.remove(2);
 		result.Scenarios.remove(0);
 		return result;
 	}
 
-	function convertSettlementsToUIData()
+	function convertSettlementsToUIData( _factions )
 	{
 		local result = [];
 
 		foreach(i, settlement in this.World.EntityManager.getSettlements())
 		{
+			local faction;
+			local buildings = [];
+			local attached_locations = [];
+			local situations = [];
+			local owner = settlement.getOwner() != null && !settlement.getOwner().isNull() ? settlement.getOwner().getID() : null;
+			local find = settlement.getFactionOfType(this.Const.FactionType.Settlement);
+
+			if (find != null)
+			{
+				faction = find.getID();
+			}
+			else
+			{
+				faction = settlement.getFactions()[0];
+			}
+
+			foreach(i, b in settlement.m.Buildings )
+			{
+				if (b == null)
+				{
+					buildings.push(null);
+				}
+				else
+				{
+					buildings.push({
+						ID = b.getID(),
+						ImagePath = b.m.UIImage + ".png",
+						TooltipId = b.m.Tooltip,
+					});
+				}
+
+				if (i == 5)
+				{
+					break;
+				}
+			}
+
+			foreach( a in settlement.getAttachedLocations() )
+			{
+				if (a.getTypeID() == "attached_location.harbor")
+				{
+					continue;
+				}
+
+				attached_locations.push({
+					ID = a.getTypeID(),
+					ImagePath = a.getUIImage(),
+				});
+			}
+
+			foreach( situation in settlement.getSituations() )
+			{
+				situations.push({
+					ID = situation.getID(),
+					ImagePath = situation.getIcon()
+				});
+			}
+
 			result.push({
 				Name = settlement.getName(),
 				Size = settlement.getSize(),
-				Faction = null,
-				Owner = null,
+				Buildings = buildings,
+				Attachments = attached_locations,
+				Situations = situations,
+				Owner = this.findIdIn(owner, _factions),
+				Faction = this.findIdIn(faction, _factions),
 				ImagePath = settlement.getImagePath(),
 				IsCoastal = settlement.isCoastal(),
 				IsMilitary = settlement.isMilitary(),
@@ -265,6 +326,24 @@ this.origin_customizer_screen <- {
 		}
 
 		return result;
+	}
+
+	function findIdIn( _id, _array )
+	{
+		if (_id == null)
+		{
+			return null;
+		}
+
+		foreach (i, a in _array )
+		{
+			if (a.ID == _id)
+			{
+				return i;
+			}
+		}
+
+		return null;
 	}
 
 	function onSortFactions( _f1, _f2 )

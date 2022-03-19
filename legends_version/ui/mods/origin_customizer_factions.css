@@ -12,6 +12,10 @@
 
     overflow: hidden;
 }
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .scroll-container .l-row:first-child
+{
+    margin-top: 0.1rem;
+}
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .scroll-container .l-row:last-child
 {
     margin-bottom: 0;
@@ -177,6 +181,7 @@
 
 
 /******Faction Detail Screen******/
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .s-building-container,
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .f-contracts-container
 {
     width: 95%;
@@ -187,7 +192,6 @@
     left: 0;
     right: 0;
     margin: auto;
-
     position: absolute;
 }
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .faction-banner-button
@@ -253,8 +257,15 @@
 }
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .faction-landlord-container
 {
-    top: 4.0rem;
-    left: 2.5rem;
+    /*top: 4.0rem;
+    left: 4.5rem;*/
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    
     width: 7.0rem;
     height: 11.0rem;
 

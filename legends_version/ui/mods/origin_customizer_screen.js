@@ -164,9 +164,16 @@ var OriginCustomizerScreen = function(_parent)
     this.mSettlement =
     {
         Data               : null,
+        Name               : null,
         Selected           : null,
+        Buildings          : null,
+        OwnerBanner        : null,
+        FactionBanner      : null,
+        SideButton         : null,
+        SideListScroll     : null,
         ListContainer      : null,
         ListScrollContainer: null,
+        IsViewingAttachment: true,
     }
 
     // configure options
@@ -298,7 +305,8 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
 {
     var self = this;
 
-    var column = $('<div class="column25 with-dialog-background"/>');
+    var column = $('<div class="column23 with-dialog-background"/>');
+    column.css('padding-top', '0.6rem');
     _parentDiv.append(column);
     {
         var listContainerLayout = $('<div class="l-list-container"/>');
@@ -307,9 +315,147 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
         this.mSettlement.ListScrollContainer = this.mSettlement.ListContainer.findListScrollContainer();
     }
 
-    var column = $('<div class="column75 with-dialog-background"/>');
+    var column = $('<div class="column77"/>');
     _parentDiv.append(column);
     {
+        var row75 = $('<div class="row75"/>');
+        column.append(row75);
+        {
+            var column78 = $('<div class="column78"/>');
+            row75.append(column78);
+            {
+                var leftHalf = $('<div class="column50"/>');
+                column78.append(leftHalf);
+                {
+                    var row25 = $('<div class="row25"/>');
+                    leftHalf.append(row25);
+                    {
+                        var row = $('<div class="row"/>');
+                        row25.append(row);
+                        var title = $('<div class="title title-font-big font-color-title">Settlement Name</div>');
+                        row.append(title);
+                        var inputLayout = $('<div class="l-input-big"/>');
+                        row.append(inputLayout);
+                        this.mSettlement.Name = inputLayout.createInput('', 0, 40, 1, function (_input) {
+                            
+                        }, 'title-font-big font-bold font-color-brother-name');
+                    }
+
+                    var row30 = $('<div class="row30 with-small-dialog-background"/>');
+                    leftHalf.append(row30);
+                    {
+                        var column75 = $('<div class="column75"/>');
+                        row30.append(column75);
+
+                        var column25 = $('<div class="column25"/>');
+                        row30.append(column25);
+
+                        var buttonRow = $('<div class="s-button-row"/>');
+                        column25.append(buttonRow);
+                        var buttonLayout = $('<div class="s-image-button-center"/>');
+                        buttonRow.append(buttonLayout);
+                        var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_retract.png', function() {
+                            //self.onPreviousBannerClicked();
+                        }, '', 6);
+
+                        var buttonRow = $('<div class="s-button-row"/>');
+                        column25.append(buttonRow);
+                        var buttonLayout = $('<div class="s-image-button-center"/>');
+                        buttonRow.append(buttonLayout);
+                        var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_expand.png', function() {
+                            //self.onPreviousBannerClicked();
+                        }, '', 6);
+                    }
+
+                    var row35 = $('<div class="row35"/>');
+                    leftHalf.append(row35);
+                    {
+                        var column50 = $('<div class="column50"/>');
+                        row35.append(column50);
+                        var row = $('<div class="row"/>');
+                        column50.append(row);
+                        var title = $('<div class="title title-font-big font-color-title">Faction</div>');
+                        title.css('text-align', 'center');
+                        row.append(title);
+
+                        var ownerContainer = $('<div class="faction-landlord-container"/>');
+                        column50.append(ownerContainer);
+                        this.mSettlement.FactionBanner = ownerContainer.createImage(null, function(_image) {
+                            _image.fitImageToParent(0, 0);
+                        }, null, '');
+
+
+                        var column50 = $('<div class="column50"/>');
+                        row35.append(column50);
+                        var row = $('<div class="row"/>');
+                        column50.append(row);
+                        var title = $('<div class="title title-font-big font-color-title">Owner</div>');
+                        title.css('text-align', 'center');
+                        row.append(title);
+
+                        this.mSettlement.OwnerBanner = $('<div class="faction-landlord-container"/>');
+                        column50.append(this.mSettlement.OwnerBanner);
+                        var image = this.mSettlement.OwnerBanner.createImage(null, function(_image) {
+                            _image.fitImageToParent(0, 0);
+                        }, null, '');
+                    }
+
+                    var row10 = $('<div class="row10"/>');
+                    leftHalf.append(row10);
+                    {
+                        var row = $('<div class="row"/>');
+                        row10.append(row);
+                        var title = $('<div class="title title-font-big font-color-title">Buildings</div>');
+                        title.css('margin-top', '0.8rem');
+                        title.css('margin-bottom', '0');
+                        row.append(title);
+                    }
+                }
+
+                var rightHalf = $('<div class="column50 with-dialog-background"/>');
+                column78.append(rightHalf);
+                {
+
+                }
+            }
+
+            var column22 = $('<div class="column22 with-scroll-tooltip-background"/>');
+            row75.append(column22);
+            {
+                var scrollHeader = $('<div class="title-scroll-header-container"/>');
+                column22.append(scrollHeader);
+                /*var title = $('<div class="title-scroll-header title-font-big font-color-ink">Attachments</div>');
+                scrollHeader.append(title);*/
+
+                var buttonLayout = $('<div class="s-button-center"/>');
+                scrollHeader.append(buttonLayout);
+
+                this.mSettlement.SideButton = buttonLayout.createTextButton("Attachments", function ()
+                {
+                    self.switchBetweenSituationsAttachments();
+                }, '', 7);
+
+                var slotContainer = $('<div class="s-attach-container"/>');
+                column22.append(slotContainer);
+
+                var listContainerLayout = $('<div class="l-list-container"/>');
+                slotContainer.append(listContainerLayout);
+                var listContainer = listContainerLayout.createList(1);
+                this.mSettlement.SideListScroll = listContainer.findListScrollContainer();
+            }
+        }
+
+        var row = $('<div class="row25 with-small-dialog-background"/>');
+        column.append(row);
+        {
+            var buildingsContainer = $('<div class="s-building-container"/>');
+            row.append(buildingsContainer);
+
+            this.mSettlement.Buildings = [];
+            for (var i = 0; i < 6; i++) {
+                this.createSettlementBuildingSlot(i, buildingsContainer);
+            }
+        }
     }
 };
 
@@ -318,6 +464,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
     var self = this;
 
     var column40 = $('<div class="column40 with-dialog-background"/>');
+    column40.css('padding-top', '0.9rem');
     _parentDiv.append(column40);
     {
         var listContainerLayout = $('<div class="l-list-container"/>');
@@ -344,7 +491,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                     row.append(title);
                     var inputLayout = $('<div class="l-input-big"/>');
                     row.append(inputLayout);
-                    this.mFaction.Name = inputLayout.createInput('', 0, 32, 1, function (_input) {
+                    this.mFaction.Name = inputLayout.createInput('', 0, 40, 1, function (_input) {
                         
                     }, 'title-font-big font-bold font-color-brother-name');
                     
@@ -419,7 +566,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                     var button = buttonLayout.createTextButton("View Settlements", function ()
                     {
                         //self.notifyBackendNewCampaignButtonPressed();
-                    }, '', 4);
+                    }, '', 7);
 
                     // 2nd button
                     var row = $('<div class="faction-button-row"></div>');
@@ -681,7 +828,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
                     }, 'display-block', 1);
                 }
 
-                var avatarColumn = $('<div class="column65"/>');
+                var avatarColumn = $('<div class="column65 with-small-dialog-background"/>');
                 avatarChangerContainer.append(avatarColumn);
                 {
                     var avatarContainer = $('<div class="avatar-container"/>');
@@ -724,7 +871,9 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
             row.append(inputLayout);
             this.mCompanyName = inputLayout.createInput('Battle Brothers', 0, 32, 1, function (_input) {
                 if (_input.getInputTextLength() === 0)
+                {
                     _input.val('Battle Brothers');
+                }
             }, 'title-font-big font-bold font-color-brother-name');
             this.mCompanyName.setInputText('Battle Brothers');
 
@@ -1139,56 +1288,49 @@ OriginCustomizerScreen.prototype.isVisible = function()
 
 OriginCustomizerScreen.prototype.loadFromData = function(_data) 
 {
-    if ('Scenarios' in _data && _data.Scenarios !== undefined && _data.Scenarios !== null && jQuery.isArray(Scenarios))
+    if ('Scenarios' in _data && _data.Scenarios !== undefined && _data.Scenarios !== null && jQuery.isArray(_data.Scenarios))
         this.mScenario.Data = _data.Scenarios;
 
-    if ('Factions' in _data && _data.Factions !== undefined && _data.Factions !== null && jQuery.isArray(Factions))
+    if ('Factions' in _data && _data.Factions !== undefined && _data.Factions !== null && jQuery.isArray(_data.Factions))
         this.addFactionsData(_data.Factions);
 
-    if ('Settlements' in _data && _data.Settlements !== undefined && _data.Settlements !== null && jQuery.isArray(Settlements))
+    if ('Settlements' in _data && _data.Settlements !== undefined && _data.Settlements !== null && jQuery.isArray(_data.Settlements))
         this.addSettlementsData(_data.Settlements);
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnConnected = function()
 {
-    if(this.mSQHandle !== null)
-        SQ.call(this.mSQHandle, 'onScreenConnected');
+    SQ.call(this.mSQHandle, 'onScreenConnected');
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnDisconnected = function()
 {
-    if(this.mSQHandle !== null)
-        SQ.call(this.mSQHandle, 'onScreenDisconnected');
+    SQ.call(this.mSQHandle, 'onScreenDisconnected');
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnShown = function()
 {
-    if(this.mSQHandle !== null)
-        SQ.call(this.mSQHandle, 'onScreenShown');
+    SQ.call(this.mSQHandle, 'onScreenShown');
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnHidden = function()
 {
-    if(this.mSQHandle !== null)
-        SQ.call(this.mSQHandle, 'onScreenHidden');
+    SQ.call(this.mSQHandle, 'onScreenHidden');
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnAnimating = function()
 {
-    if(this.mSQHandle !== null)
-        SQ.call(this.mSQHandle, 'onScreenAnimating');
+    SQ.call(this.mSQHandle, 'onScreenAnimating');
 };
 
 OriginCustomizerScreen.prototype.notifyBackendPopupDialogIsVisible = function (_visible)
 {
-    if(this.mSQHandle !== null)
-        SQ.call(this.mSQHandle, 'onPopupDialogIsVisible', [_visible]);
+    SQ.call(this.mSQHandle, 'onPopupDialogIsVisible', [_visible]);
 };
 
 OriginCustomizerScreen.prototype.notifyBackendCloseButtonPressed = function()
 {
-    if(this.mSQHandle !== null)
-        SQ.call(this.mSQHandle, 'onCloseButtonPressed');
+    SQ.call(this.mSQHandle, 'onCloseButtonPressed');
 };
 
 
