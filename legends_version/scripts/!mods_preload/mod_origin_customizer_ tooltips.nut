@@ -593,64 +593,89 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.freebuildingslot":
+			//
+			case "origincustomizer.addnewentry":
 		       	return [
 					{
 						id = 1,
 						type = "title",
-						text = "Empty Slot"
+						text = "Add New Entry"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "This slot is currently unoccupied."
+						text = "Let you add more entries to the current list."
+					},
+				];
+
+			case "origincustomizer.removeentry":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Discard"
 					},
 					{
-						id = 3
-						type = "hint",
-						icon = "ui/icons/mouse_left_button.png",
-						text = "Add new building"
+						id = 2,
+						type = "description",
+						text = "Remove the selected entry from the list."
 					}
 				];
 
-			case "origincustomizer.freeattachmentslot":
+			case "origincustomizer.partystrength":
 		       	return [
 					{
 						id = 1,
 						type = "title",
-						text = "Empty Slot"
+						text = "Strength"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "This slot is currently unoccupied."
-					},
-					{
-						id = 3
-						type = "hint",
-						icon = "ui/icons/mouse_left_button.png",
-						text = "Add new attached location"
+						text = "Display how strong the game considers these units worth"
 					}
 				];
 
-			case "origincustomizer.freesituationslot":
+			case "origincustomizer.championization":
 		       	return [
 					{
 						id = 1,
 						type = "title",
-						text = "Add New Situation"
+						text = "Become Champion"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Select a new situation and add to the current settlement."
+						text = "Convert a unit into a champion."
+					},
+				];
+
+			case "origincustomizer.dechampionization":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Return normal"
 					},
 					{
-						id = 3
-						type = "hint",
-						icon = "ui/icons/mouse_left_button.png",
-						text = "Left click"
-					}
+						id = 2,
+						type = "description",
+						text = "Convert a champion into a normal unit."
+					},
+				];
+
+			case "origincustomizer.choosecoords":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Choose Tile"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Show you the world map, after you have hovered your mouse to a desired location, re-open the screen to get the coordinate of the hovering tile so you can start spawning stuff on that tile."
+					},
 				];
 			}
 			

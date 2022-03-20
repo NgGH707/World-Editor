@@ -101,16 +101,6 @@
 */
 .ui-control.list .list-entry-fat
 {
-/*
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 96%;
-    height: 100%;
-    position: relative;
-    margin : auto;
-*/
     top: 0;
     left: 0.3rem;
     right: 0.3rem;
@@ -182,5 +172,26 @@
     position: absolute;
     margin: auto;
 }
+
+
+/*
+    List Entry reskined, not for selecting
+*/
+.ui-control.list .list-entry-noice
+{
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    margin : auto;
+
+    background-image: url("coui://gfx/ui/skin/tactical_character_background.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+
+    text-shadow: 1px 1px 1px #000;
+}
+
 
 

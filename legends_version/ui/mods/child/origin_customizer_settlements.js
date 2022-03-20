@@ -1,18 +1,4 @@
 
-
-OriginCustomizerScreen.prototype.switchBetweenSituationsAttachments = function ()
-{
-    this.mSettlement.IsViewingAttachment = !this.mSettlement.IsViewingAttachment;
-
-    if(this.mSettlement.Selected !== null && this.mSettlement.Selected.length > 0)
-        this.updateSideListScroll(this.mSettlement.Selected.data('entry'));
-
-    if (this.mSettlement.IsViewingAttachment === true)
-        this.mSettlement.SideButton.changeButtonText('Attachments');
-    else
-        this.mSettlement.SideButton.changeButtonText('Situations');
-};
-
 OriginCustomizerScreen.prototype.createSettlementBuildingSlot = function (_index, _parentDiv)
 {
     var slot = $('<div class="is-building-slot building' + _index + '"/>');
@@ -38,7 +24,7 @@ OriginCustomizerScreen.prototype.createSettlementBuildingSlot = function (_index
     {
         this.classList.remove('is-highlighted');
     });
-    this.mSettlement.Buildings[_index].bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.freebuildingslot' });
+    this.mSettlement.Buildings[_index].bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
 };
 
 OriginCustomizerScreen.prototype.addSettlementsData = function (_data)
@@ -138,7 +124,7 @@ OriginCustomizerScreen.prototype.updateSettlementDetailsPanel = function(_elemen
                     continue;
 
                 image.attr('src', Path.GFX + 'ui/buttons/free_building_slot_icon.png');
-                image.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.freebuildingslot' });
+                image.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
             }
             else {
                 image.attr('src', Path.GFX + entry.ImagePath);
@@ -168,12 +154,6 @@ OriginCustomizerScreen.prototype.updateSideListScroll = function (_data)
     this.mSettlement.Situations.empty();
    
     var data = _data.Attachments;
-    // create the add-new-attached-location button
-    this.addAttachmentEntry({
-        ImagePath: 'ui/buttons/free_building_slot_icon.png',
-        ID: 'origincustomizer.freeattachmentslot',
-    });
-
     for (var i = 0; i < data.length; i++) {
         this.addAttachmentEntry(data[i]);
     }
@@ -189,37 +169,35 @@ OriginCustomizerScreen.prototype.updateSideListScroll = function (_data)
     containerLayout.append(container);
 
     for (var i = 0; i < data.length; i++) {
-        this.addSituationEntry(data[i], container, false);
+        this.addSituationEntry(data[i], container);
     }
-
-    // create the add-new-attached-location button
-    this.addSituationEntry({
-        ImagePath: 'ui/buttons/free_slot_icon.png',
-        ID: 'origincustomizer.freesituationslot',
-    }, container, true);
 
     row.append(containerLayout);
 };
 
-OriginCustomizerScreen.prototype.addSituationEntry = function (_data, _parentDiv, _isButton)
+OriginCustomizerScreen.prototype.addSituationEntry = function (_data, _parentDiv)
 {
     var image = $('<img/>');
     image.attr('src', Path.GFX + _data.ImagePath);
     _parentDiv.append(image);
 
-    if (_isButton === true)
+    image.click(function(_event)
     {
-        image.bindTooltip({ contentType: 'ui-element', elementId: _data.ID });
-    }
-    else
+    });
+    image.mouseover(function()
     {
-        image.bindTooltip({ contentType: 'settlement-status-effect', statusEffectId: _data.ID });
-    }
+        this.classList.add('is-highlighted');
+    });
+    image.mouseout(function()
+    {
+        this.classList.remove('is-highlighted');
+    });
+
+    image.bindTooltip({ contentType: 'settlement-status-effect', statusEffectId: _data.ID });
 };
 
 OriginCustomizerScreen.prototype.addAttachmentEntry = function (_data)
 {
-    var isButton = _data.ID === 'origincustomizer.freeattachmentslot';
     var entry = $('<div class="attach-row"/>');
     this.mSettlement.Attachments.append(entry);
     var image = entry.createImage(Path.GFX + _data.ImagePath, function(_image)
@@ -244,8 +222,5 @@ OriginCustomizerScreen.prototype.addAttachmentEntry = function (_data)
         this.classList.remove('is-highlighted');
     });
 
-    if (isButton)
-        image.bindTooltip({ contentType: 'ui-element', elementId: _data.ID });
-    else
-        image.bindTooltip({ contentType: 'ui-element', elementId: _data.ID, elementOwner: 'origincustomizer.attached_location' });
+    image.bindTooltip({ contentType: 'ui-element', elementId: _data.ID, elementOwner: 'origincustomizer.attached_location' });
 };

@@ -2,8 +2,9 @@
 
 var OriginCustomizer =
 {
-    Screens: ['General'   , 'Properties'   , 'Factions'   , 'Settlements'   , 'Contracts'   ],
-    Classes: ['is-general', 'is-properties', 'is-factions', 'is-settlements', 'is-contracts'],
+    Screens: ['General'   , 'Properties'   , 'Factions'   , 'Settlements'   , 'Locations'   , 'Contracts'   ],
+    Classes: ['is-general', 'is-properties', 'is-factions', 'is-settlements', 'is-locations', 'is-contracts'],
+    Locations: ['Locations', 'Legendary', 'Misc'],
 };
 
 var OriginCustomizerScreen = function(_parent)
@@ -14,9 +15,6 @@ var OriginCustomizerScreen = function(_parent)
 	this.mContainer = null;
     this.mDialogContainer = null;
 
-    // popup dialog
-    this.mCurrentPopupDialog = null;
-
     // screens
     this.mScreens = 
     {
@@ -24,7 +22,55 @@ var OriginCustomizerScreen = function(_parent)
         Properties : null,
         Factions   : null,
         Settlements: null,
+        Locations  : null,
         Contracts  : null,
+    };
+
+    // factions
+    this.mFaction =
+    {
+        Data               : null,
+        Name               : null,
+        Banner             : null,
+        Selected           : null,
+        Contracts          : null,
+        NextButton         : null,
+        PrevButton         : null,
+        Settlement         : null,
+        ListContainer      : null,
+        ListScrollContainer: null,
+    };
+
+    // settlements
+    this.mSettlement =
+    {
+        Data               : null,
+        Name               : null,
+        Image              : null,
+        Selected           : null,
+        Buildings          : null,
+        Situations         : null,
+        Attachments        : null,
+        OwnerBanner        : null,
+        FactionBanner      : null,
+        ListContainer      : null,
+        ListScrollContainer: null,
+        IsViewingAttachment: true,
+    }
+
+    // locations
+    this.mLocation =
+    {
+        Data               : null,
+        Name               : null,
+        Image              : null,
+        Loots              : null,
+        Troops             : null,
+        Selected           : null,
+        FilterButton       : null,
+        ListContainer      : null,
+        ListScrollContainer: null,
+        FilterType         : 0,
     };
 
     // switch-to buttons
@@ -34,10 +80,16 @@ var OriginCustomizerScreen = function(_parent)
         Properties : null,
         Factions   : null,
         Settlements: null,
+        Locations  : null,
         Contracts  : null,
     };
 
     // inputs
+    this.mCoordinate = 
+    {
+        X: {Input: null, Value: 0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
+        Y: {Input: null, Value: 0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.MoralReputation},
+    }
     this.mAssets =
     {
         BusinessReputation: {Input: null, Value: 0, ValueMin: -1000, ValueMax: 20000, Min: 0, Max: 5, IconPath: Path.GFX + Asset.ICON_ASSET_BUSINESS_REPUTATION, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
@@ -48,7 +100,6 @@ var OriginCustomizerScreen = function(_parent)
         Supplies          : {Input: null, Value: 0, ValueMin: 150  , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_SUPPLIES           , TooltipId: TooltipIdentifier.Assets.Supplies},
         Medicine          : {Input: null, Value: 0, ValueMin: 100  , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_MEDICINE           , TooltipId: TooltipIdentifier.Assets.Medicine},
     };
-
     this.mAssetProperties =
     {
         // general properties
@@ -133,52 +184,6 @@ var OriginCustomizerScreen = function(_parent)
         SocketIndex : 0,
     };
 
-    // scenarios
-    this.mScenario = 
-    {
-        Data               : null,
-        Image              : null,
-        Selected           : null,
-        Description        : null,
-        ListContainer      : null,
-        ListScrollContainer: null,
-    };
-
-    // factions
-    this.mFaction =
-    {
-        Data               : null,
-        Name               : null,
-        Banner             : null,
-        //Landlord           : null,
-        //LandlordContainer  : null,
-        Selected           : null,
-        Contracts          : null,
-        NextButton         : null,
-        PrevButton         : null,
-        Settlement         : null,
-        ListContainer      : null,
-        ListScrollContainer: null,
-    };
-
-    this.mSettlement =
-    {
-        Data               : null,
-        Name               : null,
-        Image              : null,
-        Selected           : null,
-        Buildings          : null,
-        OwnerBanner        : null,
-        FactionBanner      : null,
-        //SideButton         : null,
-        //SideListScroll     : null,
-        Situations         : null,
-        Attachments        : null,
-        ListContainer      : null,
-        ListScrollContainer: null,
-        IsViewingAttachment: true,
-    }
-
     // configure options
     this.mCompanyName = null;
     this.mGenderLevel = 0;
@@ -213,20 +218,35 @@ var OriginCustomizerScreen = function(_parent)
         Hard     : {Checkbox: null, Label: null, Name: 'Expert'   , TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.EconomicDifficultyHard},
         Legendary: {Checkbox: null, Label: null, Name: 'Legendary', TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.EconomicDifficultyLegendary}
     };
+    this.mFactionFixedRelation = {Checkbox: null, Label: null, Name: 'Stop Relation Deterioration', TooltipId: 'origincustomizer.fixedrelation'};
 
     // sliders
     this.mRosterTier           = {Control: null, Title: null, Min: 1, Max:  10, Value:   2, Step: 1, TooltipId: 'origincustomizer.rostertier', Postfix: ''};
     this.mDifficultyMult       = {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'origincustomizer.difficultymult', Postfix: '%'};
     this.mFactionRelation      = {Control: null, Title: null, Min: 0, Max: 100, Value:  50, Step: 5, TooltipId: TooltipIdentifier.RelationsScreen.Relations, Postfix: ''};
-    this.mFactionFixedRelation = {Checkbox: null, Label: null, Name: 'Stop Relation Deterioration', TooltipId: 'origincustomizer.fixedrelation'},
 
     // buttons
     this.mSaveButton  = null;
     this.mCloseButton = null;
 
+    // popup dialog
+    this.mCurrentPopupDialog = null;
+
+    // popup scenarios picker
+    this.mScenario = 
+    {
+        Data               : null,
+        Image              : null,
+        Selected           : null,
+        Description        : null,
+        ListContainer      : null,
+        ListScrollContainer: null,
+    };
+
     // generics
-    this.mLastScreen = null;
-    this.mIsVisible  = false;
+    this.mLastScreen           = null;
+    this.mIsVisible            = false;
+    this.mIsChoosingCoordinate = false;
 };
 
 OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
@@ -304,11 +324,165 @@ OriginCustomizerScreen.prototype.createContractsPanelDIV = function(_parentDiv)
     var self = this;
 };
 
+OriginCustomizerScreen.prototype.createLocationsPanelDIV = function(_parentDiv) 
+{
+    var self = this;
+
+    // divide into 2 column - 23% and 77%
+    var column = this.addColumn(23);
+    _parentDiv.append(column);
+    {
+        var row90 = this.addRow(90, 'with-scroll-tooltip-background');
+        column.append(row90);
+        {
+            var scrollHeader = $('<div class="title-scroll-header-container"/>');
+            row90.append(scrollHeader);
+            {
+                var column88 = this.addColumn(85);
+                scrollHeader.append(column88);
+                var buttonLayout = $('<div class="location-filter-button is-center"/>');
+                column88.append(buttonLayout);
+                this.mLocation.FilterButton = buttonLayout.createTextButton("Locations", function() {
+                    self.changeLocationfilter();
+                }, '', 4);
+
+                var column12 = this.addColumn(15);
+                scrollHeader.append(column12);
+                var buttonLayout = $('<div class="position-button is-center"/>');
+                buttonLayout.css('top', '0.5rem') // css is retarded, fuck it
+                column12.append(buttonLayout);
+                var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
+                    //self.onPreviousBannerClicked();
+                }, '', 6);
+                button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+            }
+
+            var slotContainer = $('<div class="locations-container"/>');
+            row90.append(slotContainer);
+            var listContainerLayout = $('<div class="l-list-container"/>');
+            slotContainer.append(listContainerLayout);
+            this.mLocation.ListContainer = listContainerLayout.createList(2);
+            this.mLocation.ListScrollContainer = this.mLocation.ListContainer.findListScrollContainer();
+        }
+
+        var row10 = this.addRow(10, 'with-small-dialog-background');
+        column.append(row10);
+        {
+            var column20 = this.addColumn(20);
+            row10.append(column20);
+            var buttonLayout = $('<div class="position-button is-center"/>');
+            column20.append(buttonLayout);
+            var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/center.png', function() {
+                //self.onPreviousBannerClicked();
+            }, '', 6);
+            button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.choosecoords' });
+
+            var column40 = this.addColumn(40);
+            row10.append(column40);
+            this.createSmallInputDIV('X:', this.mCoordinate.X ,column40);
+
+            var column40 = this.addColumn(40);
+            row10.append(column40);
+            this.createSmallInputDIV('Y:', this.mCoordinate.Y ,column40);
+        }
+    }
+
+    var column = this.addColumn(77);
+    _parentDiv.append(column);
+    {
+        var column50 = this.addColumn(50);
+        column.append(column50);
+        {
+
+        }
+
+        var column50 = this.addColumn(50);
+        column.append(column50);
+        {
+            var upperHalf = this.addRow(40);
+            column50.append(upperHalf);
+            {
+
+            }
+
+            var lowerHalf = this.addRow(60, 'with-dirty-scroll-background');
+            column50.append(lowerHalf);
+            {
+                var scrollHeader = $('<div class="title-scroll-header-container"/>');
+                lowerHalf.append(scrollHeader);
+                {
+                    var column = this.addColumn(50, undefined, 'blue');
+                    scrollHeader.append(column);
+                    var buttonLayout = $('<div class="location-filter-button is-horizontal-center"/>');
+                    buttonLayout.css('bottom', '0.5rem'); // css is retarded, fuck it
+                    column.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Defenders", function() {
+                        //self.changeLocationfilter();
+                    }, '', 4);
+
+                    var column = this.addColumn(10, undefined, 'red');
+                    scrollHeader.append(column);
+                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    column.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
+                        //self.onPreviousBannerClicked();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+
+                    var column = this.addColumn(10, undefined, 'red');
+                    scrollHeader.append(column);
+                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    column.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
+                        //self.onPreviousBannerClicked();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+
+                    var column = this.addColumn(10, undefined, 'red');
+                    scrollHeader.append(column);
+                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    column.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
+                        //self.onPreviousBannerClicked();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+
+                    var column = this.addColumn(10, undefined, 'red');
+                    scrollHeader.append(column);
+                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    column.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
+                        //self.onPreviousBannerClicked();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+
+                    var column = this.addColumn(10, undefined, 'red');
+                    scrollHeader.append(column);
+                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    column.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
+                        //self.onPreviousBannerClicked();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+                }
+
+                var slotContainer = $('<div class="troops-container"/>');
+                lowerHalf.append(slotContainer);
+                var listContainerLayout = $('<div class="l-list-container"/>');
+                slotContainer.append(listContainerLayout);
+                var listContainer = listContainerLayout.createList(2);
+                this.mLocation.Troops = listContainer.findListScrollContainer();
+            }
+        }
+    }
+};
+
 OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv) 
 {
     var self = this;
 
-    var column = $('<div class="column23 with-dialog-background"/>');
+    // divide into 2 column - 23% and 77%
+    var column = this.addColumn(23, 'with-dialog-background');
     column.css('padding-top', '0.6rem');
     _parentDiv.append(column);
     {
@@ -318,20 +492,19 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
         this.mSettlement.ListScrollContainer = this.mSettlement.ListContainer.findListScrollContainer();
     }
 
-    var column = $('<div class="column77"/>');
+    var column = this.addColumn(77);
     _parentDiv.append(column);
     {
-        
-        var column78 = $('<div class="column78"/>');
+        var column78 = this.addColumn(78);
         column.append(column78);
         {
-            var row75 = $('<div class="row75"/>');
+            var row75 = this.addRow(75);
             column78.append(row75);
             {
-                var leftHalf = $('<div class="column50"/>');
+                var leftHalf = this.addColumn(50);
                 row75.append(leftHalf);
                 {
-                    var row25 = $('<div class="row25"/>');
+                    var row25 = this.addRow(25);
                     leftHalf.append(row25);
                     {
                         var row = $('<div class="row"/>');
@@ -345,10 +518,10 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                         }, 'title-font-big font-bold font-color-brother-name');
                     }
 
-                    var row30 = $('<div class="row30 with-small-dialog-background"/>');
+                    var row30 = this.addRow(30, 'with-small-dialog-background');
                     leftHalf.append(row30);
                     {
-                        var column75 = $('<div class="column75"/>');
+                        var column75 = this.addColumn(75);
                         row30.append(column75);
                         var imageContainer = $('<div class="s-image-container"/>');
                         column75.append(imageContainer);
@@ -357,7 +530,7 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                             _image.fitImageToParent(0, 0);
                         }, null, '');
 
-                        var column25 = $('<div class="column25"/>');
+                        var column25 = this.addColumn(25);
                         row30.append(column25);
 
                         var buttonRow = $('<div class="s-button-row"/>');
@@ -377,10 +550,10 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                         }, '', 6);
                     }
 
-                    var row35 = $('<div class="row35"/>');
+                    var row35 = this.addRow(35);
                     leftHalf.append(row35);
                     {
-                        var column50 = $('<div class="column50"/>');
+                        var column50 = this.addColumn(50);
                         row35.append(column50);
                         var row = $('<div class="row"/>');
                         column50.append(row);
@@ -395,7 +568,7 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                         }, null, '');
 
 
-                        var column50 = $('<div class="column50"/>');
+                        var column50 = this.addColumn(50);
                         row35.append(column50);
                         var row = $('<div class="row"/>');
                         column50.append(row);
@@ -410,7 +583,7 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                         }, null, '');
                     }
 
-                    var row10 = $('<div class="row10"/>');
+                    var row10 = this.addRow(10);
                     leftHalf.append(row10);
                     {
                         var row = $('<div class="row"/>');
@@ -422,7 +595,7 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                     }
                 }
 
-                var rightHalf = $('<div class="column50 with-dialog-background"/>');
+                var rightHalf = this.addColumn(50, 'with-dialog-background');
                 row75.append(rightHalf);
                 {
                     var row = $('<div class="faction-button-row"></div>');
@@ -486,7 +659,7 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                 }
             }
 
-            var row25 = $('<div class="row25 with-small-dialog-background"/>');
+            var row25 = this.addRow(25, 'with-small-dialog-background');
             column78.append(row25);
             {
                 var buildingsContainer = $('<div class="s-building-container"/>');
@@ -499,24 +672,34 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
             }
         }
 
-        var column22 = $('<div class="column22"/>');
+        var column22 = this.addColumn(22);
         column.append(column22);
         {
-            var row = $('<div class="row35 with-scroll-tooltip-background"/>');
+            var row = this.addRow(35, 'with-scroll-tooltip-background');
             column22.append(row);
             {
                 var scrollHeader = $('<div class="title-scroll-header-container"/>');
                 row.append(scrollHeader);
-                /*var title = $('<div class="title-scroll-header title-font-big font-color-ink">Attachments</div>');
-                scrollHeader.append(title);*/
-
-                var buttonLayout = $('<div class="s-button-center"/>');
-                scrollHeader.append(buttonLayout);
-
-                var button = buttonLayout.createTextButton("Situations", function ()
                 {
-                    //self.switchBetweenSituationsAttachments();
-                }, '', 7);
+                    var column80 = this.addColumn(80);
+                    scrollHeader.append(column80);
+                    var buttonLayout = $('<div class="s-button-center"/>');
+                    column80.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Situations", function ()
+                    {
+                        //self.switchBetweenSituationsAttachments();
+                    }, '', 7);
+
+                    var column20 = this.addColumn(20);
+                    scrollHeader.append(column20);
+                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    column20.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
+                        //self.onPreviousBannerClicked();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+                }
+                
 
                 var slotContainer = $('<div class="s-attach-container"/>');
                 slotContainer.css('height', '16.0rem');
@@ -528,21 +711,30 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                 this.mSettlement.Situations = listContainer.findListScrollContainer();
             }
 
-            var row = $('<div class="row65 with-scroll-tooltip-background"/>');
+            var row = this.addRow(65, 'with-scroll-tooltip-background');
             column22.append(row);
             {
                 var scrollHeader = $('<div class="title-scroll-header-container"/>');
                 row.append(scrollHeader);
-                /*var title = $('<div class="title-scroll-header title-font-big font-color-ink">Attachments</div>');
-                scrollHeader.append(title);*/
+                {  
+                    var column80 = this.addColumn(80);
+                    scrollHeader.append(column80);
+                    var buttonLayout = $('<div class="s-button-center"/>');
+                    column80.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Attachments", function ()
+                    {
+                        //self.switchBetweenSituationsAttachments();
+                    }, '', 7);
 
-                var buttonLayout = $('<div class="s-button-center"/>');
-                scrollHeader.append(buttonLayout);
-
-                var button = buttonLayout.createTextButton("Attachments", function ()
-                {
-                    //self.switchBetweenSituationsAttachments();
-                }, '', 7);
+                    var column20 = this.addColumn(20);
+                    scrollHeader.append(column20);
+                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    column20.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
+                        //self.onPreviousBannerClicked();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+                }
 
                 var slotContainer = $('<div class="s-attach-container"/>');
                 slotContainer.css('height', '33.0rem');
@@ -561,7 +753,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
 {
     var self = this;
 
-    var column40 = $('<div class="column40 with-dialog-background"/>');
+    var column40 = this.addColumn(40, 'with-dialog-background');
     column40.css('padding-top', '0.9rem');
     _parentDiv.append(column40);
     {
@@ -571,16 +763,16 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
         this.mFaction.ListScrollContainer = this.mFaction.ListContainer.findListScrollContainer();
     }
 
-    var column60 = $('<div class="column60"/>');
+    var column60 = this.addColumn(60);
     _parentDiv.append(column60);
     {
-        var row80 = $('<div class="row80"/>');
+        var row80 = this.addRow(80);
         column60.append(row80);
         {
-            var column = $('<div class="column50"/>');
+            var column = this.addColumn(50);
             row80.append(column);
             {
-                var row90 = $('<div class="row90"/>');
+                var row90 = this.addRow(90);
                 column.append(row90);
                 {
                     var row = $('<div class="row"/>');
@@ -609,7 +801,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                 }
                 
 
-                var row10 = $('<div class="row10"/>');
+                var row10 = this.addRow(10);
                 column.append(row10);
                 {
                     var row = $('<div class="row"/>');
@@ -621,13 +813,13 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                 }
             }
 
-            var column = $('<div class="column50"/>');
+            var column = this.addColumn(50);
             row80.append(column);
             {
-                var row40 = $('<div class="row40 with-small-dialog-background"/>');
+                var row40 = this.addRow(40, 'with-small-dialog-background');
                 column.append(row40);
                 {
-                    var leftColumn = $('<div class="column30"/>');
+                    var leftColumn = this.addColumn(30);
                     row40.append(leftColumn);
                     var prevButtonLayout = $('<div class="faction-banner-button"/>');
                     leftColumn.append(prevButtonLayout);
@@ -635,7 +827,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                         //self.onPreviousBannerClicked();
                     }, '', 6);
 
-                    var midColumn = $('<div class="column40"/>');
+                    var midColumn = this.addColumn(40);
                     row40.append(midColumn);
                     var bannerContainer = $('<div class="faction-banner-container"/>');
                     midColumn.append(bannerContainer);
@@ -644,7 +836,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                         _image.removeClass('display-none').addClass('display-block');
                     }, null, 'display-none');
 
-                    var rightColumn = $('<div class="column30"/>');
+                    var rightColumn = this.addColumn(30);
                     row40.append(rightColumn);
                     var nextButtonLayout = $('<div class="faction-banner-button"/>');
                     rightColumn.append(nextButtonLayout);
@@ -653,7 +845,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                     }, '', 6);
                 }
 
-                var row60 = $('<div class="row60 with-scroll-tooltip-background"/>'); //
+                var row60 = this.addRow(60, 'with-scroll-tooltip-background');
                 column.append(row60);
                 {
                     // 1st button
@@ -720,7 +912,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
         }
 
         // contract panel
-        var row20 = $('<div class="row20 with-small-dialog-background"/>');
+        var row20 = this.addRow(20, 'with-small-dialog-background');
         column60.append(row20);
         {
             this.mFaction.Contracts = $('<div class="f-contracts-container"/>');
@@ -733,13 +925,13 @@ OriginCustomizerScreen.prototype.createPropertiesPanelDIV = function(_parentDiv)
 {   
     var self = this;
 
-    var column50 = $('<div class="column50 with-dialog-background"/>');
+    var column50 = this.addColumn(50, 'with-dialog-background');
     _parentDiv.append(column50);
     {
-        var row80 = $('<div class="row80"/>');
+        var row80 = this.addRow(80);
         column50.append(row80);
         {
-            var subColumn50 = $('<div class="column50"/>');
+            var subColumn50 = this.addColumn(50);
             row80.append(subColumn50);
             {
                 var count = 0;
@@ -767,7 +959,7 @@ OriginCustomizerScreen.prototype.createPropertiesPanelDIV = function(_parentDiv)
                 });
             }
 
-            var subColumn50 = $('<div class="column50"/>');
+            var subColumn50 = this.addColumn(50);
             row80.append(subColumn50);
             {
                 var count = 0;
@@ -792,14 +984,14 @@ OriginCustomizerScreen.prototype.createPropertiesPanelDIV = function(_parentDiv)
             }
         }
 
-        var row20 = $('<div class="row20"/>');
+        var row20 = this.addRow(20);
         column50.append(row20);
         {
             this.createSliderControlDIV(this.mDifficultyMult, 'Difficulty Multiplier', row20);
         }
     }
 
-    var column25 = $('<div class="column25"/>');
+    var column25 = this.addColumn(25);
     _parentDiv.append(column25);
     {
         var row = $('<div class="row"/>');
@@ -823,7 +1015,7 @@ OriginCustomizerScreen.prototype.createPropertiesPanelDIV = function(_parentDiv)
         });
     }
 
-    var column25 = $('<div class="column25 with-scroll-background"/>');
+    var column25 = this.addColumn(25, 'with-scroll-background');
     _parentDiv.append(column25);
     {
         var row = $('<div class="row"/>');
@@ -855,7 +1047,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
     var leftColumn = $('<div class="column-left"/>');
     _parentDiv.append(leftColumn);
     {
-        var subLeftColumn = $('<div class="column26"/>');
+        var subLeftColumn = this.addColumn(26);
         leftColumn.append(subLeftColumn);
         {
             var originImageContainer = $('<div class="origin-image-container"/>');
@@ -883,7 +1075,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
             });
         }
 
-        var subRightColumn = $('<div class="column74 with-dialog-background"/>');
+        var subRightColumn = this.addColumn(74, 'with-dialog-background');
         leftColumn.append(subRightColumn);
         {
             var row = $('<div class="row"/>');
@@ -895,7 +1087,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
             var avatarChangerContainer = $('<div class="avatar-changer-container"/>');
             row.append(avatarChangerContainer);
             {
-                var buttonColumn = $('<div class="column35"/>');
+                var buttonColumn = this.addColumn(35);
                 avatarChangerContainer.append(buttonColumn);
                 {
                     var subRow = $('<div class="avatar-row"/>');
@@ -926,13 +1118,13 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
                     }, 'display-block', 1);
                 }
 
-                var avatarColumn = $('<div class="column65 with-small-dialog-background"/>');
+                var avatarColumn = this.addColumn(65, 'with-small-dialog-background');
                 avatarChangerContainer.append(avatarColumn);
                 {
                     var avatarContainer = $('<div class="avatar-container"/>');
                     avatarColumn.append(avatarContainer);
 
-                    var left = $('<div class="avatar-column"/>');
+                    var left = this.addColumn(25);
                     avatarContainer.append(left);
                     var prevAvatar = $('<div class="avatar-button"/>');
                     left.append(prevAvatar);
@@ -940,7 +1132,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
                         //self.onPreviousBannerClicked();
                     }, '', 6);
 
-                    var mid = $('<div class="avatar-column-mid"/>');
+                    var mid = this.addColumn(50);
                     avatarContainer.append(mid);
                     var avatarImage = $('<div class="avatar-image-container"/>');
                     mid.append(avatarImage);
@@ -949,7 +1141,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
                         _image.removeClass('display-none').addClass('display-block');
                     }, null, 'display-none');
 
-                    var right = $('<div class="avatar-column"/>');
+                    var right = this.addColumn(25);
                     avatarContainer.append(right);
                     var nextAvatar = $('<div class="avatar-button"/>');
                     right.append(nextAvatar);
@@ -960,7 +1152,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
             }
 
 
-            var row = $('<div class="row" />');
+            var row = $('<div class="row"/>');
             row.css('padding-top', '1.0rem'); // css is retarded XD
             subRightColumn.append(row);
             var title = $('<div class="title title-font-big font-color-title">Company Name</div>');
@@ -983,9 +1175,9 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
             var configureOptionsContainer = $('<div class="configure-container"/>');
             subRightColumn.append(configureOptionsContainer);
             {
-                var column45 = $('<div class="column45"/>');
+                var column45 = this.addColumn(45);
                 configureOptionsContainer.append(column45);
-                var column55 = $('<div class="column55"/>');
+                var column55 = this.addColumn(55);
                 configureOptionsContainer.append(column55);
 
                 var count = 0;
@@ -1067,7 +1259,7 @@ OriginCustomizerScreen.prototype.createRadioControlDIV = function(_definition, _
         self[_result] = _index;
     });
 
-    _definition.Checkbox.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
+    _definition.Label.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
 };
 
 OriginCustomizerScreen.prototype.createCheckBoxControlDIV = function(_definition, _parentDiv) 
@@ -1087,7 +1279,7 @@ OriginCustomizerScreen.prototype.createCheckBoxControlDIV = function(_definition
         increaseArea: '30%'
     });
 
-    _definition.Checkbox.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
+    _definition.Label.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
 };
 
 OriginCustomizerScreen.prototype.createSliderControlDIV = function(_definition, _title, _parentDiv) 
@@ -1142,7 +1334,7 @@ OriginCustomizerScreen.prototype.createInputDIV = function(_key, _definition, _p
     _definition.Input.css('background-size', '14.2rem 3.2rem');
     _definition.Input.css('text-align', 'center');
 
-    _definition.Input.assignInputEventListener('mouseover', function(_event) {
+    _definition.Input.assignInputEventListener('mouseover', function(_input, _event) {
         _definition.Input.css('background-image', 'url("coui://gfx/ui/skin/barber_textbox.png")');
     });
 
@@ -1155,16 +1347,16 @@ OriginCustomizerScreen.prototype.createInputDIV = function(_key, _definition, _p
         //self.ConfirmAttributeChange(_input, _key);
     });*/
 
-    _definition.Input.assignInputEventListener('click', function(_input, _event) {
+    /*_definition.Input.assignInputEventListener('click', function(_input, _event) {
         var currentText = _input.getInputText();
         var index = currentText.indexOf(' ');
         if (index > 0)
         {
             _input.setInputText(currentText.slice(0, index));
         }
-    });
+    });*/
 
-    _definition.Input.setInputText(_definition.Value);
+    _definition.Input.val(_definition.Value);
 }
 
 OriginCustomizerScreen.prototype.destroyDIV = function()
@@ -1384,6 +1576,38 @@ OriginCustomizerScreen.prototype.isVisible = function()
     return this.mIsVisible;
 };
 
+OriginCustomizerScreen.prototype.addColumn = function(_width, _class, _color)
+{
+    if (_class === undefined)
+        _class = '';
+    else
+        _class = ' ' + _class;
+
+    var result = $('<div class="custom-column' + _class + '"/>');
+    result.css('width', _width + '%');
+
+    if (_color !== undefined)
+        result.css('border', '1px solid ' + _color);
+
+    return result;
+}
+
+OriginCustomizerScreen.prototype.addRow = function(_height, _class, _color)
+{
+    if (_class === undefined)
+        _class = '';
+    else
+        _class = ' ' + _class;
+
+    var result = $('<div class="custom-row' + _class + '"/>');
+    result.css('height', _height + '%');
+
+    if (_color !== undefined)
+        result.css('border', '1px solid ' + _color);
+
+    return result;
+}
+
 OriginCustomizerScreen.prototype.loadFromData = function(_data) 
 {
     if ('Scenarios' in _data && _data.Scenarios !== undefined && _data.Scenarios !== null && jQuery.isArray(_data.Scenarios))
@@ -1394,6 +1618,9 @@ OriginCustomizerScreen.prototype.loadFromData = function(_data)
 
     if ('Settlements' in _data && _data.Settlements !== undefined && _data.Settlements !== null && jQuery.isArray(_data.Settlements))
         this.addSettlementsData(_data.Settlements);
+
+    if ('Locations' in _data && _data.Locations !== undefined && _data.Locations !== null && jQuery.isArray(_data.Locations))
+        this.addLocationsData(_data.Locations);
 };
 
 OriginCustomizerScreen.prototype.notifyBackendOnConnected = function()

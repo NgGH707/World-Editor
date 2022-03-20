@@ -98,7 +98,7 @@
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .s-button-center
 {
     top: 0;
-    left: 0.7rem;
+    left: 0;
     right: 0;
     bottom: 0;
     width: 17.4rem;
@@ -175,13 +175,13 @@
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building0
 {
     position: absolute;
-    left: 7.0rem;
+    left: 3.0rem;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building1
 {
     position: absolute;
-    left: 22.0rem;
+    left: 20.0rem;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building2
@@ -193,9 +193,10 @@
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building3
 {
     position: absolute;
-    left: 52.0rem;
+    left: 54.0rem;
 }
 
+/* redundant
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building4
 {
     position: absolute;

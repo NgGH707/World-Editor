@@ -132,9 +132,89 @@ this.origin_customizer_screen <- {
 		local result = {};
 		result.Factions <- this.convertFactionsToUIData();
 		result.Settlements <- this.convertSettlementsToUIData(result.Factions);
+		result.Locations <- this.convertLocationsToUIData(result.Factions);
 		result.Scenarios <- this.Const.ScenarioManager.getScenariosForUI();
 		result.Scenarios.remove(2);
 		result.Scenarios.remove(0);
+		return result;
+	}
+
+	function convertLocationsToUIData( _factions )
+	{
+		local result = [
+			[],
+			[],
+			[]
+		];
+
+		foreach (i, location in this.World.EntityManager.getLocations())
+		{
+			if (location.isLocationType(this.Const.World.LocationType.AttachedLocation) || location.m.IsBattlesite)
+			{
+				continue;
+			}
+			else
+			{
+				location.onVisibleToPlayer();
+			}
+
+			local index;
+
+			if (location.isLocationType(this.Const.World.LocationType.Unique))
+			{
+				index = 1;
+			}
+			else if (location.isLocationType(this.Const.World.LocationType.Lair))
+			{
+				index = 0;
+			}
+			else
+			{
+				index = 2;
+			}
+
+			local loots = [];
+			local troops = [];
+
+			foreach ( troop in location.getTroops() )
+			{
+				local key = this.OriginCustomizer.getTroopKey(troop);
+				local isMiniBoss = troop.Variant != 0;
+				local i = this.lookForTroop(key, troops, isMiniBoss);
+
+				if (i != null)
+				{
+					++troops[i].Num;
+				}
+				else
+				{
+					troops.push({
+						Name = this.OriginCustomizer.getTroopName(troop),
+						Icon = this.OriginCustomizer.getTroopIcon(troop),
+						Strength = troop.Strength,
+						IsChampion = isMiniBoss,
+						Key = key,
+						Num = 1,
+					});
+				}
+			}
+
+			result[index].push({
+				ID = location.getTypeID(),
+				Type = location.getLocationType(),
+				Name = location.getName(),
+				Faction = location.getFaction(),
+				TooltipId = location.getTooltipId(),
+				Banner = location.getUIBanner(),
+				ImagePath = location.getUIImage(),
+				Loots = loots,
+				Troops = troops,
+			});
+		}
+
+		result[0].sort(this.onSortWithFaction);
+		result[1].sort(this.onSortName);
+		result[2].sort(this.onSortName);
 		return result;
 	}
 
@@ -333,6 +413,19 @@ this.origin_customizer_screen <- {
 		return result;
 	}
 
+	function lookForTroop( _key, _troops, _isChampion )
+	{
+		foreach (i, troop in _troops )
+		{
+			if (troop.Key == _key && (!_isChampion || troop.IsChampion))
+			{
+				return i;
+			}
+		}
+
+		return null;
+	}
+
 	function findIdIn( _id, _array )
 	{
 		if (_id == null)
@@ -349,6 +442,38 @@ this.origin_customizer_screen <- {
 		}
 
 		return null;
+	}
+
+	function onSortWithFaction( _f1, _f2 )
+	{
+		if (_f1.Faction < _f2.Faction)
+		{
+			return -1;
+		}
+		else if (_f1.Faction > _f2.Faction)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	function onSortName( _f1, _f2 )
+	{
+		if (_f1.Name < _f2.Name)
+		{
+			return -1;
+		}
+		else if (_f1.Name > _f2.Name)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	function onSortFactions( _f1, _f2 )
@@ -389,5 +514,5 @@ this.origin_customizer_screen <- {
 			return 0;
 		}
 	}
-};	
+};
 

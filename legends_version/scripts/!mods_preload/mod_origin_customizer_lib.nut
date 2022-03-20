@@ -258,5 +258,87 @@ this.getroottable().OriginCustomizer.createLib <- function ()
 		"figure_white_direwolf_01",
 	]);
 
+
+	// processing the spawnlist so i can add them as entry to the mod ui
+	gt.OriginCustomizer.TroopKeys <- {};
+	gt.OriginCustomizer.TroopNames <- {};
+
+	foreach (key, entry in this.Const.World.Spawn.Troops)
+	{
+		if (!(entry.Script in gt.OriginCustomizer.TroopKeys))
+		{
+			gt.OriginCustomizer.TroopKeys[entry.Script] <- key;
+		}
+		else
+		{
+			continue;
+		}
+
+		local prefix = "";
+		local postfix = "";
+		local isGhoul = key.find("Ghoul") != null;
+		local isSandGolem = key.find("SandGolem") != null;
+		local isWeak = entry.Script.slice(entry.Script.len() - 4) == "_low";
+		local isBodyGuard = key.find("Bodyguard") != null;
+		local hasRanged = key.find("Ranged") != null;
+		local hasPolearm = key.find("Polearm") != null;
+		local isFrenzied = key == "DirewolfHIGH" || key == "HyenaHIGH";
+		local isArmored = key == "ArmoredWardog";
+		local isFake = entry.Script.find("bandit_raider_wolf") != null;
+
+		switch (true)
+		{
+		case isGhoul:
+		case isSandGolem:
+			if (entry.Script.find("_med") != null) postfix += " (M)";
+			else if (entry.Script.find("_high") != null) postfix += " (L)";
+			else postfix += " (S)";
+			break;
+
+		case isWeak:
+			postfix += " (W)";
+			break;
+
+		case isBodyGuard:
+			postfix += " (B)";
+			break;
+
+		case hasRanged:
+			postfix += " (R)";
+			break;
+
+		case hasPolearm:
+			postfix += " (P)";
+			break;
+
+		case isFrenzied:
+			prefix += "Frenzied ";
+			break;
+
+		case isArmored:
+			prefix += "Armored ";
+			break;
+
+		case isFake:
+			prefix += "Faked ";
+			break;
+		}
+
+		gt.OriginCustomizer.TroopNames[entry.Script] <- prefix + gt.Const.Strings.EntityName[entry.ID] + postfix;
+	}
+
+	gt.OriginCustomizer.getTroopKey <- function(_entry)
+	{
+		return this.OriginCustomizer.TroopKeys[_entry.Script];
+	};
+	gt.OriginCustomizer.getTroopName <- function(_entry)
+	{
+		return this.OriginCustomizer.TroopNames[_entry.Script];
+	};
+	gt.OriginCustomizer.getTroopIcon <- function(_entry)
+	{
+		return "ui/orientation/" + this.Const.EntityIcon[_entry.ID] + ".png";
+	};
+
 	delete this.OriginCustomizer.createLib;
 }

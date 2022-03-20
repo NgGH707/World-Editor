@@ -61,9 +61,13 @@
 {
     left: 49.5rem;
 }
-.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-contracts
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-locations
 {
     left: 66.0rem;
+}
+.origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-contracts
+{
+    left: 82.5rem;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-save
@@ -73,129 +77,21 @@
     height: 4.1rem;
 }
 
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column15
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .custom-column
 {
-    width: 15%;
     height: 100%;
     position: relative;
     float : left;
 }
 
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column17
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .custom-row
 {
-    width: 17%;
-    height: 100%;
+    width: 100%;
     position: relative;
     float : left;
 }
 
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column22
-{
-    width: 22%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column23
-{
-    width: 23%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column25
-{
-    width: 25%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column26
-{
-    width: 26%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column30
-{
-    width: 30%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column40
-{
-    width: 40%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column50
-{
-    width: 50%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column60
-{
-    width: 60%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column62
-{
-    width: 62%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column74
-{
-    width: 74%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column75
-{
-    width: 75%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column77
-{
-    width: 77%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column78
-{
-    width: 78%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-
-
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column65,
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .column-left
 {
     width: 65%;
@@ -204,7 +100,6 @@
     float : left;
 }
 
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column35,
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .column-right
 {
     width: 35%;
@@ -213,100 +108,16 @@
     float : left;
 }
 
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row90
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-bottom-border
 {
-    height: 90%;
-    width: 100%;
-    float: left;
-    position: relative;
+    border-image: url("coui://gfx/ui/skin/line_metal.png") 0% 0% 100% 0%;
+    border-image-outset: 0 0 0.5rem 0;
 }
 
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row80
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-bottom-border-gold
 {
-    height: 80%;
-    width: 100%;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row75
-{
-    height: 75%;
-    width: 100%;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row70
-{
-    height: 70%;
-    width: 100%;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row65
-{
-    height: 65%;
-    width: 100%;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row60
-{
-    height: 60%;
-    width: 100%;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row40
-{
-    height: 40%;
-    width: 100%;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row35
-{
-    height: 35%;
-    width: 100%;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row30
-{
-    height: 30%;
-    width: 100%;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row25
-{
-    height: 25%;
-    width: 100%;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row20
-{
-    height: 20%;
-    width: 100%;
-    float: left;
-    position: relative;
-}
-
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .row10
-{
-    height: 10%;
-    width: 100%;
-    float: left;
-    position: relative;
+    border-image: url("coui://gfx/ui/skin/line_gold.png") 0% 0% 100% 0%;
+    border-image-outset: 0 0 0.5rem 0;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .with-small-dialog-background
@@ -527,20 +338,7 @@
     position: relative;
     /*padding-top : 1.0rem;*/
 }
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column45
-{
-    width: 45%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .column55
-{
-    width: 55%;
-    height: 100%;
-    position: relative;
-    float : left;
-}
+
 
 
 
@@ -603,7 +401,6 @@
     position: relative;
     float: left;
 
-    /*border: 4px solid purple;*/
 }
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-row
 {
@@ -618,28 +415,7 @@
     height: 100%;
     margin-bottom: 1.0rem;
 }
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-column
-{
-    width: 25%;
-    height: 100%;
-
-    float: left;
-    position: relative;
-    /*border: 4px solid brown;*/
-}
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-column-mid
-{
-    width: 50%;
-    height: 100%;
-
-    float: left;
-    position: relative;
-
-    /*background-image: url("coui://gfx/ui/skin/popup_background_449x250.png");
-    background-size: 100% 100%;
-    background-repeat: no-repeat;*/
-}
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-column .avatar-button
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-button
 {
     height: 4.1rem;
     width: 4.5rem;
@@ -652,7 +428,7 @@
 
     position: absolute;    
 }
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-column-mid .avatar-image-container
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-image-container
 {
     width: 13.0rem;
     height: 16.0rem;
@@ -664,9 +440,8 @@
     margin: auto;
 
     position: absolute;
-    /*border: 4px solid red;*/
 }
-.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-column-mid .avatar-image-container > img
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .avatar-changer-container .avatar-container .avatar-image-container > img
 {
     max-height: 100%;
     max-width: 100%;
@@ -706,6 +481,38 @@
 {
     margin-top: 0.4rem;
     margin-bottom: 0.4rem;
+}
+
+
+.origin-customizer-screen .l-origin-customizer-dialog-container .is-center
+{
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+
+    position: absolute;
+}
+
+.origin-customizer-screen .l-origin-customizer-dialog-container .is-vertical-center
+{
+    top: 0;
+    bottom: 0;
+    margin-top: auto;
+    margin-bottom: auto;
+
+    position: absolute;
+}
+
+.origin-customizer-screen .l-origin-customizer-dialog-container .is-horizontal-center
+{
+    right: 0;
+    left: 0;
+    margin-left: auto;
+    margin-right: auto;
+
+    position: absolute;
 }
 
 

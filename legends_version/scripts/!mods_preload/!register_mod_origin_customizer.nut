@@ -4,18 +4,20 @@ this.getroottable().OriginCustomizer.Version <- version;
 this.getroottable().OriginCustomizer.Name <- "mod_origin_customizer_legends";
 
 // register CSS
-::mods_registerCSS("origin_customizer_controls.css");
 ::mods_registerCSS("origin_customizer_screen.css");
-::mods_registerCSS("origin_customizer_factions.css");
-::mods_registerCSS("origin_customizer_settlements.css");
-::mods_registerCSS("origin_customizer_popup_dialogs.css");
+::mods_registerCSS("control/origin_customizer_controls.css");
+::mods_registerCSS("child/origin_customizer_factions.css");
+::mods_registerCSS("child/origin_customizer_settlements.css");
+::mods_registerCSS("child/origin_customizer_locations.css");
+::mods_registerCSS("child/origin_customizer_popup_dialogs.css");
 
 // register JS
-::mods_registerJS("origin_customizer_controls.js");
 ::mods_registerJS("origin_customizer_screen.js");
-::mods_registerJS("origin_customizer_factions.js");
-::mods_registerJS("origin_customizer_settlements.js");
-::mods_registerJS("origin_customizer_popup_dialogs.js");
+::mods_registerJS("control/origin_customizer_controls.js");
+::mods_registerJS("child/origin_customizer_factions.js");
+::mods_registerJS("child/origin_customizer_settlements.js");
+::mods_registerJS("child/origin_customizer_locations.js");
+::mods_registerJS("child/origin_customizer_popup_dialogs.js");
 
 // register hooks
 ::mods_registerMod(this.OriginCustomizer.Name, version, "NgGH's Hard Work");
@@ -28,5 +30,6 @@ this.getroottable().OriginCustomizer.Name <- "mod_origin_customizer_legends";
 	this.OriginCustomizer.hookScenarios();
 	this.OriginCustomizer.hookContracts();
 	this.OriginCustomizer.hookBuildings();
+	this.OriginCustomizer.hookLocation();
 	this.OriginCustomizer.hookAttachedLocation();
 });
