@@ -126,6 +126,7 @@ OriginCustomizerScreen.prototype.updateSettlementDetailsPanel = function(_elemen
         var data = _element.data('entry');
 
         this.mSettlement.Name.setInputText(data.Name);
+        this.mSettlement.Image.attr('src', Path.GFX + data.ImagePath);
         this.updateSideListScroll(data);
         
         for (var i = 0; i < data.Buildings.length; i++) {
@@ -163,42 +164,41 @@ OriginCustomizerScreen.prototype.updateSettlementDetailsPanel = function(_elemen
 
 OriginCustomizerScreen.prototype.updateSideListScroll = function (_data)
 {
-    this.mSettlement.SideListScroll.empty();
+    this.mSettlement.Attachments.empty();
+    this.mSettlement.Situations.empty();
+   
+    var data = _data.Attachments;
+    // create the add-new-attached-location button
+    this.addAttachmentEntry({
+        ImagePath: 'ui/buttons/free_building_slot_icon.png',
+        ID: 'origincustomizer.freeattachmentslot',
+    });
 
-    if (this.mSettlement.IsViewingAttachment === true) {
-        var data = _data.Attachments;
-
-        // create the add-new-attached-location button
-        this.addAttachmentEntry({
-            ImagePath: 'ui/buttons/free_building_slot_icon.png',
-            ID: 'origincustomizer.freeattachmentslot',
-        });
-
-        for (var i = 0; i < data.length; i++) {
-            this.addAttachmentEntry(data[i]);
-        }
+    for (var i = 0; i < data.length; i++) {
+        this.addAttachmentEntry(data[i]);
     }
-    else {
-        var data = _data.Situations;
-        var row = $('<div class="situation-row"/>');
-        this.mSettlement.SideListScroll.append(row);
+    
 
-        var containerLayout = $('<div class="l-situations-group-container"/>');
-        var container = $('<div class="l-situation-groups-container"/>');
-        containerLayout.append(container);
 
-        for (var i = 0; i < data.length; i++) {
-            this.addSituationEntry(data[i], container, false);
-        }
+    var data = _data.Situations;
+    var row = $('<div class="situation-row"/>');
+    this.mSettlement.Situations.append(row);
 
-        // create the add-new-attached-location button
-        this.addSituationEntry({
-            ImagePath: 'ui/buttons/free_slot_icon.png',
-            ID: 'origincustomizer.freesituationslot',
-        }, container, true);
+    var containerLayout = $('<div class="l-situations-group-container"/>');
+    var container = $('<div class="l-situation-groups-container"/>');
+    containerLayout.append(container);
 
-        row.append(containerLayout);
+    for (var i = 0; i < data.length; i++) {
+        this.addSituationEntry(data[i], container, false);
     }
+
+    // create the add-new-attached-location button
+    this.addSituationEntry({
+        ImagePath: 'ui/buttons/free_slot_icon.png',
+        ID: 'origincustomizer.freesituationslot',
+    }, container, true);
+
+    row.append(containerLayout);
 };
 
 OriginCustomizerScreen.prototype.addSituationEntry = function (_data, _parentDiv, _isButton)
@@ -221,7 +221,7 @@ OriginCustomizerScreen.prototype.addAttachmentEntry = function (_data)
 {
     var isButton = _data.ID === 'origincustomizer.freeattachmentslot';
     var entry = $('<div class="attach-row"/>');
-    this.mSettlement.SideListScroll.append(entry);
+    this.mSettlement.Attachments.append(entry);
     var image = entry.createImage(Path.GFX + _data.ImagePath, function(_image)
     {
         _image.centerImageWithinParent(0, 0, 1.0);

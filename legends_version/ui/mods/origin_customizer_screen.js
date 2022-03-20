@@ -165,12 +165,15 @@ var OriginCustomizerScreen = function(_parent)
     {
         Data               : null,
         Name               : null,
+        Image              : null,
         Selected           : null,
         Buildings          : null,
         OwnerBanner        : null,
         FactionBanner      : null,
-        SideButton         : null,
-        SideListScroll     : null,
+        //SideButton         : null,
+        //SideListScroll     : null,
+        Situations         : null,
+        Attachments        : null,
         ListContainer      : null,
         ListScrollContainer: null,
         IsViewingAttachment: true,
@@ -318,14 +321,15 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
     var column = $('<div class="column77"/>');
     _parentDiv.append(column);
     {
-        var row75 = $('<div class="row75"/>');
-        column.append(row75);
+        
+        var column78 = $('<div class="column78"/>');
+        column.append(column78);
         {
-            var column78 = $('<div class="column78"/>');
-            row75.append(column78);
+            var row75 = $('<div class="row75"/>');
+            column78.append(row75);
             {
                 var leftHalf = $('<div class="column50"/>');
-                column78.append(leftHalf);
+                row75.append(leftHalf);
                 {
                     var row25 = $('<div class="row25"/>');
                     leftHalf.append(row25);
@@ -346,6 +350,12 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                     {
                         var column75 = $('<div class="column75"/>');
                         row30.append(column75);
+                        var imageContainer = $('<div class="s-image-container"/>');
+                        column75.append(imageContainer);
+
+                        this.mSettlement.Image = imageContainer.createImage(null, function(_image) {
+                            _image.fitImageToParent(0, 0);
+                        }, null, '');
 
                         var column25 = $('<div class="column25"/>');
                         row30.append(column25);
@@ -413,47 +423,135 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                 }
 
                 var rightHalf = $('<div class="column50 with-dialog-background"/>');
-                column78.append(rightHalf);
+                row75.append(rightHalf);
                 {
+                    var row = $('<div class="faction-button-row"></div>');
+                    row.css('margin-top', '2.0rem');
+                    rightHalf.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Shut Down", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
 
+                    var row = $('<div class="faction-button-row"></div>');
+                    rightHalf.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Change Type", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
+
+
+                    var row = $('<div class="faction-button-row"></div>');
+                    rightHalf.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Send Caravan", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
+
+                    
+                    var row = $('<div class="faction-button-row"></div>');
+                    rightHalf.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Send Mercenary", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
+
+                    
+                    var row = $('<div class="faction-button-row"></div>');
+                    rightHalf.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Refresh Shops", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
+
+                    
+                    var row = $('<div class="faction-button-row"></div>');
+                    rightHalf.append(row);
+                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton("Refresh Roster", function ()
+                    {
+                        //self.notifyBackendNewCampaignButtonPressed();
+                    }, '', 4);
                 }
             }
 
-            var column22 = $('<div class="column22 with-scroll-tooltip-background"/>');
-            row75.append(column22);
+            var row25 = $('<div class="row25 with-small-dialog-background"/>');
+            column78.append(row25);
+            {
+                var buildingsContainer = $('<div class="s-building-container"/>');
+                row25.append(buildingsContainer);
+
+                this.mSettlement.Buildings = [];
+                for (var i = 0; i < 4; i++) {
+                    this.createSettlementBuildingSlot(i, buildingsContainer);
+                }
+            }
+        }
+
+        var column22 = $('<div class="column22"/>');
+        column.append(column22);
+        {
+            var row = $('<div class="row35 with-scroll-tooltip-background"/>');
+            column22.append(row);
             {
                 var scrollHeader = $('<div class="title-scroll-header-container"/>');
-                column22.append(scrollHeader);
+                row.append(scrollHeader);
                 /*var title = $('<div class="title-scroll-header title-font-big font-color-ink">Attachments</div>');
                 scrollHeader.append(title);*/
 
                 var buttonLayout = $('<div class="s-button-center"/>');
                 scrollHeader.append(buttonLayout);
 
-                this.mSettlement.SideButton = buttonLayout.createTextButton("Attachments", function ()
+                var button = buttonLayout.createTextButton("Situations", function ()
                 {
-                    self.switchBetweenSituationsAttachments();
+                    //self.switchBetweenSituationsAttachments();
                 }, '', 7);
 
                 var slotContainer = $('<div class="s-attach-container"/>');
-                column22.append(slotContainer);
+                slotContainer.css('height', '16.0rem');
+                row.append(slotContainer);
 
                 var listContainerLayout = $('<div class="l-list-container"/>');
                 slotContainer.append(listContainerLayout);
                 var listContainer = listContainerLayout.createList(1);
-                this.mSettlement.SideListScroll = listContainer.findListScrollContainer();
+                this.mSettlement.Situations = listContainer.findListScrollContainer();
             }
-        }
 
-        var row = $('<div class="row25 with-small-dialog-background"/>');
-        column.append(row);
-        {
-            var buildingsContainer = $('<div class="s-building-container"/>');
-            row.append(buildingsContainer);
+            var row = $('<div class="row65 with-scroll-tooltip-background"/>');
+            column22.append(row);
+            {
+                var scrollHeader = $('<div class="title-scroll-header-container"/>');
+                row.append(scrollHeader);
+                /*var title = $('<div class="title-scroll-header title-font-big font-color-ink">Attachments</div>');
+                scrollHeader.append(title);*/
 
-            this.mSettlement.Buildings = [];
-            for (var i = 0; i < 6; i++) {
-                this.createSettlementBuildingSlot(i, buildingsContainer);
+                var buttonLayout = $('<div class="s-button-center"/>');
+                scrollHeader.append(buttonLayout);
+
+                var button = buttonLayout.createTextButton("Attachments", function ()
+                {
+                    //self.switchBetweenSituationsAttachments();
+                }, '', 7);
+
+                var slotContainer = $('<div class="s-attach-container"/>');
+                slotContainer.css('height', '33.0rem');
+                row.append(slotContainer);
+
+                var listContainerLayout = $('<div class="l-list-container"/>');
+                slotContainer.append(listContainerLayout);
+                var listContainer = listContainerLayout.createList(1);
+                this.mSettlement.Attachments = listContainer.findListScrollContainer();
             }
         }
     }
@@ -566,7 +664,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                     var button = buttonLayout.createTextButton("View Settlements", function ()
                     {
                         //self.notifyBackendNewCampaignButtonPressed();
-                    }, '', 7);
+                    }, '', 4);
 
                     // 2nd button
                     var row = $('<div class="faction-button-row"></div>');

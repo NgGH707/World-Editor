@@ -168,6 +168,11 @@ this.origin_customizer_screen <- {
 				}
 				else
 				{
+					if (b.getID() == "building.crowd" || b.getID() == "building.marketplace")
+					{
+						continue;
+					}
+
 					buildings.push({
 						ID = b.getID(),
 						ImagePath = b.m.UIImage + ".png",
@@ -175,7 +180,7 @@ this.origin_customizer_screen <- {
 					});
 				}
 
-				if (i == 5)
+				if (buildings.len() == 4)
 				{
 					break;
 				}

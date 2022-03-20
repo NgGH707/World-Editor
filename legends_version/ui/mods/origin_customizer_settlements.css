@@ -27,8 +27,6 @@
     left: 3.0rem;
 
     position: absolute;
-
-    border: 1px solid green;
 }
 .origin-customizer-screen > .l-origin-customizer-dialog-container .content .scroll-container .l-settlement-row .l-settlement-image-container > img
 {
@@ -177,37 +175,37 @@
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building0
 {
     position: absolute;
-    left: 1.5rem;
+    left: 7.0rem;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building1
 {
     position: absolute;
-    left: 16.5rem;
+    left: 22.0rem;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building2
 {
     position: absolute;
-    left: 31.5rem;
+    left: 37.0rem;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building3
 {
     position: absolute;
-    left: 46.5rem;
+    left: 52.0rem;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building4
 {
     position: absolute;
-    left: 61.5rem;
+    left: 67.0rem;
 }
 
 .origin-customizer-screen > .l-origin-customizer-dialog-container .building5
 {
     position: absolute;
-    left: 76.5rem;
+    left: 82.0rem;
 }
 
 /****Owner & Faction banners***
@@ -238,6 +236,18 @@
     bottom: 0;
     height: 4.1rem;
     width: 4.5rem;
+    position: absolute;
+    margin: auto;
+}
+
+.origin-customizer-screen > .l-origin-customizer-dialog-container .content .s-image-container
+{
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 16.0rem;
+    height: 12.0rem;
     position: absolute;
     margin: auto;
 }
