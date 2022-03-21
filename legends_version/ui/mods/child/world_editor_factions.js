@@ -1,6 +1,5 @@
 
-
-OriginCustomizerScreen.prototype.addFactionsData = function (_data)
+WorldEditorScreen.prototype.addFactionsData = function (_data)
 {
     this.mFaction.ListScrollContainer.empty();
     this.mFaction.Data = _data;
@@ -14,7 +13,7 @@ OriginCustomizerScreen.prototype.addFactionsData = function (_data)
     this.selectFactionListEntry(this.mFaction.ListContainer.findListEntryByIndex(0), true);
 };
 
-OriginCustomizerScreen.prototype.addFactionListEntry = function (_data, _index)
+WorldEditorScreen.prototype.addFactionListEntry = function (_data, _index)
 {
     var result = $('<div class="l-row"/>');
 
@@ -86,7 +85,7 @@ OriginCustomizerScreen.prototype.addFactionListEntry = function (_data, _index)
     progressbarContainer.append(progressbarLabel);
 };
 
-OriginCustomizerScreen.prototype.selectFactionListEntry = function(_element, _scrollToEntry)
+WorldEditorScreen.prototype.selectFactionListEntry = function(_element, _scrollToEntry)
 {
     if (_element !== null && _element.length > 0)
     {
@@ -108,31 +107,21 @@ OriginCustomizerScreen.prototype.selectFactionListEntry = function(_element, _sc
     }
 };
 
-OriginCustomizerScreen.prototype.updateFactionDetailsPanel = function(_element)
+WorldEditorScreen.prototype.updateFactionDetailsPanel = function(_element)
 {
     if(_element !== null && _element.length > 0)
     {
         var data = _element.data('entry');
         
-        this.mFaction.Banner.attr('src', Path.GFX + data.ImagePath);
         this.mFaction.Name.setInputText(data.Name);
+        this.mFaction.Banner.attr('src', Path.GFX + data.ImagePath);
         this.mFaction.PrevButton.enableButton(data.NoChangeName !== true);
         this.mFaction.NextButton.enableButton(data.NoChangeName !== true);
         this.addContractToFactionDetail(data.Contracts);
-
-        /*if ('Landlord' in data && data.Landlord !== undefined && data.Landlord !== null)
-        {
-            this.mFaction.Landlord.attr('src', Path.GFX + data.Landlord);
-            this.mFaction.LandlordContainer.removeClass('display-none').addClass('display-block');
-        }
-        else
-        {
-            this.mFaction.LandlordContainer.removeClass('display-block').addClass('display-none');
-        }*/
     }
 };
 
-OriginCustomizerScreen.prototype.addContractToFactionDetail = function(_data) 
+WorldEditorScreen.prototype.addContractToFactionDetail = function(_data) 
 {
     var self = this;
     this.mFaction.Contracts.empty();
@@ -142,32 +131,34 @@ OriginCustomizerScreen.prototype.addContractToFactionDetail = function(_data)
         for (var i = 0; i < _data.length; ++i)
         {
             var entry = _data[i];
-            var classes = 'display-block is-contract contract' + i;
-            var contract = this.mFaction.Contracts.createImage(Path.GFX + entry.Icon + '.png', null, null, classes);
-            var scroll = this.mFaction.Contracts.createImage(Path.GFX + 'ui/icons/scroll_0' + (_data.IsNegotiated ? 1 : 2) + '.png', null, null, 'display-block is-scroll contract' + i);
-            var difficulty = this.mFaction.Contracts.createImage(Path.GFX + entry.DifficultyIcon + '.png', null, null, 'display-block is-difficulty contract' + i);
+            var a = 2.0 + i * 6.0;
+            var contract = this.mFaction.Contracts.createImage(Path.GFX + entry.Icon + '.png', null, null, 'display-block is-contract');
+            var scroll = this.mFaction.Contracts.createImage(Path.GFX + 'ui/icons/scroll_0' + (_data.IsNegotiated ? 1 : 2) + '.png', null, null, 'display-block is-scroll');
+            var difficulty = this.mFaction.Contracts.createImage(Path.GFX + entry.DifficultyIcon + '.png', null, null, 'display-block is-difficulty');
+
+            contract.css('left', a + 'rem');
+            scroll.css('left', a + 'rem');
+            difficulty.css('left', a + 'rem');
 
             // set up event listeners
-            contract.click(function(_event)
-            {
+            contract.click(function(_event) {
                 //if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
-                    //self.notifyBackendContractRemoved(_data.ID);
+                    //self.(_data.ID);
                 //else
-                    //self.notifyBackendContractClicked(_data.ID);
+                    //self.(_data.ID);
             });
-            contract.mouseover(function()
-            {
+            contract.mouseover(function() {
                 this.classList.add('is-highlighted');
                 scroll.addClass('is-highlighted');
                 difficulty.addClass('is-highlighted');
             });
-            contract.mouseout(function()
-            {
+            contract.mouseout(function() {
                 this.classList.remove('is-highlighted');
                 scroll.removeClass('is-highlighted');
                 difficulty.removeClass('is-highlighted');
             });
-            contract.bindTooltip({ contentType: 'ui-element', elementId: entry.ID, elementOwner: 'origincustomizer.faction_contracts' });
+
+            contract.bindTooltip({ contentType: 'ui-element', elementId: entry.ID, elementOwner: 'woditor.faction_contracts' });
 
             if (i === 11)
                 break;

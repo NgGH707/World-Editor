@@ -1,4 +1,4 @@
-this.getroottable().OriginCustomizer.createLib <- function ()
+this.getroottable().Woditor.createLib <- function ()
 {
 	local gt = this.getroottable();
 	gt.Const.PercentageNoteString <- " The value is calculated in percentage. The default value is 100 which means 100%."
@@ -260,14 +260,14 @@ this.getroottable().OriginCustomizer.createLib <- function ()
 
 
 	// processing the spawnlist so i can add them as entry to the mod ui
-	gt.OriginCustomizer.TroopKeys <- {};
-	gt.OriginCustomizer.TroopNames <- {};
+	gt.Woditor.TroopKeys <- {};
+	gt.Woditor.TroopNames <- {};
 
 	foreach (key, entry in this.Const.World.Spawn.Troops)
 	{
-		if (!(entry.Script in gt.OriginCustomizer.TroopKeys))
+		if (!(entry.Script in gt.Woditor.TroopKeys))
 		{
-			gt.OriginCustomizer.TroopKeys[entry.Script] <- key;
+			gt.Woditor.TroopKeys[entry.Script] <- key;
 		}
 		else
 		{
@@ -324,21 +324,21 @@ this.getroottable().OriginCustomizer.createLib <- function ()
 			break;
 		}
 
-		gt.OriginCustomizer.TroopNames[entry.Script] <- prefix + gt.Const.Strings.EntityName[entry.ID] + postfix;
+		gt.Woditor.TroopNames[entry.Script] <- prefix + gt.Const.Strings.EntityName[entry.ID] + postfix;
 	}
 
-	gt.OriginCustomizer.getTroopKey <- function(_entry)
+	gt.Woditor.getTroopKey <- function(_entry)
 	{
-		return this.OriginCustomizer.TroopKeys[_entry.Script];
+		return this.Woditor.TroopKeys[_entry.Script];
 	};
-	gt.OriginCustomizer.getTroopName <- function(_entry)
+	gt.Woditor.getTroopName <- function(_entry)
 	{
-		return this.OriginCustomizer.TroopNames[_entry.Script];
+		return this.Woditor.TroopNames[_entry.Script];
 	};
-	gt.OriginCustomizer.getTroopIcon <- function(_entry)
+	gt.Woditor.getTroopIcon <- function(_entry)
 	{
 		return "ui/orientation/" + this.Const.EntityIcon[_entry.ID] + ".png";
 	};
 
-	delete this.OriginCustomizer.createLib;
+	delete this.Woditor.createLib;
 }

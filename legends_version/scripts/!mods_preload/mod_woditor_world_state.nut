@@ -1,4 +1,4 @@
-this.getroottable().OriginCustomizer.hookWorldState <- function ()
+this.getroottable().Woditor.hookWorldState <- function ()
 {
 	::mods_hookNewObjectOnce("states/world_state", function( obj ) 
 	{
@@ -6,8 +6,8 @@ this.getroottable().OriginCustomizer.hookWorldState <- function ()
 		obj.onInitUI = function()
 		{
 			init_ui();
-			this.m.OriginCustomizerScreen <- this.new("scripts/ui/screens/mods/origin_customizer_screen");
-			this.m.OriginCustomizerScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
+			this.m.WorldEditorScreen <- this.new("scripts/ui/screens/mods/origin_customizer_screen");
+			this.m.WorldEditorScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
 			this.initLoadingScreenHandler();
 		}
 
@@ -15,46 +15,46 @@ this.getroottable().OriginCustomizer.hookWorldState <- function ()
 		obj.onDestroyUI = function()
 		{
 			destroy_ui();
-			this.m.OriginCustomizerScreen.destroy();
-			this.m.OriginCustomizerScreen = null;
+			this.m.Woditor.destroy();
+			this.m.Woditor = null;
 		}
 
-		obj.showOriginCustomizerScreen <- function()
+		obj.showWorldEditorScreen <- function()
 		{
-			if (!this.m.OriginCustomizerScreen.isVisible() && !this.m.OriginCustomizerScreen.isAnimating())
+			if (!this.m.WorldEditorScreen.isVisible() && !this.m.WorldEditorScreen.isAnimating())
 			{
 				this.m.CustomZoom = this.World.getCamera().Zoom;
 				this.World.getCamera().zoomTo(1.0, 4.0);
 				this.World.Assets.updateFormation();
 				this.setAutoPause(true);
-				this.m.OriginCustomizerScreen.show();
+				this.m.WorldEditorScreen.show();
 				this.m.WorldScreen.hide();
 				this.Cursor.setCursor(this.Const.UI.Cursor.Hand);
 				this.m.MenuStack.push(function ()
 				{
 					this.World.getCamera().zoomTo(this.m.CustomZoom, 4.0);
-					this.m.OriginCustomizerScreen.hide();
+					this.m.WorldEditorScreen.hide();
 					this.m.WorldScreen.show();
 					this.World.Assets.refillAmmo();
 					this.updateTopbarAssets();
 					this.setAutoPause(false);
 				}, function ()
 				{
-					return !this.m.OriginCustomizerScreen.isAnimating();
+					return !this.m.WorldEditorScreen.isAnimating();
 				});
 			}
 		}
 
-		obj.toggleOriginCustomizerScreen <- function()
+		obj.toggleWorldEditorScreen <- function()
 		{
-			if (this.m.OriginCustomizerScreen.isVisible())
+			if (this.m.WorldEditorScreen.isVisible())
 			{
 				this.m.MenuStack.pop();
 				return false;
 			}
 			else
 			{
-				this.showOriginCustomizerScreen();
+				this.showWorldEditorScreen();
 				return true;
 			}
 		}
@@ -68,12 +68,12 @@ this.getroottable().OriginCustomizer.hookWorldState <- function ()
 				{
 					if (!this.m.CharacterScreen.isVisible() && !this.m.WorldTownScreen.isVisible() && !this.m.EventScreen.isVisible() && !this.m.EventScreen.isAnimating())
 					{
-						return this.toggleOriginCustomizerScreen();
+						return this.toggleWorldEditorScreen();
 					}
 				}
 			}
 		}
 	});
 
-	delete this.OriginCustomizer.hookWorldState;
+	delete this.Woditor.hookWorldState;
 }

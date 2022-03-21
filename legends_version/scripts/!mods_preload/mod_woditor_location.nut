@@ -1,4 +1,4 @@
-this.getroottable().OriginCustomizer.hookLocation <- function ()
+this.getroottable().Woditor.hookLocation <- function ()
 {
 	::mods_hookExactClass("entity/world/location", function( obj ) 
 	{
@@ -9,8 +9,14 @@ this.getroottable().OriginCustomizer.hookLocation <- function ()
 			if (body.HasBrush)
 			{
 				local string = body.getBrush().Name;
-				local new = string.slice(6);
-				return "ui/locations/" + new + ".png";
+				local find = string.slice(0, 6);
+
+				if (find == "world_")
+				{
+					return "ui/locations/" + string.slice(6) + ".png";
+				}
+
+				return "ui/locations/" + string + ".png";
 			}
 			
 			return null;
@@ -34,5 +40,5 @@ this.getroottable().OriginCustomizer.hookLocation <- function ()
 		};
 	});
 
-	delete this.OriginCustomizer.hookLocation;
+	delete this.Woditor.hookLocation;
 }

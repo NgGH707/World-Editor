@@ -1,6 +1,6 @@
 
 
-OriginCustomizerScreen.prototype.createScenarioPopupDialog = function() 
+WorldEditorScreen.prototype.createScenarioPopupDialog = function() 
 {
     var self = this;
 
@@ -37,7 +37,7 @@ OriginCustomizerScreen.prototype.createScenarioPopupDialog = function()
     this.mScenario.Description = descriptionContainer.findListScrollContainer();
     this.addScenariosToList(this.mScenario.Data);
 };
-OriginCustomizerScreen.prototype.createScenarioDialogContent = function(_dialog) 
+WorldEditorScreen.prototype.createScenarioDialogContent = function(_dialog) 
 {
     var self = this;
     var content = $('<div class="scenarios-content-container"/>');
@@ -56,7 +56,7 @@ OriginCustomizerScreen.prototype.createScenarioDialogContent = function(_dialog)
     return content;
 };
 
-OriginCustomizerScreen.prototype.addScenarioEntryToList = function (_data)
+WorldEditorScreen.prototype.addScenarioEntryToList = function (_data)
 {
     var row = $('<div class="l-row"/>');
     var entry = $('<div class="list-entry list-entry-small-fit"><span class="label text-font-normal font-color-label">' + _data.Name + '</span></div></div>');
@@ -96,7 +96,7 @@ OriginCustomizerScreen.prototype.addScenarioEntryToList = function (_data)
     this.mScenario.ListScrollContainer.append(row);
 };
 
-OriginCustomizerScreen.prototype.addScenariosToList = function (_scenarios)
+WorldEditorScreen.prototype.addScenariosToList = function (_scenarios)
 {
     if (_scenarios !== null && jQuery.isArray(_scenarios))
     {
@@ -124,7 +124,7 @@ OriginCustomizerScreen.prototype.addScenariosToList = function (_scenarios)
 };
 
 
-OriginCustomizerScreen.prototype.selectFirstScenario = function()
+WorldEditorScreen.prototype.selectFirstScenario = function()
 {
     // deselect all entries first
     this.mScenario.ListScrollContainer.find('.is-selected').each(function (index, el)
@@ -142,7 +142,7 @@ OriginCustomizerScreen.prototype.selectFirstScenario = function()
     }
 };
 
-OriginCustomizerScreen.prototype.updateScenarioDescription = function (_data)
+WorldEditorScreen.prototype.updateScenarioDescription = function (_data)
 {
     if (_data !== null && 'Description' in _data && typeof(_data.Description) == 'string')
     {

@@ -1,7 +1,8 @@
 
-OriginCustomizerScreen.prototype.createSettlementBuildingSlot = function (_index, _parentDiv)
+WorldEditorScreen.prototype.createSettlementBuildingSlot = function (_index, _parentDiv)
 {
-    var slot = $('<div class="is-building-slot building' + _index + '"/>');
+    var slot = $('<div class="is-building-slot"/>');
+    slot.css('left', (1.5 + _index * 17.0) + 'rem');
     _parentDiv.append(slot);
     this.mSettlement.Buildings[_index] = slot.createImage(Path.GFX + 'ui/buttons/free_building_slot_icon.png', function(_image)
     {
@@ -24,10 +25,10 @@ OriginCustomizerScreen.prototype.createSettlementBuildingSlot = function (_index
     {
         this.classList.remove('is-highlighted');
     });
-    this.mSettlement.Buildings[_index].bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+    this.mSettlement.Buildings[_index].bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
 };
 
-OriginCustomizerScreen.prototype.addSettlementsData = function (_data)
+WorldEditorScreen.prototype.addSettlementsData = function (_data)
 {
     this.mSettlement.ListScrollContainer.empty();
     this.mSettlement.Data = _data;
@@ -41,7 +42,7 @@ OriginCustomizerScreen.prototype.addSettlementsData = function (_data)
     this.selectSettlementListEntry(this.mSettlement.ListContainer.findListEntryByIndex(0), true);
 };
 
-OriginCustomizerScreen.prototype.addSettlementListEntry = function(_data, _index)
+WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
 {
     var result = $('<div class="l-settlement-row"/>');
 
@@ -83,7 +84,7 @@ OriginCustomizerScreen.prototype.addSettlementListEntry = function(_data, _index
     entry.append(name);
 };
 
-OriginCustomizerScreen.prototype.selectSettlementListEntry = function(_element, _scrollToEntry)
+WorldEditorScreen.prototype.selectSettlementListEntry = function(_element, _scrollToEntry)
 {
     if (_element !== null && _element.length > 0)
     {
@@ -105,13 +106,15 @@ OriginCustomizerScreen.prototype.selectSettlementListEntry = function(_element, 
     }
 };
 
-OriginCustomizerScreen.prototype.updateSettlementDetailsPanel = function(_element)
+WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
 {
     if(_element !== null && _element.length > 0)
     {
         var data = _element.data('entry');
 
         this.mSettlement.Name.setInputText(data.Name);
+        this.mSettlement.Resources.val('' + data.Resources + '');
+        this.mSettlement.Wealth.val('' + data.Wealth + '%');
         this.mSettlement.Image.attr('src', Path.GFX + data.ImagePath);
         this.updateSideListScroll(data);
         
@@ -124,79 +127,71 @@ OriginCustomizerScreen.prototype.updateSettlementDetailsPanel = function(_elemen
                     continue;
 
                 image.attr('src', Path.GFX + 'ui/buttons/free_building_slot_icon.png');
-                image.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+                image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
             }
             else {
+                if (image.attr('src') == Path.GFX + entry.ImagePath)
+                    continue;
+
                 image.attr('src', Path.GFX + entry.ImagePath);
-                image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId , elementOwner: 'origincustomizer.buildings'});
+                image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId , elementOwner: 'woditor.buildings'});
             }
         }
 
         var noOwner = data.Owner === undefined || data.Owner === null;
         var isTheSame = !noOwner && data.Owner === data.Faction;
-        var image = this.mSettlement.OwnerBanner.find('img:first');
-
         this.mSettlement.FactionBanner.attr('src', Path.GFX + this.mFaction.Data[data.Faction].ImagePath);
 
-        if (noOwner || isTheSame) {
-            this.mSettlement.OwnerBanner.removeClass('display-block').addClass('display-none');
-        }
-        else {
-            this.mSettlement.OwnerBanner.removeClass('display-none').addClass('display-block');
-            image.attr('src', Path.GFX + this.mFaction.Data[data.Owner].ImagePath);
-        }
+        if (noOwner || isTheSame)
+            this.mSettlement.OwnerBanner.attr('src', Path.GFX + 'ui/banners/add_banner.png');
+        else 
+            this.mSettlement.OwnerBanner.attr('src', Path.GFX + this.mFaction.Data[data.Owner].ImagePath);
     }
 };
 
-OriginCustomizerScreen.prototype.updateSideListScroll = function (_data)
+WorldEditorScreen.prototype.updateSideListScroll = function (_data)
 {
     this.mSettlement.Attachments.empty();
     this.mSettlement.Situations.empty();
    
+    // update attached location list
     var data = _data.Attachments;
     for (var i = 0; i < data.length; i++) {
         this.addAttachmentEntry(data[i]);
     }
-    
 
-
+    // update situation list
     var data = _data.Situations;
     var row = $('<div class="situation-row"/>');
     this.mSettlement.Situations.append(row);
-
     var containerLayout = $('<div class="l-situations-group-container"/>');
     var container = $('<div class="l-situation-groups-container"/>');
     containerLayout.append(container);
-
     for (var i = 0; i < data.length; i++) {
         this.addSituationEntry(data[i], container);
     }
-
     row.append(containerLayout);
 };
 
-OriginCustomizerScreen.prototype.addSituationEntry = function (_data, _parentDiv)
+WorldEditorScreen.prototype.addSituationEntry = function (_data, _parentDiv)
 {
     var image = $('<img/>');
     image.attr('src', Path.GFX + _data.ImagePath);
     _parentDiv.append(image);
 
-    image.click(function(_event)
-    {
+    image.click(function(_event) {
     });
-    image.mouseover(function()
-    {
+    image.mouseover(function() {
         this.classList.add('is-highlighted');
     });
-    image.mouseout(function()
-    {
+    image.mouseout(function() {
         this.classList.remove('is-highlighted');
     });
 
     image.bindTooltip({ contentType: 'settlement-status-effect', statusEffectId: _data.ID });
 };
 
-OriginCustomizerScreen.prototype.addAttachmentEntry = function (_data)
+WorldEditorScreen.prototype.addAttachmentEntry = function (_data)
 {
     var entry = $('<div class="attach-row"/>');
     this.mSettlement.Attachments.append(entry);
@@ -206,21 +201,18 @@ OriginCustomizerScreen.prototype.addAttachmentEntry = function (_data)
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
 
-    image.click(function(_event)
-    {
+    image.click(function(_event) {
         //if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
-            //self.notifyBackendContractRemoved(_data.ID);
+            //self.(_data.ID);
         //else
-            //self.notifyBackendContractClicked(_data.ID);
+            //self.(_data.ID);
     });
-    image.mouseover(function()
-    {
+    image.mouseover(function() {
         this.classList.add('is-highlighted');
     });
-    image.mouseout(function()
-    {
+    image.mouseout(function() {
         this.classList.remove('is-highlighted');
     });
 
-    image.bindTooltip({ contentType: 'ui-element', elementId: _data.ID, elementOwner: 'origincustomizer.attached_location' });
+    image.bindTooltip({ contentType: 'ui-element', elementId: _data.ID, elementOwner: 'woditor.attached_location' });
 };

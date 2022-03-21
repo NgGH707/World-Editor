@@ -1,4 +1,4 @@
-this.getroottable().OriginCustomizer.hookTooltips <- function ()
+this.getroottable().Woditor.hookTooltips <- function ()
 {
 	::mods_hookNewObjectOnce("ui/screens/tooltip/tooltip_events", function( obj ) 
 	{
@@ -34,7 +34,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 	 	{
 	 		if (_elementOwner != null)
 	 		{
-	 			if (_elementOwner == "origincustomizer.faction_contracts")
+	 			if (_elementOwner == "woditor.faction_contracts")
 	 			{
 		 			local contract = this.World.Contracts.getContractsByID(_elementId);
 
@@ -74,7 +74,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					}
 				}
 
-				if (_elementOwner == "origincustomizer.attached_location")
+				if (_elementOwner == "woditor.attached_location")
 	 			{
 	 				local tooltip = this.getAttachedLocationTooltip(_elementId);
 
@@ -91,7 +91,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 
 			if (tooltip != null)
 			{
-				if (_elementOwner != null && _elementOwner == "origincustomizer.buildings")
+				if (_elementOwner != null && _elementOwner == "woditor.buildings")
 				{
 					this.Const.AddBuildingHints(tooltip);
 				}
@@ -101,7 +101,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 
 			switch (_elementId) 
 			{
-			case "origincustomizer.rostertier":
+			case "woditor.rostertier":
 		       	local ret = [
 					{
 						id = 1,
@@ -125,7 +125,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 				}
 				return ret;
 
-			case "origincustomizer.difficultymult":
+			case "woditor.difficultymult":
 		       	return [
 					{
 						id = 1,
@@ -139,7 +139,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.equipmentloot":
+			case "woditor.equipmentloot":
 		       	return [
 					{
 						id = 1,
@@ -153,7 +153,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-		    case "origincustomizer.xp":
+		    case "woditor.xp":
 		       	return [
 					{
 						id = 1,
@@ -167,7 +167,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 			
-		    case "origincustomizer.hiring":
+		    case "woditor.hiring":
 		       	return [
 					{
 						id = 1,
@@ -181,7 +181,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.wage":
+			case "woditor.wage":
 		       	return [
 					{
 						id = 1,
@@ -195,7 +195,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.selling":
+			case "woditor.selling":
 		       	return [
 					{
 						id = 1,
@@ -209,7 +209,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.buying":
+			case "woditor.buying":
 		       	return [
 					{
 						id = 1,
@@ -223,7 +223,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.selling_trade":
+			case "woditor.selling_trade":
 		       	return [
 					{
 						id = 1,
@@ -237,7 +237,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.buying_trade":
+			case "woditor.buying_trade":
 		       	return [
 					{
 						id = 1,
@@ -251,7 +251,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.loot":
+			case "woditor.loot":
 		       	return [
 					{
 						id = 1,
@@ -265,7 +265,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.champion":
+			case "woditor.champion":
 		       	return [
 					{
 						id = 1,
@@ -279,7 +279,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.speed":
+			case "woditor.speed":
 		       	return [
 					{
 						id = 1,
@@ -293,7 +293,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.contractpayment":
+			case "woditor.contractpayment":
 		       	return [
 					{
 						id = 1,
@@ -307,7 +307,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.vision":
+			case "woditor.vision":
 		       	return [
 					{
 						id = 1,
@@ -321,7 +321,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.hp":
+			case "woditor.hp":
 		       	return [
 					{
 						id = 1,
@@ -335,7 +335,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.repair":
+			case "woditor.repair":
 		       	return [
 					{
 						id = 1,
@@ -349,7 +349,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.renown":
+			case "woditor.renown":
 		       	return [
 					{
 						id = 1,
@@ -363,7 +363,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.negotiation":
+			case "woditor.negotiation":
 		       	return [
 					{
 						id = 1,
@@ -377,7 +377,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.recruitmin":
+			case "woditor.recruitmin":
 		       	return [
 					{
 						id = 1,
@@ -391,7 +391,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.recruitmax":
+			case "woditor.recruitmax":
 		       	return [
 					{
 						id = 1,
@@ -405,7 +405,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.craft":
+			case "woditor.craft":
 		       	return [
 					{
 						id = 1,
@@ -419,7 +419,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.tryout":
+			case "woditor.tryout":
 		       	return [
 					{
 						id = 1,
@@ -433,7 +433,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.goodrelation":
+			case "woditor.goodrelation":
 		       	return [
 					{
 						id = 1,
@@ -447,7 +447,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.badrelation":
+			case "woditor.badrelation":
 		       	return [
 					{
 						id = 1,
@@ -461,7 +461,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.brotherscalemax":
+			case "woditor.brotherscalemax":
 		       	return [
 					{
 						id = 1,
@@ -475,7 +475,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.brotherscalemin":
+			case "woditor.brotherscalemin":
 		       	return [
 					{
 						id = 1,
@@ -489,7 +489,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.fooddays":
+			case "woditor.fooddays":
 		       	return [
 					{
 						id = 1,
@@ -503,7 +503,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.footprint":
+			case "woditor.footprint":
 		       	return [
 					{
 						id = 1,
@@ -517,7 +517,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.advancepaymentcap":
+			case "woditor.advancepaymentcap":
 		       	return [
 					{
 						id = 1,
@@ -531,7 +531,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.trainingprice":
+			case "woditor.trainingprice":
 		       	return [
 					{
 						id = 1,
@@ -545,7 +545,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.choose_origin":
+			case "woditor.choose_origin":
 		       	return [
 					{
 						id = 1,
@@ -565,7 +565,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.save_button":
+			case "woditor.save_button":
 		       	return [
 					{
 						id = 1,
@@ -579,7 +579,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.fixedrelation":
+			case "woditor.fixedrelation":
 		       	return [
 					{
 						id = 1,
@@ -594,7 +594,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 				];
 
 			//
-			case "origincustomizer.addnewentry":
+			case "woditor.addnewentry":
 		       	return [
 					{
 						id = 1,
@@ -608,7 +608,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.removeentry":
+			case "woditor.removeentry":
 		       	return [
 					{
 						id = 1,
@@ -622,7 +622,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					}
 				];
 
-			case "origincustomizer.partystrength":
+			case "woditor.partystrength":
 		       	return [
 					{
 						id = 1,
@@ -636,7 +636,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					}
 				];
 
-			case "origincustomizer.championization":
+			case "woditor.championization":
 		       	return [
 					{
 						id = 1,
@@ -650,7 +650,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.dechampionization":
+			case "woditor.dechampionization":
 		       	return [
 					{
 						id = 1,
@@ -664,7 +664,7 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					},
 				];
 
-			case "origincustomizer.choosecoords":
+			case "woditor.choosecoords":
 		       	return [
 					{
 						id = 1,
@@ -674,7 +674,98 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 					{
 						id = 2,
 						type = "description",
-						text = "Show you the world map, after you have hovered your mouse to a desired location, re-open the screen to get the coordinate of the hovering tile so you can start spawning stuff on that tile."
+						text = "Show you the world map, after you have hovered your mouse to a desired location, re-open the screen to get the coordinate of the hovered tile so you can start spawning stuff on that tile."
+					},
+				];
+
+			case "woditor.addrandomtroop":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Add Random Troop"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Automatically pick a random troop either in the current selected template or from master spawn list."
+					},
+				];
+
+			case "woditor.refreshtroops":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Reroll Troops"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Discard the current troops list then use the current template and resources to create a new one. If no template is chosen, it will only discard the troop list."
+					},
+				];
+
+			case "woditor.picktrooptemplate":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Choose Troop List Template"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Choose a template so you can use \'Reroll Troops\' to create a random troop list."
+					},
+				];
+
+			case "woditor.troopsinfo":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Notes"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "There is some notes i have left in the troop name to identify them. Here is what they stand for:"
+					},
+					{
+						id = 3,
+						type = "text",
+						text = "([color=#8f1e1e]W[/color]) - [color=#8f1e1e]W[/color]eaken version."
+					},
+					{
+						id = 4,
+						type = "text",
+						text = "([color=#8f1e1e]B[/color]) - [color=#8f1e1e]B[/color]odyguard."
+					},
+					{
+						id = 5,
+						type = "text",
+						text = "([color=#8f1e1e]R[/color]) - Equipped with [color=#8f1e1e]R[/color]anged weapon."
+					},
+					{
+						id = 6,
+						type = "text",
+						text = "([color=#8f1e1e]P[/color]) - Equipped with [color=#8f1e1e]P[/color]olarm."
+					},
+					{
+						id = 7,
+						type = "text",
+						text = "([color=#8f1e1e]S[/color]) - [color=#8f1e1e]S[/color]mall size."
+					},
+					{
+						id = 8,
+						type = "text",
+						text = "([color=#8f1e1e]M[/color]) - [color=#8f1e1e]M[/color]edium size."
+					},
+					{
+						id = 9,
+						type = "text",
+						text = "([color=#8f1e1e]L[/color]) - [color=#8f1e1e]L[/color]arge size."
 					},
 				];
 			}
@@ -1181,5 +1272,5 @@ this.getroottable().OriginCustomizer.hookTooltips <- function ()
 		}
 	});
 	
-	delete this.OriginCustomizer.hookTooltips;
+	delete this.Woditor.hookTooltips;
 };

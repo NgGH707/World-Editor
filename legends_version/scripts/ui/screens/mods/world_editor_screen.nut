@@ -1,4 +1,4 @@
-this.origin_customizer_screen <- {
+this.world_editor_screen <- {
 	m = {
 		JSHandle = null,
 		Visible = null,
@@ -52,7 +52,7 @@ this.origin_customizer_screen <- {
 		this.m.Visible = false;
 		this.m.Animating = false;
 		this.m.PopupDialogVisible = false;
-		this.m.JSHandle = this.UI.connect("OriginCustomizerScreen", this);
+		this.m.JSHandle = this.UI.connect("WorldEditorScreen", this);
 	}
 
 	function destroy()
@@ -178,7 +178,7 @@ this.origin_customizer_screen <- {
 
 			foreach ( troop in location.getTroops() )
 			{
-				local key = this.OriginCustomizer.getTroopKey(troop);
+				local key = this.Woditor.getTroopKey(troop);
 				local isMiniBoss = troop.Variant != 0;
 				local i = this.lookForTroop(key, troops, isMiniBoss);
 
@@ -189,8 +189,8 @@ this.origin_customizer_screen <- {
 				else
 				{
 					troops.push({
-						Name = this.OriginCustomizer.getTroopName(troop),
-						Icon = this.OriginCustomizer.getTroopIcon(troop),
+						Name = this.Woditor.getTroopName(troop),
+						Icon = this.Woditor.getTroopIcon(troop),
 						Strength = troop.Strength,
 						IsChampion = isMiniBoss,
 						Key = key,
@@ -207,6 +207,7 @@ this.origin_customizer_screen <- {
 				TooltipId = location.getTooltipId(),
 				Banner = location.getUIBanner(),
 				ImagePath = location.getUIImage(),
+				Resources = location.getResources(),
 				Loots = loots,
 				Troops = troops,
 			});
@@ -296,6 +297,8 @@ this.origin_customizer_screen <- {
 				Owner = this.findIdIn(owner, _factions),
 				Faction = this.findIdIn(faction, _factions),
 				ImagePath = settlement.getImagePath(),
+				Wealth = settlement.getWealth(),
+				Resources = settlement.getResources(),
 				IsCoastal = settlement.isCoastal(),
 				IsMilitary = settlement.isMilitary(),
 				IsSouthern = settlement.isSouthern(),

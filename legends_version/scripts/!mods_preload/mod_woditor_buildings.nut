@@ -1,4 +1,4 @@
-this.getroottable().OriginCustomizer.hookBuildings <- function ()
+this.getroottable().Woditor.hookBuildings <- function ()
 {
 	::mods_hookNewObject("ui/screens/world/modules/world_town_screen/town_training_dialog_module", function(obj) 
 	{
@@ -138,5 +138,5 @@ this.getroottable().OriginCustomizer.hookBuildings <- function ()
 		}
 	});
 
-	delete this.OriginCustomizer.hookBuildings;
+	delete this.Woditor.hookBuildings;
 }

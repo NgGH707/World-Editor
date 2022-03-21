@@ -1,13 +1,13 @@
 "use strict";
 
-var OriginCustomizer =
+var WorldEditor =
 {
     Screens: ['General'   , 'Properties'   , 'Factions'   , 'Settlements'   , 'Locations'   , 'Contracts'   ],
     Classes: ['is-general', 'is-properties', 'is-factions', 'is-settlements', 'is-locations', 'is-contracts'],
     Locations: ['Locations', 'Legendary', 'Misc'],
 };
 
-var OriginCustomizerScreen = function(_parent)
+var WorldEditorScreen = function(_parent)
 {
 	this.mSQHandle = null;
 
@@ -48,6 +48,8 @@ var OriginCustomizerScreen = function(_parent)
         Name               : null,
         Image              : null,
         Selected           : null,
+        Wealth             : null,
+        Resources          : null,
         Buildings          : null,
         Situations         : null,
         Attachments        : null,
@@ -67,6 +69,8 @@ var OriginCustomizerScreen = function(_parent)
         Loots              : null,
         Troops             : null,
         Selected           : null,
+        Strength               : null,
+        Resources          : null,
         FilterButton       : null,
         ListContainer      : null,
         ListScrollContainer: null,
@@ -105,65 +109,65 @@ var OriginCustomizerScreen = function(_parent)
         // general properties
         General:
         {
-            BusinessReputationRate  : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/asset_business_reputation.png', TooltipId: 'origincustomizer.renown'},
-            XPMult                  : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/xp_received.png', TooltipId: 'origincustomizer.xp'},
-            HitpointsPerHourMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/days_wounded.png', TooltipId: 'origincustomizer.hp'},
-            RepairSpeedMult         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/repair_item.png', TooltipId: 'origincustomizer.repair'},
-            VisionRadiusMult        : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/vision.png', TooltipId: 'origincustomizer.vision'},
-            FootprintVision         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/tracking_disabled.png', TooltipId: 'origincustomizer.footprint'},
-            MovementSpeedMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/boot.png', TooltipId: 'origincustomizer.speed'},
-            FoodAdditionalDays      : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/asset_daily_food.png', TooltipId: 'origincustomizer.fooddays'},
+            BusinessReputationRate  : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/asset_business_reputation.png', TooltipId: 'woditor.renown'},
+            XPMult                  : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/xp_received.png', TooltipId: 'woditor.xp'},
+            HitpointsPerHourMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/days_wounded.png', TooltipId: 'woditor.hp'},
+            RepairSpeedMult         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/repair_item.png', TooltipId: 'woditor.repair'},
+            VisionRadiusMult        : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/vision.png', TooltipId: 'woditor.vision'},
+            FootprintVision         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/tracking_disabled.png', TooltipId: 'woditor.footprint'},
+            MovementSpeedMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/boot.png', TooltipId: 'woditor.speed'},
+            FoodAdditionalDays      : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/asset_daily_food.png', TooltipId: 'woditor.fooddays'},
         },
 
         // relation properties
         Relation:
         {
-            RelationDecayGoodMult   : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/relation_good.png', TooltipId: 'origincustomizer.goodrelation'},
-            RelationDecayBadMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/relation_bad.png', TooltipId: 'origincustomizer.badrelation'},
+            RelationDecayGoodMult   : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/relation_good.png', TooltipId: 'woditor.goodrelation'},
+            RelationDecayBadMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/relation_bad.png', TooltipId: 'woditor.badrelation'},
         },
 
         // contract properties
         Contract:
         {
-            NegotiationAnnoyanceMult: {Input: null, Value: 100, ValueMin: 1, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/contract_annoyance.png', TooltipId: 'origincustomizer.negotiation'},
-            ContractPaymentMult     : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/contract_payment.png', TooltipId: 'origincustomizer.contractpayment'},
-            AdvancePaymentCap       : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scroll_01.png', TooltipId: 'origincustomizer.advancepaymentcap'},
+            NegotiationAnnoyanceMult: {Input: null, Value: 100, ValueMin: 1, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/contract_annoyance.png', TooltipId: 'woditor.negotiation'},
+            ContractPaymentMult     : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/contract_payment.png', TooltipId: 'woditor.contractpayment'},
+            AdvancePaymentCap       : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scroll_01.png', TooltipId: 'woditor.advancepaymentcap'},
         },
 
         // scaling properties
         Scaling:
         {
-            BrothersScaleMax        : {Input: null, Value:   0, ValueMin: 1, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scaling_max.png', TooltipId: 'origincustomizer.brotherscalemax'},
-            BrothersScaleMin        : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scaling_min.png', TooltipId: 'origincustomizer.brotherscalemin'},
+            BrothersScaleMax        : {Input: null, Value:   0, ValueMin: 1, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scaling_max.png', TooltipId: 'woditor.brotherscalemax'},
+            BrothersScaleMin        : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scaling_min.png', TooltipId: 'woditor.brotherscalemin'},
         },
 
         // recruit properties
         Recruit:
         {
-            RosterSizeAdditionalMax : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/recruit_max.png', TooltipId: 'origincustomizer.recruitmax'},
-            RosterSizeAdditionalMin : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/recruit_min.png', TooltipId: 'origincustomizer.recruitmin'},
-            HiringCostMult          : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/hiring_cost.png', TooltipId: 'origincustomizer.hiring'},
-            TryoutPriceMult         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/tryout_cost.png', TooltipId: 'origincustomizer.tryout'},
-            DailyWageMult           : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/asset_daily_money.png', TooltipId: 'origincustomizer.wage'},
-            TrainingPriceMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/training_cost.png', TooltipId: 'origincustomizer.trainingprice'},
+            RosterSizeAdditionalMax : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/recruit_max.png', TooltipId: 'woditor.recruitmax'},
+            RosterSizeAdditionalMin : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/recruit_min.png', TooltipId: 'woditor.recruitmin'},
+            HiringCostMult          : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/hiring_cost.png', TooltipId: 'woditor.hiring'},
+            TryoutPriceMult         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/tryout_cost.png', TooltipId: 'woditor.tryout'},
+            DailyWageMult           : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/asset_daily_money.png', TooltipId: 'woditor.wage'},
+            TrainingPriceMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/training_cost.png', TooltipId: 'woditor.trainingprice'},
         },
 
         // economy properties
         Economy:
         {
-            TaxidermistPriceMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/crafting_cost.png', TooltipId: 'origincustomizer.craft'},
-            BuyPriceMult            : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/buying.png', TooltipId: 'origincustomizer.buying'},
-            SellPriceMult           : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/selling.png', TooltipId: 'origincustomizer.selling'},
-            BuyPriceTradeMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/buying_player.png', TooltipId: 'origincustomizer.buying_trade'},
-            SellPriceTradeMult      : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/selling_player.png', TooltipId: 'origincustomizer.selling_trade'},
+            TaxidermistPriceMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/crafting_cost.png', TooltipId: 'woditor.craft'},
+            BuyPriceMult            : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/buying.png', TooltipId: 'woditor.buying'},
+            SellPriceMult           : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/selling.png', TooltipId: 'woditor.selling'},
+            BuyPriceTradeMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/buying_player.png', TooltipId: 'woditor.buying_trade'},
+            SellPriceTradeMult      : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/selling_player.png', TooltipId: 'woditor.selling_trade'},
         },
 
         // combat properties
         Combat:
         {
-            ChampionChanceAdditional: {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/miniboss.png', TooltipId: 'origincustomizer.champion'},
-            ExtraLootChance         : {Input: null, Value:   0, ValueMin: 0, ValueMax:  100, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/bag.png', TooltipId: 'origincustomizer.loot'},
-            EquipmentLootChance     : {Input: null, Value:   0, ValueMin: 0, ValueMax:  100, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/grab.png', TooltipId: 'origincustomizer.equipmentloot'},
+            ChampionChanceAdditional: {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/miniboss.png', TooltipId: 'woditor.champion'},
+            ExtraLootChance         : {Input: null, Value:   0, ValueMin: 0, ValueMax:  100, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/bag.png', TooltipId: 'woditor.loot'},
+            EquipmentLootChance     : {Input: null, Value:   0, ValueMin: 0, ValueMax:  100, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/grab.png', TooltipId: 'woditor.equipmentloot'},
         }
     }
 
@@ -218,11 +222,11 @@ var OriginCustomizerScreen = function(_parent)
         Hard     : {Checkbox: null, Label: null, Name: 'Expert'   , TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.EconomicDifficultyHard},
         Legendary: {Checkbox: null, Label: null, Name: 'Legendary', TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.EconomicDifficultyLegendary}
     };
-    this.mFactionFixedRelation = {Checkbox: null, Label: null, Name: 'Stop Relation Deterioration', TooltipId: 'origincustomizer.fixedrelation'};
+    this.mFactionFixedRelation = {Checkbox: null, Label: null, Name: 'Stop Relation Deterioration', TooltipId: 'woditor.fixedrelation'};
 
     // sliders
-    this.mRosterTier           = {Control: null, Title: null, Min: 1, Max:  10, Value:   2, Step: 1, TooltipId: 'origincustomizer.rostertier', Postfix: ''};
-    this.mDifficultyMult       = {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'origincustomizer.difficultymult', Postfix: '%'};
+    this.mRosterTier           = {Control: null, Title: null, Min: 1, Max:  10, Value:   2, Step: 1, TooltipId: 'woditor.rostertier', Postfix: ''};
+    this.mDifficultyMult       = {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.difficultymult', Postfix: '%'};
     this.mFactionRelation      = {Control: null, Title: null, Min: 0, Max: 100, Value:  50, Step: 5, TooltipId: TooltipIdentifier.RelationsScreen.Relations, Postfix: ''};
 
     // buttons
@@ -249,20 +253,20 @@ var OriginCustomizerScreen = function(_parent)
     this.mIsChoosingCoordinate = false;
 };
 
-OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
+WorldEditorScreen.prototype.createDIV = function(_parentDiv)
 {
     var self = this;
 
     // create: containers (init hidden!)
-    this.mContainer = $('<div class="origin-customizer-screen ui-control dialog-modal-background display-none opacity-none"/>');
+    this.mContainer = $('<div class="world-editor-screen ui-control dialog-modal-background display-none opacity-none"/>');
     _parentDiv.append(this.mContainer);
 
     // create: dialog layout (init hidden!)
-    var dialogLayout = $('<div class="l-origin-customizer-dialog-container"/>');
+    var dialogLayout = $('<div class="l-world-editor-dialog-container"/>');
     this.mContainer.append(dialogLayout);
 
     // create: dialog
-    this.mDialogContainer = dialogLayout.createDialog('Origin Customizer', '', '', true, 'dialog-1280-768');
+    this.mDialogContainer = dialogLayout.createDialog('World Editor', '', '', true, 'dialog-1280-768');
 
     // create tabs
     var tabContainer = $('<div class="l-tab-container"/>');
@@ -274,7 +278,7 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
         // create the buttons to switch to other screens
         var index = 0;
         $.each(this.mSwitchToButton, function(_key, _definition) {
-            var buttonLayout = $('<div class="l-tab-button ' + OriginCustomizer.Classes[index] + '"/>');
+            var buttonLayout = $('<div class="l-tab-button ' + WorldEditor.Classes[index] + '"/>');
             buttonPanel.append(buttonLayout);
             self.mSwitchToButton[_key] = buttonLayout.createTabTextButton(_key, function() {
                 self.switchScreen(_key);
@@ -289,7 +293,7 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
         this.mSaveButton = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/save_settings.png', function () {
             //self.mDataSource.notifyBackendCloseButtonClicked();
         }, '', 6);
-        this.mSaveButton.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.save_button' });
+        this.mSaveButton.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.save_button' });
     }
 
 
@@ -298,9 +302,9 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
     {
         // create content screens
         $.each(this.mScreens, function(_key, _definition) {
-            self.mScreens[_key] = $('<div class="display-none"/>'); // display-none display-block
+            self.mScreens[_key] = $('<div class="display-none"/>');
             content.append(self.mScreens[_key]);
-            self['create' + _key + 'PanelDIV'](self.mScreens[_key]);
+            self['create' + _key + 'ScreenDIV'](self.mScreens[_key]);
         });
     }
 
@@ -319,12 +323,12 @@ OriginCustomizerScreen.prototype.createDIV = function(_parentDiv)
     this.mIsVisible = false;
 };
 
-OriginCustomizerScreen.prototype.createContractsPanelDIV = function(_parentDiv) 
+WorldEditorScreen.prototype.createContractsScreenDIV = function(_parentDiv) 
 {
     var self = this;
 };
 
-OriginCustomizerScreen.prototype.createLocationsPanelDIV = function(_parentDiv) 
+WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv) 
 {
     var self = this;
 
@@ -335,29 +339,30 @@ OriginCustomizerScreen.prototype.createLocationsPanelDIV = function(_parentDiv)
         var row90 = this.addRow(90, 'with-scroll-tooltip-background');
         column.append(row90);
         {
-            var scrollHeader = $('<div class="title-scroll-header-container"/>');
+            var scrollHeader = this.addContainer(null, 4.3);
             row90.append(scrollHeader);
             {
-                var column88 = this.addColumn(85);
+                var column88 = this.addColumn(80);
                 scrollHeader.append(column88);
-                var buttonLayout = $('<div class="location-filter-button is-center"/>');
+                var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0); 
                 column88.append(buttonLayout);
                 this.mLocation.FilterButton = buttonLayout.createTextButton("Locations", function() {
                     self.changeLocationfilter();
                 }, '', 4);
 
-                var column12 = this.addColumn(15);
+                var column12 = this.addColumn(20);
                 scrollHeader.append(column12);
-                var buttonLayout = $('<div class="position-button is-center"/>');
-                buttonLayout.css('top', '0.5rem') // css is retarded, fuck it
+                var buttonLayout = this.addLayout(4.5, 4.1, 'is-horizontal-center');
+                buttonLayout.css('top', '0.6rem') // css is retarded, fuck it
                 column12.append(buttonLayout);
                 var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
-                    //self.onPreviousBannerClicked();
+                    //self.();
                 }, '', 6);
-                button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+                button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
             }
 
-            var slotContainer = $('<div class="locations-container"/>');
+            var slotContainer = this.addContainer(null, 47.0);  //$('<div class="locations-container"/>');
+            slotContainer.css('padding-top', '0.5rem');
             row90.append(slotContainer);
             var listContainerLayout = $('<div class="l-list-container"/>');
             slotContainer.append(listContainerLayout);
@@ -370,12 +375,12 @@ OriginCustomizerScreen.prototype.createLocationsPanelDIV = function(_parentDiv)
         {
             var column20 = this.addColumn(20);
             row10.append(column20);
-            var buttonLayout = $('<div class="position-button is-center"/>');
+            var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
             column20.append(buttonLayout);
             var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/center.png', function() {
                 //self.onPreviousBannerClicked();
             }, '', 6);
-            button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.choosecoords' });
+            button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.choosecoords' });
 
             var column40 = this.addColumn(40);
             row10.append(column40);
@@ -390,102 +395,246 @@ OriginCustomizerScreen.prototype.createLocationsPanelDIV = function(_parentDiv)
     var column = this.addColumn(77);
     _parentDiv.append(column);
     {
-        var column50 = this.addColumn(50);
-        column.append(column50);
+        var row40 = this.addRow(40);
+        column.append(row40);
         {
+            var leftColumn = this.addColumn(37.5);
+            row40.append(leftColumn);
+            {
+                var upperHalf = this.addRow(50);
+                leftColumn.append(upperHalf);
+                {
+                    // name input
+                    var row = $('<div class="row"/>');
+                    upperHalf.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Location Name</div>');
+                    row.append(title);
+                    var inputLayout = $('<div class="l-input-big"/>');
+                    row.append(inputLayout);
+                    this.mLocation.Name = inputLayout.createInput('', 0, 40, 1, function (_input) {
+                        //
+                    }, 'title-font-big font-bold font-color-brother-name');
+                }
 
+                var lowerHalf = this.addRow(50, 'with-small-dialog-background');
+                leftColumn.append(lowerHalf);
+                {
+                    // location image
+                    var column65 = this.addColumn(65);
+                    lowerHalf.append(column65);
+                    var imageContainer = this.addLayout(16.0, 12.0, 'is-center');
+                    column65.append(imageContainer);
+                    this.mLocation.Image = imageContainer.createImage(null, function(_image) {
+                        _image.fitImageToParent(0, 0);
+                    }, null, '');
+
+                    var column35 = this.addColumn(35);
+                    lowerHalf.append(column35);
+                    {
+                        // button
+                        var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
+                        column35.append(buttonLayout);
+                        var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
+                            //self.();
+                        }, '', 6);
+                    }
+                }
+            }
+
+            var midColumn = this.addColumn(37.5, 'with-medium-dialog-background');
+            row40.append(midColumn);
+            {
+                var upperRow = this.addRow(40);
+                midColumn.append(upperRow);
+                {
+                    var resourcesColumn = this.addColumn(50);
+                    upperRow.append(resourcesColumn);
+                    {
+                        // name input
+                        var row = $('<div class="row"/>');
+                        resourcesColumn.append(row);
+                        var title = $('<div class="title title-font-big font-color-title">Resources</div>');
+                        row.append(title);
+                        var inputLayout = $('<div class="l-input-half-big"/>');
+                        row.append(inputLayout);
+                        this.mLocation.Resources = inputLayout.createInput('', 0, 4, 1, function (_input) {
+                            //
+                        }, 'title-font-big font-bold font-color-brother-name');
+                        this.mLocation.Resources.css('background-size', '100% 4.0rem');
+                    }
+
+                    var strengthColumn = this.addColumn(50);
+                    upperRow.append(strengthColumn);
+                    {
+                        // name input
+                        var row = $('<div class="row"/>');
+                        strengthColumn.append(row);
+                        var title = $('<div class="title title-font-big font-color-title">Strength</div>');
+                        row.append(title);
+                        var row = $('<div class="row"/>');
+                        strengthColumn.append(row);
+                        var inputLayout = $('<div class="strength-label-container with-input-box"/>');
+                        row.append(inputLayout);
+                        this.mLocation.Strength = $('<div class="strength-title is-vertical-center title-font-big font-bold font-color-brother-name"></div>');
+                        inputLayout.append(this.mLocation.Strength);
+                    }
+                }
+
+                var lowerRow = this.addRow(60);
+                midColumn.append(lowerRow);
+                {
+                    var row = this.addContainer(null, 4.6);
+                    lowerRow.append(row);
+                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton('Reroll Loots', function ()
+                    {
+                        //self.();
+                    }, '', 4);
+
+                    var row = this.addContainer(null, 4.6);
+                    lowerRow.append(row);
+                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                    row.append(buttonLayout);
+                    var button = buttonLayout.createTextButton('Refresh Loot Scale', function ()
+                    {
+                        //self.();
+                    }, '', 4);
+                }
+            }
+
+            var rightColumn = this.addColumn(25, 'with-dirty-scroll-background');
+            row40.append(rightColumn);
+            {
+                var scrollHeader = this.addContainer(null, 4.3);
+                rightColumn.append(scrollHeader);
+                {
+                    var column80 = this.addColumn(80);
+                    scrollHeader.append(column80);
+                    var buttonLayout = this.addLayout(17.4, 4.3, 'is-center', 3.0);
+                    column80.append(buttonLayout);
+                    var button = buttonLayout.createTextButton('Loots', null, '', 7);
+                    button.enableButton(false);
+
+                    var column20 = this.addColumn(20);
+                    scrollHeader.append(column20);
+                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center'); 
+                    column20.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
+                        //self.onPreviousBannerClicked();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
+                }
+
+                var slotContainer = this.addContainer(null, 18.5);
+                rightColumn.append(slotContainer);
+
+                var listContainerLayout = $('<div class="l-list-container"/>');
+                slotContainer.append(listContainerLayout);
+                var listContainer = listContainerLayout.createList(1);
+                this.mLocation.Loots = listContainer.findListScrollContainer();
+            }
         }
 
-        var column50 = this.addColumn(50);
-        column.append(column50);
+        var row60 = this.addRow(60);
+        column.append(row60);
         {
-            var upperHalf = this.addRow(40);
-            column50.append(upperHalf);
+            var leftHalf = this.addColumn(50);
+            row60.append(leftHalf);
             {
 
             }
 
-            var lowerHalf = this.addRow(60, 'with-dirty-scroll-background');
-            column50.append(lowerHalf);
+            var rightHalf = this.addColumn(50, 'with-scroll-tooltip-background');
+            row60.append(rightHalf);
             {
-                var scrollHeader = $('<div class="title-scroll-header-container"/>');
-                lowerHalf.append(scrollHeader);
+                var scrollHeader = this.addContainer(null, 4.3);
+                rightHalf.append(scrollHeader);
                 {
-                    var column = this.addColumn(50, undefined, 'blue');
+                    // button
+                    var column = this.addColumn(10);
                     scrollHeader.append(column);
-                    var buttonLayout = $('<div class="location-filter-button is-horizontal-center"/>');
-                    buttonLayout.css('bottom', '0.5rem'); // css is retarded, fuck it
+                    var buttonLayout = this.addLayout(3.9, 3.9, 'is-center');
                     column.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Defenders", function() {
-                        //self.changeLocationfilter();
-                    }, '', 4);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/info.png', function() {
+                        //self.();
+                    }, '', 10);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.troopsinfo' });
 
-                    var column = this.addColumn(10, undefined, 'red');
+                    // not button
+                    var column = this.addColumn(50);
                     scrollHeader.append(column);
-                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-horizontal-center', 3.0);
+                    buttonLayout.css('bottom', '0.3rem'); // css is retarded, fuck it
+                    column.append(buttonLayout);
+                    var button = buttonLayout.createTextButton('Defenders', null, '', 4);
+                    button.enableButton(false);
+
+                    // button button
+                    var column = this.addColumn(10);
+                    scrollHeader.append(column);
+                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
+                    column.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/sort-button.png', function() {
+                        //self.();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.picktrooptemplate' });
+
+                    // button button button
+                    var column = this.addColumn(10);
+                    scrollHeader.append(column);
+                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     column.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
-                        //self.onPreviousBannerClicked();
+                        //self.();
                     }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.refreshtroops' });
 
-                    var column = this.addColumn(10, undefined, 'red');
+                    // button button button button
+                    var column = this.addColumn(10);
                     scrollHeader.append(column);
-                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     column.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
-                        //self.onPreviousBannerClicked();
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/unknown_traits.png', function() {
+                        //self.();
                     }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addrandomtroop' });
 
-                    var column = this.addColumn(10, undefined, 'red');
+                    // button button button button button
+                    var column = this.addColumn(10);
                     scrollHeader.append(column);
-                    var buttonLayout = $('<div class="position-button is-center"/>');
-                    column.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
-                        //self.onPreviousBannerClicked();
-                    }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
-
-                    var column = this.addColumn(10, undefined, 'red');
-                    scrollHeader.append(column);
-                    var buttonLayout = $('<div class="position-button is-center"/>');
-                    column.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
-                        //self.onPreviousBannerClicked();
-                    }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
-
-                    var column = this.addColumn(10, undefined, 'red');
-                    scrollHeader.append(column);
-                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     column.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
-                        //self.onPreviousBannerClicked();
+                        //self.();
                     }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
                 }
 
-                var slotContainer = $('<div class="troops-container"/>');
-                lowerHalf.append(slotContainer);
+                // troop list
+                var slotContainer = this.addContainer(null, 30.0);
+                rightHalf.append(slotContainer);
                 var listContainerLayout = $('<div class="l-list-container"/>');
                 slotContainer.append(listContainerLayout);
                 var listContainer = listContainerLayout.createList(2);
                 this.mLocation.Troops = listContainer.findListScrollContainer();
             }
+
         }
+
     }
 };
 
-OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv) 
+WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv) 
 {
     var self = this;
 
-    // divide into 2 column - 23% and 77%
+    // divide into 2 columns - 23% and 77%
     var column = this.addColumn(23, 'with-dialog-background');
     column.css('padding-top', '0.6rem');
     _parentDiv.append(column);
-    {
+    {   
+        // settlement list
         var listContainerLayout = $('<div class="l-list-container"/>');
         column.append(listContainerLayout);
         this.mSettlement.ListContainer = listContainerLayout.createList(2);
@@ -507,6 +656,7 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                     var row25 = this.addRow(25);
                     leftHalf.append(row25);
                     {
+                        // name input
                         var row = $('<div class="row"/>');
                         row25.append(row);
                         var title = $('<div class="title title-font-big font-color-title">Settlement Name</div>');
@@ -521,64 +671,68 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                     var row30 = this.addRow(30, 'with-small-dialog-background');
                     leftHalf.append(row30);
                     {
+                        // settlement image
                         var column75 = this.addColumn(75);
                         row30.append(column75);
-                        var imageContainer = $('<div class="s-image-container"/>');
+                        var imageContainer = this.addLayout(16.0, 12.0, 'is-center');
                         column75.append(imageContainer);
-
                         this.mSettlement.Image = imageContainer.createImage(null, function(_image) {
                             _image.fitImageToParent(0, 0);
                         }, null, '');
 
+
                         var column25 = this.addColumn(25);
                         row30.append(column25);
+                        {
+                            // button
+                            var buttonRow = this.addRow(50);
+                            column25.append(buttonRow);
+                            var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
+                            buttonRow.append(buttonLayout);
+                            var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_retract.png', function() {
+                                //self.onPreviousBannerClicked();
+                            }, '', 6);
 
-                        var buttonRow = $('<div class="s-button-row"/>');
-                        column25.append(buttonRow);
-                        var buttonLayout = $('<div class="s-image-button-center"/>');
-                        buttonRow.append(buttonLayout);
-                        var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_retract.png', function() {
-                            //self.onPreviousBannerClicked();
-                        }, '', 6);
-
-                        var buttonRow = $('<div class="s-button-row"/>');
-                        column25.append(buttonRow);
-                        var buttonLayout = $('<div class="s-image-button-center"/>');
-                        buttonRow.append(buttonLayout);
-                        var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_expand.png', function() {
-                            //self.onPreviousBannerClicked();
-                        }, '', 6);
+                            // button button
+                            var buttonRow = this.addRow(50);
+                            column25.append(buttonRow);
+                            var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
+                            buttonRow.append(buttonLayout);
+                            var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_expand.png', function() {
+                                //self.onPreviousBannerClicked();
+                            }, '', 6);
+                        }
                     }
 
                     var row35 = this.addRow(35);
                     leftHalf.append(row35);
                     {
+                        // title
                         var column50 = this.addColumn(50);
                         row35.append(column50);
                         var row = $('<div class="row"/>');
                         column50.append(row);
                         var title = $('<div class="title title-font-big font-color-title">Faction</div>');
-                        title.css('text-align', 'center');
                         row.append(title);
-
-                        var ownerContainer = $('<div class="faction-landlord-container"/>');
-                        column50.append(ownerContainer);
-                        this.mSettlement.FactionBanner = ownerContainer.createImage(null, function(_image) {
+                        // faction image banner
+                        var imageContainer = $('<div class="faction-landlord-container"/>');
+                        column50.append(imageContainer);
+                        this.mSettlement.FactionBanner = imageContainer.createImage(null, function(_image) {
                             _image.fitImageToParent(0, 0);
                         }, null, '');
 
 
+                        // title
                         var column50 = this.addColumn(50);
                         row35.append(column50);
                         var row = $('<div class="row"/>');
                         column50.append(row);
                         var title = $('<div class="title title-font-big font-color-title">Owner</div>');
-                        title.css('text-align', 'center');
                         row.append(title);
-
-                        this.mSettlement.OwnerBanner = $('<div class="faction-landlord-container"/>');
-                        column50.append(this.mSettlement.OwnerBanner);
-                        var image = this.mSettlement.OwnerBanner.createImage(null, function(_image) {
+                        // owner image banner
+                        var imageContainer = $('<div class="faction-landlord-container"/>');
+                        column50.append(imageContainer);
+                        this.mSettlement.OwnerBanner = imageContainer.createImage(null, function(_image) {
                             _image.fitImageToParent(0, 0);
                         }, null, '');
                     }
@@ -586,6 +740,7 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                     var row10 = this.addRow(10);
                     leftHalf.append(row10);
                     {
+                        // title, don't ask why XD
                         var row = $('<div class="row"/>');
                         row10.append(row);
                         var title = $('<div class="title title-font-big font-color-title">Buildings</div>');
@@ -598,76 +753,115 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
                 var rightHalf = this.addColumn(50, 'with-dialog-background');
                 row75.append(rightHalf);
                 {
-                    var row = $('<div class="faction-button-row"></div>');
-                    row.css('margin-top', '2.0rem');
-                    rightHalf.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
-                    row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Shut Down", function ()
+                    var upperRow = this.addRow(30);
+                    rightHalf.append(upperRow);
                     {
-                        //self.notifyBackendNewCampaignButtonPressed();
-                    }, '', 4);
+                        var resourcesColumn = this.addColumn(50);
+                        upperRow.append(resourcesColumn);
+                        {
+                            // name input
+                            var row = $('<div class="row"/>');
+                            resourcesColumn.append(row);
+                            var title = $('<div class="title title-font-big font-color-title">Resources</div>');
+                            row.append(title);
+                            var inputLayout = $('<div class="l-input-half-big"/>');
+                            row.append(inputLayout);
+                            this.mSettlement.Resources = inputLayout.createInput('', 0, 4, 1, function (_input) {
+                                //
+                            }, 'title-font-big font-bold font-color-brother-name');
+                            this.mSettlement.Resources.css('background-size', '100% 4.0rem'); // simple solution to get a smaller input without much work :evilgrins
+                        }
 
-                    var row = $('<div class="faction-button-row"></div>');
-                    rightHalf.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
-                    row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Change Type", function ()
+                        var wealthColumn = this.addColumn(50);
+                        upperRow.append(wealthColumn);
+                        {
+                            // name input
+                            var row = $('<div class="row"/>');
+                            wealthColumn.append(row);
+                            var title = $('<div class="title title-font-big font-color-title">Wealth</div>');
+                            row.append(title);
+                            var inputLayout = $('<div class="l-input-half-big"/>');
+                            row.append(inputLayout);
+                            this.mSettlement.Wealth = inputLayout.createInput('', 0, 3, 1, function (_input) {
+                            }, 'title-font-big font-bold font-color-brother-name');
+                            this.mSettlement.Wealth.css('background-size', '100% 4.0rem');
+
+                            // set up fun event listeners
+                            this.mSettlement.Wealth.assignInputEventListener('focusout', function(_input, _event) {
+                                _input.addPercentageToInput();
+                            });
+                            this.mSettlement.Wealth.assignInputEventListener('click', function(_input, _event) {
+                                _input.removePercentageToInput();
+                            });
+                        }
+                    }
+
+                    var lowerRow = this.addRow(70);
+                    rightHalf.append(lowerRow);
                     {
-                        //self.notifyBackendNewCampaignButtonPressed();
-                    }, '', 4);
+                        var row = this.addContainer(null, 4.6);
+                        //row.css('margin-top', '2.0rem');
+                        lowerRow.append(row);
+                        // button
+                        var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                        row.append(buttonLayout);
+                        var button = buttonLayout.createTextButton('Shut Down', function ()
+                        {
+                            //self.();
+                        }, '', 4);
 
+                        var row = this.addContainer(null, 4.6);
+                        lowerRow.append(row);
+                        // button button 
+                        var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                        row.append(buttonLayout);
+                        var button = buttonLayout.createTextButton('Send Caravan', function ()
+                        {
+                            //self.();
+                        }, '', 4);
 
-                    var row = $('<div class="faction-button-row"></div>');
-                    rightHalf.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
-                    row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Send Caravan", function ()
-                    {
-                        //self.notifyBackendNewCampaignButtonPressed();
-                    }, '', 4);
+                        var row = this.addContainer(null, 4.6);
+                        lowerRow.append(row);
+                        // button button button 
+                        var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                        row.append(buttonLayout);
+                        var button = buttonLayout.createTextButton('Send Mercenary', function ()
+                        {
+                            //self.();
+                        }, '', 4);
 
-                    
-                    var row = $('<div class="faction-button-row"></div>');
-                    rightHalf.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
-                    row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Send Mercenary", function ()
-                    {
-                        //self.notifyBackendNewCampaignButtonPressed();
-                    }, '', 4);
+                        var row = this.addContainer(null, 4.6);
+                        lowerRow.append(row);
+                        // button button button button 
+                        var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                        row.append(buttonLayout);
+                        var button = buttonLayout.createTextButton('Refresh Shops', function ()
+                        {
+                            //self.();
+                        }, '', 4);
 
-                    
-                    var row = $('<div class="faction-button-row"></div>');
-                    rightHalf.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
-                    row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Refresh Shops", function ()
-                    {
-                        //self.notifyBackendNewCampaignButtonPressed();
-                    }, '', 4);
-
-                    
-                    var row = $('<div class="faction-button-row"></div>');
-                    rightHalf.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
-                    row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Refresh Roster", function ()
-                    {
-                        //self.notifyBackendNewCampaignButtonPressed();
-                    }, '', 4);
+                        var row = this.addContainer(null, 4.6);
+                        lowerRow.append(row);
+                        // button button button button button 
+                        var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                        row.append(buttonLayout);
+                        var button = buttonLayout.createTextButton('Refresh Roster', function ()
+                        {
+                            //self.();
+                        }, '', 4);
+                    }
                 }
             }
 
             var row25 = this.addRow(25, 'with-small-dialog-background');
             column78.append(row25);
             {
-                var buildingsContainer = $('<div class="s-building-container"/>');
-                row25.append(buildingsContainer);
+                var buildingsLayout = $('<div class="a-container is-center"/>');
+                row25.append(buildingsLayout);
 
                 this.mSettlement.Buildings = [];
                 for (var i = 0; i < 4; i++) {
-                    this.createSettlementBuildingSlot(i, buildingsContainer);
+                    this.createSettlementBuildingSlot(i, buildingsLayout);
                 }
             }
         }
@@ -678,33 +872,35 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
             var row = this.addRow(35, 'with-scroll-tooltip-background');
             column22.append(row);
             {
-                var scrollHeader = $('<div class="title-scroll-header-container"/>');
+                var scrollHeader = this.addContainer(null, 4.3);
                 row.append(scrollHeader);
-                {
+                {   
                     var column80 = this.addColumn(80);
                     scrollHeader.append(column80);
-                    var buttonLayout = $('<div class="s-button-center"/>');
+                    // not button
+                    var buttonLayout = this.addLayout(17.4, 4.3, 'is-center', 3.0);
                     column80.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Situations", function ()
-                    {
-                        //self.switchBetweenSituationsAttachments();
-                    }, '', 7);
+                    var button = buttonLayout.createTextButton('Situations', null, '', 7);
+                    button.enableButton(false);
 
                     var column20 = this.addColumn(20);
                     scrollHeader.append(column20);
-                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    // button
+                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     column20.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
-                        //self.onPreviousBannerClicked();
+                        //self.();
                     }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
                 }
                 
 
-                var slotContainer = $('<div class="s-attach-container"/>');
-                slotContainer.css('height', '16.0rem');
+                var slotContainer = this.addContainer(null, 16.0);
+                slotContainer.css('padding-top', '0.5rem');
+                slotContainer.css('padding-left', '1.0rem');
                 row.append(slotContainer);
 
+                // situation list
                 var listContainerLayout = $('<div class="l-list-container"/>');
                 slotContainer.append(listContainerLayout);
                 var listContainer = listContainerLayout.createList(1);
@@ -714,32 +910,34 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
             var row = this.addRow(65, 'with-scroll-tooltip-background');
             column22.append(row);
             {
-                var scrollHeader = $('<div class="title-scroll-header-container"/>');
+                var scrollHeader = this.addContainer(null, 4.3);
                 row.append(scrollHeader);
                 {  
                     var column80 = this.addColumn(80);
                     scrollHeader.append(column80);
-                    var buttonLayout = $('<div class="s-button-center"/>');
+                    // not button
+                    var buttonLayout = this.addLayout(17.4, 4.3, 'is-center', 3.0);
                     column80.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Attachments", function ()
-                    {
-                        //self.switchBetweenSituationsAttachments();
-                    }, '', 7);
+                    var button = buttonLayout.createTextButton('Attachments', null, '', 7);
+                    button.enableButton(false);
 
                     var column20 = this.addColumn(20);
                     scrollHeader.append(column20);
-                    var buttonLayout = $('<div class="position-button is-center"/>');
+                    // button
+                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     column20.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
-                        //self.onPreviousBannerClicked();
+                        //self.();
                     }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.addnewentry' });
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
                 }
 
-                var slotContainer = $('<div class="s-attach-container"/>');
-                slotContainer.css('height', '33.0rem');
+                var slotContainer = this.addContainer(null, 33.0);
+                slotContainer.css('padding-top', '0.3rem');
+                slotContainer.css('padding-left', '1.0rem');
                 row.append(slotContainer);
 
+                // attached location list
                 var listContainerLayout = $('<div class="l-list-container"/>');
                 slotContainer.append(listContainerLayout);
                 var listContainer = listContainerLayout.createList(1);
@@ -749,7 +947,7 @@ OriginCustomizerScreen.prototype.createSettlementsPanelDIV = function(_parentDiv
     }
 };
 
-OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv) 
+WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv) 
 {
     var self = this;
 
@@ -775,6 +973,7 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                 var row90 = this.addRow(90);
                 column.append(row90);
                 {
+                    // input name
                     var row = $('<div class="row"/>');
                     row90.append(row);
                     var title = $('<div class="title title-font-big font-color-title">Faction Name</div>');
@@ -785,25 +984,15 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                         
                     }, 'title-font-big font-bold font-color-brother-name');
                     
+                    // relation stuffs
                     this.createSliderControlDIV(this.mFactionRelation, 'Relation', row90);
                     this.createCheckBoxControlDIV(this.mFactionFixedRelation, row90);
-
-                    /*this.mFaction.LandlordContainer = $('<div class="row"/>');
-                    row90.append(this.mFaction.LandlordContainer);
-                    var title = $('<div class="title title-font-big font-color-title">Landlord</div>');
-                    this.mFaction.LandlordContainer.append(title);
-
-                    var landlordContainer = $('<div class="faction-landlord-container"/>');
-                    this.mFaction.LandlordContainer.append(landlordContainer);
-                    this.mFaction.Landlord = landlordContainer.createImage(null, function(_image) {
-                        _image.fitImageToParent(0, 0);
-                    }, null, '');*/
                 }
-                
 
                 var row10 = this.addRow(10);
                 column.append(row10);
                 {
+                    // another title that you shouldn't ask why
                     var row = $('<div class="row"/>');
                     row10.append(row);
                     var title = $('<div class="title title-font-big font-color-title">Available Contracts</div>');
@@ -821,7 +1010,8 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                 {
                     var leftColumn = this.addColumn(30);
                     row40.append(leftColumn);
-                    var prevButtonLayout = $('<div class="faction-banner-button"/>');
+                    // button
+                    var prevButtonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     leftColumn.append(prevButtonLayout);
                     this.mFaction.PrevButton = prevButtonLayout.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function() {
                         //self.onPreviousBannerClicked();
@@ -829,8 +1019,9 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
 
                     var midColumn = this.addColumn(40);
                     row40.append(midColumn);
-                    var bannerContainer = $('<div class="faction-banner-container"/>');
+                    var bannerContainer = this.addLayout(15.0, 20.0, 'is-center');
                     midColumn.append(bannerContainer);
+                    // banner image
                     this.mFaction.Banner = bannerContainer.createImage(null, function(_image) {
                         _image.centerImageWithinParent(0, 0, 1.0);
                         _image.removeClass('display-none').addClass('display-block');
@@ -838,7 +1029,8 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
 
                     var rightColumn = this.addColumn(30);
                     row40.append(rightColumn);
-                    var nextButtonLayout = $('<div class="faction-banner-button"/>');
+                    // button button
+                    var nextButtonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     rightColumn.append(nextButtonLayout);
                     this.mFaction.NextButton = nextButtonLayout.createImageButton(Path.GFX + Asset.BUTTON_NEXT_BANNER, function() {
                         //self.onPreviousBannerClicked();
@@ -848,64 +1040,64 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
                 var row60 = this.addRow(60, 'with-scroll-tooltip-background');
                 column.append(row60);
                 {
-                    // 1st button
-                    var row = $('<div class="faction-button-row"></div>');
+                    // button
+                    var row = this.addContainer(null, 4.6);
                     row60.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("View Settlements", function ()
+                    var button = buttonLayout.createTextButton('View Settlements', function ()
                     {
-                        //self.notifyBackendNewCampaignButtonPressed();
+                        //self.();
                     }, '', 4);
 
-                    // 2nd button
-                    var row = $('<div class="faction-button-row"></div>');
+                    // button button
+                    var row = this.addContainer(null, 4.6);
                     row60.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("View Alliance", function ()
+                    var button = buttonLayout.createTextButton('View Alliance', function ()
                     {
-                        //self.notifyBackendNewCampaignButtonPressed();
+                        //self.();
                     }, '', 4);
 
-                    // 3rd button
-                    var row = $('<div class="faction-button-row"></div>');
+                    // button button button
+                    var row = this.addContainer(null, 4.6);
                     row60.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Despawn Troops", function ()
+                    var button = buttonLayout.createTextButton('Despawn Troops', function ()
                     {
-                        //self.notifyBackendNewCampaignButtonPressed();
+                        //self.();
                     }, '', 4);
 
-                    // 4th button
-                    var row = $('<div class="faction-button-row"></div>');
+                    // button button button button
+                    var row = this.addContainer(null, 4.6);
                     row60.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Refresh Roster", function ()
+                    var button = buttonLayout.createTextButton('Refresh Roster', function ()
                     {
-                        //self.notifyBackendNewCampaignButtonPressed();
+                        //self.();
                     }, '', 4);
 
-                    // 5th button
-                    var row = $('<div class="faction-button-row"></div>');
+                    // button button button button button 
+                    var row = this.addContainer(null, 4.6);
                     row60.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Refresh Actions", function ()
+                    var button = buttonLayout.createTextButton('Refresh Actions', function ()
                     {
-                        //self.notifyBackendNewCampaignButtonPressed();
+                        //self.();
                     }, '', 4);
 
-                    // 6th button
-                    var row = $('<div class="faction-button-row"></div>');
+                    // button button button button button button
+                    var row = this.addContainer(null, 4.6);
                     row60.append(row);
-                    var buttonLayout = $('<div class="f-button-center"></div>');
+                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton("Refresh Contracts", function ()
+                    var button = buttonLayout.createTextButton('Refresh Contracts', function ()
                     {
-                        //self.notifyBackendNewCampaignButtonPressed();
+                        //self.();
                     }, '', 4);
                 }
             }
@@ -915,13 +1107,13 @@ OriginCustomizerScreen.prototype.createFactionsPanelDIV = function(_parentDiv)
         var row20 = this.addRow(20, 'with-small-dialog-background');
         column60.append(row20);
         {
-            this.mFaction.Contracts = $('<div class="f-contracts-container"/>');
+            this.mFaction.Contracts = $('<div class="a-container is-center"/>');
             row20.append(this.mFaction.Contracts);
         }
     }
 };
 
-OriginCustomizerScreen.prototype.createPropertiesPanelDIV = function(_parentDiv) 
+WorldEditorScreen.prototype.createPropertiesScreenDIV = function(_parentDiv) 
 {   
     var self = this;
 
@@ -1040,11 +1232,11 @@ OriginCustomizerScreen.prototype.createPropertiesPanelDIV = function(_parentDiv)
     }
 };
 
-OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv) 
+WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv) 
 {
     var self = this;
 
-    var leftColumn = $('<div class="column-left"/>');
+    var leftColumn = this.addColumn(65);
     _parentDiv.append(leftColumn);
     {
         var subLeftColumn = this.addColumn(26);
@@ -1056,7 +1248,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
             this.mScenario.Image = originImageContainer.createImage(Path.GFX + 'ui/events/event_99.png', function(_image) {
                 _image.removeClass('opacity-none');
             }, null, 'opacity-none');
-            this.mScenario.Image.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.choose_origin' });
+            this.mScenario.Image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.choose_origin' });
             this.mScenario.Image.click(function ()
             {
                 self.createScenarioPopupDialog();
@@ -1078,72 +1270,80 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
         var subRightColumn = this.addColumn(74, 'with-dialog-background');
         leftColumn.append(subRightColumn);
         {
+            // title
             var row = $('<div class="row"/>');
             subRightColumn.append(row);
             var title = $('<div class="title title-font-big font-color-title">Company Avatar</div>');
             title.css('margin-bottom', '1.0rem');
             row.append(title);
 
-            var avatarChangerContainer = $('<div class="avatar-changer-container"/>');
+            var avatarChangerContainer = this.addContainer(null, 17.0);
             row.append(avatarChangerContainer);
             {
                 var buttonColumn = this.addColumn(35);
                 avatarChangerContainer.append(buttonColumn);
                 {
-                    var subRow = $('<div class="avatar-row"/>');
+                    // button
+                    var subRow = this.addContainer(null, 3.6);
                     buttonColumn.append(subRow);
-                    var button = $('<div class="l-avatar-button" />');
+                    var button = this.addLayout(17.5, 4.3, 'is-center');
                     subRow.append(button);
                     this.mAvatar.TypeButton = button.createTextButton('Human', function () 
                     {
-                        //self.onPressAvatarTypeButton();
+                        //self.();
                     }, 'display-block', 1);
 
-                    var subRow = $('<div class="avatar-row"/>');
+                    // button button
+                    var subRow = this.addContainer(null, 3.6);
                     buttonColumn.append(subRow);
-                    var button = $('<div class="l-avatar-button" />');
+                    var button = this.addLayout(17.5, 4.3, 'is-center');
                     subRow.append(button);
                     this.mAvatar.FlipButton = button.createTextButton('Flip', function () 
                     {
-                        //self.onPressAvatarTypeButton();
+                        //self.();
                     }, 'display-block', 1);
 
-                    var subRow = $('<div class="avatar-row"/>');
+                    // button button button
+                    var subRow = this.addContainer(null, 3.6);
                     buttonColumn.append(subRow);
-                    var button = $('<div class="l-avatar-button" />');
+                    var button = this.addLayout(17.5, 4.3, 'is-center');
                     subRow.append(button);
                     this.mAvatar.SocketButton = button.createTextButton('Socket', function () 
                     {
-                        //self.onPressAvatarTypeButton();
+                        //self.();
                     }, 'display-block', 1);
                 }
 
                 var avatarColumn = this.addColumn(65, 'with-small-dialog-background');
                 avatarChangerContainer.append(avatarColumn);
                 {
-                    var avatarContainer = $('<div class="avatar-container"/>');
+                    var avatarContainer = this.addContainer(null, null);
+                    avatarContainer.css('margin-bottom', '1.0rem');
                     avatarColumn.append(avatarContainer);
 
+                    // button
                     var left = this.addColumn(25);
                     avatarContainer.append(left);
-                    var prevAvatar = $('<div class="avatar-button"/>');
+                    var prevAvatar = this.addLayout(4.5, 4.1, 'is-center');
                     left.append(prevAvatar);
                     this.mAvatar.PrevButton = prevAvatar.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function() {
                         //self.onPreviousBannerClicked();
                     }, '', 6);
 
+                    // avatar image
                     var mid = this.addColumn(50);
                     avatarContainer.append(mid);
-                    var avatarImage = $('<div class="avatar-image-container"/>');
+                    var avatarImage = this.addLayout(13.0, 16.0, 'is-center');
                     mid.append(avatarImage);
                     this.mAvatar.Image = avatarImage.createImage(Path.GFX + 'ui/icons/legends_party.png', function(_image) {
                         _image.centerImageWithinParent(0, 0, 1.0);
                         _image.removeClass('display-none').addClass('display-block');
                     }, null, 'display-none');
 
+                    // button button
                     var right = this.addColumn(25);
                     avatarContainer.append(right);
-                    var nextAvatar = $('<div class="avatar-button"/>');
+                    var nextAvatar = this.addLayout(4.5, 4.1, 'is-center');
                     right.append(nextAvatar);
                     this.mAvatar.NextButton = nextAvatar.createImageButton(Path.GFX + Asset.BUTTON_NEXT_BANNER, function() {
                         //self.onNextBannerClicked();
@@ -1151,7 +1351,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
                 }
             }
 
-
+            // name input
             var row = $('<div class="row"/>');
             row.css('padding-top', '1.0rem'); // css is retarded XD
             subRightColumn.append(row);
@@ -1172,7 +1372,7 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
             subRightColumn.append(row);
             var title = $('<div class="title title-font-big font-color-title">Configuration Options</div>');
             row.append(title);
-            var configureOptionsContainer = $('<div class="configure-container"/>');
+            var configureOptionsContainer = this.addContainer(null, 30.0);
             subRightColumn.append(configureOptionsContainer);
             {
                 var column45 = this.addColumn(45);
@@ -1204,15 +1404,16 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
         }
     }
 
-    var rightColumn = $('<div class="column-right"/>');
+    var rightColumn = this.addColumn(35);
     _parentDiv.append(rightColumn);
     {
-        // banner
+        // title
         var row = $('<div class="row"/>');
         rightColumn.append(row);
         var title = $('<div class="title title-font-big font-color-title">Company Banner</div>');
         row.append(title);
 
+        // banner table copied from new campaign screen
         var bannerContainer = $('<div class="banner-container"/>');
         row.append(bannerContainer);
         {
@@ -1235,12 +1436,12 @@ OriginCustomizerScreen.prototype.createGeneralPanelDIV = function (_parentDiv)
             }, null, 'display-none banner-image');
         }
 
-        // rostier slider
+        // roster slider
         this.createSliderControlDIV(this.mRosterTier, 'Roster Tier', rightColumn);
     }
 };
 
-OriginCustomizerScreen.prototype.createRadioControlDIV = function(_definition, _parentDiv, _index, _name, _result) 
+WorldEditorScreen.prototype.createRadioControlDIV = function(_definition, _parentDiv, _index, _name, _result) 
 {
     var control = $('<div class="control"></div>');
     _parentDiv.append(control);
@@ -1262,7 +1463,7 @@ OriginCustomizerScreen.prototype.createRadioControlDIV = function(_definition, _
     _definition.Label.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
 };
 
-OriginCustomizerScreen.prototype.createCheckBoxControlDIV = function(_definition, _parentDiv) 
+WorldEditorScreen.prototype.createCheckBoxControlDIV = function(_definition, _parentDiv) 
 {
     var row = $('<div class="row"></div>');
     _parentDiv.append(row);
@@ -1282,7 +1483,7 @@ OriginCustomizerScreen.prototype.createCheckBoxControlDIV = function(_definition
     _definition.Label.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
 };
 
-OriginCustomizerScreen.prototype.createSliderControlDIV = function(_definition, _title, _parentDiv) 
+WorldEditorScreen.prototype.createSliderControlDIV = function(_definition, _title, _parentDiv) 
 {
     var row = $('<div class="row"></div>');
     _parentDiv.append(row);
@@ -1310,7 +1511,7 @@ OriginCustomizerScreen.prototype.createSliderControlDIV = function(_definition, 
     });
 };
 
-OriginCustomizerScreen.prototype.createInputDIV = function(_key, _definition, _parentDiv)
+WorldEditorScreen.prototype.createInputDIV = function(_key, _definition, _parentDiv)
 {
     var inputRow = $('<div class="row input-row"/>');
     _parentDiv.append(inputRow);
@@ -1359,7 +1560,7 @@ OriginCustomizerScreen.prototype.createInputDIV = function(_key, _definition, _p
     _definition.Input.val(_definition.Value);
 }
 
-OriginCustomizerScreen.prototype.destroyDIV = function()
+WorldEditorScreen.prototype.destroyDIV = function()
 {
 	this.mCloseButton.remove();
     this.mCloseButton = null;
@@ -1373,24 +1574,24 @@ OriginCustomizerScreen.prototype.destroyDIV = function()
     this.mContainer = null;
 };
 
-OriginCustomizerScreen.prototype.isConnected = function()
+WorldEditorScreen.prototype.isConnected = function()
 {
     return this.mSQHandle !== null;
 };
 
-OriginCustomizerScreen.prototype.onConnection = function(_handle)
+WorldEditorScreen.prototype.onConnection = function(_handle)
 {
     this.mSQHandle = _handle;
     this.register($('.root-screen'));
 };
 
-OriginCustomizerScreen.prototype.onDisconnection = function()
+WorldEditorScreen.prototype.onDisconnection = function()
 {
     this.mSQHandle = null;
     this.unregister();
 };
 
-OriginCustomizerScreen.prototype.getModule = function(_name)
+WorldEditorScreen.prototype.getModule = function(_name)
 {
     switch(_name)
     {
@@ -1398,38 +1599,38 @@ OriginCustomizerScreen.prototype.getModule = function(_name)
     }
 };
 
-OriginCustomizerScreen.prototype.getModules = function()
+WorldEditorScreen.prototype.getModules = function()
 {
     return [];
 };
 
-OriginCustomizerScreen.prototype.bindTooltips = function()
+WorldEditorScreen.prototype.bindTooltips = function()
 {
 };
 
-OriginCustomizerScreen.prototype.unbindTooltips = function()
+WorldEditorScreen.prototype.unbindTooltips = function()
 {
 };
 
-OriginCustomizerScreen.prototype.create = function(_parentDiv)
+WorldEditorScreen.prototype.create = function(_parentDiv)
 {
     this.createDIV(_parentDiv);
     this.bindTooltips();
 };
 
-OriginCustomizerScreen.prototype.destroy = function()
+WorldEditorScreen.prototype.destroy = function()
 {
     this.unbindTooltips();
     this.destroyDIV();
 };
 
-OriginCustomizerScreen.prototype.register = function(_parentDiv)
+WorldEditorScreen.prototype.register = function(_parentDiv)
 {
-    console.log('OriginCustomizerScreen::REGISTER');
+    console.log('WorldEditorScreen::REGISTER');
 
     if (this.mContainer !== null)
     {
-        console.error('ERROR: Failed to register Origin Customizer Screen. Reason: Origin Customizer Screen is already initialized.');
+        console.error('ERROR: Failed to register World Editor Screen. Reason: World Editor Screen is already initialized.');
         return;
     }
 
@@ -1439,20 +1640,20 @@ OriginCustomizerScreen.prototype.register = function(_parentDiv)
     }
 };
 
-OriginCustomizerScreen.prototype.unregister = function()
+WorldEditorScreen.prototype.unregister = function()
 {
-    console.log('OriginCustomizerScreen::UNREGISTER');
+    console.log('WorldEditorScreen::UNREGISTER');
 
     if (this.mContainer === null)
     {
-        console.error('ERROR: Failed to unregister Origin Customizer Screen. Reason: Origin Customizer Screen is not initialized.');
+        console.error('ERROR: Failed to unregister World Editor Screen. Reason: World Editor Screen is not initialized.');
         return;
     }
 
     this.destroy();
 };
 
-OriginCustomizerScreen.prototype.isRegistered = function()
+WorldEditorScreen.prototype.isRegistered = function()
 {
     if (this.mContainer !== null)
     {
@@ -1462,7 +1663,7 @@ OriginCustomizerScreen.prototype.isRegistered = function()
     return false;
 };
 
-OriginCustomizerScreen.prototype.show = function(_data)
+WorldEditorScreen.prototype.show = function(_data)
 {
     var screen = this.mLastScreen !== null && this.mLastScreen !== undefined ? this.mLastScreen : 'General';
 
@@ -1510,7 +1711,7 @@ OriginCustomizerScreen.prototype.show = function(_data)
     }
 };
 
-OriginCustomizerScreen.prototype.hide = function(_withSlideAnimation)
+WorldEditorScreen.prototype.hide = function(_withSlideAnimation)
 {
     var self = this;
     var withAnimation = (_withSlideAnimation !== undefined && _withSlideAnimation !== null) ? _withSlideAnimation : true;
@@ -1552,7 +1753,7 @@ OriginCustomizerScreen.prototype.hide = function(_withSlideAnimation)
     }
 };
 
-OriginCustomizerScreen.prototype.switchScreen = function(_screen)
+WorldEditorScreen.prototype.switchScreen = function(_screen)
 {
     $.each(this.mScreens, function (_key, _definition) {
         if (_key === _screen)
@@ -1571,44 +1772,81 @@ OriginCustomizerScreen.prototype.switchScreen = function(_screen)
     this.mLastScreen = _screen;
 };
 
-OriginCustomizerScreen.prototype.isVisible = function()
+WorldEditorScreen.prototype.isVisible = function()
 {
     return this.mIsVisible;
 };
 
-OriginCustomizerScreen.prototype.addColumn = function(_width, _class, _color)
-{
-    if (_class === undefined)
-        _class = '';
-    else
-        _class = ' ' + _class;
 
-    var result = $('<div class="custom-column' + _class + '"/>');
+// simple functions so i don't have to prepare so many css elements
+WorldEditorScreen.prototype.addLayout = function(_width, _height, _class, _line, _color)
+{
+    if (_class === undefined || _class === null)
+        _class = '';
+
+    var result = $('<div class="custom-layout-container ' + _class + '"/>');
+    result.css('width', _width + 'rem'); //only accept number, no %
+    result.css('height', _height + 'rem'); //only accept number, no %
+
+    if (_line !== undefined)
+        result.css('line-height', _line + 'rem'); //only accept number, no %
+
+    if (_color !== undefined) // the border is only used for testing
+        result.css('border', '1px solid ' + _color);
+
+    return result;
+};
+WorldEditorScreen.prototype.addContainer = function(_width, _height, _class, _color)
+{
+    if (_class === undefined || _class === null)
+        _class = '';
+
+    if (_width === undefined || _width === null)
+        _width = '100%';
+    else if (typeof _width !== 'string') // i only use string when i add %
+        _width = _width + 'rem';
+
+    if (_height === undefined || _height === null)
+        _height = '100%';
+    else if (typeof _height !== 'string') // i only use string when i add %
+        _height = _height + 'rem';
+
+    var result = $('<div class="custom-container ' + _class + '"/>');
+    result.css('width', _width);
+    result.css('height', _height);
+
+    if (_color !== undefined) // the border is only used for testing
+        result.css('border', '1px solid ' + _color);
+
+    return result;
+};
+WorldEditorScreen.prototype.addColumn = function(_width, _class, _color)
+{
+    if (_class === undefined || _class === null)
+        _class = '';
+
+    var result = $('<div class="custom-column ' + _class + '"/>');
     result.css('width', _width + '%');
 
     if (_color !== undefined)
         result.css('border', '1px solid ' + _color);
 
     return result;
-}
-
-OriginCustomizerScreen.prototype.addRow = function(_height, _class, _color)
+};
+WorldEditorScreen.prototype.addRow = function(_height, _class, _color)
 {
-    if (_class === undefined)
+    if (_class === undefined || _class === null)
         _class = '';
-    else
-        _class = ' ' + _class;
 
-    var result = $('<div class="custom-row' + _class + '"/>');
+    var result = $('<div class="custom-row ' + _class + '"/>');
     result.css('height', _height + '%');
 
     if (_color !== undefined)
         result.css('border', '1px solid ' + _color);
 
     return result;
-}
-
-OriginCustomizerScreen.prototype.loadFromData = function(_data) 
+};
+WorldEditorScreen.prototype.loadFromData = function(_data) 
 {
     if ('Scenarios' in _data && _data.Scenarios !== undefined && _data.Scenarios !== null && jQuery.isArray(_data.Scenarios))
         this.mScenario.Data = _data.Scenarios;
@@ -1623,42 +1861,42 @@ OriginCustomizerScreen.prototype.loadFromData = function(_data)
         this.addLocationsData(_data.Locations);
 };
 
-OriginCustomizerScreen.prototype.notifyBackendOnConnected = function()
+WorldEditorScreen.prototype.notifyBackendOnConnected = function()
 {
     SQ.call(this.mSQHandle, 'onScreenConnected');
 };
 
-OriginCustomizerScreen.prototype.notifyBackendOnDisconnected = function()
+WorldEditorScreen.prototype.notifyBackendOnDisconnected = function()
 {
     SQ.call(this.mSQHandle, 'onScreenDisconnected');
 };
 
-OriginCustomizerScreen.prototype.notifyBackendOnShown = function()
+WorldEditorScreen.prototype.notifyBackendOnShown = function()
 {
     SQ.call(this.mSQHandle, 'onScreenShown');
 };
 
-OriginCustomizerScreen.prototype.notifyBackendOnHidden = function()
+WorldEditorScreen.prototype.notifyBackendOnHidden = function()
 {
     SQ.call(this.mSQHandle, 'onScreenHidden');
 };
 
-OriginCustomizerScreen.prototype.notifyBackendOnAnimating = function()
+WorldEditorScreen.prototype.notifyBackendOnAnimating = function()
 {
     SQ.call(this.mSQHandle, 'onScreenAnimating');
 };
 
-OriginCustomizerScreen.prototype.notifyBackendPopupDialogIsVisible = function (_visible)
+WorldEditorScreen.prototype.notifyBackendPopupDialogIsVisible = function (_visible)
 {
     SQ.call(this.mSQHandle, 'onPopupDialogIsVisible', [_visible]);
 };
 
-OriginCustomizerScreen.prototype.notifyBackendCloseButtonPressed = function()
+WorldEditorScreen.prototype.notifyBackendCloseButtonPressed = function()
 {
     SQ.call(this.mSQHandle, 'onCloseButtonPressed');
 };
 
 
-registerScreen("OriginCustomizerScreen", new OriginCustomizerScreen());
+registerScreen("WorldEditorScreen", new WorldEditorScreen());
 
 

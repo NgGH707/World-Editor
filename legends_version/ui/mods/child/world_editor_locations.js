@@ -1,5 +1,5 @@
 
-OriginCustomizerScreen.prototype.changeLocationfilter = function()
+WorldEditorScreen.prototype.changeLocationfilter = function()
 {
     this.mLocation.FilterType++;
 
@@ -9,7 +9,7 @@ OriginCustomizerScreen.prototype.changeLocationfilter = function()
     this.reloadLocationsData();
 };
 
-OriginCustomizerScreen.prototype.reloadLocationsData = function ()
+WorldEditorScreen.prototype.reloadLocationsData = function ()
 {
     var toLoad = this.mLocation.Data[this.mLocation.FilterType];
     this.mLocation.ListScrollContainer.empty();
@@ -21,10 +21,10 @@ OriginCustomizerScreen.prototype.reloadLocationsData = function ()
     }
 
     this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0), true);
-    this.mLocation.FilterButton.changeButtonText(OriginCustomizer.Locations[this.mLocation.FilterType]);
+    this.mLocation.FilterButton.changeButtonText(WorldEditor.Locations[this.mLocation.FilterType]);
 };
 
-OriginCustomizerScreen.prototype.addLocationsData = function (_data)
+WorldEditorScreen.prototype.addLocationsData = function (_data)
 {
     this.mLocation.ListScrollContainer.empty();
     this.mLocation.Data = _data;
@@ -38,10 +38,10 @@ OriginCustomizerScreen.prototype.addLocationsData = function (_data)
     }
 
     this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0), true);
-    this.mLocation.FilterButton.changeButtonText(OriginCustomizer.Locations[this.mLocation.FilterType]);
+    this.mLocation.FilterButton.changeButtonText(WorldEditor.Locations[this.mLocation.FilterType]);
 };
 
-OriginCustomizerScreen.prototype.addLocationListEntry = function(_data, _index)
+WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
 {
     var result = $('<div class="l-settlement-row"/>'); // reuse the list entry from settlement screen :evilgirns:
     this.mLocation.ListScrollContainer.append(result);
@@ -79,7 +79,7 @@ OriginCustomizerScreen.prototype.addLocationListEntry = function(_data, _index)
     entry.append(name);
 };
 
-OriginCustomizerScreen.prototype.selectLocationListEntry = function(_element, _scrollToEntry)
+WorldEditorScreen.prototype.selectLocationListEntry = function(_element, _scrollToEntry)
 {
     if (_element !== null && _element.length > 0)
     {
@@ -101,9 +101,10 @@ OriginCustomizerScreen.prototype.selectLocationListEntry = function(_element, _s
     }
 };
 
-OriginCustomizerScreen.prototype.addTroopListEntry = function (_data, _index, _listScrollContainer)
+WorldEditorScreen.prototype.addTroopListEntry = function (_data, _index, _listScrollContainer)
 {
     var result = $('<div class="troop-row"/>');
+    var strength = _data.Strength * _data.Num;
 
     _listScrollContainer.append(result);
 
@@ -113,7 +114,7 @@ OriginCustomizerScreen.prototype.addTroopListEntry = function (_data, _index, _l
 
     var leftColumn = this.addColumn(25);
     result.append(leftColumn);
-    var iconLayout = $('<div class="troop-icon is-center"/>');
+    var iconLayout = this.addLayout(5.6, 5.6, 'is-center');
     leftColumn.append(iconLayout);
     var icon = iconLayout.createImage(Path.GFX + _data.Icon, function(_image)
     {
@@ -125,7 +126,8 @@ OriginCustomizerScreen.prototype.addTroopListEntry = function (_data, _index, _l
     var color = 'font-color-white';
     if (_data.IsChampion === true)
     {
-        var iconLayout = $('<div class="champion-icon is-horizontal-center"/>');
+        var iconLayout = this.addLayout(2.2, 2.2, 'is-horizontal-center');
+        iconLayout.css('top', '6.6rem');
         leftColumn.append(iconLayout);
         var icon = iconLayout.createImage(Path.GFX + 'ui/icons/miniboss.png', function(_image)
         {
@@ -159,59 +161,65 @@ OriginCustomizerScreen.prototype.addTroopListEntry = function (_data, _index, _l
         // to display the strength this troop entry contributes
         var column = this.addColumn(30);
         upperRow.append(column);
-        var iconLayout = $('<div class="strength-button is-vertical-center"/>');
+        var iconLayout = this.addLayout(3.0, 3.0, 'is-vertical-center');
         column.append(iconLayout);
         var image = iconLayout.createImage(Path.GFX + 'ui/icons/fist.png', function(_image)
         {
             _image.fitImageToParent(0, 0);
             _image.removeClass('opacity-none');
         }, null, 'opacity-none');
-        image.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.partystrength' });
-        var name = $('<div class="strength-label is-vertical-center title-font-normal font-bold ' + color + '">' + (_data.Strength * _data.Num) + '</div>');
+        image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.partystrength' });
+        var name = $('<div class="strength-label is-vertical-center title-font-normal font-bold ' + color + '">' + strength + '</div>');
         column.append(name);
 
         // a button so you can turn a unit in this entry into a champion or vice versa
         var column = this.addColumn(15);
         upperRow.append(column);
-        var buttonLayout = $('<div class="position-button is-center"/>');
+        var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
         column.append(buttonLayout);
         var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/' + minibossIcon + '.png', function() {
             //self.onPreviousBannerClicked();
         }, '', 6);
-        button.bindTooltip({ contentType: 'ui-element', elementId: (_data.IsChampion === true ? 'origincustomizer.dechampionization' : 'origincustomizer.championization') });
+        button.bindTooltip({ contentType: 'ui-element', elementId: (_data.IsChampion === true ? 'woditor.dechampionization' : 'woditor.championization') });
 
         // remove the entire entry
         var column = this.addColumn(15);
         upperRow.append(column);
-        var buttonLayout = $('<div class="position-button is-center"/>');
+        var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
         column.append(buttonLayout);
-        var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_delete.png', function() {
+        var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/cancel.png', function() {
             //self.onPreviousBannerClicked();
         }, '', 6);
-        button.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.removeentry' });
+        button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.removeentry' });
 
         // for name
         var lowerRow = this.addRow(50);
         rightColumn.append(lowerRow);
         var name = $('<div class="troop-name is-vertical-center title-font-big font-bold ' + color + ' ">' + _data.Name + '</div>');
         lowerRow.append(name);
+
+        return strength;
     }
 };
 
-OriginCustomizerScreen.prototype.updateLocationDetailsPanel = function(_element)
+WorldEditorScreen.prototype.updateLocationDetailsPanel = function(_element)
 {
     if(_element !== null && _element.length > 0)
     {
         var data = _element.data('entry');
+        var strength = 0;
 
         this.mLocation.Troops.empty();
         for (var i = 0; i < data.Troops.length; i++) {
-            this.addTroopListEntry(data.Troops[i], i, this.mLocation.Troops);
+            strength += this.addTroopListEntry(data.Troops[i], i, this.mLocation.Troops);
         }
 
-        /*this.mSettlement.Name.setInputText(data.Name);
-        this.mSettlement.Image.attr('src', Path.GFX + data.ImagePath);
-        this.updateSideListScroll(data);
+        this.mLocation.Name.setInputText(data.Name);
+        this.mLocation.Resources.setInputText('' + data.Resources + '');
+        this.mLocation.Strength.html('' + strength + '');
+        this.mLocation.Image.attr('src', Path.GFX + data.ImagePath);
+
+        /*this.updateSideListScroll(data);
         
         for (var i = 0; i < data.Buildings.length; i++) {
             var entry = data.Buildings[i];
@@ -222,11 +230,11 @@ OriginCustomizerScreen.prototype.updateLocationDetailsPanel = function(_element)
                     continue;
 
                 image.attr('src', Path.GFX + 'ui/buttons/free_building_slot_icon.png');
-                image.bindTooltip({ contentType: 'ui-element', elementId: 'origincustomizer.freebuildingslot' });
+                image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.freebuildingslot' });
             }
             else {
                 image.attr('src', Path.GFX + entry.ImagePath);
-                image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId , elementOwner: 'origincustomizer.buildings'});
+                image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId , elementOwner: 'woditor.buildings'});
             }
         }
 
@@ -247,7 +255,7 @@ OriginCustomizerScreen.prototype.updateLocationDetailsPanel = function(_element)
 };
 
 
-OriginCustomizerScreen.prototype.createSmallInputDIV = function(_key, _definition, _parentDiv)
+WorldEditorScreen.prototype.createSmallInputDIV = function(_key, _definition, _parentDiv)
 {
     var font = 'Font' in _definition ? _definition.Font  : 'title-font-big';
     var color = 'Color' in _definition ? _definition.Color : 'font-color-title';

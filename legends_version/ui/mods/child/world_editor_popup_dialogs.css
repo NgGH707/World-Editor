@@ -1,0 +1,78 @@
+
+.world-editor-screen .ui-control.popup-dialog.scenarios-popup
+{
+    width: 80.0rem;
+    height: 72.0rem;
+
+    background-image: url("coui://gfx/ui/skin/dialog_background_02.png");
+    background-size: 80.0rem 72.0rem;
+    background-repeat: no-repeat;
+}
+
+.world-editor-screen .ui-control.popup-dialog.scenarios-popup .scenarios-content-container
+{
+    width: 100%;
+    height: 58.0rem;
+
+    position: relative;
+    overflow: hidden;
+
+    /*border: 2px solid blue;*/
+}
+
+.world-editor-screen .ui-control.popup-dialog.scenarios-popup .scenarios-content-container .l-list-container
+{
+    top: 1.0rem;
+    left: 1.0rem;/*2.0*/
+    bottom: 1.0rem;
+    width: 31.0rem;
+    position: absolute;
+}
+
+.world-editor-screen .ui-control.popup-dialog.scenarios-popup .scenarios-content-container .l-list-container .scroll-container
+{
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+}
+
+.world-editor-screen .ui-control.popup-dialog.scenarios-popup .scenarios-content-container .l-list-container .l-row
+{
+    width: 100%;
+    height: 3.7rem;
+    position: relative;
+    margin-bottom: 0.1rem;
+
+    line-height: 3.24rem;
+}
+
+.world-editor-screen .ui-control.popup-dialog.scenarios-popup .scenarios-content-container .l-list-container .l-row:last-child
+{
+    margin-bottom: 0;
+}
+
+.world-editor-screen .ui-control.popup-dialog.scenarios-popup .scenarios-content-container .l-description-container
+{
+    top: 1.0rem;
+    right: 2.0rem;
+    bottom : 1.0rem;
+    width: 40.0rem;
+    position: absolute;
+}
+
+.world-editor-screen .ui-control.popup-dialog.scenarios-popup .scenarios-content-container .l-description-container .scroll-container
+{
+    width: 94%;
+    float: left;
+    margin-left: 1.0rem;
+    padding-top: 1.0rem;
+}
+
+.world-editor-screen .ui-control.popup-dialog.scenarios-popup .move-to-left
+{
+    right: 20.0rem;
+}
+
+.world-editor-screen .ui-control.popup-dialog.scenarios-popup .move-to-right
+{
+    left: 20.0rem;
+}

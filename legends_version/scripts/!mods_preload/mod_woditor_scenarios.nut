@@ -1,4 +1,4 @@
-this.getroottable().OriginCustomizer.hookScenarios <- function ()
+this.getroottable().Woditor.hookScenarios <- function ()
 {
 	::mods_hookExactClass("scenarios/world/starting_scenario", function( obj )
 	{
@@ -41,5 +41,5 @@ this.getroottable().OriginCustomizer.hookScenarios <- function ()
 		}
 	});
 
-	delete this.OriginCustomizer.hookScenarios;
+	delete this.Woditor.hookScenarios;
 }
