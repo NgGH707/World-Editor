@@ -729,6 +729,17 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         this.mSettlement.FactionBanner = imageContainer.createImage(null, function(_image) {
                             _image.fitImageToParent(0, 0);
                         }, null, '');
+                        this.mSettlement.FactionBanner.click(function(_event) {
+                            if (self.mSettlement.Selected !== null && self.mSettlement.Selected.length > 0)
+                                self.createChooseFactionPopupDialog('mSettlement', 'Faction');
+                        });
+                        this.mSettlement.FactionBanner.mouseover(function() {
+                            this.classList.add('is-highlighted');
+                        });
+                        this.mSettlement.FactionBanner.mouseout(function() {
+                            this.classList.remove('is-highlighted');
+                        });
+                        this.mSettlement.FactionBanner.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.choosefaction' });
 
 
                         // title
@@ -744,6 +755,17 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         this.mSettlement.OwnerBanner = imageContainer.createImage(null, function(_image) {
                             _image.fitImageToParent(0, 0);
                         }, null, '');
+                        this.mSettlement.OwnerBanner.click(function(_event) {
+                            if (self.mSettlement.Selected !== null && self.mSettlement.Selected.length > 0)
+                                self.createChooseFactionPopupDialog('mSettlement', 'Owner');
+                        });
+                        this.mSettlement.OwnerBanner.mouseover(function() {
+                            this.classList.add('is-highlighted');
+                        });
+                        this.mSettlement.OwnerBanner.mouseout(function() {
+                            this.classList.remove('is-highlighted');
+                        });
+                        this.mSettlement.OwnerBanner.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.choosefaction' });
                     }
 
                     var row10 = this.addRow(10);

@@ -90,8 +90,6 @@
     width: 100%;
     height: 4.3rem;
     position: relative;
-
-    border: 1px solid green;
 }
 .world-editor-screen .ui-control.popup-dialog.troops-popup .troops-tab-container .l-tab-button
 {
@@ -150,35 +148,35 @@
     margin-top: 0.4rem;
     margin-bottom: 0.4rem;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .column-is-25
+.world-editor-screen .ui-control.popup-dialog .column-is-25
 {
     width: 25%;
     height: 100%;
     position: relative;
     float: left;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .column-is-20
+.world-editor-screen .ui-control.popup-dialog .column-is-20
 {
     width: 20%;
     height: 100%;
     position: relative;
     float: left;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .column-is-30
+.world-editor-screen .ui-control.popup-dialog .column-is-30
 {
     width: 30%;
     height: 100%;
     position: relative;
     float: left;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .column-is-40
+.world-editor-screen .ui-control.popup-dialog .column-is-40
 {
     width: 40%;
     height: 100%;
     position: relative;
     float: left;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .column-is-75
+.world-editor-screen .ui-control.popup-dialog .column-is-75
 {
     width: 75%;
     height: 100%;
@@ -192,7 +190,7 @@
     position: relative;
     float: left;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .troop-icon
+.world-editor-screen .ui-control.popup-dialog .troop-icon
 {
     width: 5.6rem;
     height: 5.6rem;
@@ -205,7 +203,7 @@
     margin: auto;
     position: absolute;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .troop-name
+.world-editor-screen .ui-control.popup-dialog .troop-name
 {
     height: 2.6rem;
     line-height: 3.0rem;
@@ -219,7 +217,7 @@
 
     overflow: hidden;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .check-image
+.world-editor-screen .ui-control.popup-dialog .check-image
 {
     height: 4.1rem;
     width: 4.5rem;
@@ -231,7 +229,7 @@
     margin-bottom: auto;
     position: absolute;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .strength-icon
+.world-editor-screen .ui-control.popup-dialog .strength-icon
 {
     height: 3.0rem;
     width: 3.0rem;
@@ -243,7 +241,7 @@
     margin-bottom: auto;
     position: absolute;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .strength-label
+.world-editor-screen .ui-control.popup-dialog .strength-label
 {
     height: 2.6rem;
     line-height: 3.0rem;
@@ -257,6 +255,19 @@
     position: absolute;
 
     overflow: hidden;
+}
+.world-editor-screen .ui-control.popup-dialog .banner-icon
+{
+    width: 9.0rem;
+    height: 100%;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+
+    margin: auto;
+    position: absolute;
 }
 
 

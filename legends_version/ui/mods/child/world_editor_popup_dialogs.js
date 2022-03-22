@@ -158,6 +158,124 @@ WorldEditorScreen.prototype.updateScenarioDescription = function (_data)
 
 
 /*
+    Choose Faction
+*/
+WorldEditorScreen.prototype.createChooseFactionPopupDialog = function(_screen, _choose) 
+{
+    var self = this;
+    var parent = self[_screen];
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Choose a Faction', '', null, 'troops-popup');
+
+    // create: content
+    var result = this.createChooseFactionDialogContent(this.mCurrentPopupDialog);
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // create: list
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var listScrollContainer = result.ListContainer.findListScrollContainer();
+
+    // add the ok button
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        //self.notifyBackendUpdateNewFactionFor(_screen, _choose);
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    
+    // add the cancel button
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.findPopupDialogCancelButton().addClass('move-to-left');
+
+    var button = this.mCurrentPopupDialog.findPopupDialogOkButton();
+    button.addClass('move-to-right');
+    button.enableButton(false);
+    this.addFactionToPopupDialog(this.mFaction.Data, listScrollContainer, button, this.mFaction.Data[parent.Selected.data('entry')[_choose]]);
+};
+WorldEditorScreen.prototype.createChooseFactionDialogContent = function(_dialog) 
+{
+    var self = this;
+    var content = $('<div class="troops-content-container"/>');
+
+    var tab = $('<div class="troops-tab-container"/>');
+    content.append(tab);
+
+    var container = $('<div class="l-list-container"></div>');
+    content.append(container);
+
+    var listContainer = $('<div class="ui-control list has-frame"/>');
+    container.append(listContainer);
+    var scrollContainer = $('<div class="scroll-container"/>');
+    listContainer.append(scrollContainer);
+
+    return {
+        Content: content,
+        ListContainer: listContainer
+    };
+};
+WorldEditorScreen.prototype.addFactionToPopupDialog = function(_entries, _listScrollContainer, _button, _selected) 
+{
+    if (_entries !== null && jQuery.isArray(_entries))
+    {
+        _listScrollContainer.empty();
+
+        for (var i = 0; i < _entries.length; ++i)
+        {
+            var data = _entries[i];
+            this.createChooseFactionEntry(data, _listScrollContainer, _button, data.ID === _selected);
+        }
+    }
+};
+WorldEditorScreen.prototype.createChooseFactionEntry = function(_data, _listScrollContainer, _button, _isSelected) 
+{
+    var result = $('<div class="ui-control is-troop-slot"/>');
+    _listScrollContainer.append(result);
+
+    var entry = $('<div class="ui-control troop-panel"/>');
+    result.append(entry);
+    entry.data('entry', _data);
+
+    if (_isSelected === true)
+        entry.addClass('is-selected');
+
+    // icon
+    var leftColumn = $('<div class="column-is-25"/>');
+    entry.append(leftColumn);
+    var iconLayout = $('<div class="banner-icon"/>');  
+    leftColumn.append(iconLayout);
+    var icon = iconLayout.createImage(Path.GFX + _data.ImagePath, function(_image)
+    {
+        _image.fitImageToParent(0, 0);
+        _image.removeClass('opacity-none');
+    }, null, 'opacity-none');
+
+    var rightColumn = $('<div class="column-is-75"/>');
+    entry.append(rightColumn);
+    
+    // for name
+    var row = $('<div class="row"/>');
+    rightColumn.append(row);
+    var name = $('<div class="troop-name title-font-normal font-bold font-color-title">' + _data.Name + '</div>');
+    row.append(name);
+
+    // set up event listener
+    entry.click(this, function(_event) {
+        var entryDiv = $(this);
+        _button.enableButton(true);
+        _listScrollContainer.find('.is-selected').each(function (_index, _element) {
+            $(_element).removeClass('is-selected');
+        });
+        entryDiv.addClass('is-selected');
+    });
+};
+
+
+
+/*
     Add Troop Dialog
 */
 WorldEditorScreen.prototype.createAddTroopPopupDialog = function() 

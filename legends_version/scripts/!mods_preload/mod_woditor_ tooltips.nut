@@ -720,6 +720,20 @@ this.getroottable().Woditor.hookTooltips <- function ()
 					},
 				];
 
+			case "woditor.choosefaction":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Choose Faction"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Let you change to another faction."
+					},
+				];
+
 			case "woditor.troopsinfo":
 		       	return [
 					{

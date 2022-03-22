@@ -138,11 +138,9 @@ WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
             }
         }
 
-        var noOwner = data.Owner === undefined || data.Owner === null;
-        var isTheSame = !noOwner && data.Owner === data.Faction;
         this.mSettlement.FactionBanner.attr('src', Path.GFX + this.mFaction.Data[data.Faction].ImagePath);
 
-        if (noOwner || isTheSame)
+        if (data.Owner === undefined || data.Owner === null)
             this.mSettlement.OwnerBanner.attr('src', Path.GFX + 'ui/banners/add_banner.png');
         else 
             this.mSettlement.OwnerBanner.attr('src', Path.GFX + this.mFaction.Data[data.Owner].ImagePath);
