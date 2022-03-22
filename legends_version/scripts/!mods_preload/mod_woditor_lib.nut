@@ -258,16 +258,62 @@ this.getroottable().Woditor.createLib <- function ()
 		"figure_white_direwolf_01",
 	]);
 
-
+	gt.Const.IsOrcs <- [
+		this.Const.EntityType.OrcYoung,
+		this.Const.EntityType.OrcBerserker,
+		this.Const.EntityType.OrcWarrior,
+		this.Const.EntityType.OrcWarlord,
+		this.Const.EntityType.LegendOrcElite,
+		this.Const.EntityType.LegendOrcBehemoth,
+	];
+	gt.Woditor.TroopTypeFilter <- {
+		All = 0,
+		Human = 1,
+		Undead = 2,
+		Greenskin = 3,
+		Misc = 4,
+		COUNT = 5
+	}
 	// processing the spawnlist so i can add them as entry to the mod ui
+	gt.Woditor.ValidTroops <- [
+		[], // all
+		[], // human
+		[], // undead
+		[], // greenskin
+		[], // misc
+	];
 	gt.Woditor.TroopKeys <- {};
 	gt.Woditor.TroopNames <- {};
 
 	foreach (key, entry in this.Const.World.Spawn.Troops)
 	{
+		if (key == "BanditOutrider")
+		{
+			continue;
+		}
+
 		if (!(entry.Script in gt.Woditor.TroopKeys))
 		{
 			gt.Woditor.TroopKeys[entry.Script] <- key;
+			
+			// attempting to filter out all entry
+			local entity = this.new(entry.Script);
+			if (entity.getFlags().has("human"))
+			{
+				gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human].push(key);
+			}
+			else if (entity.getFlags().has("undead"))
+			{
+				gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead].push(key);
+			}
+			else if (entity.getFlags().has("goblin") || this.Const.IsOrcs.find(entity.getType()) != null)
+			{
+				gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin].push(key);
+			}
+			else
+			{
+				gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Misc].push(key);
+			}
 		}
 		else
 		{
@@ -326,6 +372,11 @@ this.getroottable().Woditor.createLib <- function ()
 
 		gt.Woditor.TroopNames[entry.Script] <- prefix + gt.Const.Strings.EntityName[entry.ID] + postfix;
 	}
+
+	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human]);
+	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead]);
+	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin]);
+	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Misc]);
 
 	gt.Woditor.getTroopKey <- function(_entry)
 	{

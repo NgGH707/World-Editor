@@ -194,4 +194,38 @@
 }
 
 
+/*
+    Troop entry slot
+*/
+.ui-control.is-troop-slot
+{
+    width: 37.0rem;
+    height: 10.7rem;
+    float: left;
+    position: relative;
+    margin-left: 1.0rem;
+    margin-top: 0.2rem;
+
+    text-shadow: 1px 1px 1px #000;
+}
+
+.ui-control.is-troop-slot > .troop-panel
+{
+    width: 100%;
+    height: 100%;
+
+    background-image: url("coui://gfx/ui/skin/tactical_character_background.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.ui-control.is-troop-slot > .troop-panel:hover,
+.ui-control.is-troop-slot > .troop-panel.is-selected
+{
+    background-image: url("coui://gfx/ui/skin/tactical_character_background_hovered.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+
 

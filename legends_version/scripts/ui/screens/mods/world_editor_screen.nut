@@ -127,6 +127,39 @@ this.world_editor_screen <- {
 		}
 	}
 
+	function onGetTroopEntries( _data )
+	{
+		local exclude = _data[0];
+		local filter = _data[1];
+		local list = clone this.Woditor.ValidTroops[filter];
+		local result = [];
+
+		foreach( key in exclude )
+		{
+			local i = list.find(key);
+
+			if (i != null)
+			{
+				list.remove(i);
+			}
+		}
+
+		foreach( key in list )
+		{
+			local troop = this.Const.World.Spawn.Troops[key];
+
+			result.push({
+				Name = this.Woditor.getTroopName(troop),
+				Icon = this.Woditor.getTroopIcon(troop),
+				Strength = troop.Strength,
+				Cost = troop.Cost,
+				Key = key,
+			})
+		}
+
+		return result;
+	}
+
 	function convertToUIData()
 	{
 		local result = {};

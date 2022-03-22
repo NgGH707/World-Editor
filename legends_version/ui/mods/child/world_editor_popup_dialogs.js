@@ -1,14 +1,13 @@
 
-
+// Scenario selection dialog
 WorldEditorScreen.prototype.createScenarioPopupDialog = function() 
 {
     var self = this;
 
     this.notifyBackendPopupDialogIsVisible(true);
-    this.mCurrentPopupDialog = $('.origin-customizer-screen').createPopupDialog('Origins', '', null, 'scenarios-popup');
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Origins', '', null, 'scenarios-popup');
 
-    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog)
-    {
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
         //self.notifyBackendUpdateScenario(self.mScenario.Selected);
         self.mCurrentPopupDialog = null;
         self.mScenario.Description = null;
@@ -18,8 +17,7 @@ WorldEditorScreen.prototype.createScenarioPopupDialog = function()
         self.notifyBackendPopupDialogIsVisible(false);
     });
     
-    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog)
-    {
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
         self.mCurrentPopupDialog = null;
         self.mScenario.Description = null;
         self.mScenario.ListContainer = null;
@@ -55,7 +53,6 @@ WorldEditorScreen.prototype.createScenarioDialogContent = function(_dialog)
 
     return content;
 };
-
 WorldEditorScreen.prototype.addScenarioEntryToList = function (_data)
 {
     var row = $('<div class="l-row"/>');
@@ -95,7 +92,6 @@ WorldEditorScreen.prototype.addScenarioEntryToList = function (_data)
     row.append(entry);
     this.mScenario.ListScrollContainer.append(row);
 };
-
 WorldEditorScreen.prototype.addScenariosToList = function (_scenarios)
 {
     if (_scenarios !== null && jQuery.isArray(_scenarios))
@@ -122,14 +118,12 @@ WorldEditorScreen.prototype.addScenariosToList = function (_scenarios)
         this.selectFirstScenario();
     }
 };
-
-
 WorldEditorScreen.prototype.selectFirstScenario = function()
 {
     // deselect all entries first
-    this.mScenario.ListScrollContainer.find('.is-selected').each(function (index, el)
+    this.mScenario.ListScrollContainer.find('.is-selected').each(function (_index, _element)
     {
-        $(el).removeClass('is-selected');
+        $(_element).removeClass('is-selected');
     });
 
     var firstEntry = this.mScenario.ListScrollContainer.find('.l-row:first');
@@ -141,7 +135,6 @@ WorldEditorScreen.prototype.selectFirstScenario = function()
         this.updateScenarioDescription(entry.data('scenario'));
     }
 };
-
 WorldEditorScreen.prototype.updateScenarioDescription = function (_data)
 {
     if (_data !== null && 'Description' in _data && typeof(_data.Description) == 'string')
@@ -159,4 +152,258 @@ WorldEditorScreen.prototype.updateScenarioDescription = function (_data)
     {
         console.error('ERROR: Failed to find "Description" field while interpreting scenario data. ID: ' + _data.ID);
     }
+};
+
+
+
+
+/*
+    Add Troop Dialog
+*/
+WorldEditorScreen.prototype.createAddTroopPopupDialog = function() 
+{
+    var self = this;
+    this.mTroop.Selected = [];
+    this.mTroop.Filter = 0;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Add Troop', 'Selected: 0', null, 'troops-popup');
+
+    // create: content
+    var subTitle = this.mCurrentPopupDialog.findPopupDialogSubTitle();
+    var result = this.createAddTroopDialogContent(this.mCurrentPopupDialog);
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // create: list
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var listScrollContainer = result.ListContainer.findListScrollContainer();
+
+    var buttonLayout = $('<div class="l-tab-button is-deselect-all"/>');
+    result.Tab.append(buttonLayout);
+    var button = buttonLayout.createTextButton("Deselect All", function() {
+        listScrollContainer.find('.is-selected').each(function (_index, _element)
+        {
+            var div = $(_element)
+            div.removeClass('is-selected');
+            var result = div.find('.check-image:first').find('img:first');
+            result.attr('src', Path.GFX + 'ui/skin/hud_button_01_default.png');
+        });
+        self.mTroop.Selected = [];
+        subTitle.html('Selected: 0');
+    }, null, 4);
+
+    var buttonLayout = $('<div class="l-tab-button is-filter-all"/>');
+    result.Tab.append(buttonLayout);
+    var button = buttonLayout.createTextButton("All", function() {
+        if (self.mTroop.Filter !== 0) {
+            self.mTroop.Filter = 0;
+            self.notifyBackendGetTroopEntries({
+                ListScrollContainer: listScrollContainer,
+                SubTitle: subTitle
+            });
+        }
+    }, null, 2);
+    var buttonLayout = $('<div class="l-tab-button is-filter-human"/>');
+    result.Tab.append(buttonLayout);
+    var button = buttonLayout.createTextButton("Human", function() {
+        if (self.mTroop.Filter !== 1) {
+            self.mTroop.Filter = 1;
+            self.notifyBackendGetTroopEntries({
+                ListScrollContainer: listScrollContainer,
+                SubTitle: subTitle
+            });
+        }
+    }, null, 2);
+    var buttonLayout = $('<div class="l-tab-button is-filter-undead"/>');
+    result.Tab.append(buttonLayout);
+    var button = buttonLayout.createTextButton("Undead", function() {
+        if (self.mTroop.Filter !== 2) {
+            self.mTroop.Filter = 2;
+            self.notifyBackendGetTroopEntries({
+                ListScrollContainer: listScrollContainer,
+                SubTitle: subTitle
+            });
+        }
+    }, null, 2);
+    var buttonLayout = $('<div class="l-tab-button is-filter-greenskin"/>');
+    result.Tab.append(buttonLayout);
+    var button = buttonLayout.createTextButton("Greenskin", function() {
+        if (self.mTroop.Filter !== 3) {
+            self.mTroop.Filter = 3;
+            self.notifyBackendGetTroopEntries({
+                ListScrollContainer: listScrollContainer,
+                SubTitle: subTitle
+            });
+        }
+    }, null, 2);
+    var buttonLayout = $('<div class="l-tab-button is-filter-misc"/>');
+    result.Tab.append(buttonLayout);
+    var button = buttonLayout.createTextButton("Others", function() {
+        if (self.mTroop.Filter !== 4) {
+            self.mTroop.Filter = 4;
+            self.notifyBackendGetTroopEntries({
+                ListScrollContainer: listScrollContainer,
+                SubTitle: subTitle
+            });
+        }
+    }, null, 2);
+
+    // add the ok button
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        //self.notifyBackendUpdateCurrentTroopList();
+        self.mTroop.Selected = [];
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.findPopupDialogOkButton().addClass('move-to-right');
+    
+    // add the cancel button
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mTroop.Selected = [];
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.findPopupDialogCancelButton().addClass('move-to-left');
+
+    // add data to the list
+    this.notifyBackendGetTroopEntries({
+        ListScrollContainer: listScrollContainer,
+        SubTitle: subTitle
+    });
+};
+WorldEditorScreen.prototype.createAddTroopDialogContent = function(_dialog) 
+{
+    var self = this;
+    var content = $('<div class="troops-content-container"/>');
+
+    var tab = $('<div class="troops-tab-container"/>');
+    content.append(tab);
+
+    var container = $('<div class="l-list-container"></div>');
+    content.append(container);
+
+    var listContainer = $('<div class="ui-control list has-frame"/>');
+    container.append(listContainer);
+    var scrollContainer = $('<div class="scroll-container"/>');
+    listContainer.append(scrollContainer);
+
+    return {
+        Content: content,
+        Tab: tab,
+        ListContainer: listContainer
+    };
+};
+WorldEditorScreen.prototype.addTroopEntriesToPopupDialog = function(_entries, _listScrollContainer, _subTitle) 
+{
+    if (_entries !== null && jQuery.isArray(_entries))
+    {
+        _listScrollContainer.empty();
+
+        for (var i = 0; i < _entries.length; ++i)
+        {
+            var data = _entries[i];
+            this.createTroopEntry(data, _listScrollContainer, _subTitle);
+        }
+    }
+};
+WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContainer, _subTitle) 
+{
+    var result = $('<div class="ui-control is-troop-slot"/>');
+    _listScrollContainer.append(result);
+
+    var isSelected = this.mTroop.Selected.indexOf(_data.Key) > 0;
+    var entry = $('<div class="ui-control troop-panel"/>');
+    result.append(entry);
+    entry.data('entry', _data);
+
+    if (isSelected === true)
+        entry.addClass('is-selected');
+
+    // icon
+    var leftColumn = $('<div class="column-is-25"/>');
+    entry.append(leftColumn);
+    var iconLayout = $('<div class="troop-icon"/>');  
+    leftColumn.append(iconLayout);
+    var icon = iconLayout.createImage(Path.GFX + _data.Icon, function(_image)
+    {
+        _image.fitImageToParent(0, 0);
+        _image.removeClass('opacity-none');
+    }, null, 'opacity-none');
+
+    var rightColumn = $('<div class="column-is-75"/>');
+    entry.append(rightColumn);
+    
+    var row = $('<div class="row"/>');
+    rightColumn.append(row);
+    
+    // to display the cost of this troop entry
+    var column = $('<div class="column-is-30"/>');
+    row.append(column);
+    var iconLayout = $('<div class="strength-icon"/>');
+    column.append(iconLayout);
+    var image = iconLayout.createImage(Path.GFX + 'ui/icons/money2.png', function(_image)
+    {
+        _image.fitImageToParent(0, 0);
+        _image.removeClass('opacity-none');
+    }, null, 'opacity-none');
+    //image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.partystrength' });
+    var name = $('<div class="strength-label title-font-normal font-bold font-color-white">' + _data.Cost + '</div>');
+    column.append(name);
+
+    // to display the strength of this troop entry contributes
+    var column = $('<div class="column-is-30"/>');
+    row.append(column);
+    var iconLayout = $('<div class="strength-icon"/>');
+    column.append(iconLayout);
+    var image = iconLayout.createImage(Path.GFX + 'ui/icons/fist.png', function(_image)
+    {
+        _image.fitImageToParent(0, 0);
+        _image.removeClass('opacity-none');
+    }, null, 'opacity-none');
+    image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.partystrength' });
+    var name = $('<div class="strength-label title-font-normal font-bold font-color-white">' + _data.Strength + '</div>');
+    column.append(name);
+
+    //
+    var column = $('<div class="column-is-20"/>');
+    row.append(column);
+
+    // 
+    var column = $('<div class="column-is-20"/>');
+    row.append(column);
+    var iconLayout = $('<div class="check-image"/>');
+    column.append(iconLayout);
+    var check = iconLayout.createImage(Path.GFX + (isSelected === true ? 'ui/skin/hud_button_01_checked.png' : 'ui/skin/hud_button_01_default.png'), function(_image)
+    {
+        _image.centerImageWithinParent(0, 0, 1.0);
+        _image.removeClass('opacity-none');
+    }, null, 'opacity-none');
+
+    // for name
+    var row = $('<div class="row"/>');
+    rightColumn.append(row);
+    var name = $('<div class="troop-name title-font-normal font-bold font-color-white">' + _data.Name + '</div>');
+    row.append(name);
+
+    // set up event listener
+    entry.click(this, function(_event) {
+        var self = _event.data;
+        var entryDiv = $(this);
+
+        if (entryDiv.hasClass('is-selected') === true) {
+            var index = self.mTroop.Selected.indexOf(_data.Key);
+            entryDiv.removeClass('is-selected');
+            check.attr('src', Path.GFX + 'ui/skin/hud_button_01_default.png');
+            if (index > 0)
+                self.mTroop.Selected.splice(index, 1);
+        }
+        else {
+            entryDiv.addClass('is-selected');
+            check.attr('src', Path.GFX + 'ui/skin/hud_button_01_checked.png');
+            self.mTroop.Selected.push(_data.Key);
+        }
+
+        _subTitle.html('Selected: ' + self.mTroop.Selected.length);
+    });
 };

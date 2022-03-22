@@ -15,6 +15,17 @@ var WorldEditorScreen = function(_parent)
 	this.mContainer = null;
     this.mDialogContainer = null;
 
+    // switch-to buttons
+    this.mSwitchToButton = 
+    {
+        General    : null,
+        Properties : null,
+        Factions   : null,
+        Settlements: null,
+        Locations  : null,
+        Contracts  : null,
+    };
+
     // screens
     this.mScreens = 
     {
@@ -69,23 +80,12 @@ var WorldEditorScreen = function(_parent)
         Loots              : null,
         Troops             : null,
         Selected           : null,
-        Strength               : null,
+        Strength           : null,
         Resources          : null,
         FilterButton       : null,
         ListContainer      : null,
         ListScrollContainer: null,
         FilterType         : 0,
-    };
-
-    // switch-to buttons
-    this.mSwitchToButton = 
-    {
-        General    : null,
-        Properties : null,
-        Factions   : null,
-        Settlements: null,
-        Locations  : null,
-        Contracts  : null,
     };
 
     // inputs
@@ -96,13 +96,13 @@ var WorldEditorScreen = function(_parent)
     }
     this.mAssets =
     {
-        BusinessReputation: {Input: null, Value: 0, ValueMin: -1000, ValueMax: 20000, Min: 0, Max: 5, IconPath: Path.GFX + Asset.ICON_ASSET_BUSINESS_REPUTATION, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-        MoralReputation   : {Input: null, Value: 0, ValueMin: 0    , ValueMax: 100  , Min: 0, Max: 3, IconPath: Path.GFX + Asset.ICON_ASSET_MORAL_REPUTATION   , TooltipId: TooltipIdentifier.Assets.MoralReputation},
-        Money             : {Input: null, Value: 0, ValueMin: 0    , ValueMax: null , Min: 0, Max: 9, IconPath: Path.GFX + Asset.ICON_ASSET_MONEY              , TooltipId: TooltipIdentifier.Assets.Money},
-        Stash             : {Input: null, Value: 0, ValueMin: 0    , ValueMax: 500  , Min: 0, Max: 3, IconPath: Path.GFX + Asset.ICON_BAG                      , TooltipId: TooltipIdentifier.Stash.FreeSlots},
-        Ammo              : {Input: null, Value: 0, ValueMin: 300  , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_AMMO               , TooltipId: TooltipIdentifier.Assets.Ammo},
-        Supplies          : {Input: null, Value: 0, ValueMin: 150  , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_SUPPLIES           , TooltipId: TooltipIdentifier.Assets.Supplies},
-        Medicine          : {Input: null, Value: 0, ValueMin: 100  , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_MEDICINE           , TooltipId: TooltipIdentifier.Assets.Medicine},
+        BusinessReputation: {Input: null, Value: 0, ValueMin:-1000, ValueMax: 20000, Min: 0, Max: 5, IconPath: Path.GFX + Asset.ICON_ASSET_BUSINESS_REPUTATION, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
+        MoralReputation   : {Input: null, Value: 0, ValueMin: 0   , ValueMax: 100  , Min: 0, Max: 3, IconPath: Path.GFX + Asset.ICON_ASSET_MORAL_REPUTATION   , TooltipId: TooltipIdentifier.Assets.MoralReputation},
+        Money             : {Input: null, Value: 0, ValueMin: 0   , ValueMax: null , Min: 0, Max: 9, IconPath: Path.GFX + Asset.ICON_ASSET_MONEY              , TooltipId: TooltipIdentifier.Assets.Money},
+        Stash             : {Input: null, Value: 0, ValueMin: 0   , ValueMax: 500  , Min: 0, Max: 3, IconPath: Path.GFX + Asset.ICON_BAG                      , TooltipId: TooltipIdentifier.Stash.FreeSlots},
+        Ammo              : {Input: null, Value: 0, ValueMin: 300 , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_AMMO               , TooltipId: TooltipIdentifier.Assets.Ammo},
+        Supplies          : {Input: null, Value: 0, ValueMin: 150 , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_SUPPLIES           , TooltipId: TooltipIdentifier.Assets.Supplies},
+        Medicine          : {Input: null, Value: 0, ValueMin: 100 , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_MEDICINE           , TooltipId: TooltipIdentifier.Assets.Medicine},
     };
     this.mAssetProperties =
     {
@@ -228,6 +228,13 @@ var WorldEditorScreen = function(_parent)
     this.mRosterTier           = {Control: null, Title: null, Min: 1, Max:  10, Value:   2, Step: 1, TooltipId: 'woditor.rostertier', Postfix: ''};
     this.mDifficultyMult       = {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.difficultymult', Postfix: '%'};
     this.mFactionRelation      = {Control: null, Title: null, Min: 0, Max: 100, Value:  50, Step: 5, TooltipId: TooltipIdentifier.RelationsScreen.Relations, Postfix: ''};
+
+    // troop selection dialog
+    this.mTroop =
+    {
+        Selected: [],
+        Filter: 0,
+    };
 
     // buttons
     this.mSaveButton  = null;
@@ -484,6 +491,7 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                 midColumn.append(lowerRow);
                 {
                     var row = this.addContainer(null, 4.6);
+                    row.css('margin-top', '2.0rem');
                     lowerRow.append(row);
                     var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
@@ -606,7 +614,8 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     column.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
-                        //self.();
+                        if(self.mLocation.Selected !== null && self.mLocation.Selected.length > 0)
+                            self.createAddTroopPopupDialog();
                     }, '', 6);
                     button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
                 }
@@ -800,7 +809,6 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                     rightHalf.append(lowerRow);
                     {
                         var row = this.addContainer(null, 4.6);
-                        //row.css('margin-top', '2.0rem');
                         lowerRow.append(row);
                         // button
                         var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
@@ -1245,7 +1253,7 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
             var originImageContainer = $('<div class="origin-image-container"/>');
             subLeftColumn.append(originImageContainer);
 
-            this.mScenario.Image = originImageContainer.createImage(Path.GFX + 'ui/events/event_99.png', function(_image) {
+            this.mScenario.Image = originImageContainer.createImage(Path.GFX + 'ui/events/event_141.png', function(_image) {
                 _image.removeClass('opacity-none');
             }, null, 'opacity-none');
             this.mScenario.Image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.choose_origin' });
@@ -1335,7 +1343,7 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                     avatarContainer.append(mid);
                     var avatarImage = this.addLayout(13.0, 16.0, 'is-center');
                     mid.append(avatarImage);
-                    this.mAvatar.Image = avatarImage.createImage(Path.GFX + 'ui/icons/legends_party.png', function(_image) {
+                    this.mAvatar.Image = avatarImage.createImage(Path.GFX + 'ui/icons/legends_necro.png', function(_image) {
                         _image.centerImageWithinParent(0, 0, 1.0);
                         _image.removeClass('display-none').addClass('display-block');
                     }, null, 'display-none');
@@ -1755,18 +1763,17 @@ WorldEditorScreen.prototype.hide = function(_withSlideAnimation)
 
 WorldEditorScreen.prototype.switchScreen = function(_screen)
 {
-    $.each(this.mScreens, function (_key, _definition) {
-        if (_key === _screen)
-            _definition.removeClass('display-none').addClass('display-block');
-        else
-            _definition.removeClass('display-block').addClass('display-none');
-    });
+    var self = this;
 
-    $.each(this.mSwitchToButton, function (_key, _definition) {
-        if (_key === _screen)
-            _definition.enableButton(false);
-        else
-            _definition.enableButton(true);
+    $.each(this.mScreens, function (_key, _definition) {
+        if (_key === _screen) {
+            _definition.removeClass('display-none').addClass('display-block');
+            self.mSwitchToButton[_key].enableButton(false);
+        }
+        else {
+            _definition.removeClass('display-block').addClass('display-none');
+            self.mSwitchToButton[_key].enableButton(true);
+        }
     });
 
     this.mLastScreen = _screen;
@@ -1894,6 +1901,28 @@ WorldEditorScreen.prototype.notifyBackendPopupDialogIsVisible = function (_visib
 WorldEditorScreen.prototype.notifyBackendCloseButtonPressed = function()
 {
     SQ.call(this.mSQHandle, 'onCloseButtonPressed');
+};
+
+WorldEditorScreen.prototype.notifyBackendGetTroopEntries = function( _result )
+{
+    var self = this;
+    var filter = this.mTroop.Filter;
+    var troop_data = this.mLocation.Selected.data('entry').Troops;
+    var key = [];
+
+    troop_data.forEach(function (_definition) {
+        key.push(_definition.Key);
+    });
+
+    SQ.call(this.mSQHandle, 'onGetTroopEntries', [ key, filter ], function(_data) {
+        if (_data === undefined || _data == null || !jQuery.isArray(_data))
+        {
+            console.error('ERROR: Failed to get Troops Entries. Invalid data result.');
+            return;
+        }
+
+        self.addTroopEntriesToPopupDialog(_data, _result.ListScrollContainer, _result.SubTitle);
+    });
 };
 
 

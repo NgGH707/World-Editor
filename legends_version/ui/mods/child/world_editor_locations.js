@@ -197,9 +197,9 @@ WorldEditorScreen.prototype.addTroopListEntry = function (_data, _index, _listSc
         rightColumn.append(lowerRow);
         var name = $('<div class="troop-name is-vertical-center title-font-big font-bold ' + color + ' ">' + _data.Name + '</div>');
         lowerRow.append(name);
-
-        return strength;
     }
+
+    return strength;
 };
 
 WorldEditorScreen.prototype.updateLocationDetailsPanel = function(_element)

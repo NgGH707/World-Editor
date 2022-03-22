@@ -6,7 +6,7 @@ this.getroottable().Woditor.hookWorldState <- function ()
 		obj.onInitUI = function()
 		{
 			init_ui();
-			this.m.WorldEditorScreen <- this.new("scripts/ui/screens/mods/origin_customizer_screen");
+			this.m.WorldEditorScreen <- this.new("scripts/ui/screens/mods/world_editor_screen");
 			this.m.WorldEditorScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
 			this.initLoadingScreenHandler();
 		}
