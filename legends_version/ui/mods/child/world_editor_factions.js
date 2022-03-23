@@ -25,6 +25,7 @@ WorldEditorScreen.prototype.addFactionListEntry = function (_data, _index)
     var entry = $('<div class="ui-control list-entry"/>');
     result.append(entry);
     entry.data('entry', _data);
+    entry.data('index', _index);
     entry.click(this, function(_event)
     {
         _event.data.selectFactionListEntry($(this));
@@ -106,6 +107,20 @@ WorldEditorScreen.prototype.selectFactionListEntry = function(_element, _scrollT
         this.updateFactionDetailsPanel(this.mFaction.Selected);
     }
 };
+
+WorldEditorScreen.prototype.updateFactionName = function(_name)
+{
+    var element = this.mFaction.Selected;
+    var index = element.data('index');
+    var name = element.find('.name:first');
+    if (name.length > 0) {
+        name.html(_name);
+    }
+    var data = this.mFaction.Data[index];
+    data.Name = _name;
+    element.data('entry', data);
+    return data.ID;
+}
 
 WorldEditorScreen.prototype.updateFactionDetailsPanel = function(_element)
 {

@@ -39,7 +39,7 @@ WorldEditorScreen.prototype.addSettlementsData = function (_data)
         this.addSettlementListEntry(entry, i);
     }
 
-    this.selectSettlementListEntry(this.mSettlement.ListContainer.findListEntryByIndex(0), true);
+    this.selectSettlementListEntry(this.mSettlement.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
 };
 
 WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
@@ -54,6 +54,7 @@ WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
     var entry = $('<div class="ui-control list-entry-fat"/>');
     result.append(entry);
     entry.data('entry', _data);
+    entry.data('index', _index);
     entry.click(this, function(_event)
     {
         _event.data.selectSettlementListEntry($(this));
@@ -105,6 +106,20 @@ WorldEditorScreen.prototype.selectSettlementListEntry = function(_element, _scro
         this.updateSettlementDetailsPanel(this.mSettlement.Selected);
     }
 };
+
+WorldEditorScreen.prototype.updateSettlementName = function(_name)
+{
+    var element = this.mSettlement.Selected;
+    var index = element.data('index');
+    var name = element.find('.name:first');
+    if (name.length > 0) {
+        name.html(_name);
+    }
+    var data = this.mSettlement.Data[index];
+    data.Name = _name;
+    element.data('entry', data);
+    return data.ID;
+}
 
 WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
 {

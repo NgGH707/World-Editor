@@ -4,6 +4,7 @@ var WorldEditor =
 {
     Screens: ['General'   , 'Properties'   , 'Factions'   , 'Settlements'   , 'Locations'   , 'Contracts'   ],
     Classes: ['is-general', 'is-properties', 'is-factions', 'is-settlements', 'is-locations', 'is-contracts'],
+    AssetsProperties : ['General', 'Relation', 'Contract', 'Scaling', 'Recruit', 'Economy', 'Combat'],
     Locations: ['Locations', 'Legendary', 'Misc'],
 };
 
@@ -91,83 +92,83 @@ var WorldEditorScreen = function(_parent)
     // inputs
     this.mCoordinate = 
     {
-        X: {Input: null, Value: 0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-        Y: {Input: null, Value: 0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.MoralReputation},
+        X: {Input: null, Value: 0, ValueMin: 0, ValueMax: 999, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
+        Y: {Input: null, Value: 0, ValueMin: 0, ValueMax: 999, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.MoralReputation},
     }
     this.mAssets =
     {
-        BusinessReputation: {Input: null, Value: 0, ValueMin:-1000, ValueMax: 20000, Min: 0, Max: 5, IconPath: Path.GFX + Asset.ICON_ASSET_BUSINESS_REPUTATION, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-        MoralReputation   : {Input: null, Value: 0, ValueMin: 0   , ValueMax: 100  , Min: 0, Max: 3, IconPath: Path.GFX + Asset.ICON_ASSET_MORAL_REPUTATION   , TooltipId: TooltipIdentifier.Assets.MoralReputation},
-        Money             : {Input: null, Value: 0, ValueMin: 0   , ValueMax: null , Min: 0, Max: 9, IconPath: Path.GFX + Asset.ICON_ASSET_MONEY              , TooltipId: TooltipIdentifier.Assets.Money},
-        Stash             : {Input: null, Value: 0, ValueMin: 0   , ValueMax: 500  , Min: 0, Max: 3, IconPath: Path.GFX + Asset.ICON_BAG                      , TooltipId: TooltipIdentifier.Stash.FreeSlots},
-        Ammo              : {Input: null, Value: 0, ValueMin: 300 , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_AMMO               , TooltipId: TooltipIdentifier.Assets.Ammo},
-        Supplies          : {Input: null, Value: 0, ValueMin: 150 , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_SUPPLIES           , TooltipId: TooltipIdentifier.Assets.Supplies},
-        Medicine          : {Input: null, Value: 0, ValueMin: 100 , ValueMax: null , Min: 0, Max: 4, IconPath: Path.GFX + Asset.ICON_ASSET_MEDICINE           , TooltipId: TooltipIdentifier.Assets.Medicine},
+        BusinessReputation: {Input: null, ValueMin:-1000, ValueMax: 20000    , Min: 0, Max: 5, IsPercentage: false, IconPath: Path.GFX + Asset.ICON_ASSET_BUSINESS_REPUTATION, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
+        MoralReputation   : {Input: null, ValueMin: 0   , ValueMax: 100      , Min: 0, Max: 3, IsPercentage: false, IconPath: Path.GFX + Asset.ICON_ASSET_MORAL_REPUTATION   , TooltipId: TooltipIdentifier.Assets.MoralReputation},
+        Money             : {Input: null, ValueMin: 0   , ValueMax: 999999999, Min: 0, Max: 9, IsPercentage: false, IconPath: Path.GFX + Asset.ICON_ASSET_MONEY              , TooltipId: TooltipIdentifier.Assets.Money},
+        Stash             : {Input: null, ValueMin: 0   , ValueMax: 500      , Min: 0, Max: 3, IsPercentage: false, IconPath: Path.GFX + Asset.ICON_BAG                      , TooltipId: TooltipIdentifier.Stash.FreeSlots},
+        Ammo              : {Input: null, ValueMin: 0   , ValueMax: 9999     , Min: 0, Max: 4, IsPercentage: false, IconPath: Path.GFX + Asset.ICON_ASSET_AMMO               , TooltipId: TooltipIdentifier.Assets.Ammo},
+        ArmorParts        : {Input: null, ValueMin: 0   , ValueMax: 9999     , Min: 0, Max: 4, IsPercentage: false, IconPath: Path.GFX + Asset.ICON_ASSET_SUPPLIES           , TooltipId: TooltipIdentifier.Assets.Supplies},
+        Medicine          : {Input: null, ValueMin: 0   , ValueMax: 9999     , Min: 0, Max: 4, IsPercentage: false, IconPath: Path.GFX + Asset.ICON_ASSET_MEDICINE           , TooltipId: TooltipIdentifier.Assets.Medicine},
     };
     this.mAssetProperties =
     {
         // general properties
         General:
         {
-            BusinessReputationRate  : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/asset_business_reputation.png', TooltipId: 'woditor.renown'},
-            XPMult                  : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/xp_received.png', TooltipId: 'woditor.xp'},
-            HitpointsPerHourMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/days_wounded.png', TooltipId: 'woditor.hp'},
-            RepairSpeedMult         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/repair_item.png', TooltipId: 'woditor.repair'},
-            VisionRadiusMult        : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/vision.png', TooltipId: 'woditor.vision'},
-            FootprintVision         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/tracking_disabled.png', TooltipId: 'woditor.footprint'},
-            MovementSpeedMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/boot.png', TooltipId: 'woditor.speed'},
-            FoodAdditionalDays      : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/asset_daily_food.png', TooltipId: 'woditor.fooddays'},
+            BusinessReputationRate  : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/asset_business_reputation.png', TooltipId: 'woditor.renown'},
+            XPMult                  : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/xp_received.png', TooltipId: 'woditor.xp'},
+            HitpointsPerHourMult    : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/days_wounded.png', TooltipId: 'woditor.hp'},
+            RepairSpeedMult         : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/repair_item.png', TooltipId: 'woditor.repair'},
+            VisionRadiusMult        : {Input: null, ValueMin: 0, ValueMax: 999 , Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/vision.png', TooltipId: 'woditor.vision'},
+            FootprintVision         : {Input: null, ValueMin: 0, ValueMax: 999 , Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/tracking_disabled.png', TooltipId: 'woditor.footprint'},
+            MovementSpeedMult       : {Input: null, ValueMin: 0, ValueMax: 999 , Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/boot.png', TooltipId: 'woditor.speed'},
+            FoodAdditionalDays      : {Input: null, ValueMin: 0, ValueMax: 999 , Min: 0, Max: 3, IsPercentage: false, IconPath: Path.GFX + 'ui/icons/asset_daily_food.png', TooltipId: 'woditor.fooddays'},
         },
 
         // relation properties
         Relation:
         {
-            RelationDecayGoodMult   : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/relation_good.png', TooltipId: 'woditor.goodrelation'},
-            RelationDecayBadMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/relation_bad.png', TooltipId: 'woditor.badrelation'},
+            RelationDecayGoodMult   : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/relation_good.png', TooltipId: 'woditor.goodrelation'},
+            RelationDecayBadMult    : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/relation_bad.png', TooltipId: 'woditor.badrelation'},
         },
 
         // contract properties
         Contract:
         {
-            NegotiationAnnoyanceMult: {Input: null, Value: 100, ValueMin: 1, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/contract_annoyance.png', TooltipId: 'woditor.negotiation'},
-            ContractPaymentMult     : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/contract_payment.png', TooltipId: 'woditor.contractpayment'},
-            AdvancePaymentCap       : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scroll_01.png', TooltipId: 'woditor.advancepaymentcap'},
+            NegotiationAnnoyanceMult: {Input: null, ValueMin: 1, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/contract_annoyance.png', TooltipId: 'woditor.negotiation'},
+            ContractPaymentMult     : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/contract_payment.png', TooltipId: 'woditor.contractpayment'},
+            AdvancePaymentCap       : {Input: null, ValueMin: 0, ValueMax: 99  , Min: 0, Max: 2, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/scroll_01.png', TooltipId: 'woditor.advancepaymentcap'},
         },
 
         // scaling properties
         Scaling:
         {
-            BrothersScaleMax        : {Input: null, Value:   0, ValueMin: 1, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scaling_max.png', TooltipId: 'woditor.brotherscalemax'},
-            BrothersScaleMin        : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/scaling_min.png', TooltipId: 'woditor.brotherscalemin'},
+            BrothersScaleMax        : {Input: null, ValueMin: 1, ValueMax: 99, Min: 0, Max: 2, IsPercentage: false, IconPath: Path.GFX + 'ui/icons/scaling_max.png', TooltipId: 'woditor.brotherscalemax'},
+            BrothersScaleMin        : {Input: null, ValueMin: 0, ValueMax: 99, Min: 0, Max: 2, IsPercentage: false, IconPath: Path.GFX + 'ui/icons/scaling_min.png', TooltipId: 'woditor.brotherscalemin'},
         },
 
         // recruit properties
         Recruit:
         {
-            RosterSizeAdditionalMax : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/recruit_max.png', TooltipId: 'woditor.recruitmax'},
-            RosterSizeAdditionalMin : {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 2, IconPath: Path.GFX + 'ui/icons/recruit_min.png', TooltipId: 'woditor.recruitmin'},
-            HiringCostMult          : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/hiring_cost.png', TooltipId: 'woditor.hiring'},
-            TryoutPriceMult         : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/tryout_cost.png', TooltipId: 'woditor.tryout'},
-            DailyWageMult           : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/asset_daily_money.png', TooltipId: 'woditor.wage'},
-            TrainingPriceMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/training_cost.png', TooltipId: 'woditor.trainingprice'},
+            RosterSizeAdditionalMax : {Input: null, ValueMin: 0, ValueMax: 24  , Min: 0, Max: 2, IsPercentage: false, IconPath: Path.GFX + 'ui/icons/recruit_max.png', TooltipId: 'woditor.recruitmax'},
+            RosterSizeAdditionalMin : {Input: null, ValueMin: 0, ValueMax: 24  , Min: 0, Max: 2, IsPercentage: false, IconPath: Path.GFX + 'ui/icons/recruit_min.png', TooltipId: 'woditor.recruitmin'},
+            HiringCostMult          : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/hiring_cost.png', TooltipId: 'woditor.hiring'},
+            TryoutPriceMult         : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/tryout_cost.png', TooltipId: 'woditor.tryout'},
+            DailyWageMult           : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/asset_daily_money.png', TooltipId: 'woditor.wage'},
+            TrainingPriceMult       : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/training_cost.png', TooltipId: 'woditor.trainingprice'},
         },
 
         // economy properties
         Economy:
         {
-            TaxidermistPriceMult    : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/crafting_cost.png', TooltipId: 'woditor.craft'},
-            BuyPriceMult            : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/buying.png', TooltipId: 'woditor.buying'},
-            SellPriceMult           : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/selling.png', TooltipId: 'woditor.selling'},
-            BuyPriceTradeMult       : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/buying_player.png', TooltipId: 'woditor.buying_trade'},
-            SellPriceTradeMult      : {Input: null, Value: 100, ValueMin: 0, ValueMax: null, Min: 0, Max: 4, IconPath: Path.GFX + 'ui/icons/selling_player.png', TooltipId: 'woditor.selling_trade'},
+            TaxidermistPriceMult    : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/crafting_cost.png', TooltipId: 'woditor.craft'},
+            BuyPriceMult            : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/buying.png', TooltipId: 'woditor.buying'},
+            SellPriceMult           : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/selling.png', TooltipId: 'woditor.selling'},
+            BuyPriceTradeMult       : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/buying_player.png', TooltipId: 'woditor.buying_trade'},
+            SellPriceTradeMult      : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/selling_player.png', TooltipId: 'woditor.selling_trade'},
         },
 
         // combat properties
         Combat:
         {
-            ChampionChanceAdditional: {Input: null, Value:   0, ValueMin: 0, ValueMax: null, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/miniboss.png', TooltipId: 'woditor.champion'},
-            ExtraLootChance         : {Input: null, Value:   0, ValueMin: 0, ValueMax:  100, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/bag.png', TooltipId: 'woditor.loot'},
-            EquipmentLootChance     : {Input: null, Value:   0, ValueMin: 0, ValueMax:  100, Min: 0, Max: 3, IconPath: Path.GFX + 'ui/icons/grab.png', TooltipId: 'woditor.equipmentloot'},
+            ChampionChanceAdditional: {Input: null, ValueMin: 0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/miniboss.png', TooltipId: 'woditor.champion'},
+            ExtraLootChance         : {Input: null, ValueMin: 0, ValueMax: 100, Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/bag.png', TooltipId: 'woditor.loot'},
+            EquipmentLootChance     : {Input: null, ValueMin: 0, ValueMax: 100, Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/grab.png', TooltipId: 'woditor.equipmentloot'},
         }
     }
 
@@ -189,6 +190,7 @@ var WorldEditorScreen = function(_parent)
     };
 
     // configure options
+    this.mAssetsData = null;
     this.mCompanyName = null;
     this.mGenderLevel = 0;
     this.mDifficultyLevel = 0;
@@ -418,9 +420,12 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     row.append(title);
                     var inputLayout = $('<div class="l-input-big"/>');
                     row.append(inputLayout);
-                    this.mLocation.Name = inputLayout.createInput('', 0, 40, 1, function (_input) {
-                        //
-                    }, 'title-font-big font-bold font-color-brother-name');
+                    this.mLocation.Name = inputLayout.createInput('', 0, 40, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                        if (_input.getInputTextLength() === 0)
+                            _input.val(self.mLocation.Selected.data('entry').Name);
+                        else
+                            self.notifyBackendToChangeName(_input.getInputText(), 'location');
+                    });
                 }
 
                 var lowerHalf = this.addRow(50, 'with-small-dialog-background');
@@ -672,9 +677,12 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         row.append(title);
                         var inputLayout = $('<div class="l-input-big"/>');
                         row.append(inputLayout);
-                        this.mSettlement.Name = inputLayout.createInput('', 0, 40, 1, function (_input) {
-                            
-                        }, 'title-font-big font-bold font-color-brother-name');
+                        this.mSettlement.Name = inputLayout.createInput('', 0, 40, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                            if (_input.getInputTextLength() === 0)
+                                _input.val(self.mSettlement.Selected.data('entry').Name);
+                            else
+                                self.notifyBackendToChangeName(_input.getInputText(), 'settlement');
+                        });
                     }
 
                     var row30 = this.addRow(30, 'with-small-dialog-background');
@@ -797,9 +805,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             row.append(title);
                             var inputLayout = $('<div class="l-input-half-big"/>');
                             row.append(inputLayout);
-                            this.mSettlement.Resources = inputLayout.createInput('', 0, 4, 1, function (_input) {
-                                //
-                            }, 'title-font-big font-bold font-color-brother-name');
+                            this.mSettlement.Resources = inputLayout.createInput('', 0, 4, 1, null, 'title-font-big font-bold font-color-brother-name');
                             this.mSettlement.Resources.css('background-size', '100% 4.0rem'); // simple solution to get a smaller input without much work :evilgrins
                         }
 
@@ -813,8 +819,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             row.append(title);
                             var inputLayout = $('<div class="l-input-half-big"/>');
                             row.append(inputLayout);
-                            this.mSettlement.Wealth = inputLayout.createInput('', 0, 3, 1, function (_input) {
-                            }, 'title-font-big font-bold font-color-brother-name');
+                            this.mSettlement.Wealth = inputLayout.createInput('', 0, 3, 1, null, 'title-font-big font-bold font-color-brother-name');
                             this.mSettlement.Wealth.css('background-size', '100% 4.0rem');
 
                             // set up fun event listeners
@@ -822,7 +827,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                                 _input.addPercentageToInput();
                             });
                             this.mSettlement.Wealth.assignInputEventListener('click', function(_input, _event) {
-                                _input.removePercentageToInput();
+                                _input.removePercentageFromInput();
                             });
                         }
                     }
@@ -1010,9 +1015,12 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row.append(title);
                     var inputLayout = $('<div class="l-input-big"/>');
                     row.append(inputLayout);
-                    this.mFaction.Name = inputLayout.createInput('', 0, 40, 1, function (_input) {
-                        
-                    }, 'title-font-big font-bold font-color-brother-name');
+                    this.mFaction.Name = inputLayout.createInput('', 0, 40, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                        if (_input.getInputTextLength() === 0)
+                            _input.val(self.mFaction.Selected.data('entry').Name);
+                        else
+                            self.notifyBackendToChangeName(_input.getInputText(), 'faction');
+                    });
                     
                     // relation stuffs
                     this.createSliderControlDIV(this.mFactionRelation, 'Relation', row90);
@@ -1173,11 +1181,11 @@ WorldEditorScreen.prototype.createPropertiesScreenDIV = function(_parentDiv)
                 row.append(title);
                 
                 $.each(this.mAssetProperties.Scaling, function(_key, _definition) {
-                    self.createInputDIV(_key, _definition, row);
+                    self.createInputDIV(_key, _definition, row, 'mAssetProperties');
                 });
                 
                 $.each(this.mAssetProperties.Combat, function(_key, _definition) {
-                    self.createInputDIV(_key, _definition, row);
+                    self.createInputDIV(_key, _definition, row, 'mAssetProperties');
                 });
             }
 
@@ -1201,7 +1209,7 @@ WorldEditorScreen.prototype.createPropertiesScreenDIV = function(_parentDiv)
                 row.append(title);
                 
                 $.each(this.mAssetProperties.Economy, function(_key, _definition) {
-                    self.createInputDIV(_key, _definition, row);
+                    self.createInputDIV(_key, _definition, row, 'mAssetProperties');
                 });
             }
         }
@@ -1222,7 +1230,7 @@ WorldEditorScreen.prototype.createPropertiesScreenDIV = function(_parentDiv)
         row.append(title);
 
         $.each(this.mAssetProperties.General, function(_key, _definition) {
-            self.createInputDIV(_key, _definition, row);
+            self.createInputDIV(_key, _definition, row, 'mAssetProperties');
         });
 
 
@@ -1233,7 +1241,7 @@ WorldEditorScreen.prototype.createPropertiesScreenDIV = function(_parentDiv)
         row.append(title);
 
         $.each(this.mAssetProperties.Contract, function(_key, _definition) {
-            self.createInputDIV(_key, _definition, row);
+            self.createInputDIV(_key, _definition, row, 'mAssetProperties');
         });
     }
 
@@ -1246,7 +1254,7 @@ WorldEditorScreen.prototype.createPropertiesScreenDIV = function(_parentDiv)
         row.append(title);
 
         $.each(this.mAssetProperties.Recruit, function(_key, _definition) {
-            self.createInputDIV(_key, _definition, row);
+            self.createInputDIV(_key, _definition, row, 'mAssetProperties');
         });
 
 
@@ -1257,7 +1265,7 @@ WorldEditorScreen.prototype.createPropertiesScreenDIV = function(_parentDiv)
         row.append(title);
 
         $.each(this.mAssetProperties.Relation, function(_key, _definition) {
-            self.createInputDIV(_key, _definition, row);
+            self.createInputDIV(_key, _definition, row, 'mAssetProperties');
         });
     }
 };
@@ -1292,7 +1300,7 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
 
             var count = 0;
             $.each(this.mAssets, function (_key, _definition) {
-                self.createInputDIV(_key, _definition, row);
+                self.createInputDIV(_key, _definition, row, 'mAssets');
                 count++;
             });
         }
@@ -1389,12 +1397,12 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
             row.append(title);
             var inputLayout = $('<div class="l-input-big"/>');
             row.append(inputLayout);
-            this.mCompanyName = inputLayout.createInput('Battle Brothers', 0, 32, 1, function (_input) {
+            this.mCompanyName = inputLayout.createInput('Battle Brothers', 0, 32, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
                 if (_input.getInputTextLength() === 0)
-                {
                     _input.val('Battle Brothers');
-                }
-            }, 'title-font-big font-bold font-color-brother-name');
+
+                self.notifyBackendToChangeName(_input.getInputText(), 'company');
+            });
             this.mCompanyName.setInputText('Battle Brothers');
 
 
@@ -1541,8 +1549,9 @@ WorldEditorScreen.prototype.createSliderControlDIV = function(_definition, _titl
     });
 };
 
-WorldEditorScreen.prototype.createInputDIV = function(_key, _definition, _parentDiv)
+WorldEditorScreen.prototype.createInputDIV = function(_key, _definition, _parentDiv, _type)
 {
+    var self = this;
     var inputRow = $('<div class="row input-row"/>');
     _parentDiv.append(inputRow);
 
@@ -1559,35 +1568,31 @@ WorldEditorScreen.prototype.createInputDIV = function(_key, _definition, _parent
     var inputLayout = $('<div class="l-input"/>');
     inputRowLayout.append(inputLayout);
     _definition.Input = inputLayout.createInput(_definition.Value, _definition.Min, _definition.Max, null, null, 'title-font-medium font-bold font-color-brother-name', function (_input) {
-        //self.ConfirmAttributeChange(_input, _key);
+        if (_type === 'mAssets')
+            self.confirmAssetChanges(_input, _key);
+        else
+            self.confirmPropertyChanges(_input, _key);
     });
     _definition.Input.css('background-image', 'url("coui://gfx/ui/skin/barber_textbox.png")');
     _definition.Input.css('background-size', '14.2rem 3.2rem');
     _definition.Input.css('text-align', 'center');
 
     _definition.Input.assignInputEventListener('mouseover', function(_input, _event) {
-        _definition.Input.css('background-image', 'url("coui://gfx/ui/skin/barber_textbox.png")');
+        _input.css('background-image', 'url("coui://gfx/ui/skin/barber_textbox.png")');
     });
-
     _definition.Input.assignInputEventListener('mouseout', function(_input, _event) {
-        _definition.Input.css('background-image', 'url("coui://gfx/ui/skin/barber_textbox.png")');
+        _input.css('background-image', 'url("coui://gfx/ui/skin/barber_textbox.png")');
     });
 
-    /*_definition.Input.assignInputEventListener('focusout', function(_input, _event)
+    if (_definition.IsPercentage === true)
     {
-        //self.ConfirmAttributeChange(_input, _key);
-    });*/
-
-    /*_definition.Input.assignInputEventListener('click', function(_input, _event) {
-        var currentText = _input.getInputText();
-        var index = currentText.indexOf(' ');
-        if (index > 0)
-        {
-            _input.setInputText(currentText.slice(0, index));
-        }
-    });*/
-
-    _definition.Input.val(_definition.Value);
+        _definition.Input.assignInputEventListener('focusout', function(_input, _event) {
+            _input.addPercentageToInput();
+        });
+        _definition.Input.assignInputEventListener('click', function(_input, _event) {
+            _input.removePercentageFromInput();
+        });
+    }
 }
 
 WorldEditorScreen.prototype.destroyDIV = function()
@@ -1806,7 +1811,6 @@ WorldEditorScreen.prototype.isVisible = function()
     return this.mIsVisible;
 };
 
-
 // simple functions so i don't have to prepare so many css elements
 WorldEditorScreen.prototype.addLayout = function(_width, _height, _class, _line, _color)
 {
@@ -1875,10 +1879,101 @@ WorldEditorScreen.prototype.addRow = function(_height, _class, _color)
 
     return result;
 };
+
+WorldEditorScreen.prototype.confirmAssetChanges = function(_input, _keyName)
+{
+    var definition = this.mAssets[_keyName];
+    var text = _input.getInputText();
+    var value = 0;
+    var isValid = true;
+
+    if (text.length <= 0) {
+        isValid = false;
+    }
+    else {
+        value = this.isValidNumber(text, definition.ValueMin, definition.ValueMax);
+        if (value === null)
+            isValid = false;
+    }
+
+    if (isValid === true) {
+        _input.val('' + value + '');
+        this.mAssetsData[_keyName] = value;
+        this.notifyBackendUpdateAssetsValue(_keyName, value);
+    }
+    else {
+        _input.val('' + this.mAssetsData[_keyName] + '');
+    }
+};
+WorldEditorScreen.prototype.confirmPropertyChanges = function(_input, _keyName)
+{
+    var self = this;
+    var definition = null;
+
+    $.each(this.mAssetProperties, function(_key, _definition) {
+        if (_keyName in self.mAssetProperties[_key])
+            definition = self.mAssetProperties[_key][_keyName];
+    });
+
+    var text = _input.getInputText();
+    var value = 0;
+    var isValid = true;
+
+    if (text.length <= 0 || definition === null) {
+        isValid = false;
+    }
+    else {
+        value = this.isValidNumber(text, definition.ValueMin, definition.ValueMax);
+        if (value === null)
+            isValid = false;
+    }
+
+    if (isValid === true) {
+        _input.val('' + value + '');
+        this.mAssetsData[_keyName] = value;
+        this.notifyBackendUpdateAssetsPropertyValue(_keyName, value);
+    }
+    else {
+        _input.val('' + this.mAssetsData[_keyName] + '');
+    }
+};
+WorldEditorScreen.prototype.isValidNumber = function(_inputText, _min, _max)
+{
+    var convertedText = parseInt(_inputText);
+
+    if(isNaN(convertedText)) 
+        return null;
+
+    if (convertedText < _min) 
+        return _min;
+
+    if (convertedText > _max)
+        return _max;
+
+    return convertedText;
+};
+
+WorldEditorScreen.prototype.updateAssetsData = function(_data)
+{
+    var self = this;
+    this.mAssetsData = _data;
+    this.mCompanyName.setInputText(_data.Name);
+
+    $.each(this.mAssets, function(_key, _definition) {
+        _definition.Input.val('' + _data[_key] + (_definition.IsPercentage === true ? '%' : ''));
+    });
+
+    $.each(self.mAssetProperties, function(_key, _def) {
+        $.each(self.mAssetProperties[_key], function(_name, _definition) {
+            _definition.Input.val('' + _data[_name] + (_definition.IsPercentage === true ? '%' : ''));
+        });
+    });
+};
+
 WorldEditorScreen.prototype.loadFromData = function(_data) 
 {
-    if ('Scenarios' in _data && _data.Scenarios !== undefined && _data.Scenarios !== null && jQuery.isArray(_data.Scenarios))
-        this.mScenario.Data = _data.Scenarios;
+    if ('Assets' in _data && _data.Assets !== undefined && _data.Assets !== null && typeof _data.Assets === 'object')
+        this.updateAssetsData(_data.Assets);
 
     if ('Factions' in _data && _data.Factions !== undefined && _data.Factions !== null && jQuery.isArray(_data.Factions))
         this.addFactionsData(_data.Factions);
@@ -1888,6 +1983,9 @@ WorldEditorScreen.prototype.loadFromData = function(_data)
 
     if ('Locations' in _data && _data.Locations !== undefined && _data.Locations !== null && jQuery.isArray(_data.Locations))
         this.addLocationsData(_data.Locations);
+
+    if ('Scenarios' in _data && _data.Scenarios !== undefined && _data.Scenarios !== null && jQuery.isArray(_data.Scenarios))
+        this.mScenario.Data = _data.Scenarios;
 };
 
 WorldEditorScreen.prototype.notifyBackendOnConnected = function()
@@ -1923,6 +2021,43 @@ WorldEditorScreen.prototype.notifyBackendPopupDialogIsVisible = function (_visib
 WorldEditorScreen.prototype.notifyBackendCloseButtonPressed = function()
 {
     SQ.call(this.mSQHandle, 'onCloseButtonPressed');
+};
+
+WorldEditorScreen.prototype.notifyBackendUpdateAssetsValue = function(_keyName, _value) 
+{
+    SQ.call(this.mSQHandle, 'onUpdateAssetsValue', [_keyName, _value]);
+};
+
+WorldEditorScreen.prototype.notifyBackendUpdateAssetsPropertyValue = function(_keyName, _value) 
+{
+    SQ.call(this.mSQHandle, 'onUpdateAssetsPropertyValue', [_keyName, _value]);
+};
+
+WorldEditorScreen.prototype.notifyBackendToChangeName = function( _name, _key)
+{
+    var id = null;
+
+    switch(_key)
+    {
+    case 'location':
+        id = this.updateLocationName(_name);
+        SQ.call(this.mSQHandle, 'onChangeWorldEntityName', [_name, id]);
+        break;
+
+    case 'settlement':
+        id = this.updateSettlementName(_name);
+        SQ.call(this.mSQHandle, 'onChangeWorldEntityName', [_name, id]);
+        break;
+
+    case 'faction':
+        id = this.updateFactionName(_name);
+        SQ.call(this.mSQHandle, 'onChangeFactionName', [_name, id]);
+        break;
+
+    default:
+        this.mAssetsData.Name = _name;
+        SQ.call(this.mSQHandle, 'onChangeCompanyName', _name);
+    }
 };
 
 WorldEditorScreen.prototype.notifyBackendGetTroopEntries = function( _result )

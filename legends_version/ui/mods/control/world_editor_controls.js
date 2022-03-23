@@ -15,7 +15,6 @@ $.fn.assignInputEventListener = function(_type, _callback)
         });
     }
 };
-
 $.fn.addPercentageToInput = function()
 {
     var currentText = this.getInputText();
@@ -24,8 +23,7 @@ $.fn.addPercentageToInput = function()
         this.val(currentText + '%');
     }
 }
-
-$.fn.removePercentageToInput = function()
+$.fn.removePercentageFromInput = function()
 {
     var currentText = this.getInputText();
     var index = currentText.indexOf('%');
@@ -33,3 +31,16 @@ $.fn.removePercentageToInput = function()
         this.val(currentText.slice(0, index));
     }
 }
+
+
+
+// For List
+$.fn.findFirstIndexOfSelectedListEntry = function()
+{
+    var result = -1;
+    this.find('.is-selected').each(function (index, element)
+    {
+        return index;
+    });
+    return result;
+};

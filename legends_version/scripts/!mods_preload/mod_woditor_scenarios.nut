@@ -4,7 +4,24 @@ this.getroottable().Woditor.hookScenarios <- function ()
 	{
 		obj.isDroppedAsLoot = function( _item )
 		{
-			return this.Math.rand(1, 100) <= this.World.Flags.getAsInt("EquipmentLootChance");
+			return this.Math.rand(1, 100) <= this.World.Assets.m.EquipmentLootChance;
+		};
+		obj.getStashModifier = function()
+		{
+			return this.m.StashModifier + this.World.Flags.getAsInt("StashModifier");
+		};
+	});
+
+	::mods_hookExactClass("scenarios/world/raiders_scenario", function( obj )
+	{
+		obj.isDroppedAsLoot = function( _item )
+		{
+			return this.starting_scenario.isDroppedAsLoot(_item);
+		};
+		obj.onInit <- function()
+		{
+			this.starting_scenario.onInit();
+			this.World.Assets.m.EquipmentLootChance += 15;
 		};
 	});
 

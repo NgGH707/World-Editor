@@ -2,7 +2,7 @@ this.getroottable().Woditor.hookWorldState <- function ()
 {
 	::mods_hookNewObjectOnce("states/world_state", function( obj ) 
 	{
-		local init_ui = ::mods_getMember(obj, "onInitUI");
+		local init_ui = obj.onInitUI;
 		obj.onInitUI = function()
 		{
 			init_ui();
@@ -11,7 +11,7 @@ this.getroottable().Woditor.hookWorldState <- function ()
 			this.initLoadingScreenHandler();
 		}
 
-		local destroy_ui = ::mods_getMember(obj, "onDestroyUI");
+		local destroy_ui = obj.onDestroyUI;
 		obj.onDestroyUI = function()
 		{
 			destroy_ui();
@@ -26,19 +26,24 @@ this.getroottable().Woditor.hookWorldState <- function ()
 				this.m.CustomZoom = this.World.getCamera().Zoom;
 				this.World.getCamera().zoomTo(1.0, 4.0);
 				this.World.Assets.updateFormation();
+				this.World.Assets.updateBaseProperties();
 				this.setAutoPause(true);
 				this.m.WorldEditorScreen.show();
 				this.m.WorldScreen.hide();
 				this.Cursor.setCursor(this.Const.UI.Cursor.Hand);
-				this.m.MenuStack.push(function ()
+				this.m.MenuStack.push(function()
 				{
+					local a = this.World.State.m.AppropriateTimeToRecalc;
+					this.World.State.m.AppropriateTimeToRecalc = 1;
 					this.World.getCamera().zoomTo(this.m.CustomZoom, 4.0);
 					this.m.WorldEditorScreen.hide();
 					this.m.WorldScreen.show();
-					this.World.Assets.refillAmmo();
+					this.m.Retinue.update();
+					this.World.State.getPlayer().calculateModifiers();
 					this.updateTopbarAssets();
 					this.setAutoPause(false);
-				}, function ()
+					this.World.State.m.AppropriateTimeToRecalc = a;
+				}, function()
 				{
 					return !this.m.WorldEditorScreen.isAnimating();
 				});
@@ -59,12 +64,12 @@ this.getroottable().Woditor.hookWorldState <- function ()
 			}
 		}
 
-		local keyHandler = ::mods_getMember(obj, "helper_handleContextualKeyInput");
-		obj.helper_handleContextualKeyInput = function(key)
+		local keyHandler = obj.helper_handleContextualKeyInput;
+		obj.helper_handleContextualKeyInput = function(_key)
 		{
-			if(!keyHandler(key) && key.getState() == 0)
+			if(!keyHandler(_key) && _key.getState() == 0)
 			{
-				if (key.getModifier() == 2 && key.getKey() == 38) //CTRL + Tab
+				if (_key.getModifier() == 2 && _key.getKey() == 38) //CTRL + Tab
 				{
 					if (!this.m.CharacterScreen.isVisible() && !this.m.WorldTownScreen.isVisible() && !this.m.EventScreen.isVisible() && !this.m.EventScreen.isAnimating())
 					{

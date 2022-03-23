@@ -9,7 +9,7 @@ WorldEditorScreen.prototype.changeLocationfilter = function()
     this.reloadLocationsData();
 };
 
-WorldEditorScreen.prototype.reloadLocationsData = function ()
+WorldEditorScreen.prototype.reloadLocationsData = function()
 {
     var toLoad = this.mLocation.Data[this.mLocation.FilterType];
     this.mLocation.ListScrollContainer.empty();
@@ -20,11 +20,11 @@ WorldEditorScreen.prototype.reloadLocationsData = function ()
         this.addLocationListEntry(entry, i);
     }
 
-    this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0), true);
+    this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
     this.mLocation.FilterButton.changeButtonText(WorldEditor.Locations[this.mLocation.FilterType]);
 };
 
-WorldEditorScreen.prototype.addLocationsData = function (_data)
+WorldEditorScreen.prototype.addLocationsData = function(_data)
 {
     this.mLocation.ListScrollContainer.empty();
     this.mLocation.Data = _data;
@@ -37,7 +37,7 @@ WorldEditorScreen.prototype.addLocationsData = function (_data)
         this.addLocationListEntry(entry, i);
     }
 
-    this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0), true);
+    this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
     this.mLocation.FilterButton.changeButtonText(WorldEditor.Locations[this.mLocation.FilterType]);
 };
 
@@ -49,6 +49,7 @@ WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
     var entry = $('<div class="ui-control list-entry-fat"/>');
     result.append(entry);
     entry.data('entry', _data);
+    entry.data('index', _index);
     entry.click(this, function(_event)
     {
         _event.data.selectLocationListEntry($(this));
@@ -201,6 +202,20 @@ WorldEditorScreen.prototype.addTroopListEntry = function (_data, _index, _listSc
 
     return strength;
 };
+
+WorldEditorScreen.prototype.updateLocationName = function(_name)
+{
+    var element = this.mLocation.Selected;
+    var index = element.data('index');
+    var name = element.find('.name:first');
+    if (name.length > 0) {
+        name.html(_name);
+    }
+    var data = this.mLocation.Data[this.mLocation.FilterType][index];
+    data.Name = _name;
+    element.data('entry', data);
+    return data.ID;
+}
 
 WorldEditorScreen.prototype.updateLocationDetailsPanel = function(_element)
 {

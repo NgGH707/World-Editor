@@ -26,6 +26,7 @@ this.getroottable().Woditor.Name <- "mod_world_editor_legends";
 	// run hooks
 	this.Woditor.createLib();
 	this.Woditor.hookWorldState();
+	this.Woditor.hookAssetsManager();
 	this.Woditor.hookTooltips();
 	this.Woditor.hookScenarios();
 	this.Woditor.hookContracts();

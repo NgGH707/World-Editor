@@ -266,6 +266,12 @@ this.getroottable().Woditor.createLib <- function ()
 		this.Const.EntityType.LegendOrcElite,
 		this.Const.EntityType.LegendOrcBehemoth,
 	];
+	gt.Woditor.sortByName <- function(_a, _b)
+	{
+	 	if (_a < _b) return -1;
+		else if (_a > _b) return 1;
+		else return 0;
+	};
 	gt.Woditor.TroopTypeFilter <- {
 		All = 0,
 		Human = 1,
@@ -296,7 +302,7 @@ this.getroottable().Woditor.createLib <- function ()
 		{
 			gt.Woditor.TroopKeys[entry.Script] <- key;
 			
-			// attempting to filter out all entry
+			// attempting to filter out all entries by enemy type group
 			local entity = this.new(entry.Script);
 			if (entity.getFlags().has("human"))
 			{
@@ -373,6 +379,11 @@ this.getroottable().Woditor.createLib <- function ()
 		gt.Woditor.TroopNames[entry.Script] <- prefix + gt.Const.Strings.EntityName[entry.ID] + postfix;
 	}
 
+	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human].sort(this.Woditor.sortByName);
+	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead].sort(this.Woditor.sortByName);
+	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin].sort(this.Woditor.sortByName);
+	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Misc].sort(this.Woditor.sortByName);
+
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human]);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead]);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin]);
@@ -389,6 +400,44 @@ this.getroottable().Woditor.createLib <- function ()
 	gt.Woditor.getTroopIcon <- function(_entry)
 	{
 		return "ui/orientation/" + this.Const.EntityIcon[_entry.ID] + ".png";
+	};
+
+	gt.Woditor.Helper <- this.new("scripts/mods/world_editor_data_helper");
+	gt.Woditor.AssetsProperties <- {
+		Mult = [
+			"BusinessReputationRate",
+			"XPMult",
+			"HitpointsPerHourMult",
+			"RepairSpeedMult",
+			"VisionRadiusMult",
+			"FootprintVision",
+			"MovementSpeedMult",
+			"RelationDecayGoodMult",
+			"RelationDecayBadMult",
+			"NegotiationAnnoyanceMult",
+			"ContractPaymentMult",
+			"HiringCostMult",
+			"TryoutPriceMult",
+			"DailyWageMult",
+			"TrainingPriceMult",
+			"TaxidermistPriceMult",
+			"BuyPriceMult",
+			"SellPriceMult",
+			"BuyPriceTradeMult",
+			"SellPriceTradeMult",
+			"MovementSpeedMult",
+			"AdvancePaymentCap",
+		],
+		Additive = [
+			"FoodAdditionalDays",
+			"BrothersScaleMax",
+			"BrothersScaleMin",
+			"RosterSizeAdditionalMax",
+			"RosterSizeAdditionalMin",
+			"ChampionChanceAdditional",
+			"ExtraLootChance",
+			"EquipmentLootChance"
+		]
 	};
 
 	delete this.Woditor.createLib;
