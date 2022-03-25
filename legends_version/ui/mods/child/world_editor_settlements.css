@@ -106,12 +106,21 @@
 }
 
 /****Buildings Panel****/
+
+.world-editor-screen > .l-world-editor-dialog-container .content .buildings-container
+{
+    width: 100%;
+    height: 95%;
+
+    position: absolute;
+}
+
 .world-editor-screen > .l-world-editor-dialog-container .content .is-building-slot
 {
-    top: 1.5rem;
+    top: 2.0rem;
 
-    width: 15.0rem; /*15*/
-    height: 10.0rem; /*12*/
+    width: 15.0rem;
+    height: 10.0rem;
     position: absolute;
 }
 

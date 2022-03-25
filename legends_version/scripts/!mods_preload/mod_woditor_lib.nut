@@ -1,6 +1,13 @@
 this.getroottable().Woditor.createLib <- function ()
 {
 	local gt = this.getroottable();
+
+	// fix the broken icon
+	gt.Const.EntityIcon[this.Const.EntityType.SatoManhunter] = "nomad_02_orientation";
+	gt.Const.EntityIcon[this.Const.EntityType.SatoManhunterVeteran] = "nomad_05_orientation";
+
+
+	// something to add to the tooltips
 	gt.Const.PercentageNoteString <- " The value is calculated in percentage. The default value is 100 which means 100%."
 	gt.Const.AddContractHints <- function( _tooltips )
 	{
@@ -53,7 +60,21 @@ this.getroottable().Woditor.createLib <- function ()
 		]);
 	};
 
-	gt.Const.WorldSprites <- [];
+
+	// faction banner lib
+	gt.Const.NobleBanners <- [];
+	gt.Const.OtherBanner <- [];
+	for (local i = 0; i < 11; ++i)
+	{
+		gt.Const.NobleBanners.push("banner_noble_" + (i < 10 ? "0" + i : i));
+	}
+	for (local i = 0; i < 15; ++i)
+	{
+		gt.Const.OtherBanner.push("banner_noble_" + (i < 10 ? "0" + i : i));
+	}
+
+
+	// lib for avatar changer
 	gt.Const.WorldSockets <- [
 		"world_base_01",
 		"world_base_02",
@@ -78,6 +99,7 @@ this.getroottable().Woditor.createLib <- function ()
 		"Greenskin",
 		"Misc"
 	];
+	gt.Const.WorldSprites <- [];
 	gt.Const.WorldSprites.push([
 		"figure_player_01",
 		"figure_player_02",
@@ -113,7 +135,6 @@ this.getroottable().Woditor.createLib <- function ()
 		"figure_player_troupe",
 		"figure_player_slave",
 	]);
-
 	if (::mods_getRegisteredMod("mod_nggh_magic_concept") != null)
 	{
 		gt.Const.WorldSprites[0].extend([
@@ -128,7 +149,6 @@ this.getroottable().Woditor.createLib <- function ()
 			"figure_player_9999",
 		]);
 	}
-
 	gt.Const.WorldSprites.push([
 		"figure_civilian_01",
 		"figure_civilian_02",
@@ -258,6 +278,7 @@ this.getroottable().Woditor.createLib <- function ()
 		"figure_white_direwolf_01",
 	]);
 
+	// the orc group type
 	gt.Const.IsOrcs <- [
 		this.Const.EntityType.OrcYoung,
 		this.Const.EntityType.OrcBerserker,
@@ -280,6 +301,7 @@ this.getroottable().Woditor.createLib <- function ()
 		Misc = 4,
 		COUNT = 5
 	}
+
 	// processing the spawnlist so i can add them as entry to the mod ui
 	gt.Woditor.ValidTroops <- [
 		[], // all
@@ -379,16 +401,19 @@ this.getroottable().Woditor.createLib <- function ()
 		gt.Woditor.TroopNames[entry.Script] <- prefix + gt.Const.Strings.EntityName[entry.ID] + postfix;
 	}
 
+	// try my best to sorting the entries, still look a bit chaotic though
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human].sort(this.Woditor.sortByName);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead].sort(this.Woditor.sortByName);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin].sort(this.Woditor.sortByName);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Misc].sort(this.Woditor.sortByName);
 
+	// add all entry to the all list
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human]);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead]);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin]);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Misc]);
 
+	// function to assist getting ui data from troop entry from world map location/party
 	gt.Woditor.getTroopKey <- function(_entry)
 	{
 		return this.Woditor.TroopKeys[_entry.Script];
@@ -402,7 +427,10 @@ this.getroottable().Woditor.createLib <- function ()
 		return "ui/orientation/" + this.Const.EntityIcon[_entry.ID] + ".png";
 	};
 
+	// UI Processing Helper for Woditor
 	gt.Woditor.Helper <- this.new("scripts/mods/world_editor_data_helper");
+
+	// Assets Properties
 	gt.Woditor.AssetsProperties <- {
 		Mult = [
 			"BusinessReputationRate",

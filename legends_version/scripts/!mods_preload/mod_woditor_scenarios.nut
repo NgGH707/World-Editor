@@ -2,6 +2,24 @@ this.getroottable().Woditor.hookScenarios <- function ()
 {
 	::mods_hookExactClass("scenarios/world/starting_scenario", function( obj )
 	{
+		obj.getStartingRosterTier = function()
+		{
+			if (this.World.Flags.has("RosterTier"))
+			{
+				return this.World.Flags.getAsInt("RosterTier");
+			}
+
+			return this.m.StartingRosterTier;
+		}
+		obj.getRosterTierMax = function()
+		{
+			if (this.m.RosterTierMax < this.World.Flags.getAsInt("RosterTier"))
+			{
+				return this.World.Flags.getAsInt("RosterTier");
+			}
+
+			return this.m.RosterTierMax;
+		}
 		obj.isDroppedAsLoot = function( _item )
 		{
 			return this.Math.rand(1, 100) <= this.World.Assets.m.EquipmentLootChance;
@@ -29,17 +47,18 @@ this.getroottable().Woditor.hookScenarios <- function ()
 	{	
 		obj.getOriginImage <- function( _description )
 		{
-			local start = _description.find("events/");
+			local start = _description.find("ui/events/");
+			if (start == null) return null;
 			local end = _description.find(".png");
-			return _description.slice(start, end);
+			return _description.slice(start, end + 4);
 		}
-		obj.getScenariosForUI = function()
+		obj.getDataScenariosForUI <- function()
 		{
 			local ret = [];
 
 			foreach(i, s in this.m.Scenarios )
 			{
-				if (!s.isValid())
+				if (!s.isValid() || s.getID() == "scenario.random")
 				{
 					continue;
 				}
@@ -47,10 +66,10 @@ this.getroottable().Woditor.hookScenarios <- function ()
 				local scenario = {
 					ID = s.getID(),
 					Name = s.getName(),
+					Image = this.getOriginImage(s.getDescription()),
 					Description = s.getDescription(),
 					Difficulty = s.getDifficultyForUI()
 				};
-				scenario.Image <- this.getOriginImage(scenario.Description);
 				ret.push(scenario);
 			}
 

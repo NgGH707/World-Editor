@@ -6,8 +6,7 @@ WorldEditorScreen.prototype.addFactionsData = function (_data)
 
     for(var i = 0; i < _data.length; ++i)
     {
-        var entry = _data[i];
-        this.addFactionListEntry(entry, i);
+        this.addFactionListEntry(_data[i], i);
     }
 
     this.selectFactionListEntry(this.mFaction.ListContainer.findListEntryByIndex(0), true);
@@ -82,7 +81,7 @@ WorldEditorScreen.prototype.addFactionListEntry = function (_data, _index)
     progressbar.css('width', newWidth + '%');
     progressbarContainer.append(progressbar);
 
-    var progressbarLabel = $('<div class="stats-progressbar-label text-font-small font-color-progressbar-label">' + _data['Relation'] + '</div>');
+    var progressbarLabel = $('<div class="stats-progressbar-label text-font-small font-color-progressbar-label">' + _data.Relation + '</div>');
     progressbarContainer.append(progressbarLabel);
 };
 
@@ -122,6 +121,60 @@ WorldEditorScreen.prototype.updateFactionName = function(_name)
     return data.ID;
 }
 
+WorldEditorScreen.prototype.updateFactionBanner = function(_bannerID)
+{
+    var element = this.mFaction.Selected;
+    var index = element.data('index');
+    var data = this.mFaction.Data[index];
+    data.ImagePath = 'ui/banners/factions/banner_' + (_bannerID < 10 ? '0' + _bannerID : _bannerID) + '.png';
+    element.data('entry', data);
+
+    // update banner in list container
+    var column = element.find('.faction-column:first');
+    if (column.length > 0) {
+        var image = column.find('img:first');
+        if (image.length > 0) {
+            image.attr('src', Path.GFX + data.ImagePath);
+        }
+    }
+
+    // update banner image in detail panel
+    this.mFaction.Banner.attr('src', Path.GFX + data.ImagePath);
+    return {
+        ID: data.ID,
+        Index: index
+    };
+}
+
+WorldEditorScreen.prototype.updateFactionRelation = function(_data)
+{
+    var element = this.mFaction.Selected;
+    var index = element.data('index');
+    var progressbar = element.find('.stats-progressbar:first');
+    if (progressbar.length > 0) {
+        var newWidth = (_data.RelationNum / 100.0) * 100;
+        progressbar.css('width', newWidth + '%');
+    }
+    var label = element.find('.stats-progressbar-label:first');
+    if (label.length > 0) {
+        label.html(_data.Relation);
+    }
+    var data = this.mFaction.Data[index];
+    data.RelationNum = _data.RelationNum;
+    data.Relation = _data.Relation;
+    element.data('entry', data);
+}
+
+WorldEditorScreen.prototype.updateFactionRelationDeterioration = function(_isChecked)
+{
+    var element = this.mFaction.Selected;
+    var index = element.data('index');
+    var data = this.mFaction.Data[index];
+    data.FactionFixedRelation = _isChecked;
+    element.data('entry', data);
+    return data.ID;
+}
+
 WorldEditorScreen.prototype.updateFactionDetailsPanel = function(_element)
 {
     if(_element !== null && _element.length > 0)
@@ -132,9 +185,36 @@ WorldEditorScreen.prototype.updateFactionDetailsPanel = function(_element)
         this.mFaction.Banner.attr('src', Path.GFX + data.ImagePath);
         this.mFaction.PrevButton.enableButton(data.NoChangeName !== true);
         this.mFaction.NextButton.enableButton(data.NoChangeName !== true);
+
+        this.mFactionRelation.Control.val(data.RelationNum);
+        this.mFactionRelation.Label.text('' + data.RelationNum + this.mFactionRelation.Postfix);
+
+        if (data.FactionFixedRelation === true)
+            this.mFactionFixedRelation.Checkbox.iCheck('check');
+
         this.addContractToFactionDetail(data.Contracts);
     }
 };
+
+WorldEditorScreen.prototype.updateFactionContracts = function(_data) 
+{
+    if (_data === undefined || _data === null || typeof _data !== 'object') return;
+
+    this.mFaction.Data[_data.Index] = _data.Contracts;
+    this.mFaction.Selected.data('entry', this.mFaction.Data[_data.Index]);
+    this.addContractToFactionDetail(_data.Contracts);
+}
+
+WorldEditorScreen.prototype.resetContractInFactionDetail = function() 
+{
+    var element = this.mFaction.Selected;
+    var index = element.data('index');
+    var data = this.mFaction.Data[index];
+    data.Contracts = [];
+    this.mFaction.Contracts.empty();
+    element.data('entry', data);
+    return data.ID;
+}
 
 WorldEditorScreen.prototype.addContractToFactionDetail = function(_data) 
 {

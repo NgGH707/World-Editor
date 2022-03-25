@@ -2,10 +2,10 @@
 
 var WorldEditor =
 {
-    Screens: ['General'   , 'Properties'   , 'Factions'   , 'Settlements'   , 'Locations'   , 'Contracts'   ],
-    Classes: ['is-general', 'is-properties', 'is-factions', 'is-settlements', 'is-locations', 'is-contracts'],
-    AssetsProperties : ['General', 'Relation', 'Contract', 'Scaling', 'Recruit', 'Economy', 'Combat'],
-    Locations: ['Locations', 'Legendary', 'Misc'],
+    Screens  : ['General'   , 'Properties'      , 'Factions'   , 'Settlements'   , 'Locations'   , 'Contracts'   ],
+    Classes  : ['is-general', 'is-properties'   , 'is-factions', 'is-settlements', 'is-locations', 'is-contracts'],
+    RadioBox : ['IsGender'  , 'CombatDifficulty', 'EconomicDifficulty'],
+    Locations: ['Locations' , 'Legendary'       , 'Misc'],
 };
 
 var WorldEditorScreen = function(_parent)
@@ -15,6 +15,7 @@ var WorldEditorScreen = function(_parent)
 	// generic containers
 	this.mContainer = null;
     this.mDialogContainer = null;
+    this.mCurrentPopupDialog = null;
 
     // switch-to buttons
     this.mSwitchToButton = 
@@ -94,7 +95,7 @@ var WorldEditorScreen = function(_parent)
     {
         X: {Input: null, Value: 0, ValueMin: 0, ValueMax: 999, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
         Y: {Input: null, Value: 0, ValueMin: 0, ValueMax: 999, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.MoralReputation},
-    }
+    };
     this.mAssets =
     {
         BusinessReputation: {Input: null, ValueMin:-1000, ValueMax: 20000    , Min: 0, Max: 5, IsPercentage: false, IconPath: Path.GFX + Asset.ICON_ASSET_BUSINESS_REPUTATION, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
@@ -170,47 +171,25 @@ var WorldEditorScreen = function(_parent)
             ExtraLootChance         : {Input: null, ValueMin: 0, ValueMax: 100, Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/bag.png', TooltipId: 'woditor.loot'},
             EquipmentLootChance     : {Input: null, ValueMin: 0, ValueMax: 100, Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/grab.png', TooltipId: 'woditor.equipmentloot'},
         }
-    }
-
-    // avatar changer
-    this.mAvatar = 
-    {
-        Image       : null,
-        PrevButton  : null,
-        NextButton  : null,
-        TypeButton  : null,
-        FlipButton  : null,
-        SocketButton: null,
-        IsFlipping  : false,
-        Selected    : { Row: 0, Index: 0 },
-        Avatars     : [[], [], [], [], []],
-        RowNames    : [],
-        Sockets     : [],
-        SocketIndex : 0,
     };
 
-    // configure options
-    this.mAssetsData = null;
-    this.mCompanyName = null;
-    this.mGenderLevel = 0;
-    this.mDifficultyLevel = 0;
-    this.mEconomicDifficultyLevel = 0;
+    // configure check box
     this.mConfig = 
     {
-        Ironman              : {Checkbox: null, Label: null, Name: 'Ironman'                      , TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.Ironman},
-        LegendBleedKiller    : {Checkbox: null, Label: null, Name: 'Bleeds Count As Kills'        , TooltipId: 'mapconfig.legendbleedkiller'},
-        LegendLocationScaling: {Checkbox: null, Label: null, Name: 'Distance Scaling'             , TooltipId: 'mapconfig.legendlocationscaling'},
-        LegendRecruitScaling : {Checkbox: null, Label: null, Name: 'Recruit Scaling'              , TooltipId: 'mapconfig.legendrecruitscaling'},
-        LegendWorldEconomy   : {Checkbox: null, Label: null, Name: 'World Economy'                , TooltipId: 'mapconfig.legendworldeconomy'},
-        LegendAllBlueprints  : {Checkbox: null, Label: null, Name: 'All Crafting Recipes Unlocked', TooltipId: 'mapconfig.legendallblueprints'},
+        IsIronman          : {Checkbox: null, Label: null, Name: 'Ironman'                      , TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.Ironman},
+        IsBleedKiller      : {Checkbox: null, Label: null, Name: 'Bleeds Count As Kills'        , TooltipId: 'mapconfig.legendbleedkiller'},
+        IsLocationScaling  : {Checkbox: null, Label: null, Name: 'Distance Scaling'             , TooltipId: 'mapconfig.legendlocationscaling'},
+        IsRecruitScaling   : {Checkbox: null, Label: null, Name: 'Recruit Scaling'              , TooltipId: 'mapconfig.legendrecruitscaling'},
+        IsWorldEconomy     : {Checkbox: null, Label: null, Name: 'World Economy'                , TooltipId: 'mapconfig.legendworldeconomy'},
+        IsBlueprintsVisible: {Checkbox: null, Label: null, Name: 'All Crafting Recipes Unlocked', TooltipId: 'mapconfig.legendallblueprints'},
     };
-    this.mGender =
+    this.mIsGender =
     {
         Off : {Checkbox: null, Label: null, Name: 'Disabled', TooltipId: 'mapconfig.legendgenderequality_off' },
         Low : {Checkbox: null, Label: null, Name: 'Specific', TooltipId: 'mapconfig.legendgenderequality_low' },
         High: {Checkbox: null, Label: null, Name: 'All'     , TooltipId: 'mapconfig.legendgenderequality_high'}
     };
-    this.mDifficulty =
+    this.mCombatDifficulty =
     {
         Easy     : {Checkbox: null, Label: null, Name: 'Beginner' , TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.DifficultyEasy},
         Normal   : {Checkbox: null, Label: null, Name: 'Veteran'  , TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.DifficultyNormal},
@@ -227,7 +206,7 @@ var WorldEditorScreen = function(_parent)
     this.mFactionFixedRelation = {Checkbox: null, Label: null, Name: 'Stop Relation Deterioration', TooltipId: 'woditor.fixedrelation'};
 
     // sliders
-    this.mRosterTier           = {Control: null, Title: null, Min: 1, Max:  10, Value:   2, Step: 1, TooltipId: 'woditor.rostertier', Postfix: ''};
+    this.mRosterTier           = {Control: null, Title: null, Min: 0, Max:  10, Value:   2, Step: 1, TooltipId: 'woditor.rostertier', Postfix: ''};
     this.mDifficultyMult       = {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.difficultymult', Postfix: '%'};
     this.mFactionRelation      = {Control: null, Title: null, Min: 0, Max: 100, Value:  50, Step: 5, TooltipId: TooltipIdentifier.RelationsScreen.Relations, Postfix: ''};
 
@@ -238,12 +217,31 @@ var WorldEditorScreen = function(_parent)
         Filter: 0,
     };
 
-    // buttons
-    this.mSaveButton  = null;
-    this.mCloseButton = null;
+    // avatar changer
+    this.mAvatar = 
+    {
+        Image       : null,
+        PrevButton  : null,
+        NextButton  : null,
+        TypeButton  : null,
+        FlipButton  : null,
+        SocketButton: null,
+        ResetButton : null,
+        IsFlipping  : false,
+        Selected    : { Row: 0, Index: 0 },
+        Avatars     : [[], [], [], [], []],
+        RowNames    : [],
+        Sockets     : [],
+        SocketIndex : 0,
+    };
 
-    // popup dialog
-    this.mCurrentPopupDialog = null;
+    // banner
+    this.mBanner = {
+        Data    : null,
+        Image   : null,
+        Player  : 0,
+        Selected: 0,
+    }
 
     // popup scenarios picker
     this.mScenario = 
@@ -256,9 +254,16 @@ var WorldEditorScreen = function(_parent)
         ListScrollContainer: null,
     };
 
+    // generic buttons
+    this.mReloadButton  = null;
+    this.mCloseButton = null;
+
     // generics
     this.mLastScreen           = null;
+    this.mAssetsData           = null;
+    this.mCompanyName          = null;
     this.mIsVisible            = false;
+    this.mIsUpdating           = false;
     this.mIsChoosingCoordinate = false;
 };
 
@@ -299,10 +304,10 @@ WorldEditorScreen.prototype.createDIV = function(_parentDiv)
         // save changes button
         var buttonLayout = $('<div class="l-tab-button is-save"/>');
         buttonPanel.append(buttonLayout);
-        this.mSaveButton = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/save_settings.png', function () {
-            //self.mDataSource.notifyBackendCloseButtonClicked();
+        this.mReloadButton = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/save_settings.png', function () {
+            self.notifyBackendReloadButtonPressed();
         }, '', 6);
-        this.mSaveButton.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.save_button' });
+        this.mReloadButton.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.reload_button' });
     }
 
 
@@ -891,11 +896,11 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
             var row25 = this.addRow(25, 'with-small-dialog-background');
             column78.append(row25);
             {
-                var buildingsLayout = $('<div class="a-container is-center"/>');
+                var buildingsLayout = $('<div class="buildings-container is-center"/>'); //a-container
                 row25.append(buildingsLayout);
 
                 this.mSettlement.Buildings = [];
-                for (var i = 0; i < 4; i++) {
+                for (var i = 0; i < 5; i++) {
                     this.createSettlementBuildingSlot(i, buildingsLayout);
                 }
             }
@@ -1024,7 +1029,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     
                     // relation stuffs
                     this.createSliderControlDIV(this.mFactionRelation, 'Relation', row90);
-                    this.createCheckBoxControlDIV(this.mFactionFixedRelation, row90);
+                    this.createCheckBoxControlDIV(this.mFactionFixedRelation, row90, 'relation');
                 }
 
                 var row10 = this.addRow(10);
@@ -1052,7 +1057,14 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     var prevButtonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     leftColumn.append(prevButtonLayout);
                     this.mFaction.PrevButton = prevButtonLayout.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function() {
-                        //self.onPreviousBannerClicked();
+                        var index = self.mFaction.Selected.data('index');
+                        var data = self.mFaction.Data[index];
+                        var banners = self.mBanner.Data[data.IsNoble === true ? 1 : 2];
+
+                        if (--data.Banner <= 1)
+                            data.Banner = banners.length - 1;
+
+                        self.notifyBackendChangeFactionBanner(data.Banner);
                     }, '', 6);
 
                     var midColumn = this.addColumn(40);
@@ -1071,7 +1083,14 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     var nextButtonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     rightColumn.append(nextButtonLayout);
                     this.mFaction.NextButton = nextButtonLayout.createImageButton(Path.GFX + Asset.BUTTON_NEXT_BANNER, function() {
-                        //self.onPreviousBannerClicked();
+                        var index = self.mFaction.Selected.data('index');
+                        var data = self.mFaction.Data[index];
+                        var banners = self.mBanner.Data[data.IsNoble === true ? 1 : 2];
+
+                        if (++data.Banner >= banners.length - 1)
+                            data.Banner = 1;
+
+                        self.notifyBackendChangeFactionBanner(data.Banner);
                     }, '', 6);
                 }
 
@@ -1095,7 +1114,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row.append(buttonLayout);
                     var button = buttonLayout.createTextButton('View Alliance', function ()
                     {
-                        //self.();
+                        self.createChooseFactionAlliancePopupDialog();
                     }, '', 4);
 
                     // button button button
@@ -1105,7 +1124,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row.append(buttonLayout);
                     var button = buttonLayout.createTextButton('Despawn Troops', function ()
                     {
-                        //self.();
+                        self.notifyBackendDespawnFactionTroops();
                     }, '', 4);
 
                     // button button button button
@@ -1115,7 +1134,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row.append(buttonLayout);
                     var button = buttonLayout.createTextButton('Refresh Roster', function ()
                     {
-                        //self.();
+                        self.notifyBackendRefreshFactionOwningCharacter();
                     }, '', 4);
 
                     // button button button button button 
@@ -1125,7 +1144,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row.append(buttonLayout);
                     var button = buttonLayout.createTextButton('Refresh Actions', function ()
                     {
-                        //self.();
+                        self.notifyBackendRefreshFactionActions();
                     }, '', 4);
 
                     // button button button button button button
@@ -1135,7 +1154,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row.append(buttonLayout);
                     var button = buttonLayout.createTextButton('Refresh Contracts', function ()
                     {
-                        //self.();
+                        self.notifyBackendRefreshFactionContracts();
                     }, '', 4);
                 }
             }
@@ -1169,8 +1188,8 @@ WorldEditorScreen.prototype.createPropertiesScreenDIV = function(_parentDiv)
                 subColumn50.append(row);
                 var title = $('<div class="title title-font-big font-color-title">Combat Difficulty</div>');
                 row.append(title);
-                $.each(this.mDifficulty, function(_key, _definition) {
-                    self.createRadioControlDIV(_definition, row, count, 'difficulty', 'mDifficultyLevel');
+                $.each(this.mCombatDifficulty, function(_key, _definition) {
+                    self.createRadioControlDIV(_definition, row, count, 'combat-difficulty'); 
                     count++;
                 });
 
@@ -1198,7 +1217,7 @@ WorldEditorScreen.prototype.createPropertiesScreenDIV = function(_parentDiv)
                 var title = $('<div class="title title-font-big font-color-title">Economic Difficulty</div>');
                 row.append(title);
                 $.each(this.mEconomicDifficulty, function(_key, _definition) {
-                    self.createRadioControlDIV(_definition, row, count, 'economic-difficulty', 'mEconomicDifficultyLevel');
+                    self.createRadioControlDIV(_definition, row, count, 'economic-difficulty');
                     count++;
                 });
 
@@ -1323,12 +1342,18 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                 {
                     // button
                     var subRow = this.addContainer(null, 3.6);
+                    subRow.css('margin-top', '0.5rem');
                     buttonColumn.append(subRow);
                     var button = this.addLayout(17.5, 4.3, 'is-center');
                     subRow.append(button);
                     this.mAvatar.TypeButton = button.createTextButton('Human', function () 
                     {
-                        //self.();
+                        if (++self.mAvatar.Selected.Row >= self.mAvatar.Avatars.length)
+                            self.mAvatar.Selected.Row = 0;
+
+                        self.mAvatar.Selected.Index = 0;
+                        self.mAvatar.TypeButton.changeButtonText(self.mAvatar.RowNames[self.mAvatar.Selected.Row] + ' (' + (self.mAvatar.Selected.Index + 1)  + '/' + self.mAvatar.Avatars[self.mAvatar.Selected.Row].length + ')');
+                        self.notifyBackendUpdateAvatarModel('avatar', self.mAvatar.Avatars[self.mAvatar.Selected.Row][self.mAvatar.Selected.Index]);
                     }, 'display-block', 1);
 
                     // button button
@@ -1338,7 +1363,9 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                     subRow.append(button);
                     this.mAvatar.FlipButton = button.createTextButton('Flip', function () 
                     {
-                        //self.();
+                        self.mAvatar.IsFlipping = !self.mAvatar.IsFlipping;
+                        self.mAvatar.FlipButton.changeButtonText('Flip ' + '(' + self.mAvatar.IsFlipping + ')');
+                        self.notifyBackendUpdateAvatarModel('flip', self.mAvatar.IsFlipping);
                     }, 'display-block', 1);
 
                     // button button button
@@ -1348,7 +1375,22 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                     subRow.append(button);
                     this.mAvatar.SocketButton = button.createTextButton('Socket', function () 
                     {
-                        //self.();
+                        if (++self.mAvatar.SocketIndex >= self.mAvatar.Sockets.length)
+                            self.mAvatar.SocketIndex = 0;
+
+                        self.mAvatar.SocketButton.changeButtonText('Socket' + ' (' + (self.mAvatar.SocketIndex + 1)  + '/' + self.mAvatar.Sockets.length + ')');
+                        self.notifyBackendUpdateAvatarModel('socket', self.mAvatar.Sockets[self.mAvatar.SocketIndex]);
+                    }, 'display-block', 1);
+
+                    // button button button button
+                    var subRow = this.addContainer(null, 3.6);
+                    subRow.css('margin-top', '1.3rem');
+                    buttonColumn.append(subRow);
+                    var button = this.addLayout(17.5, 4.3, 'is-center');
+                    subRow.append(button);
+                    this.mAvatar.ResetButton = button.createTextButton('Reset', function () 
+                    {
+                        self.notifyBackendUpdateAvatarModel('reset', null);
                     }, 'display-block', 1);
                 }
 
@@ -1365,7 +1407,11 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                     var prevAvatar = this.addLayout(4.5, 4.1, 'is-center');
                     left.append(prevAvatar);
                     this.mAvatar.PrevButton = prevAvatar.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function() {
-                        //self.onPreviousBannerClicked();
+                        if (--self.mAvatar.Selected.Index < 0)
+                            self.mAvatar.Selected.Index = self.mAvatar.Avatars[self.mAvatar.Selected.Row].length - 1;
+
+                        self.mAvatar.TypeButton.changeButtonText(self.mAvatar.RowNames[self.mAvatar.Selected.Row] + ' (' + (self.mAvatar.Selected.Index + 1)  + '/' + self.mAvatar.Avatars[self.mAvatar.Selected.Row].length + ')');
+                        self.notifyBackendUpdateAvatarModel('avatar', self.mAvatar.Avatars[self.mAvatar.Selected.Row][self.mAvatar.Selected.Index]);
                     }, '', 6);
 
                     // avatar image
@@ -1384,7 +1430,11 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                     var nextAvatar = this.addLayout(4.5, 4.1, 'is-center');
                     right.append(nextAvatar);
                     this.mAvatar.NextButton = nextAvatar.createImageButton(Path.GFX + Asset.BUTTON_NEXT_BANNER, function() {
-                        //self.onNextBannerClicked();
+                        if (++self.mAvatar.Selected.Index >= self.mAvatar.Avatars[self.mAvatar.Selected.Row].length)
+                            self.mAvatar.Selected.Index = 0;
+
+                        self.mAvatar.TypeButton.changeButtonText(self.mAvatar.RowNames[self.mAvatar.Selected.Row] + ' (' + (self.mAvatar.Selected.Index + 1)  + '/' + self.mAvatar.Avatars[self.mAvatar.Selected.Row].length + ')');
+                        self.notifyBackendUpdateAvatarModel('avatar', self.mAvatar.Avatars[self.mAvatar.Selected.Row][self.mAvatar.Selected.Index]);
                     }, '', 6);
                 }
             }
@@ -1399,9 +1449,9 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
             row.append(inputLayout);
             this.mCompanyName = inputLayout.createInput('Battle Brothers', 0, 32, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
                 if (_input.getInputTextLength() === 0)
-                    _input.val('Battle Brothers');
-
-                self.notifyBackendToChangeName(_input.getInputText(), 'company');
+                    _input.val(self.mAssetsData.Name);
+                else
+                    self.notifyBackendToChangeName(_input.getInputText(), 'company');
             });
             this.mCompanyName.setInputText('Battle Brothers');
 
@@ -1421,9 +1471,9 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                 var count = 0;
                 $.each(this.mConfig, function(_key, _definition) {
                     if (count < 5)
-                        self.createCheckBoxControlDIV(_definition, column45);
+                        self.createCheckBoxControlDIV(_definition, column45, _key);
                     else
-                        self.createCheckBoxControlDIV(_definition, column55);
+                        self.createCheckBoxControlDIV(_definition, column55, _key);
 
                     count++
                 });
@@ -1434,8 +1484,8 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                 row.append(title);
 
                 var count = 0;
-                $.each(this.mGender, function(_key, _definition) {
-                    self.createRadioControlDIV(_definition, row, count, 'gender-control', 'mGenderLevel');
+                $.each(this.mIsGender, function(_key, _definition) {
+                    self.createRadioControlDIV(_definition, row, count, 'gender-control');
                     count++;
                 });
             }
@@ -1459,17 +1509,27 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
             bannerContainer.append(table);
 
             var prevBanner = table.find('.prev-banner-button:first');
-            this.mPrevBannerButton = prevBanner.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function() {
-                //self.onPreviousBannerClicked();
+            var button = prevBanner.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function() {
+                if (--self.mBanner.Player < 0)
+                    self.mBanner.Player = self.mBanner.Data[0].length - 1;
+
+                var banner = self.mBanner.Data[0][self.mBanner.Player];
+                self.mBanner.Image.attr('src', Path.GFX + 'ui/banners/' + banner + '.png');
+                self.notifyBackendChangePlayerBanner(banner);
             }, '', 6);
 
             var nextBanner = table.find('.next-banner-button:first');
-            this.mNextBannerButton = nextBanner.createImageButton(Path.GFX + Asset.BUTTON_NEXT_BANNER, function() {
-                //self.onNextBannerClicked();
+            var button = nextBanner.createImageButton(Path.GFX + Asset.BUTTON_NEXT_BANNER, function() {
+                if (++self.mBanner.Player > self.mBanner.Data[0].length - 1)
+                    self.mBanner.Player = 0;
+
+                var banner = self.mBanner.Data[0][self.mBanner.Player];
+                self.mBanner.Image.attr('src', Path.GFX + 'ui/banners/' + banner + '.png');
+                self.notifyBackendChangePlayerBanner(banner);
             }, '', 6);
 
             var bannerImage = table.find('.banner-image-container:first');
-            this.mBannerImage = bannerImage.createImage(Path.GFX + 'ui/banners/banner_beasts_01.png', function(_image) {
+            this.mBanner.Image = bannerImage.createImage(Path.GFX + 'ui/banners/banner_beasts_01.png', function(_image) {
                 _image.removeClass('display-none').addClass('display-block');
             }, null, 'display-none banner-image');
         }
@@ -1479,8 +1539,9 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
     }
 };
 
-WorldEditorScreen.prototype.createRadioControlDIV = function(_definition, _parentDiv, _index, _name, _result) 
+WorldEditorScreen.prototype.createRadioControlDIV = function(_definition, _parentDiv, _index, _name) 
 {
+    var self = this;
     var control = $('<div class="control"></div>');
     _parentDiv.append(control);
     _definition.Checkbox = $('<input type="radio" id="' + _definition.TooltipId + '" name="' + _name + '" />');
@@ -1495,13 +1556,14 @@ WorldEditorScreen.prototype.createRadioControlDIV = function(_definition, _paren
     });
     _definition.Checkbox.on('ifChecked', null, this, function(_event) {
         var self = _event.data;
-        self[_result] = _index;
+        if (self.mIsUpdating === false) 
+            self.notifyBackendUpdateRadioCheckBox(_name, _index);
     });
 
     _definition.Label.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
 };
 
-WorldEditorScreen.prototype.createCheckBoxControlDIV = function(_definition, _parentDiv) 
+WorldEditorScreen.prototype.createCheckBoxControlDIV = function(_definition, _parentDiv, _key) 
 {
     var row = $('<div class="row"></div>');
     _parentDiv.append(row);
@@ -1518,11 +1580,23 @@ WorldEditorScreen.prototype.createCheckBoxControlDIV = function(_definition, _pa
         increaseArea: '30%'
     });
 
+    _definition.Checkbox.on('ifChecked', null, this, function(_event) {
+        var self = _event.data;
+        if (self.mIsUpdating === false) 
+            self.notifyBackendUpdateCheckBox(_key, true);
+    });
+    _definition.Checkbox.on('ifUnchecked', null, this, function(_event) {
+        var self = _event.data;
+        if (self.mIsUpdating === false) 
+            self.notifyBackendUpdateCheckBox(_key, false);
+    });
+
     _definition.Label.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
 };
 
 WorldEditorScreen.prototype.createSliderControlDIV = function(_definition, _title, _parentDiv) 
 {
+    var self = this;
     var row = $('<div class="row"></div>');
     _parentDiv.append(row);
     _definition.Title = $('<div class="title title-font-big font-bold font-color-title">' + _title + '</div>');
@@ -1543,10 +1617,32 @@ WorldEditorScreen.prototype.createSliderControlDIV = function(_definition, _titl
     _definition.Label.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
     control.append(_definition.Label);
     
-    _definition.Control.on("change", function () {
-        _definition.Value = parseInt(_definition.Control.val());
-        _definition.Label.text('' + _definition.Value + _definition.Postfix);
-    });
+    switch(_definition.TooltipId)
+    {
+    case 'woditor.rostertier':
+        _definition.Control.on("change", function () {
+            _definition.Value = parseInt(_definition.Control.val());
+            _definition.Label.text('' + _definition.Value + _definition.Postfix);
+            self.notifyBackendUpdateRosterTier(_definition.Value);
+        });
+        break;
+
+    case 'woditor.difficultymult':
+        _definition.Control.on("change", function () {
+            _definition.Value = parseInt(_definition.Control.val());
+            _definition.Label.text('' + _definition.Value + _definition.Postfix);
+            self.notifyBackendUpdateDifficultyMult(_definition.Value);
+        });
+        break;
+
+    default: // faction relation
+        _definition.Control.on("change", function () {
+            _definition.Value = parseInt(_definition.Control.val());
+            _definition.Label.text('' + _definition.Value + _definition.Postfix);
+            self.notifyBackendUpdateFactionRelation(_definition.Value);
+        });
+    }
+    
 };
 
 WorldEditorScreen.prototype.createInputDIV = function(_key, _definition, _parentDiv, _type)
@@ -1898,7 +1994,6 @@ WorldEditorScreen.prototype.confirmAssetChanges = function(_input, _keyName)
 
     if (isValid === true) {
         _input.val('' + value + '');
-        this.mAssetsData[_keyName] = value;
         this.notifyBackendUpdateAssetsValue(_keyName, value);
     }
     else {
@@ -1930,7 +2025,6 @@ WorldEditorScreen.prototype.confirmPropertyChanges = function(_input, _keyName)
 
     if (isValid === true) {
         _input.val('' + value + '');
-        this.mAssetsData[_keyName] = value;
         this.notifyBackendUpdateAssetsPropertyValue(_keyName, value);
     }
     else {
@@ -1941,14 +2035,11 @@ WorldEditorScreen.prototype.isValidNumber = function(_inputText, _min, _max)
 {
     var convertedText = parseInt(_inputText);
 
-    if(isNaN(convertedText)) 
-        return null;
+    if(isNaN(convertedText)) return null;
 
-    if (convertedText < _min) 
-        return _min;
+    if (convertedText < _min) return _min;
 
-    if (convertedText > _max)
-        return _max;
+    if (convertedText > _max) return _max;
 
     return convertedText;
 };
@@ -1956,8 +2047,14 @@ WorldEditorScreen.prototype.isValidNumber = function(_inputText, _min, _max)
 WorldEditorScreen.prototype.updateAssetsData = function(_data)
 {
     var self = this;
+    this.mIsUpdating = true;
     this.mAssetsData = _data;
     this.mCompanyName.setInputText(_data.Name);
+
+    // update player banner
+    this.mBanner.Data = _data.Banners.Data;
+    this.mBanner.Player = _data.Banners.Selected;
+    this.mBanner.Image.attr('src', Path.GFX + 'ui/banners/' + this.mBanner.Data[0][this.mBanner.Player] + '.png');
 
     $.each(this.mAssets, function(_key, _definition) {
         _definition.Input.val('' + _data[_key] + (_definition.IsPercentage === true ? '%' : ''));
@@ -1968,12 +2065,62 @@ WorldEditorScreen.prototype.updateAssetsData = function(_data)
             _definition.Input.val('' + _data[_name] + (_definition.IsPercentage === true ? '%' : ''));
         });
     });
+
+    // update roster tier slider
+    this.mRosterTier.Control.attr('max', _data.RosterTier.Max);
+    this.mRosterTier.Control.val(_data.RosterTier.Value);
+    this.mRosterTier.Label.text('' + _data.RosterTier.Value + this.mRosterTier.Postfix);
+
+    // update difficulty mult slider
+    this.mDifficultyMult.Control.val(_data.DifficultyMult);
+    this.mDifficultyMult.Label.text('' + _data.DifficultyMult + this.mDifficultyMult.Postfix);
+
+    // update the checkbox
+    $.each(this.mConfig, function(_key, _definition) {
+        if (_data.CheckBox[_key] === true)
+            _definition.Checkbox.iCheck('check');
+    });
+
+    WorldEditor.RadioBox.forEach(function (_name) {
+        var index = 0;
+        $.each(self['m' + _name], function(_key, _definition) {
+            if (_data.CheckBox[_name] === index)
+                _definition.Checkbox.iCheck('check');
+            index++;
+        });
+    });
+
+    this.mIsUpdating = false;
 };
+
+WorldEditorScreen.prototype.updateAvatarData = function(_data)
+{
+    this.mAvatar.IsFlipping = _data.IsFlipping;
+    this.mAvatar.Avatars = _data.Sprites;
+    this.mAvatar.RowNames = _data.SpriteNames;
+    this.mAvatar.Sockets = _data.Sockets;
+    this.mAvatar.SocketIndex = _data.SocketIndex;
+    this.mAvatar.Selected.Row = _data.Selected.Row;
+    this.mAvatar.Selected.Index = _data.Selected.Index;
+    this.mAvatar.Image.attr('src', Path.PROCEDURAL + _data.ImagePath);
+
+    this.mAvatar.TypeButton.changeButtonText(this.mAvatar.RowNames[this.mAvatar.Selected.Row] + ' (' + (this.mAvatar.Selected.Index + 1)  + '/' + this.mAvatar.Avatars[this.mAvatar.Selected.Row].length + ')');
+    this.mAvatar.FlipButton.changeButtonText('Flip ' + '(' + _data.IsFlipping + ')');
+    this.mAvatar.SocketButton.changeButtonText('Socket' + ' (' + (this.mAvatar.SocketIndex + 1)  + '/' + this.mAvatar.Sockets.length + ')');
+};
+
+WorldEditorScreen.prototype.updateAvatarImage = function(_imagePath)
+{
+    this.mAvatar.Image.attr('src', Path.PROCEDURAL + _imagePath);
+}
 
 WorldEditorScreen.prototype.loadFromData = function(_data) 
 {
     if ('Assets' in _data && _data.Assets !== undefined && _data.Assets !== null && typeof _data.Assets === 'object')
         this.updateAssetsData(_data.Assets);
+
+    if ('Avatar' in _data && _data.Avatar !== undefined && _data.Avatar !== null && typeof _data.Avatar === 'object')
+        this.updateAvatarData(_data.Avatar);
 
     if ('Factions' in _data && _data.Factions !== undefined && _data.Factions !== null && jQuery.isArray(_data.Factions))
         this.addFactionsData(_data.Factions);
@@ -1984,8 +2131,11 @@ WorldEditorScreen.prototype.loadFromData = function(_data)
     if ('Locations' in _data && _data.Locations !== undefined && _data.Locations !== null && jQuery.isArray(_data.Locations))
         this.addLocationsData(_data.Locations);
 
-    if ('Scenarios' in _data && _data.Scenarios !== undefined && _data.Scenarios !== null && jQuery.isArray(_data.Scenarios))
-        this.mScenario.Data = _data.Scenarios;
+    if ('Scenario' in _data && _data.Scenario !== undefined && _data.Scenario !== null && typeof _data.Scenario === 'object') {
+        this.mScenario.Data = _data.Scenario.Data;
+        this.mScenario.Selected = _data.Scenario.Selected;
+        this.mScenario.Image.attr('src', Path.GFX + this.mScenario.Data[this.mScenario.Selected].Image);
+    }
 };
 
 WorldEditorScreen.prototype.notifyBackendOnConnected = function()
@@ -2023,17 +2173,84 @@ WorldEditorScreen.prototype.notifyBackendCloseButtonPressed = function()
     SQ.call(this.mSQHandle, 'onCloseButtonPressed');
 };
 
+WorldEditorScreen.prototype.notifyBackendReloadButtonPressed = function()
+{
+    SQ.call(this.mSQHandle, 'onReloadButtonPressed');
+};
+
+WorldEditorScreen.prototype.notifyBackendUpdateAvatarModel = function(_keyName, _value) 
+{
+    SQ.call(this.mSQHandle, 'onUpdateAvatarModel', [_keyName, _value]);
+};
+
 WorldEditorScreen.prototype.notifyBackendUpdateAssetsValue = function(_keyName, _value) 
 {
+    this.mAssetsData[_keyName] = _value;
     SQ.call(this.mSQHandle, 'onUpdateAssetsValue', [_keyName, _value]);
 };
 
 WorldEditorScreen.prototype.notifyBackendUpdateAssetsPropertyValue = function(_keyName, _value) 
 {
+    this.mAssetsData[_keyName] = _value;
     SQ.call(this.mSQHandle, 'onUpdateAssetsPropertyValue', [_keyName, _value]);
 };
 
-WorldEditorScreen.prototype.notifyBackendToChangeName = function( _name, _key)
+WorldEditorScreen.prototype.notifyBackendUpdateRosterTier = function(_value) 
+{
+    this.mAssetsData.RosterTier.Value = _value;
+    SQ.call(this.mSQHandle, 'onUpdateRosterTier', _value);
+};
+
+WorldEditorScreen.prototype.notifyBackendUpdateDifficultyMult = function(_value) 
+{
+    this.mAssetsData.DifficultyMult = _value;
+    SQ.call(this.mSQHandle, 'onUpdateDifficultyMult', _value);
+};
+
+WorldEditorScreen.prototype.notifyBackendUpdateCheckBox = function(_key, _isChecked) 
+{
+    if (_key !== 'relation') {
+        this.mAssetsData.CheckBox[_key] = _isChecked;
+        SQ.call(this.mSQHandle, 'onUpdataAssetsCheckBox', [_key, _isChecked]);
+    }
+    else {
+        var id = this.updateFactionRelationDeterioration(_isChecked);
+        SQ.call(this.mSQHandle, 'onUpdataFactionRelationDeterioration', [id, _isChecked]);
+    }
+};
+
+WorldEditorScreen.prototype.notifyBackendUpdateRadioCheckBox = function(_key, _index) 
+{
+    switch(_key)
+    {
+    case 'combat-difficulty':
+        this.mAssetsData.CheckBox.CombatDifficulty = _index;
+        SQ.call(this.mSQHandle, 'onUpdateCombatDifficulty', _index);
+        break;
+
+    case 'economic-difficulty':
+        this.mAssetsData.CheckBox.EconomicDifficulty = _index;
+        SQ.call(this.mSQHandle, 'onUpdateEconomicDifficulty', _index);
+        break;
+
+    default:
+        this.mAssetsData.CheckBox.IsGender = _index;
+        SQ.call(this.mSQHandle, 'onUpdateGenderLevel', _index);
+    }
+};
+
+WorldEditorScreen.prototype.notifyBackendChangePlayerBanner = function(_banner)
+{
+    SQ.call(this.mSQHandle, 'onChangePlayerBanner', _banner);
+};
+
+WorldEditorScreen.prototype.notifyBackendChangeFactionBanner = function(_banner)
+{
+    var data = this.updateFactionBanner(_banner);
+    SQ.call(this.mSQHandle, 'onChangeFactionBanner', [data.ID, _banner, data.Index]);
+};
+
+WorldEditorScreen.prototype.notifyBackendToChangeName = function(_name, _key)
 {
     var id = null;
 
@@ -2041,17 +2258,17 @@ WorldEditorScreen.prototype.notifyBackendToChangeName = function( _name, _key)
     {
     case 'location':
         id = this.updateLocationName(_name);
-        SQ.call(this.mSQHandle, 'onChangeWorldEntityName', [_name, id]);
+        SQ.call(this.mSQHandle, 'onChangeWorldEntityName', [id, _name]);
         break;
 
     case 'settlement':
         id = this.updateSettlementName(_name);
-        SQ.call(this.mSQHandle, 'onChangeWorldEntityName', [_name, id]);
+        SQ.call(this.mSQHandle, 'onChangeWorldEntityName', [id], _name);
         break;
 
     case 'faction':
         id = this.updateFactionName(_name);
-        SQ.call(this.mSQHandle, 'onChangeFactionName', [_name, id]);
+        SQ.call(this.mSQHandle, 'onChangeFactionName', [id, _name]);
         break;
 
     default:
@@ -2059,6 +2276,76 @@ WorldEditorScreen.prototype.notifyBackendToChangeName = function( _name, _key)
         SQ.call(this.mSQHandle, 'onChangeCompanyName', _name);
     }
 };
+
+WorldEditorScreen.prototype.notifyBackendUpdateFactionRelation = function( _value )
+{
+    var self = this;
+    var id = this.mFaction.Selected.data('entry').ID;
+
+    SQ.call(this.mSQHandle, 'updateFactionRelation', [ id, _value ], function(_data) {
+        if (_data === undefined || _data == null || typeof _data !== 'object') {
+            console.error('ERROR: Failed to retrieve updated Faction Relation. Invalid data result.');
+            return;
+        }
+
+        self.updateFactionRelation(_data);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendDespawnFactionTroops = function()
+{
+    var id = this.mFaction.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onDespawnFactionTroops', id);
+};
+
+WorldEditorScreen.prototype.notifyBackendRefreshFactionOwningCharacter = function()
+{
+    var id = this.mFaction.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onRefreshFactionOwningCharacter', id);
+};
+
+WorldEditorScreen.prototype.notifyBackendRefreshFactionActions = function()
+{
+    var id = this.mFaction.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onRefreshFactionActions', id);
+};
+
+WorldEditorScreen.prototype.notifyBackendRefreshFactionContracts = function()
+{
+    var id = this.resetContractInFactionDetail();
+    SQ.call(this.mSQHandle, 'onRefreshFactionContracts', id);
+};
+
+WorldEditorScreen.prototype.notifyBackendUpdateScenario = function( _index )
+{
+    var data = this.mScenario.Data[_index];
+    this.mScenario.Selected = _index;
+    this.mScenario.Image.attr('src', Path.GFX + data.Image);
+    SQ.call(this.mSQHandle, 'onChangeScenario', data.ID);
+};
+
+WorldEditorScreen.prototype.notifyBackendToCollectAllianceData = function( _listContainers )
+{
+    var self = this;
+    var id = this.mFaction.Selected.data('entry').ID;
+    var index = this.mFaction.Selected.data('index');
+
+    SQ.call(this.mSQHandle, 'onCollectAllianceData', [ id, index, this.mFaction.Data ], function(_data) {
+        if (_data === undefined || _data == null || typeof _data !== 'object') {
+            console.error('ERROR: Failed to retrieve Faction Alliance Data. Invalid data result.');
+            return;
+        }
+
+        self.addFactionAllianceToPopupDialog(_data, _listContainers);
+    });
+}
+
+WorldEditorScreen.prototype.notifyBackendUpdateFactionAlliance = function( _data )
+{
+    var self = this;
+    var id = this.mFaction.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onUpdateFactionAlliance', [ id, _data ]);
+}
 
 WorldEditorScreen.prototype.notifyBackendGetTroopEntries = function( _result )
 {
@@ -2072,8 +2359,7 @@ WorldEditorScreen.prototype.notifyBackendGetTroopEntries = function( _result )
     });
 
     SQ.call(this.mSQHandle, 'onGetTroopEntries', [ key, filter ], function(_data) {
-        if (_data === undefined || _data == null || !jQuery.isArray(_data))
-        {
+        if (_data === undefined || _data == null || !jQuery.isArray(_data)) {
             console.error('ERROR: Failed to get Troops Entries. Invalid data result.');
             return;
         }

@@ -16,8 +16,7 @@ WorldEditorScreen.prototype.reloadLocationsData = function()
 
     for(var i = 0; i < toLoad.length; ++i)
     {
-        var entry = toLoad[i];
-        this.addLocationListEntry(entry, i);
+        this.addLocationListEntry(toLoad[i], i);
     }
 
     this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);

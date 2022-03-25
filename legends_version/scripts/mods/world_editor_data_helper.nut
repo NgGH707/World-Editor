@@ -1,27 +1,27 @@
 this.world_editor_data_helper <- {
 	m = {},
-	function create() {}
+	//function create() {}
 
-	function convertAssetsToUIData()
+	function convertFactionAllianceToUIData( _data )
 	{
-		local result = {};
-		result.Name <- this.World.Assets.getName();
-		result.BusinessReputation <- this.World.Assets.getBusinessReputation();
-		result.MoralReputation <- this.World.Assets.getMoralReputation();
-		result.Money <- this.World.Assets.getMoney();
-		result.Stash <- this.World.Assets.getStash().getCapacity();
-		result.Ammo <- this.World.Assets.getAmmo();
-		result.ArmorParts <- this.World.Assets.getArmorParts();
-		result.Medicine <- this.World.Assets.getMedicine();
-		
-		foreach (key in this.Woditor.AssetsProperties.Mult)
-		{
-			result[key] <- this.Math.floor(this.World.Assets.m[key] * 100);
-		}
+		local faction = this.World.FactionManager.getFaction(_data[0]);
+		local allies = faction.getAllies();
+		local result = {Allies = [], Hostile = []};
+		local index = _data[1];
+		local data = _data[2];
 
-		foreach (key in this.Woditor.AssetsProperties.Additive)
+		foreach(i, fData in  data )
 		{
-			result[key] <- this.World.Assets.m[key];
+			if (i == index) continue;
+
+			if (allies.find(fData.ID) != null)
+			{
+				result.Allies.push(i);
+			}
+			else
+			{
+				result.Hostile.push(i);
+			}
 		}
 
 		return result;
@@ -55,6 +55,131 @@ this.world_editor_data_helper <- {
 				Cost = troop.Cost,
 				Key = key,
 			})
+		}
+
+		return result;
+	}
+
+	function convertAvatarToUIData( _screen )
+	{
+		this.World.Assets.updateLook();
+		local result = {};
+		local roster = this.World.getTemporaryRoster();
+		local player = this.World.State.getPlayer();
+		local socket = player.getSprite("base").getBrush().Name;
+		local body = player.getSprite("body").getBrush().Name;
+		local flip = player.getSprite("body").isFlippedHorizontally();
+
+		// create the model
+		roster.clear();
+		_screen.m.TemporaryModel = roster.create("scripts/entity/tactical/temp_model");
+		_screen.m.TemporaryModel.getSprite("base").setBrush(socket);
+		_screen.m.TemporaryModel.getSprite("body").setBrush(body);
+		_screen.m.TemporaryModel.setFlipped(flip);
+		_screen.m.TemporaryModel.setDirty(true);
+
+		// add avatar data
+		result.ImagePath <- _screen.m.TemporaryModel.getImagePath();
+		result.IsFlipping <- flip;
+		result.Sprites <- [];
+		result.SpriteNames <- [];
+		result.Sockets <- this.Const.WorldSockets;
+		result.SocketIndex <- 0;
+		result.Selected <- {
+			Row = 0,
+			Index = 0,
+		};
+
+		foreach (i, row in this.Const.WorldSprites) 
+		{
+			local index = row.find(body);
+
+			if (index != null)
+			{
+				result.Selected.Row = i;
+				result.Selected.Index = index;
+			}
+
+			result.SpriteNames.push(this.Const.WorldSpritesNames[i]);
+			result.Sprites.push(row);
+		}
+		
+		local index = this.Const.WorldSockets.find(socket);
+		if (index != null) result.SocketIndex = index;
+		return result;
+	}
+
+	function convertScenariosToUIData()
+	{
+		local result = {};
+		local currentID = this.World.Assets.getOrigin().getID();
+		result.Data <- this.Const.ScenarioManager.getDataScenariosForUI()
+		result.Selected <- null;
+
+		foreach (i, s in result.Data)
+		{
+			if (currentID == s.ID)
+			{
+				result.Selected = i;
+				break;
+			}
+		}
+
+		return result;
+	}
+
+	function convertAssetsToUIData()
+	{
+		local result = {};
+
+		// banners
+		result.Banners <- {
+			Data = [],
+			Selected = null
+		};
+		result.Banners.Data.push(this.Const.PlayerBanners);
+		result.Banners.Data.push(this.Const.NobleBanners);
+		result.Banners.Data.push(this.Const.OtherBanner);
+		result.Banners.Selected = this.Const.PlayerBanners.find(this.World.Assets.getBanner());
+
+		// roster and difficulty sliders
+		result.DifficultyMult <- this.Math.floor(100 * (this.World.Flags.has("DifficultyMult") ? this.World.Flags.getAsFloat("DifficultyMult") : 1.0));
+		result.RosterTier <- {
+			Max = this.Const.Roster.Tier[this.Const.Roster.Tier.len() - 1],
+			Value = this.World.Assets.getOrigin().getStartingRosterTier()
+		};
+
+		// check box configurations
+		result.CheckBox <- {
+			IsIronman = this.World.Assets.isIronman(),
+			IsBleedKiller = this.LegendsMod.Configs().LegendBleedKillerEnabled(),
+			IsLocationScaling = this.LegendsMod.Configs().LegendLocationScalingEnabled(),
+			IsRecruitScaling = this.LegendsMod.Configs().LegendRecruitScalingEnabled(),
+			IsWorldEconomy = this.LegendsMod.Configs().LegendWorldEconomyEnabled(),
+			IsBlueprintsVisible = this.LegendsMod.Configs().LegendAllBlueprintsEnabled(),
+			IsGender = this.LegendsMod.Configs().LegendGenderLevel(),
+			CombatDifficulty = this.World.Assets.getCombatDifficulty(),
+			EconomicDifficulty = this.World.Assets.getEconomicDifficulty(),
+		};
+
+		// assets stuffs
+		result.Name <- this.World.Assets.getName();
+		result.BusinessReputation <- this.World.Assets.getBusinessReputation();
+		result.MoralReputation <- this.World.Assets.getMoralReputation();
+		result.Money <- this.World.Assets.getMoney();
+		result.Stash <- this.World.Assets.getStash().getCapacity();
+		result.Ammo <- this.World.Assets.getAmmo();
+		result.ArmorParts <- this.World.Assets.getArmorParts();
+		result.Medicine <- this.World.Assets.getMedicine();
+		
+		foreach (key in this.Woditor.AssetsProperties.Mult)
+		{
+			result[key] <- this.Math.floor(this.World.Assets.m[key] * 100);
+		}
+
+		foreach (key in this.Woditor.AssetsProperties.Additive)
+		{
+			result[key] <- this.World.Assets.m[key];
 		}
 
 		return result;
@@ -164,17 +289,12 @@ this.world_editor_data_helper <- {
 
 			foreach(i, b in settlement.m.Buildings )
 			{
-				if (b == null)
+				if (b == null || b.getID() == "building.crowd")
 				{
 					buildings.push(null);
 				}
 				else
 				{
-					if (b.getID() == "building.crowd" || b.getID() == "building.marketplace")
-					{
-						continue;
-					}
-
 					buildings.push({
 						ID = b.getID(),
 						ImagePath = b.m.UIImage + ".png",
@@ -182,7 +302,7 @@ this.world_editor_data_helper <- {
 					});
 				}
 
-				if (buildings.len() == 4)
+				if (buildings.len() == 5)
 				{
 					break;
 				}
@@ -281,8 +401,8 @@ this.world_editor_data_helper <- {
 				Relation = f.getPlayerRelationAsText(),
 				RelationNum = this.Math.round(f.getPlayerRelation())
 				RelationNumSimplified = this.Math.min(this.Const.Strings.Relations.len() - 1, f.getPlayerRelation() / 10),
-				IsHostile = !f.isAlliedWithPlayer(),
-				IsFixedRelation = false,
+				FactionFixedRelation = !f.isPlayerRelationPermanent(),
+				IsNoble = f.getType() == this.Const.FactionType.NobleHouse,
 			};
 
 			if (valid.find(f.getType()) != null)
@@ -290,18 +410,14 @@ this.world_editor_data_helper <- {
 				faction.ImagePath <- f.getUIBanner();
 				faction.Contracts <- this.getContractsUI(f);
 				faction.NoChangeName <- false;
-
-				if (f.getType() == this.Const.FactionType.Settlement)
-				{
-					faction.Landlord <- f.getSettlements()[0].getOwner().getUIBanner();
-					faction.NoChangeName = true;
-				}
+				faction.Banner <- f.getBanner();
 			}
 			else
 			{
 			    faction.ImagePath <- "ui/banners/banner_unknow.png";
 			    faction.Contracts <- [];
 			    faction.NoChangeName <- true;
+			    faction.Banner <- null;
 			}
 
 			result.push(faction);

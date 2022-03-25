@@ -39,6 +39,7 @@ this.getroottable().Woditor.hookWorldState <- function ()
 					this.m.WorldEditorScreen.hide();
 					this.m.WorldScreen.show();
 					this.m.Retinue.update();
+					this.World.Assets.updateLook();
 					this.World.State.getPlayer().calculateModifiers();
 					this.updateTopbarAssets();
 					this.setAutoPause(false);

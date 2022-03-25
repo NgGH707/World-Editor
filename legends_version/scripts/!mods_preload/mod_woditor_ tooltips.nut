@@ -565,17 +565,17 @@ this.getroottable().Woditor.hookTooltips <- function ()
 					},
 				];
 
-			case "woditor.save_button":
+			case "woditor.reload_button":
 		       	return [
 					{
 						id = 1,
 						type = "title",
-						text = "Save Changes"
+						text = "Reload Data"
 					},
 					{
 						id = 2,
 						type = "description",
-						text = "Some changes may not automatically save, thus, require you to manually save them by pressing this button or \'Close\' button."
+						text = "Reload the data of all tabs, you shouldn\'t use this button too often because most changes will be individually automatical updated."
 					},
 				];
 

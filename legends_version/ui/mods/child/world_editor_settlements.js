@@ -2,7 +2,7 @@
 WorldEditorScreen.prototype.createSettlementBuildingSlot = function (_index, _parentDiv)
 {
     var slot = $('<div class="is-building-slot"/>');
-    slot.css('left', (1.5 + _index * 17.0) + 'rem');
+    slot.css('left', (0.5 + _index * 15.0) + 'rem'); // (1.5 + _index * 17.0) + 'rem'
     _parentDiv.append(slot);
     this.mSettlement.Buildings[_index] = slot.createImage(Path.GFX + 'ui/buttons/free_building_slot_icon.png', function(_image)
     {
@@ -35,8 +35,7 @@ WorldEditorScreen.prototype.addSettlementsData = function (_data)
 
     for(var i = 0; i < _data.length; ++i)
     {
-        var entry = _data[i];
-        this.addSettlementListEntry(entry, i);
+        this.addSettlementListEntry(_data[i], i);
     }
 
     this.selectSettlementListEntry(this.mSettlement.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);

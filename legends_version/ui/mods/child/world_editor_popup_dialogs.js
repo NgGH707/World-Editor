@@ -3,12 +3,14 @@
 WorldEditorScreen.prototype.createScenarioPopupDialog = function() 
 {
     var self = this;
-
     this.notifyBackendPopupDialogIsVisible(true);
     this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Origins', '', null, 'scenarios-popup');
 
     this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
-        //self.notifyBackendUpdateScenario(self.mScenario.Selected);
+        var selectedEntry = self.mScenario.ListScrollContainer.find('.is-selected:first');
+        if (selectedEntry.length > 0 && self.mScenario.Selected !== selectedEntry.data('index')) {
+            self.notifyBackendUpdateScenario(selectedEntry.data('index'));
+        }
         self.mCurrentPopupDialog = null;
         self.mScenario.Description = null;
         self.mScenario.ListContainer = null;
@@ -53,11 +55,17 @@ WorldEditorScreen.prototype.createScenarioDialogContent = function(_dialog)
 
     return content;
 };
-WorldEditorScreen.prototype.addScenarioEntryToList = function (_data)
+WorldEditorScreen.prototype.addScenarioEntryToList = function (_data, _index)
 {
     var row = $('<div class="l-row"/>');
+    this.mScenario.ListScrollContainer.append(row);
     var entry = $('<div class="list-entry list-entry-small-fit"><span class="label text-font-normal font-color-label">' + _data.Name + '</span></div></div>');
+    row.append(entry);
     entry.data('scenario', _data);
+    entry.data('index', _index)
+
+    if (this.mScenario.Selected === _index)
+        entry.addClass('is-selected');
 
     entry.click(this, function(_event) {
         var self = _event.data;
@@ -71,7 +79,6 @@ WorldEditorScreen.prototype.addScenarioEntryToList = function (_data)
             });
 
             buttonDiv.addClass('is-selected');
-            self.mScenario.Selected = buttonDiv.data('scenario').ID;
         }
     });
 
@@ -88,9 +95,6 @@ WorldEditorScreen.prototype.addScenarioEntryToList = function (_data)
             self.updateScenarioDescription(selectedEntry.data('scenario'));
         }
     });
-
-    row.append(entry);
-    this.mScenario.ListScrollContainer.append(row);
 };
 WorldEditorScreen.prototype.addScenariosToList = function (_scenarios)
 {
@@ -112,27 +116,10 @@ WorldEditorScreen.prototype.addScenariosToList = function (_scenarios)
                 continue;
             }
 
-            this.addScenarioEntryToList(_scenarios[i]);
+            this.addScenarioEntryToList(_scenarios[i], i);
         }
 
-        this.selectFirstScenario();
-    }
-};
-WorldEditorScreen.prototype.selectFirstScenario = function()
-{
-    // deselect all entries first
-    this.mScenario.ListScrollContainer.find('.is-selected').each(function (_index, _element)
-    {
-        $(_element).removeClass('is-selected');
-    });
-
-    var firstEntry = this.mScenario.ListScrollContainer.find('.l-row:first');
-    if (firstEntry.length > 0)
-    {
-        var entry = firstEntry.find('.list-entry:first');
-        entry.addClass('is-selected');
-        this.mScenario.Selected = entry.data('scenario').ID;
-        this.updateScenarioDescription(entry.data('scenario'));
+        this.updateScenarioDescription(this.mScenario.Data[this.mScenario.Selected]);
     }
 };
 WorldEditorScreen.prototype.updateScenarioDescription = function (_data)
@@ -153,6 +140,229 @@ WorldEditorScreen.prototype.updateScenarioDescription = function (_data)
         console.error('ERROR: Failed to find "Description" field while interpreting scenario data. ID: ' + _data.ID);
     }
 };
+
+
+
+
+
+/*
+    Faction Alliance
+*/
+WorldEditorScreen.prototype.createChooseFactionAlliancePopupDialog = function() 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Faction Alliance', '', null, 'alliance-popup');
+
+    // create: content
+    var result = this.createChooseFactionAllianceDialogContent(this.mCurrentPopupDialog);
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // create: list
+    result.LeftListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var leftListScrollContainer = result.LeftListContainer.findListScrollContainer();
+
+    result.RightListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var rightListScrollContainer = result.RightListContainer.findListScrollContainer();
+
+    var midColumnContent = $('<div class="mid-column-content"/>');
+    result.MidColumn.append(midColumnContent);
+    var buttonContainer = $('<div class="button-container"/>');
+    midColumnContent.append(buttonContainer);
+    var layout = $('<div class="l-button is-transfer-right"/>');
+    buttonContainer.append(layout);
+    var button = layout.createImageButton(Path.GFX + Asset.BUTTON_NEXT_BANNER, function() {
+        leftListScrollContainer.find('.is-troop-slot').each(function (_index, _element)
+        {
+            var div = $(_element);
+            var entry = div.find('.troop-panel:first');
+            var data = entry.data('entry');
+            if (entry.hasClass('is-selected')) {
+                self.createFactionAllianceEntry(data, rightListScrollContainer);
+                div.remove();
+            }
+        });
+    }, '', 6);
+
+    var layout = $('<div class="l-button is-transfer-left"/>');
+    buttonContainer.append(layout);
+    var button = layout.createImageButton(Path.GFX + Asset.BUTTON_PREVIOUS_BANNER, function() {
+        rightListScrollContainer.find('.is-troop-slot').each(function (_index, _element)
+        {
+            var div = $(_element);
+            var entry = div.find('.troop-panel:first');
+            var data = entry.data('entry');
+            if (entry.hasClass('is-selected')) {
+                self.createFactionAllianceEntry(data, leftListScrollContainer);
+                div.remove();
+            }
+        });
+    }, '', 6);
+
+
+    // add the ok button
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        var ids = {Allies: [], Hostile: []};
+        leftListScrollContainer.find('.troop-panel').each(function (_index, _element)
+        {
+            var entry = $(_element);
+            ids.Allies.push(entry.data('entry').ID);
+        });
+        rightListScrollContainer.find('.troop-panel').each(function (_index, _element)
+        {
+            var entry = $(_element);
+            ids.Hostile.push(entry.data('entry').ID);
+        });
+        self.notifyBackendUpdateFactionAlliance(ids);
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.findPopupDialogOkButton().addClass('move-to-right');
+    
+    // add the cancel button
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.findPopupDialogCancelButton().addClass('move-to-left');
+    
+    this.notifyBackendToCollectAllianceData([leftListScrollContainer, rightListScrollContainer]);
+};
+WorldEditorScreen.prototype.createChooseFactionAllianceDialogContent = function(_dialog) 
+{
+    var self = this;
+    var content = $('<div class="alliance-content-container"/>');
+
+    var tab = $('<div class="alliance-tab-container"/>');
+    content.append(tab);
+    var leftColumn = $('<div class="side-column"/>');
+    tab.append(leftColumn);
+    var header = $('<div class="is-header title-font-big font-bold font-color-title">Allies</div>');
+    leftColumn.append(header);
+
+    var midColumn = $('<div class="mid-column"/>');
+    tab.append(midColumn);
+
+    var rightColumn = $('<div class="side-column"/>');
+    tab.append(rightColumn);
+    var header = $('<div class="is-header title-font-big font-bold font-color-title">Enemies</div>');
+    rightColumn.append(header);
+
+    var container = $('<div class="alliance-container"/>');
+    content.append(container);
+
+        var leftColumn = $('<div class="side-column"/>');
+        leftColumn.css('background-image', 'url("coui://gfx/ui/skin/tooltip_315_bottom.png")');
+        leftColumn.css('background-size', '100% 100%');
+        leftColumn.css('background-repeat', 'no-repeat');
+        container.append(leftColumn);
+        {
+            var containerForList = $('<div class="l-list-container"></div>');
+            leftColumn.append(containerForList);
+            var leftListContainer = $('<div class="ui-control list has-frame"/>');
+            containerForList.append(leftListContainer);
+            var scrollContainer = $('<div class="scroll-container"/>');
+            leftListContainer.append(scrollContainer);
+        }
+
+        var midColumn = $('<div class="mid-column"/>');
+        container.append(midColumn);
+
+        var rightColumn = $('<div class="side-column"/>');
+        rightColumn.css('background-image', 'url("coui://gfx/ui/skin/combat_log_bottom.png")'); // i'm too lazy to add a css element for it XD
+        rightColumn.css('background-size', '100% 100%');
+        rightColumn.css('background-repeat', 'no-repeat');
+        container.append(rightColumn);
+        {
+            var containerForList = $('<div class="l-list-container"></div>');
+            rightColumn.append(containerForList);
+            var rightListContainer = $('<div class="ui-control list has-frame"/>');
+            containerForList.append(rightListContainer);
+            var scrollContainer = $('<div class="scroll-container"/>');
+            rightListContainer.append(scrollContainer);
+        }
+
+    return {
+        Content: content,
+        LeftListContainer: leftListContainer,
+        RightListContainer: rightListContainer,
+        MidColumn: midColumn,
+    };
+};
+WorldEditorScreen.prototype.addFactionAllianceToPopupDialog = function(_data, _listScrollContainers) 
+{
+    var dataBase = this.mFaction.Data;
+
+    _listScrollContainers[0].empty();
+    for (var i = 0; i < _data.Allies.length; ++i)
+    {
+        this.createFactionAllianceEntry(dataBase[_data.Allies[i]], _listScrollContainers[0]);
+    }
+
+    _listScrollContainers[1].empty();
+    for (var i = 0; i < _data.Hostile.length; ++i)
+    {
+        this.createFactionAllianceEntry(dataBase[_data.Hostile[i]], _listScrollContainers[1]);
+    }
+};
+WorldEditorScreen.prototype.createFactionAllianceEntry = function(_data, _listScrollContainer) 
+{
+    var result = $('<div class="ui-control is-troop-slot"/>');
+    result.css('width', '33.5rem');
+    _listScrollContainer.append(result);
+
+    var entry = $('<div class="ui-control troop-panel"/>');
+    result.append(entry);
+    entry.data('entry', _data);
+
+
+    // icon
+    var leftColumn = $('<div class="column-is-25"/>');
+    entry.append(leftColumn);
+    var iconLayout = $('<div class="banner-icon"/>');  
+    leftColumn.append(iconLayout);
+    var icon = iconLayout.createImage(Path.GFX + _data.ImagePath, function(_image)
+    {
+        _image.fitImageToParent(0, 0);
+        _image.removeClass('opacity-none');
+    }, null, 'opacity-none');
+
+    var rightColumn = $('<div class="column-is-75"/>');
+    entry.append(rightColumn);
+    
+    // for name
+    var row = $('<div class="row"/>');
+    rightColumn.append(row);
+    var name = $('<div class="troop-name title-font-normal font-bold font-color-title">' + _data.Name + '</div>');
+    row.append(name);
+
+    var imageContainer = $('<div class="check-box"/>');
+    row.append(imageContainer);
+    var image = imageContainer.createImage(Path.GFX + 'ui/skin/hud_button_01_default.png', function(_image)
+    {
+        //_image.centerImageWithinParent(0, 0, 1.0);
+        _image.removeClass('opacity-none');
+    }, null, 'opacity-none');
+
+    // set up event listener
+    entry.click(this, function(_event) {
+        var div = $(this);
+        if (div.hasClass('is-selected') === true) {
+            div.removeClass('is-selected');
+            image.attr('src', Path.GFX + 'ui/skin/hud_button_01_default.png');
+        }
+        else {
+            div.addClass('is-selected');
+            image.attr('src', Path.GFX + 'ui/skin/hud_button_01_checked.png');
+        }
+    });
+};
+
+
+
+
 
 
 
@@ -219,15 +429,12 @@ WorldEditorScreen.prototype.createChooseFactionDialogContent = function(_dialog)
 };
 WorldEditorScreen.prototype.addFactionToPopupDialog = function(_entries, _listScrollContainer, _button, _selected) 
 {
-    if (_entries !== null && jQuery.isArray(_entries))
-    {
-        _listScrollContainer.empty();
+    _listScrollContainer.empty();
 
-        for (var i = 0; i < _entries.length; ++i)
-        {
-            var data = _entries[i];
-            this.createChooseFactionEntry(data, _listScrollContainer, _button, data.ID === _selected);
-        }
+    for (var i = 0; i < _entries.length; ++i)
+    {
+        var data = _entries[i];
+        this.createChooseFactionEntry(data, _listScrollContainer, _button, data.ID === _selected);
     }
 };
 WorldEditorScreen.prototype.createChooseFactionEntry = function(_data, _listScrollContainer, _button, _isSelected) 
