@@ -436,4 +436,57 @@
     background-repeat: no-repeat;
 }
 
+.world-editor-screen > .l-world-editor-dialog-container .content .layer
+{
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+}
+
+.world-editor-screen > .l-world-editor-dialog-container .content .expandable-container
+{
+    top: 0.5rem;
+    left: 1.0rem;
+    width: 23.0rem;
+    height: 4.3rem;
+
+    position: absolute;
+}
+
+.world-editor-screen > .l-world-editor-dialog-container .content .expand-button
+{
+    top: 0.7rem;
+    left: 24.0rem;
+    width: 4.5rem;
+    height: 4.1rem;
+
+    position: absolute;
+}
+
+.world-editor-screen > .l-world-editor-dialog-container .content .below-list-container
+{
+    top: 5.3rem;
+    width: 100%;
+    height: 47.0rem;
+
+    position: absolute;
+}
+
+.world-editor-screen > .l-world-editor-dialog-container .content .expandable-row
+{
+    width: 21.0rem;
+    height: 4.3rem;
+    position: relative;
+}
+
+.world-editor-screen > .l-world-editor-dialog-container .content .expandable-container .ui-control.list
+{
+    background-image: url("coui://gfx/ui/skin/tooltip_255_bottom.png");
+    background-size: 100% 55.3rem;
+    background-repeat: no-repeat;
+}
+
+
+
 

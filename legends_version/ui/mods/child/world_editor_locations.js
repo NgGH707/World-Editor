@@ -1,43 +1,123 @@
 
-WorldEditorScreen.prototype.changeLocationfilter = function()
+WorldEditorScreen.prototype.addLocationFilter = function (_data)
 {
-    this.mLocation.FilterType++;
+    var self = this;
+    this.mLocation.ExpandableListScroll.empty();
 
-    if (this.mLocation.FilterType >= 3)
-        this.mLocation.FilterType = 0;
+    // add the place holder
+    var placeholder = this.addExpandableEntry({NoFilter: true}, '-Select Filter-', this.mLocation);
+    var placeholderName = placeholder.find('.label:first');
 
-    this.reloadLocationsData();
+    // add the filter-all option, not recommend cuz the map has lots of location
+    var specialEntry = this.addExpandableEntry({NoFilter: true}, 'All', this.mLocation);
+    specialEntry.click(this, function(_event) {
+        var div = $(this);
+        if (div.hasClass('is-selected') !== true) {
+            self.mLocation.ExpandableList.deselectListEntries();
+            div.addClass('is-selected');
+            self.filterLocationsByType();
+            var label = div.data('label');
+            placeholderName.html(label);
+        }
+    });
+
+    // add the filter for enemy camp option
+    this.mLocation.DefaultFilter = this.addExpandableEntry({NoFilter: true}, 'Camps', this.mLocation);
+    this.mLocation.DefaultFilter.click(this, function(_event) {
+        var div = $(this);
+        if (div.hasClass('is-selected') !== true) {
+            self.mLocation.ExpandableList.deselectListEntries();
+            div.addClass('is-selected');
+            self.filterLocationsByType('IsCamp', true);
+            var label = div.data('label');
+            placeholderName.html(label);
+        }
+    });
+
+    // add the filter stronghold option
+    var specialEntry = this.addExpandableEntry({NoFilter: true}, 'Legendary', this.mLocation);
+    specialEntry.click(this, function(_event) {
+        var div = $(this);
+        if (div.hasClass('is-selected') !== true) {
+            self.mLocation.ExpandableList.deselectListEntries();
+            div.addClass('is-selected');
+            self.filterLocationsByType('IsLegendary', true);
+            var label = div.data('label');
+            placeholderName.html(label);
+        }
+    });
+
+    // add the filter passive location option
+    var specialEntry = this.addExpandableEntry({NoFilter: true}, 'Misc', this.mLocation);
+    specialEntry.click(this, function(_event) {
+        var div = $(this);
+        if (div.hasClass('is-selected') !== true) {
+            self.mLocation.ExpandableList.deselectListEntries();
+            div.addClass('is-selected');
+            self.filterLocationsByType('IsPassive', true);
+            var label = div.data('label');
+            placeholderName.html(label);
+        }
+    });
+
+    for (var i = 0; i < _data.length; i++) {
+        var entryData = _data[i];
+        var entry = this.addExpandableEntry(entryData, this.mFaction.Data[entryData.Index].Name, this.mLocation);
+        entry.click(this, function(_event) {
+            var div = $(this);
+            if (div.hasClass('is-selected') !== true) {
+                var data = div.data('key');
+                self.mLocation.ExpandableList.deselectListEntries();
+                div.addClass('is-selected');
+                self.filterLocationsByFaction(data);
+                var label = div.data('label');
+                placeholderName.html(label);
+            }
+        });
+    }
+
+    this.mLocation.ExpandableList.showListScrollbar(false);
 };
 
-WorldEditorScreen.prototype.reloadLocationsData = function()
+WorldEditorScreen.prototype.filterLocationsByType = function (_filter1, _value1, _filter2, _value2)
 {
-    var toLoad = this.mLocation.Data[this.mLocation.FilterType];
+    var _data = this.mLocation.Data;
+    var noFilter = _filter1 === undefined || _filter1 === null;
+    var extraFilter = _filter2 === undefined || _filter2 === null;
     this.mLocation.ListScrollContainer.empty();
 
-    for(var i = 0; i < toLoad.length; ++i)
-    {
-        this.addLocationListEntry(toLoad[i], i);
+    for(var i = 0; i < _data.length; ++i) {
+        if (noFilter || _data[i][_filter1] === _value1 && (extraFilter || _data[i][_filter2] === _value2)) 
+            this.addLocationListEntry(_data[i], i);
     }
 
     this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
-    this.mLocation.FilterButton.changeButtonText(WorldEditor.Locations[this.mLocation.FilterType]);
+    this.expandExpandableList(false, this.mLocation);
+};
+
+WorldEditorScreen.prototype.filterLocationsByFaction = function (_filter)
+{
+    var _data = this.mLocation.Data;
+    var NoFilter = _filter === undefined || _filter === null;
+    this.mLocation.ListScrollContainer.empty();
+
+    for(var i = 0; i < _data.length; ++i) {
+        if (NoFilter || _filter.ID == _data[i].Faction) 
+            this.addLocationListEntry(_data[i], i);
+    }
+
+    this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+    this.expandExpandableList(false, this.mLocation);
 };
 
 WorldEditorScreen.prototype.addLocationsData = function(_data)
 {
     this.mLocation.ListScrollContainer.empty();
+    this.mLocation.ExpandableList.deselectListEntries();
+    this.mLocation.DefaultFilter.addClass('is-selected');
     this.mLocation.Data = _data;
 
-    var toLoad = _data[this.mLocation.FilterType];
-
-    for(var i = 0; i < toLoad.length; ++i)
-    {
-        var entry = toLoad[i];
-        this.addLocationListEntry(entry, i);
-    }
-
-    this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
-    this.mLocation.FilterButton.changeButtonText(WorldEditor.Locations[this.mLocation.FilterType]);
+    this.filterLocationsByType('IsCamp', true);
 };
 
 WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
@@ -93,11 +173,13 @@ WorldEditorScreen.prototype.selectLocationListEntry = function(_element, _scroll
         _element.addClass('is-selected');
         this.mLocation.Selected = _element;
         this.updateLocationDetailsPanel(this.mLocation.Selected);
+        this.mLocation.DetailsPanel.addClass('display-block').removeClass('display-none');
     }
     else
     {
         this.mLocation.Selected = null;
         this.updateLocationDetailsPanel(this.mLocation.Selected);
+        this.mLocation.DetailsPanel.addClass('display-none').removeClass('display-block');
     }
 };
 
@@ -105,7 +187,6 @@ WorldEditorScreen.prototype.addTroopListEntry = function (_data, _index, _listSc
 {
     var result = $('<div class="troop-row"/>');
     var strength = _data.Strength * _data.Num;
-
     _listScrollContainer.append(result);
 
     var entry = $('<div class="ui-control list-entry-noice"/>');
@@ -232,39 +313,6 @@ WorldEditorScreen.prototype.updateLocationDetailsPanel = function(_element)
         this.mLocation.Resources.setInputText('' + data.Resources + '');
         this.mLocation.Strength.html('' + strength + '');
         this.mLocation.Image.attr('src', Path.GFX + data.ImagePath);
-
-        /*this.updateSideListScroll(data);
-        
-        for (var i = 0; i < data.Buildings.length; i++) {
-            var entry = data.Buildings[i];
-            var image = this.mSettlement.Buildings[i];
-           
-            if (entry === undefined || entry === null) {
-                if (image.attr('src') == Path.GFX + 'ui/buttons/free_building_slot_icon.png')
-                    continue;
-
-                image.attr('src', Path.GFX + 'ui/buttons/free_building_slot_icon.png');
-                image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.freebuildingslot' });
-            }
-            else {
-                image.attr('src', Path.GFX + entry.ImagePath);
-                image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId , elementOwner: 'woditor.buildings'});
-            }
-        }
-
-        var noOwner = data.Owner === undefined || data.Owner === null;
-        var isTheSame = !noOwner && data.Owner === data.Faction;
-        var image = this.mSettlement.OwnerBanner.find('img:first');
-
-        this.mSettlement.FactionBanner.attr('src', Path.GFX + this.mFaction.Data[data.Faction].ImagePath);
-
-        if (noOwner || isTheSame) {
-            this.mSettlement.OwnerBanner.removeClass('display-block').addClass('display-none');
-        }
-        else {
-            this.mSettlement.OwnerBanner.removeClass('display-none').addClass('display-block');
-            image.attr('src', Path.GFX + this.mFaction.Data[data.Owner].ImagePath);
-        }*/
     }
 };
 

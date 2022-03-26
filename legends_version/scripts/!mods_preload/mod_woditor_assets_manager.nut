@@ -55,21 +55,44 @@ this.getroottable().Woditor.hookAssetsManager <- function ()
 		{
 			ws_updateLook();
 
-			if (this.World.Flags.has("AvatarSprite"))
-			{
-				this.World.State.getPlayer().getSprite("body").setBrush(this.World.Flags.get("AvatarSprite"));
-			}
-
 			if (this.World.Flags.has("AvatarSocket"))
 			{
 				this.World.State.getPlayer().getSprite("base").setBrush(this.World.Flags.get("AvatarSocket"));
 			}
 
+			if (this.World.Flags.has("AvatarSprite"))
+			{
+				this.World.State.getPlayer().getSprite("body").setBrush(this.World.Flags.get("AvatarSprite"));
+			}
+
 			if (this.World.Flags.has("AvatarIsFlippedHorizontally"))
 			{
+				this.World.State.getPlayer().getSprite("base").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
 				this.World.State.getPlayer().getSprite("body").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
 			}
 		};
+
+		/*local ws_getBrothersMax = obj.getBrothersMax;
+		obj.getBrothersMax = function()
+		{
+			if (this.World.Flags.has("RosterTier"))
+			{
+				return this.Const.Roster.getSizeForTier(this.World.Flags.getAsInt("RosterTier"));
+			}
+			
+			return ws_getBrothersMax();
+		}
+
+		local ws_getBrothersMaxInCombat = obj.getBrothersMaxInCombat;
+		obj.getBrothersMaxInCombat = function()
+		{
+			if (this.World.Flags.has("RosterTier"))
+			{
+				return this.Const.Roster.getInCombatSizeForTier(this.World.Flags.getAsInt("RosterTier"));
+			}
+
+			return ws_getBrothersMaxInCombat();
+		}*/
 	});
 
 	delete this.Woditor.hookAssetsManager;

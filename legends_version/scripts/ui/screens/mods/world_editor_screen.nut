@@ -11,6 +11,8 @@ this.world_editor_screen <- {
 		//
 		TemporaryModel = null,
 		StashCapacityBefore = 0,
+		RosterTierIsChanged = false,
+		StashIsChanged = false,
 		BannerIsChanged = false,
 	},
 	function isVisible()
@@ -68,7 +70,9 @@ this.world_editor_screen <- {
 
 	function show( _withSlideAnimation = false )
 	{
+		this.m.StashIsChanged = false;
 		this.m.BannerIsChanged = false;
+		this.m.RosterTierIsChanged = false;
 
 		if (this.m.JSHandle != null)
 		{
@@ -85,6 +89,7 @@ this.world_editor_screen <- {
 			this.m.JSHandle.asyncCall("hide", _withSlideAnimation);
 		}
 
+		this.updateSomeShit();
 		this.m.TemporaryModel = null;
 		this.World.getTemporaryRoster().clear();
 	}
@@ -129,22 +134,26 @@ this.world_editor_screen <- {
 		this.m.PopupDialogVisible = _data[0];
 	}
 
+	function updateSomeShit()
+	{
+		if (this.m.StashIsChanged) this.World.State.getPlayer().forceRecalculateStashModifier();
+		if (this.m.BannerIsChanged) this.updatePlayerBannerOnAllThings();
+	}
+
 	function onCloseButtonPressed()
 	{
 		if (this.m.OnClosePressedListener != null)
 		{
 			this.m.OnClosePressedListener();
 		}
-
-		if (this.m.BannerIsChanged) this.updatePlayerBannerOnAllThings();
 	}
 
 	function onReloadButtonPressed()
 	{
 		this.m.Retinue.update();
 		this.World.Assets.updateLook();
-		this.World.State.getPlayer().calculateModifiers();
-		this.updateTopbarAssets();
+		this.World.State.updateTopbarAssets();
+		if (this.m.StashIsChanged) this.World.State.getPlayer().forceRecalculateStashModifier();
 		if (this.m.BannerIsChanged) this.updatePlayerBannerOnAllThings();
 		this.m.JSHandle.asyncCall("loadFromData", this.convertToUIData());
 	}
@@ -165,11 +174,15 @@ this.world_editor_screen <- {
 
 		foreach(id in _data[1].Allies)
 		{
+			local f = this.World.FactionManager.getFaction(id);
+			f.addAlly(_data[0]);
 			faction.addAlly(id);
 		}
 
 		foreach(id in _data[1].Hostile)
 		{
+			local f = this.World.FactionManager.getFaction(id);
+			f.removeAlly(_data[0]);
 			faction.removeAlly(id);
 		}
 	}
@@ -221,8 +234,11 @@ this.world_editor_screen <- {
 
 	function onChangeFactionBanner( _data )
 	{
-		local faction = this.World.FactionManager.getFaction(_data[0]);
-		faction.setBanner(_data[1]);
+		// find banner
+		if (_data[0] > this.Const.NobleBanners.len() - 1 && _data[0] > this.Const.OtherBanner.len() - 1) return;
+
+		local faction = this.World.FactionManager.getFaction(_data[1]);
+		faction.setBanner(_data[0]);
 		local bannerSmall = faction.getBannerSmall();
 
 		foreach (settlement in faction.getSettlements()) 
@@ -239,10 +255,7 @@ this.world_editor_screen <- {
 			banner.Visible = true;
 		}
 
-		this.m.JSHandle.asyncCall("updateFactionContracts", {
-			Index = _data[2],
-			Contracts = this.Woditor.Helper.getContractsUI(faction)
-		});
+		this.m.JSHandle.asyncCall("updateFactionContracts", this.Woditor.Helper.getContractsUI(faction));
 	}
 
 	function onChangeFactionName( _data )
@@ -333,6 +346,11 @@ this.world_editor_screen <- {
 		if (_data[0] == "Stash")
 		{
 			local before = this.m.StashCapacityBefore;
+
+			if (_data[1] != before) {
+				this.m.StashIsChanged = true;
+			}
+
 			this.World.Flags.set("StashModifier", _data[1] - before);
 		}
 		else
@@ -408,8 +426,8 @@ this.world_editor_screen <- {
 		result.Factions <- this.Woditor.Helper.convertFactionsToUIData();
 		result.Settlements <- this.Woditor.Helper.convertSettlementsToUIData(result.Factions);
 		result.Locations <- this.Woditor.Helper.convertLocationsToUIData(result.Factions);
+		result.Filter <- this.Woditor.Helper.convertToUIFilterData(result.Factions);
 		result.Scenario <- this.Woditor.Helper.convertScenariosToUIData();
-
 		this.m.StashCapacityBefore = result.Assets.Stash;
 		return result;
 	}
@@ -428,7 +446,6 @@ this.world_editor_screen <- {
 			if (faction == null) return;
 			faction.setBanner(bannerID);
 			local bannerSmall = faction.getBannerSmall();
-
 
 			foreach (settlement in faction.getMainBases()) 
 			{

@@ -228,4 +228,40 @@
 }
 
 
+/*
+    For the fancy expandable list
+*/
+.ui-control.list .list-entry-for-expandable
+{
+    width: 100%;
+    height: 100%;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    margin : auto;
+}
+.ui-control.list .list-entry-for-expandable:hover,
+.ui-control.list .list-entry-for-expandable.is-selected
+{
+    background-image: url("coui://gfx/ui/skin/special_slot_210_43.png");
+    background-size: 21.0rem 4.3rem;
+}
+.ui-control.list .list-entry-for-expandable > .label
+{
+    top: 1.0rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 90%;
+    height: 90%;
+    position: absolute;
+
+    text-align: center;
+    overflow: hidden;
+}
+
+
 

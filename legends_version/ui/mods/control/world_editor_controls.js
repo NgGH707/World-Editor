@@ -35,6 +35,36 @@ $.fn.removePercentageFromInput = function()
 
 
 // For List
+$.fn.scrollListToElementWithDelay = function(_element, _delay)
+{
+    var scrollContainer = this.findListScrollContainer();
+    var self = this;
+    var element = null;
+    
+    if (_element !== undefined)
+        element = _element;
+    else
+        element = scrollContainer.children(':last');
+
+    if (_delay === undefined || _delay === null)
+        _delay = 100;
+
+    if (element !== null && element.length > 0) {
+        var timerHandle = this.data('scroll-timer');
+        if (timerHandle !== null) {
+            clearTimeout(timerHandle);
+        }
+
+        timerHandle = setTimeout(function() {
+            self.trigger('scroll', { element: element, center: true, duration: 1, animate: 'linear', scrollTo: 'bottom' });
+            self.trigger('update', true);
+        }, 200);
+
+        this.data('scroll-timer', timerHandle);
+    }
+
+    return this;
+};
 $.fn.findFirstIndexOfSelectedListEntry = function()
 {
     var result = -1;

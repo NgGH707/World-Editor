@@ -12,8 +12,8 @@ this.temp_model <- this.inherit("scripts/entity/tactical/entity", {
 
 	function setFlipped( _flip )
 	{
-		//this.getSprite("socket").setHorizontalFlipping(_flip);
-		//this.getSprite("base").setHorizontalFlipping(_flip);
+		this.getSprite("socket").setHorizontalFlipping(_flip);
+		this.getSprite("base").setHorizontalFlipping(_flip);
 		this.getSprite("body").setHorizontalFlipping(_flip);
 	}
 

@@ -64,15 +64,15 @@ this.getroottable().Woditor.createLib <- function ()
 	// faction banner lib
 	gt.Const.NobleBanners <- [];
 	gt.Const.OtherBanner <- [];
-	for (local i = 0; i < 11; ++i)
-	{
-		gt.Const.NobleBanners.push("banner_noble_" + (i < 10 ? "0" + i : i));
-	}
 	for (local i = 0; i < 15; ++i)
 	{
-		gt.Const.OtherBanner.push("banner_noble_" + (i < 10 ? "0" + i : i));
-	}
+		if (i < 11)
+		{
+			gt.Const.NobleBanners.push("ui/banners/factions/banner_" + (i < 10 ? "0" + i : i) + ".png");
+		}
 
+		gt.Const.OtherBanner.push("ui/banners/factions/banner_" + (i < 10 ? "0" + i : i) + ".png");
+	}
 
 	// lib for avatar changer
 	gt.Const.WorldSockets <- [

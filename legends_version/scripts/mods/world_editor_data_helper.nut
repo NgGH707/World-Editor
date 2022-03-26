@@ -146,6 +146,7 @@ this.world_editor_data_helper <- {
 		result.DifficultyMult <- this.Math.floor(100 * (this.World.Flags.has("DifficultyMult") ? this.World.Flags.getAsFloat("DifficultyMult") : 1.0));
 		result.RosterTier <- {
 			Max = this.Const.Roster.Tier[this.Const.Roster.Tier.len() - 1],
+			//Value = this.World.Flags.has("RosterTier") ? this.World.Flags.getAsInt("RosterTier") : this.World.Assets.getOrigin().getRosterTier(),
 			Value = this.World.Assets.getOrigin().getStartingRosterTier()
 		};
 
@@ -187,11 +188,7 @@ this.world_editor_data_helper <- {
 
 	function convertLocationsToUIData( _factions )
 	{
-		local result = [
-			[],
-			[],
-			[]
-		];
+		local result = [];
 
 		foreach (i, location in this.World.EntityManager.getLocations())
 		{
@@ -204,21 +201,9 @@ this.world_editor_data_helper <- {
 				location.onVisibleToPlayer();
 			}
 
-			local index;
-
-			if (location.isLocationType(this.Const.World.LocationType.Unique))
-			{
-				index = 1;
-			}
-			else if (location.isLocationType(this.Const.World.LocationType.Lair))
-			{
-				index = 0;
-			}
-			else
-			{
-				index = 2;
-			}
-
+			local isUnique = location.isLocationType(this.Const.World.LocationType.Unique);
+			local isLair = location.isLocationType(this.Const.World.LocationType.Lair);
+			local isPassive = location.isLocationType(this.Const.World.LocationType.Passive);
 			local loots = [];
 			local troops = [];
 
@@ -245,7 +230,9 @@ this.world_editor_data_helper <- {
 				}
 			}
 
-			result[index].push({
+			result.push({
+				Loots = loots,
+				Troops = troops,
 				ID = location.getID(),
 				Type = location.getTypeID(),
 				Name = location.getName(),
@@ -254,14 +241,13 @@ this.world_editor_data_helper <- {
 				Banner = location.getUIBanner(),
 				ImagePath = location.getUIImage(),
 				Resources = location.getResources(),
-				Loots = loots,
-				Troops = troops,
+				IsPassive = isPassive && !isLair,
+				IsCamp =  isLair && !isUnique,
+				IsLegendary = isUnique,
 			});
 		}
 
-		result[0].sort(this.onSortWithFaction);
-		result[1].sort(this.onSortName);
-		result[2].sort(this.onSortName);
+		result.sort(this.onSortName);
 		return result;
 	}
 
@@ -350,6 +336,37 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
+	function convertToUIFilterData( _factions )
+	{
+		local result = {Settlements = [], Locations = []};
+
+		foreach(i, f in _factions )
+		{
+			if (f.SettlementNum <= 1) continue;
+			
+			if (!f.NoChangeName)
+			{
+				result.Settlements.push({
+					ID = f.ID,
+					Index = i,
+					Num = f.SettlementNum
+				});
+			}
+			else
+			{
+				result.Locations.push({
+					ID = f.ID,
+					Index = i,
+					Num = f.SettlementNum
+				});
+			}
+		}
+
+		result.Settlements.sort(this.onSortNum);
+		result.Locations.sort(this.onSortNum);
+		return result;
+	}
+
 	function convertFactionsToUIData()
 	{
 		local result = [];
@@ -401,8 +418,9 @@ this.world_editor_data_helper <- {
 				Relation = f.getPlayerRelationAsText(),
 				RelationNum = this.Math.round(f.getPlayerRelation())
 				RelationNumSimplified = this.Math.min(this.Const.Strings.Relations.len() - 1, f.getPlayerRelation() / 10),
-				FactionFixedRelation = !f.isPlayerRelationPermanent(),
+				FactionFixedRelation = f.isPlayerRelationPermanent(),
 				IsNoble = f.getType() == this.Const.FactionType.NobleHouse,
+				SettlementNum = f.getSettlements().len(),
 			};
 
 			if (valid.find(f.getType()) != null)
@@ -410,14 +428,12 @@ this.world_editor_data_helper <- {
 				faction.ImagePath <- f.getUIBanner();
 				faction.Contracts <- this.getContractsUI(f);
 				faction.NoChangeName <- false;
-				faction.Banner <- f.getBanner();
 			}
 			else
 			{
 			    faction.ImagePath <- "ui/banners/banner_unknow.png";
 			    faction.Contracts <- [];
 			    faction.NoChangeName <- true;
-			    faction.Banner <- null;
 			}
 
 			result.push(faction);
@@ -492,6 +508,22 @@ this.world_editor_data_helper <- {
 			return -1;
 		}
 		else if (_f1.Faction > _f2.Faction)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	function onSortNum( _f1, _f2 )
+	{
+		if (_f1.Num > _f2.Num)
+		{
+			return -1;
+		}
+		else if (_f1.Num < _f2.Num)
 		{
 			return 1;
 		}

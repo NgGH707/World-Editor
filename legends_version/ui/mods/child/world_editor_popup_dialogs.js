@@ -338,11 +338,13 @@ WorldEditorScreen.prototype.createFactionAllianceEntry = function(_data, _listSc
     var name = $('<div class="troop-name title-font-normal font-bold font-color-title">' + _data.Name + '</div>');
     row.append(name);
 
+    var checkboxContainer = $('<div class="check-box-container"/>');
+    rightColumn.append(checkboxContainer);
     var imageContainer = $('<div class="check-box"/>');
-    row.append(imageContainer);
+    checkboxContainer.append(imageContainer);
     var image = imageContainer.createImage(Path.GFX + 'ui/skin/hud_button_01_default.png', function(_image)
     {
-        //_image.centerImageWithinParent(0, 0, 1.0);
+        _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
 
@@ -454,8 +456,7 @@ WorldEditorScreen.prototype.createChooseFactionEntry = function(_data, _listScro
     entry.append(leftColumn);
     var iconLayout = $('<div class="banner-icon"/>');  
     leftColumn.append(iconLayout);
-    var icon = iconLayout.createImage(Path.GFX + _data.ImagePath, function(_image)
-    {
+    var icon = iconLayout.createImage(Path.GFX + _data.ImagePath, function(_image) {
         _image.fitImageToParent(0, 0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');

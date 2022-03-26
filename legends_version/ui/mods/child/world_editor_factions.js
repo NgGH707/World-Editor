@@ -121,29 +121,25 @@ WorldEditorScreen.prototype.updateFactionName = function(_name)
     return data.ID;
 }
 
-WorldEditorScreen.prototype.updateFactionBanner = function(_bannerID)
+WorldEditorScreen.prototype.updateFactionBanner = function(_imagePath)
 {
     var element = this.mFaction.Selected;
     var index = element.data('index');
     var data = this.mFaction.Data[index];
-    data.ImagePath = 'ui/banners/factions/banner_' + (_bannerID < 10 ? '0' + _bannerID : _bannerID) + '.png';
-    element.data('entry', data);
+    data.ImagePath = _imagePath;
 
     // update banner in list container
     var column = element.find('.faction-column:first');
     if (column.length > 0) {
         var image = column.find('img:first');
         if (image.length > 0) {
-            image.attr('src', Path.GFX + data.ImagePath);
+            image.attr('src', Path.GFX + _imagePath);
         }
     }
 
     // update banner image in detail panel
-    this.mFaction.Banner.attr('src', Path.GFX + data.ImagePath);
-    return {
-        ID: data.ID,
-        Index: index
-    };
+    this.mFaction.Banner.attr('src', Path.GFX + _imagePath);
+    element.data('entry', data);
 }
 
 WorldEditorScreen.prototype.updateFactionRelation = function(_data)
@@ -180,7 +176,7 @@ WorldEditorScreen.prototype.updateFactionDetailsPanel = function(_element)
     if(_element !== null && _element.length > 0)
     {
         var data = _element.data('entry');
-        
+        this.mIsUpdating = true;
         this.mFaction.Name.setInputText(data.Name);
         this.mFaction.Banner.attr('src', Path.GFX + data.ImagePath);
         this.mFaction.PrevButton.enableButton(data.NoChangeName !== true);
@@ -189,20 +185,24 @@ WorldEditorScreen.prototype.updateFactionDetailsPanel = function(_element)
         this.mFactionRelation.Control.val(data.RelationNum);
         this.mFactionRelation.Label.text('' + data.RelationNum + this.mFactionRelation.Postfix);
 
-        if (data.FactionFixedRelation === true)
+        if (this.mFactionFixedRelation.Checkbox.is(':checked') === true && data.FactionFixedRelation === false)
+            this.mFactionFixedRelation.Checkbox.iCheck('uncheck');
+        else if (this.mFactionFixedRelation.Checkbox.is(':checked') === false && data.FactionFixedRelation === true)
             this.mFactionFixedRelation.Checkbox.iCheck('check');
 
         this.addContractToFactionDetail(data.Contracts);
+        this.mIsUpdating = false;
     }
 };
 
 WorldEditorScreen.prototype.updateFactionContracts = function(_data) 
 {
-    if (_data === undefined || _data === null || typeof _data !== 'object') return;
+    if (_data === undefined || _data === null || !jQuery.isArray(_data)) return;
 
-    this.mFaction.Data[_data.Index] = _data.Contracts;
-    this.mFaction.Selected.data('entry', this.mFaction.Data[_data.Index]);
-    this.addContractToFactionDetail(_data.Contracts);
+    var index = this.mFaction.Selected.data('index');
+    this.mFaction.Data[index] = _data;
+    this.mFaction.Selected.data('entry', this.mFaction.Data[index]);
+    this.addContractToFactionDetail(_data);
 }
 
 WorldEditorScreen.prototype.resetContractInFactionDetail = function() 

@@ -28,25 +28,133 @@ WorldEditorScreen.prototype.createSettlementBuildingSlot = function (_index, _pa
     this.mSettlement.Buildings[_index].bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
 };
 
-WorldEditorScreen.prototype.addSettlementsData = function (_data)
+WorldEditorScreen.prototype.addSettlementFilter = function (_data)
 {
-    this.mSettlement.ListScrollContainer.empty();
-    this.mSettlement.Data = _data;
+    var self = this;
+    this.mSettlement.ExpandableListScroll.empty();
 
-    for(var i = 0; i < _data.length; ++i)
-    {
-        this.addSettlementListEntry(_data[i], i);
+    // add the place holder
+    var placeholder = this.addExpandableEntry({NoFilter: true}, '-Select Filter-', this.mSettlement);
+    var placeholderName = placeholder.find('.label:first');
+
+    // add the filter-all option
+    this.mSettlement.DefaultFilter = this.addExpandableEntry({NoFilter: true}, 'All', this.mSettlement);
+    this.mSettlement.DefaultFilter.click(this, function(_event) {
+        var div = $(this);
+        if (div.hasClass('is-selected') !== true) {
+            self.mSettlement.ExpandableList.deselectListEntries();
+            div.addClass('is-selected');
+            self.filterSettlementsByType();
+            var label = div.data('label');
+            placeholderName.html(label);
+        }
+    });
+
+    // add the filter town option
+    var specialEntry = this.addExpandableEntry({NoFilter: true}, 'Towns', this.mSettlement);
+    specialEntry.click(this, function(_event) {
+        var div = $(this);
+        if (div.hasClass('is-selected') !== true) {
+            self.mSettlement.ExpandableList.deselectListEntries();
+            div.addClass('is-selected');
+            self.filterSettlementsByType('IsMilitary', false, 'IsSouthern', false);
+            var label = div.data('label');
+            placeholderName.html(label);
+        }
+    });
+
+    // add the filter stronghold option
+    var specialEntry = this.addExpandableEntry({NoFilter: true}, 'Strongholds', this.mSettlement);
+    specialEntry.click(this, function(_event) {
+        var div = $(this);
+        if (div.hasClass('is-selected') !== true) {
+            self.mSettlement.ExpandableList.deselectListEntries();
+            div.addClass('is-selected');
+            self.filterSettlementsByType('IsMilitary', true, 'IsSouthern', false);
+            var label = div.data('label');
+            placeholderName.html(label);
+        }
+    });
+
+    // add the filter city state option
+    var specialEntry = this.addExpandableEntry({NoFilter: true}, 'City States', this.mSettlement);
+    specialEntry.click(this, function(_event) {
+        var div = $(this);
+        if (div.hasClass('is-selected') !== true) {
+            self.mSettlement.ExpandableList.deselectListEntries();
+            div.addClass('is-selected');
+            self.filterSettlementsByType('IsSouthern', true);
+            var label = div.data('label');
+            placeholderName.html(label);
+        }
+    });
+
+    for (var i = 0; i < _data.length; i++) {
+        var entryData = _data[i];
+        var entry = this.addExpandableEntry(entryData, this.mFaction.Data[entryData.Index].Name, this.mSettlement);
+        entry.click(this, function(_event) {
+            var div = $(this);
+            if (div.hasClass('is-selected') !== true) {
+                var data = div.data('key');
+                self.mSettlement.ExpandableList.deselectListEntries();
+                div.addClass('is-selected');
+                self.filterSettlementsByFaction(data);
+                var label = div.data('label');
+                placeholderName.html(label);
+            }
+        });
+    }
+
+    this.mSettlement.ExpandableList.showListScrollbar(false);
+};
+
+WorldEditorScreen.prototype.filterSettlementsByType = function (_filter1, _value1, _filter2, _value2)
+{
+    var _data = this.mSettlement.Data;
+    var noFilter = _filter1 === undefined || _filter1 === null;
+    var extraFilter = _filter2 === undefined || _filter2 === null;
+    this.mSettlement.ListScrollContainer.empty();
+
+    for(var i = 0; i < _data.length; ++i) {
+        if (noFilter || _data[i][_filter1] === _value1 && (extraFilter || _data[i][_filter2] === _value2)) 
+            this.addSettlementListEntry(_data[i], i);
     }
 
     this.selectSettlementListEntry(this.mSettlement.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+    this.expandExpandableList(false, this.mSettlement);
+};
+
+WorldEditorScreen.prototype.filterSettlementsByFaction = function (_filter)
+{
+    var _data = this.mSettlement.Data;
+    var NoFilter = _filter === undefined || _filter === null;
+    this.mSettlement.ListScrollContainer.empty();
+
+    for(var i = 0; i < _data.length; ++i) {
+        if (NoFilter || _filter.Index == _data[i].Owner || _filter.Index == _data[i].Faction)
+            this.addSettlementListEntry(_data[i], i);
+    }
+
+    this.selectSettlementListEntry(this.mSettlement.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+    this.expandExpandableList(false, this.mSettlement);
+};
+
+WorldEditorScreen.prototype.addSettlementsData = function (_data)
+{
+    this.mSettlement.ListScrollContainer.empty();
+    this.mSettlement.ExpandableList.deselectListEntries();
+    this.mSettlement.DefaultFilter.addClass('is-selected');
+    this.mSettlement.Data = _data;
+
+    this.filterSettlementsByType();
 };
 
 WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
 {
     var result = $('<div class="l-settlement-row"/>');
 
-    if (_index === 0)
-        result.css('margin-top', '1.0rem');
+    //if (_index === 0)
+    //    result.css('margin-top', '1.0rem');
 
     this.mSettlement.ListScrollContainer.append(result);
 
@@ -54,8 +162,7 @@ WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
     result.append(entry);
     entry.data('entry', _data);
     entry.data('index', _index);
-    entry.click(this, function(_event)
-    {
+    entry.click(this, function(_event) {
         _event.data.selectSettlementListEntry($(this));
     });
 
@@ -63,8 +170,7 @@ WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
     var imageContainer = $('<div class="l-settlement-image-container"/>');
     entry.append(imageContainer);
 
-    imageContainer.createImage(Path.GFX + _data['ImagePath'], function(_image)
-    {
+    imageContainer.createImage(Path.GFX + _data['ImagePath'], function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
@@ -74,8 +180,7 @@ WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
     entry.append(imageContainer);
 
     var find = (_data.Owner !== undefined && _data.Owner !== null) ? _data.Owner : _data.Faction;
-    imageContainer.createImage(Path.GFX + this.mFaction.Data[find].ImagePath, function(_image)
-    {
+    imageContainer.createImage(Path.GFX + this.mFaction.Data[find].ImagePath, function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
@@ -91,18 +196,18 @@ WorldEditorScreen.prototype.selectSettlementListEntry = function(_element, _scro
         this.mSettlement.ListContainer.deselectListEntries();
 
         if (_scrollToEntry !== undefined && _scrollToEntry === true)
-        {
             this.mSettlement.ListContainer.scrollListToElement(_element);
-        }
 
         _element.addClass('is-selected');
         this.mSettlement.Selected = _element;
         this.updateSettlementDetailsPanel(this.mSettlement.Selected);
+        this.mSettlement.DetailsPanel.addClass('display-block').removeClass('display-none');
     }
     else
     {
         this.mSettlement.Selected = null;
         this.updateSettlementDetailsPanel(this.mSettlement.Selected);
+        this.mSettlement.DetailsPanel.addClass('display-none').removeClass('display-block');
     }
 };
 
@@ -191,6 +296,7 @@ WorldEditorScreen.prototype.addSituationEntry = function (_data, _parentDiv)
     image.attr('src', Path.GFX + _data.ImagePath);
     _parentDiv.append(image);
 
+    // set up event listeners
     image.click(function(_event) {
     });
     image.mouseover(function() {
@@ -213,6 +319,7 @@ WorldEditorScreen.prototype.addAttachmentEntry = function (_data)
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
 
+    // set up event listeners
     image.click(function(_event) {
         //if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
             //self.(_data.ID);

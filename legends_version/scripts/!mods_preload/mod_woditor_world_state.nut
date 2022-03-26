@@ -25,25 +25,22 @@ this.getroottable().Woditor.hookWorldState <- function ()
 			{
 				this.m.CustomZoom = this.World.getCamera().Zoom;
 				this.World.getCamera().zoomTo(1.0, 4.0);
-				this.World.Assets.updateFormation();
 				this.World.Assets.updateBaseProperties();
+				this.World.State.updateTopbarAssets();
 				this.setAutoPause(true);
 				this.m.WorldEditorScreen.show();
 				this.m.WorldScreen.hide();
 				this.Cursor.setCursor(this.Const.UI.Cursor.Hand);
 				this.m.MenuStack.push(function()
 				{
-					local a = this.World.State.m.AppropriateTimeToRecalc;
-					this.World.State.m.AppropriateTimeToRecalc = 1;
 					this.World.getCamera().zoomTo(this.m.CustomZoom, 4.0);
 					this.m.WorldEditorScreen.hide();
 					this.m.WorldScreen.show();
 					this.m.Retinue.update();
 					this.World.Assets.updateLook();
-					this.World.State.getPlayer().calculateModifiers();
-					this.updateTopbarAssets();
+					this.World.State.updateTopbarAssets();
+					this.World.State.getPlayer().updateStrength();
 					this.setAutoPause(false);
-					this.World.State.m.AppropriateTimeToRecalc = a;
 				}, function()
 				{
 					return !this.m.WorldEditorScreen.isAnimating();
