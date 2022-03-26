@@ -294,6 +294,7 @@ var WorldEditorScreen = function(_parent)
     this.mAssetsData           = null;
     this.mFilterData           = null;
     this.mCompanyName          = null;
+    this.mShowEntityOnMap      = null;
     this.mIsVisible            = false;
     this.mIsUpdating           = false;
     this.mIsChoosingCoordinate = false;
@@ -2350,6 +2351,12 @@ WorldEditorScreen.prototype.notifyBackendCloseButtonPressed = function()
 WorldEditorScreen.prototype.notifyBackendReloadButtonPressed = function()
 {
     SQ.call(this.mSQHandle, 'onReloadButtonPressed');
+};
+
+WorldEditorScreen.prototype.notifyBackendShowWorldEntityOnMap = function(_id, _type) 
+{
+    this.mShowEntityOnMap = {ID: _id, Type: _type};
+    SQ.call(this.mSQHandle, 'onShowWorldEntityOnMap', _id);
 };
 
 WorldEditorScreen.prototype.notifyBackendUpdateAvatarModel = function(_keyName, _value) 

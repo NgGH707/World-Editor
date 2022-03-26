@@ -9,6 +9,7 @@ this.world_editor_screen <- {
 		OnClosePressedListener = null,
 
 		//
+		IDToShowOnMap = null,
 		TemporaryModel = null,
 		StashCapacityBefore = 0,
 		RosterTierIsChanged = false,
@@ -70,6 +71,7 @@ this.world_editor_screen <- {
 
 	function show( _withSlideAnimation = false )
 	{
+		this.m.IDToShowOnMap = false;
 		this.m.StashIsChanged = false;
 		this.m.BannerIsChanged = false;
 		this.m.RosterTierIsChanged = false;
@@ -89,7 +91,6 @@ this.world_editor_screen <- {
 			this.m.JSHandle.asyncCall("hide", _withSlideAnimation);
 		}
 
-		this.updateSomeShit();
 		this.m.TemporaryModel = null;
 		this.World.getTemporaryRoster().clear();
 	}
@@ -138,6 +139,15 @@ this.world_editor_screen <- {
 	{
 		if (this.m.StashIsChanged) this.World.State.getPlayer().forceRecalculateStashModifier();
 		if (this.m.BannerIsChanged) this.updatePlayerBannerOnAllThings();
+		if (this.m.IDToShowOnMap != null)
+		{
+			local entity = this.World.getEntityByID(this.m.IDToShowOnMap);
+			local entityTile = entity.getTile();
+			this.World.uncoverFogOfWar(entityTile.Pos, 500.0);
+			this.World.getCamera().Zoom = 1.0;
+			this.World.getCamera().setPos(entityTile.getPos());
+			this.m.IDToShowOnMap = null;
+		}
 	}
 
 	function onCloseButtonPressed()
@@ -146,6 +156,12 @@ this.world_editor_screen <- {
 		{
 			this.m.OnClosePressedListener();
 		}
+	}
+
+	function onShowWorldEntityOnMap( _id )
+	{
+		this.m.IDToShowOnMap = _id;
+		this.onCloseButtonPressed();
 	}
 
 	function onReloadButtonPressed()

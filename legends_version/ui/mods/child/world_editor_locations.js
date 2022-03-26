@@ -117,7 +117,30 @@ WorldEditorScreen.prototype.addLocationsData = function(_data)
     this.mLocation.DefaultFilter.addClass('is-selected');
     this.mLocation.Data = _data;
 
-    this.filterLocationsByType('IsCamp', true);
+    if (this.mShowEntityOnMap !== null && this.mShowEntityOnMap.Type === 'location')
+    {
+        
+
+        var find = null;
+        this.mSettlement.ListScrollContainer.find('.list-entry-fat').each(function (index, element)
+        {
+            var entry = $(element);
+            if (entry.data('entry').ID === this.mShowEntityOnMap.ID) {
+                find = entry;
+            }
+        });
+
+        if (find !== null && find.length > 0) {
+            this.selectSettlementListEntry(find, true);
+        }
+
+        this.mShowEntityOnMap = null;
+        this.filterLocationsByType('IsCamp', true);
+    }
+    else
+    {
+        this.filterLocationsByType('IsCamp', true);
+    }
 };
 
 WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
@@ -157,6 +180,13 @@ WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
 
     var name = $('<div class="name title-font-normal font-bold font-color-white">' + _data['Name'] + '</div>');
     entry.append(name);
+
+    var buttonLayout = $('<div class="distance-button"/>');
+    entry.append(buttonLayout);
+    var button = buttonLayout.createTextButton('' + _data.Distance + '', function() {
+        self.notifyBackendShowWorldEntityOnMap(_data.ID, 'location');
+    }, 'display-block', 6);
+    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.distance' });
 };
 
 WorldEditorScreen.prototype.selectLocationListEntry = function(_element, _scrollToEntry)

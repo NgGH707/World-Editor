@@ -41,6 +41,7 @@ this.getroottable().Woditor.hookWorldState <- function ()
 					this.World.State.updateTopbarAssets();
 					this.World.State.getPlayer().updateStrength();
 					this.setAutoPause(false);
+					this.m.WorldEditorScreen.updateSomeShit();
 				}, function()
 				{
 					return !this.m.WorldEditorScreen.isAnimating();

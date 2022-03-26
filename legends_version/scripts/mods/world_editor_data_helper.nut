@@ -189,6 +189,7 @@ this.world_editor_data_helper <- {
 	function convertLocationsToUIData( _factions )
 	{
 		local result = [];
+		local playerTile = this.World.State.getPlayer().getTile();
 
 		foreach (i, location in this.World.EntityManager.getLocations())
 		{
@@ -244,6 +245,7 @@ this.world_editor_data_helper <- {
 				IsPassive = isPassive && !isLair,
 				IsCamp =  isLair && !isUnique,
 				IsLegendary = isUnique,
+				Distance = playerTile.getDistanceTo(location.getTile()),
 			});
 		}
 
@@ -254,6 +256,7 @@ this.world_editor_data_helper <- {
 	function convertSettlementsToUIData( _factions )
 	{
 		local result = [];
+		local playerTile = this.World.State.getPlayer().getTile();
 
 		foreach(i, settlement in this.World.EntityManager.getSettlements())
 		{
@@ -330,6 +333,7 @@ this.world_editor_data_helper <- {
 				IsCoastal = settlement.isCoastal(),
 				IsMilitary = settlement.isMilitary(),
 				IsSouthern = settlement.isSouthern(),
+				Distance = playerTile.getDistanceTo(settlement.getTile()),
 			});
 		}
 

@@ -782,6 +782,20 @@ this.getroottable().Woditor.hookTooltips <- function ()
 						text = "([color=#8f1e1e]L[/color]) - [color=#8f1e1e]L[/color]arge size."
 					},
 				];
+
+			case "woditor.distance":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Distance to Player"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Let you know how far this world entity to player position. Also, [color=#8f1e1e]pressing this button will show you the exact location of said world entity on the world map[/color]."
+					},
+				];
 			}
 			
 			return null;

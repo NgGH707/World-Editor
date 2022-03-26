@@ -59,6 +59,19 @@
 
     line-height: 3.5rem;
 }
+.world-editor-screen > .l-world-editor-dialog-container .content .scroll-container .l-settlement-row .distance-button
+{
+    top: 0.8rem;
+    left: 20.0rem;
+    width: 4.5rem;
+    height: 4.1rem;
+    position: absolute;
+
+    overflow: hidden;
+    line-height: 2.5rem;
+
+    border: 1px solid green;
+}
 
 
 /****Attached Locations Panel****/

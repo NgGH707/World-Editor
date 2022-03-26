@@ -147,6 +147,24 @@ WorldEditorScreen.prototype.addSettlementsData = function (_data)
     this.mSettlement.Data = _data;
 
     this.filterSettlementsByType();
+
+    if (this.mShowEntityOnMap !== null && this.mShowEntityOnMap.Type === 'settlement')
+    {
+        var find = null;
+        this.mSettlement.ListScrollContainer.find('.list-entry-fat').each(function (index, element)
+        {
+            var entry = $(element);
+            if (entry.data('entry').ID === this.mShowEntityOnMap.ID) {
+                find = entry;
+            }
+        });
+
+        if (find !== null && find.length > 0) {
+            this.selectSettlementListEntry(find, true);
+        }
+
+        this.mShowEntityOnMap = null;
+    }
 };
 
 WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
@@ -187,6 +205,13 @@ WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
 
     var name = $('<div class="name title-font-normal font-bold font-color-white">' + _data['Name'] + '</div>');
     entry.append(name);
+
+    var buttonLayout = $('<div class="distance-button"/>');
+    entry.append(buttonLayout);
+    var button = buttonLayout.createTextButton('' + _data.Distance + '', function() {
+        self.notifyBackendShowWorldEntityOnMap(_data.ID, 'settlement');
+    }, 'display-block', 6);
+    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.distance' });
 };
 
 WorldEditorScreen.prototype.selectSettlementListEntry = function(_element, _scrollToEntry)
