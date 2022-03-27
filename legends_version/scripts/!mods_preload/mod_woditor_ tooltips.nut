@@ -796,6 +796,15 @@ this.getroottable().Woditor.hookTooltips <- function ()
 						text = "Let you know how far this world entity to player position. Also, [color=#8f1e1e]pressing this button will show you the exact location of said world entity on the world map[/color]."
 					},
 				];
+
+			case "woditor.notaninput":
+		       	return [
+					{
+						id = 2,
+						type = "description",
+						text = "This is not an input, please stop clicking on it XD."
+					},
+				];
 			}
 			
 			return null;

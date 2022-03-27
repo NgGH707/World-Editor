@@ -1,21 +1,27 @@
 
 WorldEditorScreen.prototype.createSettlementBuildingSlot = function (_index, _parentDiv)
 {
+    var self = this;
     var slot = $('<div class="is-building-slot"/>');
     slot.css('left', (0.5 + _index * 15.0) + 'rem'); // (1.5 + _index * 17.0) + 'rem'
     _parentDiv.append(slot);
-    this.mSettlement.Buildings[_index] = slot.createImage(Path.GFX + 'ui/buttons/free_building_slot_icon.png', function(_image)
-    {
+    this.mSettlement.Buildings[_index] = slot.createImage(Path.GFX + 'ui/buttons/free_building_slot_icon.png', function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
+    this.mSettlement.Buildings[_index].data('ID', null);
+    this.mSettlement.Buildings[_index].data('index', _index);
 
-    this.mSettlement.Buildings[_index].click(function(_event)
-    {
-        //if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
-            //self.notifyBackendContractRemoved(_data.ID);
-        //else
-            //self.notifyBackendContractClicked(_data.ID);
+    // set up event listeners
+    this.mSettlement.Buildings[_index].click(this, function(_event) {
+        var element = $(this);
+        var id = element.data('ID');
+        var index = element.data('index');
+
+        if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+            self.notifyBackendRemoveBuilding(index, id);
+        else
+            self.createBuildingPopupDialog(index);
     });
     this.mSettlement.Buildings[_index].mouseover(function()
     {
@@ -141,20 +147,20 @@ WorldEditorScreen.prototype.filterSettlementsByFaction = function (_filter)
 
 WorldEditorScreen.prototype.addSettlementsData = function (_data)
 {
+    var self = this;
     this.mSettlement.ListScrollContainer.empty();
     this.mSettlement.ExpandableList.deselectListEntries();
     this.mSettlement.DefaultFilter.addClass('is-selected');
     this.mSettlement.Data = _data;
-
     this.filterSettlementsByType();
 
+    // load back and scroll to the position where you have left to see a settlement
     if (this.mShowEntityOnMap !== null && this.mShowEntityOnMap.Type === 'settlement')
     {
         var find = null;
-        this.mSettlement.ListScrollContainer.find('.list-entry-fat').each(function (index, element)
-        {
+        this.mSettlement.ListScrollContainer.find('.list-entry-fat').each(function(index, element) {
             var entry = $(element);
-            if (entry.data('entry').ID === this.mShowEntityOnMap.ID) {
+            if (entry.data('entry').ID === self.mShowEntityOnMap.ID) {
                 find = entry;
             }
         });
@@ -169,11 +175,8 @@ WorldEditorScreen.prototype.addSettlementsData = function (_data)
 
 WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
 {
+    var self = this;
     var result = $('<div class="l-settlement-row"/>');
-
-    //if (_index === 0)
-    //    result.css('margin-top', '1.0rem');
-
     this.mSettlement.ListScrollContainer.append(result);
 
     var entry = $('<div class="ui-control list-entry-fat"/>');
@@ -236,6 +239,26 @@ WorldEditorScreen.prototype.selectSettlementListEntry = function(_element, _scro
     }
 };
 
+WorldEditorScreen.prototype.updateSettlementResources = function(_value)
+{
+    var element = this.mSettlement.Selected;
+    var index = element.data('index');
+    var data = this.mSettlement.Data[index];
+    data.Resources = _value;
+    element.data('entry', data);
+    this.mSettlement.Resources.val('' + _value + '');
+}
+
+WorldEditorScreen.prototype.updateSettlementWealth = function(_value)
+{
+    var element = this.mSettlement.Selected;
+    var index = element.data('index');
+    var data = this.mSettlement.Data[index];
+    data.Wealth = _value;
+    element.data('entry', data);
+    this.mSettlement.Wealth.val('' + _value + '%');
+}
+
 WorldEditorScreen.prototype.updateSettlementName = function(_name)
 {
     var element = this.mSettlement.Selected;
@@ -250,6 +273,82 @@ WorldEditorScreen.prototype.updateSettlementName = function(_name)
     return data.ID;
 }
 
+WorldEditorScreen.prototype.updateSettlementBuildingSlot = function(_data)
+{
+    if (_data === undefined || _data === null || typeof _data !== 'object') return;
+
+    var element = this.mSettlement.Selected;
+    var index = element.data('index');
+    var data = this.mSettlement.Data[index];
+    data.Buildings[_data.Slot] = _data.Data;
+    this.updateSettlementBuildingSlotImage(_data.Data, _data.Slot);
+    element.data('entry', data);
+};
+
+WorldEditorScreen.prototype.updateSettlementBuildingSlotImage = function(_data, _slot)
+{
+    var image = this.mSettlement.Buildings[_slot];
+
+    if (_data === undefined || _data === null) {
+        if (image.attr('src') == Path.GFX + 'ui/buttons/free_building_slot_icon.png')
+            return;
+
+        image.data('ID', null);
+        image.attr('src', Path.GFX + 'ui/buttons/free_building_slot_icon.png');
+        image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
+    }
+    else {
+        if (image.attr('src') == Path.GFX + _data.ImagePath)
+            return;
+
+        image.data('ID', _data.ID);
+        image.attr('src', Path.GFX + _data.ImagePath);
+        image.bindTooltip({ contentType: 'ui-element', elementId: _data.TooltipId , elementOwner: 'woditor.buildings'});
+    }
+}
+
+WorldEditorScreen.prototype.updateAttachmentList = function (_data)
+{
+    if (typeof _data === 'object' && 'IsUpdating' in _data) {
+        var element = this.mSettlement.Selected;
+        var index = element.data('index');
+        var data = this.mSettlement.Data[index];
+        data.Attachments = _data.Data;
+        element.data('entry', data);
+        _data = data.Attachments;
+    }
+
+    this.mSettlement.Attachments.empty();
+    // update attached location list
+    for (var i = 0; i < _data.length; i++) {
+        this.addAttachmentEntry(_data[i], i);
+    }
+}
+
+WorldEditorScreen.prototype.updateSituationList = function (_data)
+{
+    if (typeof _data === 'object' && 'IsUpdating' in _data) {
+        var element = this.mSettlement.Selected;
+        var index = element.data('index');
+        var data = this.mSettlement.Data[index];
+        data.Situations = _data.Data;
+        element.data('entry', data);
+        _data = data.Situations;
+    }
+
+    this.mSettlement.Situations.empty();
+    // update situation list
+    var row = $('<div class="situation-row"/>');
+    this.mSettlement.Situations.append(row);
+    var containerLayout = $('<div class="l-situations-group-container"/>');
+    var container = $('<div class="l-situation-groups-container"/>');
+    containerLayout.append(container);
+    for (var i = 0; i < _data.length; i++) {
+        this.addSituationEntry(_data[i], container);
+    }
+    row.append(containerLayout);
+};
+
 WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
 {
     if(_element !== null && _element.length > 0)
@@ -260,26 +359,14 @@ WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
         this.mSettlement.Resources.val('' + data.Resources + '');
         this.mSettlement.Wealth.val('' + data.Wealth + '%');
         this.mSettlement.Image.attr('src', Path.GFX + data.ImagePath);
-        this.updateSideListScroll(data);
+        this.mSettlement.ActiveButton.changeButtonText(data.IsActive ? 'Shut Down' : 'Restart');
+        this.mSettlement.SendCaravanButton.enableButton(!data.IsIsolated);
+        this.updateSituationList(data.Situations);
+        this.updateAttachmentList(data.Attachments);
         
         for (var i = 0; i < data.Buildings.length; i++) {
             var entry = data.Buildings[i];
-            var image = this.mSettlement.Buildings[i];
-           
-            if (entry === undefined || entry === null) {
-                if (image.attr('src') == Path.GFX + 'ui/buttons/free_building_slot_icon.png')
-                    continue;
-
-                image.attr('src', Path.GFX + 'ui/buttons/free_building_slot_icon.png');
-                image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
-            }
-            else {
-                if (image.attr('src') == Path.GFX + entry.ImagePath)
-                    continue;
-
-                image.attr('src', Path.GFX + entry.ImagePath);
-                image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId , elementOwner: 'woditor.buildings'});
-            }
+            this.updateSettlementBuildingSlotImage(entry, i);
         }
 
         this.mSettlement.FactionBanner.attr('src', Path.GFX + this.mFaction.Data[data.Faction].ImagePath);
@@ -291,38 +378,23 @@ WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
     }
 };
 
-WorldEditorScreen.prototype.updateSideListScroll = function (_data)
-{
-    this.mSettlement.Attachments.empty();
-    this.mSettlement.Situations.empty();
-   
-    // update attached location list
-    var data = _data.Attachments;
-    for (var i = 0; i < data.length; i++) {
-        this.addAttachmentEntry(data[i]);
-    }
-
-    // update situation list
-    var data = _data.Situations;
-    var row = $('<div class="situation-row"/>');
-    this.mSettlement.Situations.append(row);
-    var containerLayout = $('<div class="l-situations-group-container"/>');
-    var container = $('<div class="l-situation-groups-container"/>');
-    containerLayout.append(container);
-    for (var i = 0; i < data.length; i++) {
-        this.addSituationEntry(data[i], container);
-    }
-    row.append(containerLayout);
-};
-
 WorldEditorScreen.prototype.addSituationEntry = function (_data, _parentDiv)
 {
+    var self = this;
     var image = $('<img/>');
     image.attr('src', Path.GFX + _data.ImagePath);
+    image.data('ID', _data.ID);
     _parentDiv.append(image);
 
     // set up event listeners
-    image.click(function(_event) {
+    image.click(this, function(_event) {
+        var element = $(this);
+        var id = element.data('ID');
+
+        if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+            self.notifyBackendRemoveSituation(id);
+        //else
+            //self.createChooseBuildingPopupDialog(id);
     });
     image.mouseover(function() {
         this.classList.add('is-highlighted');
@@ -336,6 +408,7 @@ WorldEditorScreen.prototype.addSituationEntry = function (_data, _parentDiv)
 
 WorldEditorScreen.prototype.addAttachmentEntry = function (_data)
 {
+    var self = this;
     var entry = $('<div class="attach-row"/>');
     this.mSettlement.Attachments.append(entry);
     var image = entry.createImage(Path.GFX + _data.ImagePath, function(_image)
@@ -343,13 +416,17 @@ WorldEditorScreen.prototype.addAttachmentEntry = function (_data)
         _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
+    image.data('ID', _data.ID);
 
     // set up event listeners
-    image.click(function(_event) {
-        //if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
-            //self.(_data.ID);
+    image.click(this, function(_event) {
+        var element = $(this);
+        var id = element.data('ID');
+
+        if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+            self.notifyBackendRemoveAttachedLocation(id);
         //else
-            //self.(_data.ID);
+            //self.createChooseBuildingPopupDialog(id);
     });
     image.mouseover(function() {
         this.classList.add('is-highlighted');

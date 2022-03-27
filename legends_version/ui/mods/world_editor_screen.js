@@ -66,6 +66,8 @@ var WorldEditorScreen = function(_parent)
         Buildings          : null,
         Situations         : null,
         Attachments        : null,
+        ActiveButton       : null,
+        SendCaravanButton  : null,
         OwnerBanner        : null,
         FactionBanner      : null,
         ListContainer      : null,
@@ -337,7 +339,7 @@ WorldEditorScreen.prototype.createDIV = function(_parentDiv)
         // save changes button
         var buttonLayout = $('<div class="l-tab-button is-save"/>');
         buttonPanel.append(buttonLayout);
-        this.mReloadButton = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/save_settings.png', function () {
+        this.mReloadButton = buttonLayout.createImageButton(Path.GFX + 'ui/icons/cursor_rotate.png', function () {
             self.notifyBackendReloadButtonPressed();
         }, '', 6);
         this.mReloadButton.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.reload_button' });
@@ -508,10 +510,13 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                         row.append(title);
                         var inputLayout = $('<div class="l-input-half-big"/>');
                         row.append(inputLayout);
-                        this.mLocation.Resources = inputLayout.createInput('', 0, 4, 1, function (_input) {
-                            //
-                        }, 'title-font-big font-bold font-color-brother-name');
+                        this.mLocation.Resources = inputLayout.createInput('', 0, 4, 1, null, 'title-font-big font-bold font-color-brother-name');
                         this.mLocation.Resources.css('background-size', '100% 4.0rem');
+                        this.mLocation.Resources.assignInputEventListener('focusout', function(_input, _event) {
+                            var index = self.mLocation.Selected.data('index');
+                            self.confirmResourcesChanges(_input, index, self.mLocation);
+                            _input.addPercentageToInput();
+                        });
                     }
 
                     var strengthColumn = this.addColumn(50);
@@ -528,6 +533,7 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                         row.append(inputLayout);
                         this.mLocation.Strength = $('<div class="strength-title is-vertical-center title-font-big font-bold font-color-brother-name"></div>');
                         inputLayout.append(this.mLocation.Strength);
+                        this.mLocation.Strength.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.notaninput' });
                     }
                 }
 
@@ -893,8 +899,13 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             row.append(title);
                             var inputLayout = $('<div class="l-input-half-big"/>');
                             row.append(inputLayout);
-                            this.mSettlement.Resources = inputLayout.createInput('', 0, 4, 1, null, 'title-font-big font-bold font-color-brother-name');
+                            this.mSettlement.Resources = inputLayout.createInput('', 0, 5, 1, null, 'title-font-big font-bold font-color-brother-name');
                             this.mSettlement.Resources.css('background-size', '100% 4.0rem'); // simple solution to get a smaller input without much work :evilgrins
+                            this.mSettlement.Resources.assignInputEventListener('focusout', function(_input, _event) {
+                                var index = self.mSettlement.Selected.data('index');
+                                self.confirmResourcesChanges(_input, index, self.mSettlement);
+                                _input.addPercentageToInput();
+                            });
                         }
 
                         var wealthColumn = this.addColumn(50);
@@ -907,11 +918,13 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             row.append(title);
                             var inputLayout = $('<div class="l-input-half-big"/>');
                             row.append(inputLayout);
-                            this.mSettlement.Wealth = inputLayout.createInput('', 0, 3, 1, null, 'title-font-big font-bold font-color-brother-name');
+                            this.mSettlement.Wealth = inputLayout.createInput('', 0, 4, 1, null, 'title-font-big font-bold font-color-brother-name');
                             this.mSettlement.Wealth.css('background-size', '100% 4.0rem');
 
                             // set up fun event listeners
                             this.mSettlement.Wealth.assignInputEventListener('focusout', function(_input, _event) {
+                                var index = self.mSettlement.Selected.data('index');
+                                self.confirmWealthChanges(_input, index);
                                 _input.addPercentageToInput();
                             });
                             this.mSettlement.Wealth.assignInputEventListener('click', function(_input, _event) {
@@ -928,9 +941,14 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         // button
                         var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                         row.append(buttonLayout);
-                        var button = buttonLayout.createTextButton('Shut Down', function ()
+                        this.mSettlement.ActiveButton = buttonLayout.createTextButton('Shut Down', function ()
                         {
-                            //self.();
+                            var index = self.mSettlement.Selected.data('index');
+                            var data = self.mSettlement.Data[index];
+                            data.IsActive = !data.IsActive;
+                            self.mSettlement.ActiveButton.changeButtonText(data.IsActive ? 'Shut Down' : 'Restart');
+                            self.notifyBackendChangeActiveStatusOfSettlement(data.ID, data.IsActive);
+                            self.mSettlement.Selected.data('entry', data);
                         }, '', 4);
 
                         var row = this.addContainer(null, 4.6);
@@ -938,9 +956,9 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         // button button 
                         var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                         row.append(buttonLayout);
-                        var button = buttonLayout.createTextButton('Send Caravan', function ()
+                        this.mSettlement.SendCaravanButton = buttonLayout.createTextButton('Send Caravan', function ()
                         {
-                            //self.();
+                            //self.createSendCaravanPopupDialog();
                         }, '', 4);
 
                         var row = this.addContainer(null, 4.6);
@@ -950,7 +968,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         row.append(buttonLayout);
                         var button = buttonLayout.createTextButton('Send Mercenary', function ()
                         {
-                            //self.();
+                            //self.createSendMercenaryPopupDialog();
                         }, '', 4);
 
                         var row = this.addContainer(null, 4.6);
@@ -960,7 +978,8 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         row.append(buttonLayout);
                         var button = buttonLayout.createTextButton('Refresh Shops', function ()
                         {
-                            //self.();
+                            var data = self.mSettlement.Selected.data('entry');
+                            self.notifyBackendRefreshSettlementShop(data.ID);
                         }, '', 4);
 
                         var row = this.addContainer(null, 4.6);
@@ -970,7 +989,8 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         row.append(buttonLayout);
                         var button = buttonLayout.createTextButton('Refresh Roster', function ()
                         {
-                            //self.();
+                            var data = self.mSettlement.Selected.data('entry');
+                            self.notifyBackendToRefreshSettlementRoster(data.ID);
                         }, '', 4);
                     }
                 }
@@ -1012,7 +1032,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                     var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     column20.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
-                        //self.();
+                        self.createAttachedLocationPopupDialog(false);
                     }, '', 6);
                     button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
                 }
@@ -2145,15 +2165,64 @@ WorldEditorScreen.prototype.confirmPropertyChanges = function(_input, _keyName)
         _input.val('' + this.mAssetsData[_keyName] + '');
     }
 };
+WorldEditorScreen.prototype.confirmResourcesChanges = function(_input, _index, _parent)
+{
+    var text = _input.getInputText();
+    var value = 0;
+    var isValid = true;
+
+    if (text.length <= 0) {
+        isValid = false;
+    }
+    else {
+        value = this.isValidNumber(text, 0, 99999);
+        if (value === null)
+            isValid = false;
+    }
+
+    if (isValid === true) {
+        _input.val('' + value + '');
+        this.notifyBackendUpdateResourseValue(value, _index,_parent);
+    }
+    else {
+        _input.val('' + _parent.Data.Resources + '');
+    }
+};
+WorldEditorScreen.prototype.confirmWealthChanges = function(_input, _index)
+{
+    var text = _input.getInputText();
+    var value = 0;
+    var isValid = true;
+
+    if (text.length <= 0) {
+        isValid = false;
+    }
+    else {
+        value = this.isValidNumber(text, 0, 9999);
+        if (value === null)
+            isValid = false;
+    }
+
+    if (isValid === true) { // apply new value
+        _input.val('' + value + '');
+        this.notifyBackendUpdateWealthValue(value, _index);
+    }
+    else { // revert back to the old value
+        _input.val('' + this.mSettlement.Data.Wealth + '');
+    }
+};
 WorldEditorScreen.prototype.isValidNumber = function(_inputText, _min, _max)
 {
     var convertedText = parseInt(_inputText);
 
-    if(isNaN(convertedText)) return null;
+    if(isNaN(convertedText)) 
+        return null;
 
-    if (convertedText < _min) return _min;
+    if (convertedText < _min) 
+        return _min;
 
-    if (convertedText > _max) return _max;
+    if (convertedText > _max) 
+        return _max;
 
     return convertedText;
 };
@@ -2464,7 +2533,7 @@ WorldEditorScreen.prototype.notifyBackendUpdateFactionRelation = function( _valu
     var id = this.mFaction.Selected.data('entry').ID;
 
     SQ.call(this.mSQHandle, 'updateFactionRelation', [ id, _value ], function(_data) {
-        if (_data === undefined || _data == null || typeof _data !== 'object') {
+        if (_data === undefined || _data === null || typeof _data !== 'object') {
             console.error('ERROR: Failed to retrieve updated Faction Relation. Invalid data result.');
             return;
         }
@@ -2512,7 +2581,7 @@ WorldEditorScreen.prototype.notifyBackendToCollectAllianceData = function( _list
     var index = this.mFaction.Selected.data('index');
 
     SQ.call(this.mSQHandle, 'onCollectAllianceData', [ id, index, this.mFaction.Data ], function(_data) {
-        if (_data === undefined || _data == null || typeof _data !== 'object') {
+        if (_data === undefined || _data === null || typeof _data !== 'object') {
             console.error('ERROR: Failed to retrieve Faction Alliance Data. Invalid data result.');
             return;
         }
@@ -2521,12 +2590,123 @@ WorldEditorScreen.prototype.notifyBackendToCollectAllianceData = function( _list
     });
 }
 
+WorldEditorScreen.prototype.notifyBackendChangeActiveStatusOfSettlement = function(_id, _value)
+{
+    SQ.call(this.mSQHandle, 'onChangeActiveStatusOfSettlement', [ _id, _value ]);
+}
+
+WorldEditorScreen.prototype.notifyBackendRefreshSettlementShop = function(_id)
+{
+    SQ.call(this.mSQHandle, 'onRefreshSettlementShop', _id);
+}
+
+WorldEditorScreen.prototype.notifyBackendToRefreshSettlementRoster = function(_id)
+{
+    SQ.call(this.mSQHandle, 'onRefreshSettlementRoster', _id);
+}
+
+WorldEditorScreen.prototype.notifyBackendUpdateWealthValue = function(_value, _index)
+{
+    var data = this.mSettlement.Data[_index];
+    data.Wealth = _value;
+    this.mSettlement.Selected.data('entry', data);
+    SQ.call(this.mSQHandle, 'onUpdateWealthValue', [ data.ID, _value ]);
+}
+
+WorldEditorScreen.prototype.notifyBackendUpdateResourseValue = function(_value, _index, _parent)
+{
+    var data = _parent.Data[_index];
+    data.Resources = _value;
+    _parent.Selected.data('entry', data);
+    SQ.call(this.mSQHandle, 'onUpdateResourseValue', [ data.ID, _value ]);
+}
+
 WorldEditorScreen.prototype.notifyBackendUpdateFactionAlliance = function( _data )
 {
     var self = this;
     var id = this.mFaction.Selected.data('entry').ID;
     SQ.call(this.mSQHandle, 'onUpdateFactionAlliance', [ id, _data ]);
 }
+
+WorldEditorScreen.prototype.notifyBackendAddBuildingToSlot = function( _slot, _script )
+{
+    var self = this;
+    var id = this.mSettlement.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onAddBuildingToSlot', [ id, _slot, _script ]);
+}
+
+WorldEditorScreen.prototype.notifyBackendRemoveBuilding = function(_buildingSlot, _buildingID)
+{
+    if (_buildingID === null) return;
+
+    var id = this.mSettlement.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onRemoveBuilding', [id, _buildingSlot, _buildingID]);
+}
+
+WorldEditorScreen.prototype.notifyBackendRemoveAttachedLocation = function(_attachmentID)
+{
+    var id = this.mSettlement.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onRemoveAttachedLocation', [id, _attachmentID]);
+}
+
+WorldEditorScreen.prototype.notifyBackendAddSituationToSlot = function(_situationScripts)
+{
+    if (_situationScripts.length === 0) return;
+
+    var id = this.mSettlement.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onAddSituationToSlot', [id, _situationScripts]);
+}
+
+WorldEditorScreen.prototype.notifyBackendRemoveSituation = function(_situationID)
+{
+    var id = this.mSettlement.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onRemoveSituation', [id, _situationID]);
+}
+
+WorldEditorScreen.prototype.notifyBackendGetBuildingEntries = function( _listScrollContainer )
+{
+    var self = this;
+    var id = this.mSettlement.Selected.data('entry').ID;
+
+    SQ.call(this.mSQHandle, 'onGetBuildingEntries', id , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to get Building Entries. Invalid data result.');
+            return;
+        }
+
+        self.addBuildingEntriesToPopupDialog(_data, _listScrollContainer);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendGetAttachedLocationEntries = function( _listScrollContainer )
+{
+    var self = this;
+    var id = this.mSettlement.Selected.data('entry').ID;
+
+    SQ.call(this.mSQHandle, 'onGetAttachedLocationEntries', id , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to get Attached Location Entries. Invalid data result.');
+            return;
+        }
+
+        self.addAttachedLocationEntriesToPopupDialog(_data, _listScrollContainer);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendGetSituationEntries = function( _listScrollContainer )
+{
+    var self = this;
+    var id = this.mSettlement.Selected.data('entry').ID;
+
+    SQ.call(this.mSQHandle, 'onGetSituationEntries', id , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to get Situations Entries. Invalid data result.');
+            return;
+        }
+
+        self.addSituationEntriesToPopupDialog(_data, _listScrollContainer);
+    });
+};
 
 WorldEditorScreen.prototype.notifyBackendGetTroopEntries = function( _result )
 {
@@ -2540,7 +2720,7 @@ WorldEditorScreen.prototype.notifyBackendGetTroopEntries = function( _result )
     });
 
     SQ.call(this.mSQHandle, 'onGetTroopEntries', [ key, filter ], function(_data) {
-        if (_data === undefined || _data == null || !jQuery.isArray(_data)) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
             console.error('ERROR: Failed to get Troops Entries. Invalid data result.');
             return;
         }

@@ -1,10 +1,108 @@
 this.getroottable().Woditor.createLib <- function ()
 {
 	local gt = this.getroottable();
+	gt.Const.WoditorEntries <- {};
 
-	// fix the broken icon
+	// fix the broken icon of Sato manhunters (please fix it Sato, don't make me include it in this)
 	gt.Const.EntityIcon[this.Const.EntityType.SatoManhunter] = "nomad_02_orientation";
 	gt.Const.EntityIcon[this.Const.EntityType.SatoManhunterVeteran] = "nomad_05_orientation";
+
+
+	// valid buildings for woditor
+	gt.Woditor.Buildings <- {
+		Tooltip = {},
+		Stuff = {},
+		Valid = [],
+		All = [],
+	};
+	local invaild = [
+		"scripts/entity/world/settlements/buildings/building",
+		"scripts/entity/world/settlements/buildings/crowd_building",
+		"scripts/entity/world/settlements/buildings/crowd_oriental_building",
+		"scripts/entity/world/settlements/buildings/port_building",
+		"scripts/entity/world/settlements/buildings/port_oriental_building",
+		"scripts/entity/world/settlements/buildings/stronghold_management_building",
+		"scripts/entity/world/settlements/buildings/stronghold_storage_building"
+	];
+	local buildings = this.IO.enumerateFiles("scripts/entity/world/settlements/buildings/");
+	foreach ( script in buildings )
+	{
+		local building = this.new(script);
+
+		if (invaild.find(script) == null)
+		{
+			gt.Woditor.Buildings.Valid.push(script);
+		}
+
+		gt.Woditor.Buildings.All.push(script);
+		gt.Woditor.Buildings.Stuff[script] <- building;
+
+		if (!(building.m.Tooltip in gt.Woditor.Buildings.Tooltip))
+		{
+			gt.Woditor.Buildings.Tooltip[building.m.Tooltip] <- building;
+		}
+	}
+
+
+	// valid attached locations for woditor
+	gt.Woditor.AttachedLocations <- {
+		Tooltip = {},
+		Stuff = {},
+		Valid = [],
+		All = [],
+	};
+	local invaild = [
+		"scripts/entity/world/attached_location/harbor_location",
+	];
+	local attached_locations = this.IO.enumerateFiles("scripts/entity/world/attached_location/");
+	foreach ( script in attached_locations )
+	{
+		local attached_location = this.new(script);
+
+		if (invaild.find(script) == null)
+		{
+			gt.Woditor.AttachedLocations.Valid.push(script);
+		}
+
+		gt.Woditor.AttachedLocations.All.push(script);
+		gt.Woditor.AttachedLocations.Stuff[script] <- attached_location;
+
+		if (!(attached_location.getTypeID() in gt.Woditor.AttachedLocations.Tooltip))
+		{
+			gt.Woditor.AttachedLocations.Tooltip[attached_location.getTypeID()] <- attached_location;
+		}
+	}
+
+
+	// valid situations for woditor
+	gt.Woditor.Situations <- {
+		Tooltip = {},
+		Stuff = {},
+		Valid = [],
+		All = [],
+	};
+	local invaild = [
+		"scripts/entity/world/settlements/situations",
+		"scripts/entity/world/settlements/situations/pokebro_center_clickable_situation",
+	];
+	local situations = this.IO.enumerateFiles("scripts/entity/world/settlements/situations/");
+	foreach ( script in situations )
+	{
+		local situation = this.new(script);
+
+		if (invaild.find(script) == null)
+		{
+			gt.Woditor.Situations.Valid.push(script);
+		}
+
+		gt.Woditor.Situations.All.push(script);
+		gt.Woditor.Situations.Stuff[script] <- situation;
+
+		if (!(situation.getID() in gt.Woditor.Situations.Tooltip))
+		{
+			gt.Woditor.Situations.Tooltip[situation.getID()] <- situation;
+		}
+	}
 
 
 	// something to add to the tooltips
@@ -32,6 +130,12 @@ this.getroottable().Woditor.createLib <- function ()
 			{
 				id = 11,
 				type = "hint",
+				icon = "ui/icons/mouse_left_button.png",
+				text = "Change attachment"
+			},
+			{
+				id = 11,
+				type = "hint",
 				icon = "ui/icons/mouse_left_button_ctrl.png",
 				text = "Discard attachment"
 			}
@@ -43,6 +147,12 @@ this.getroottable().Woditor.createLib <- function ()
 			{
 				id = 11,
 				type = "hint",
+				icon = "ui/icons/mouse_left_button.png",
+				text = "Change building"
+			},
+			{
+				id = 11,
+				type = "hint",
 				icon = "ui/icons/mouse_left_button_ctrl.png",
 				text = "Discard building"
 			}
@@ -51,6 +161,12 @@ this.getroottable().Woditor.createLib <- function ()
 	gt.Const.AddSituationHints <- function( _tooltips )
 	{
 		_tooltips.extend([
+			{
+				id = 11,
+				type = "hint",
+				icon = "ui/icons/mouse_left_button.png",
+				text = "Change situation"
+			},
 			{
 				id = 11,
 				type = "hint",
@@ -312,6 +428,7 @@ this.getroottable().Woditor.createLib <- function ()
 	];
 	gt.Woditor.TroopKeys <- {};
 	gt.Woditor.TroopNames <- {};
+	local cultist = [];
 
 	foreach (key, entry in this.Const.World.Spawn.Troops)
 	{
@@ -328,7 +445,14 @@ this.getroottable().Woditor.createLib <- function ()
 			local entity = this.new(entry.Script);
 			if (entity.getFlags().has("human"))
 			{
-				gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human].push(key);
+				if (key.find("Cultist") != null) // separate Taro Cultist and vanilla cultist
+				{
+					cultist.push(key);
+				}
+				else
+				{
+					gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human].push(key);
+				}
 			}
 			else if (entity.getFlags().has("undead"))
 			{
@@ -402,12 +526,14 @@ this.getroottable().Woditor.createLib <- function ()
 	}
 
 	// try my best to sorting the entries, still look a bit chaotic though
+	cultist.sort(this.Woditor.sortByName);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human].sort(this.Woditor.sortByName);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead].sort(this.Woditor.sortByName);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin].sort(this.Woditor.sortByName);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Misc].sort(this.Woditor.sortByName);
 
 	// add all entry to the all list
+	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human].extend(cultist);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human]);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead]);
 	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin]);

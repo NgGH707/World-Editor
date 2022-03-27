@@ -27,6 +27,76 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
+	function convertBuildingEntriesToUIData( _id )
+	{
+		local settlement = this.World.getEntityByID(_id);
+		local result = [];
+
+		foreach( script in this.Woditor.Buildings.Valid)
+		{
+			local building = this.Woditor.Buildings.Stuff[script];
+
+			result.push({
+				Script = script,
+				ID = building.getID(),
+				ImagePath = building.m.UIImage + ".png",
+				TooltipId = building.m.Tooltip,
+			});
+		}
+
+		if (settlement.isCoastal())
+		{
+			local building = this.Woditor.Buildings.Stuff["scripts/entity/world/settlements/buildings/port_building"];
+
+			result.push({
+				Script = "scripts/entity/world/settlements/buildings/port_building",
+				ID = building.getID(),
+				ImagePath = building.m.UIImage + ".png",
+				TooltipId = building.m.Tooltip,
+			});
+		}
+
+		return result;
+	}
+
+	function convertAttachedLocationEntriesToUIData( _id )
+	{
+		local result = [];
+
+		foreach( script in this.Woditor.AttachedLocations.Valid )
+		{
+			local attached_location = this.Woditor.AttachedLocations.Stuff[script];
+
+			result.push({
+				Script = script,
+				ID = attached_location.getTypeID(),
+				ImagePath = attached_location.getIcon()
+			});
+		}
+
+		return result;
+	}
+
+	function convertSituationEntriesToUIData( _id )
+	{
+		local settlement = this.World.getEntityByID(_id);
+		local result = [];
+
+		foreach( script in this.Woditor.Situations.Valid )
+		{
+			local situation = this.Woditor.Situations.Stuff[script];
+			if (settlement.hasSituation(situation.getID())) continue;
+
+			result.push({
+				Script = script,
+				ID = situation.getID(),
+				ImagePath = situation.getIcon()
+			});
+		}
+
+		return result;
+	}
+
 	function convertTroopEntriesToUIData( _data )
 	{
 		local exclude = _data[0];
@@ -330,9 +400,11 @@ this.world_editor_data_helper <- {
 				ImagePath = settlement.getImagePath(),
 				Wealth = settlement.getWealth(),
 				Resources = settlement.getResources(),
+				IsActive = settlement.isActive(),
 				IsCoastal = settlement.isCoastal(),
 				IsMilitary = settlement.isMilitary(),
 				IsSouthern = settlement.isSouthern(),
+				IsIsolated = settlement.isIsolatedFromRoads(),
 				Distance = playerTile.getDistanceTo(settlement.getTile()),
 			});
 		}

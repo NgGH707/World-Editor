@@ -112,30 +112,30 @@ WorldEditorScreen.prototype.filterLocationsByFaction = function (_filter)
 
 WorldEditorScreen.prototype.addLocationsData = function(_data)
 {
+    var self = this;
     this.mLocation.ListScrollContainer.empty();
     this.mLocation.ExpandableList.deselectListEntries();
     this.mLocation.DefaultFilter.addClass('is-selected');
     this.mLocation.Data = _data;
 
+    // load back and scroll to the position where you have left to see a location
     if (this.mShowEntityOnMap !== null && this.mShowEntityOnMap.Type === 'location')
     {
-        
+        this.filterLocationsByType();
 
         var find = null;
-        this.mSettlement.ListScrollContainer.find('.list-entry-fat').each(function (index, element)
-        {
+        this.mLocation.ListScrollContainer.find('.list-entry-fat').each(function(index, element) {
             var entry = $(element);
-            if (entry.data('entry').ID === this.mShowEntityOnMap.ID) {
+            if (entry.data('entry').ID === self.mShowEntityOnMap.ID) {
                 find = entry;
             }
         });
 
         if (find !== null && find.length > 0) {
-            this.selectSettlementListEntry(find, true);
+            this.selectLocationListEntry(find, true);
         }
 
         this.mShowEntityOnMap = null;
-        this.filterLocationsByType('IsCamp', true);
     }
     else
     {
@@ -145,6 +145,7 @@ WorldEditorScreen.prototype.addLocationsData = function(_data)
 
 WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
 {
+    var self = this;
     var result = $('<div class="l-settlement-row"/>'); // reuse the list entry from settlement screen :evilgirns:
     this.mLocation.ListScrollContainer.append(result);
 
@@ -152,8 +153,7 @@ WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
     result.append(entry);
     entry.data('entry', _data);
     entry.data('index', _index);
-    entry.click(this, function(_event)
-    {
+    entry.click(this, function(_event) {
         _event.data.selectLocationListEntry($(this));
     });
 
@@ -161,8 +161,7 @@ WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
     var imageContainer = $('<div class="l-settlement-image-container"/>');
     entry.append(imageContainer);
 
-    imageContainer.createImage(Path.GFX + _data.ImagePath, function(_image)
-    {
+    imageContainer.createImage(Path.GFX + _data.ImagePath, function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
@@ -172,8 +171,7 @@ WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
     entry.append(imageContainer);
 
     var banner = (_data.Banner === undefined || _data.Banner === null) ? null : Path.GFX + _data.Banner;
-    imageContainer.createImage(banner, function(_image)
-    {
+    imageContainer.createImage(banner, function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
@@ -196,9 +194,7 @@ WorldEditorScreen.prototype.selectLocationListEntry = function(_element, _scroll
         this.mLocation.ListContainer.deselectListEntries();
 
         if (_scrollToEntry !== undefined && _scrollToEntry === true)
-        {
             this.mLocation.ListContainer.scrollListToElement(_element);
-        }
 
         _element.addClass('is-selected');
         this.mLocation.Selected = _element;

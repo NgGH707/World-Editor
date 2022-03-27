@@ -139,15 +139,17 @@ this.world_editor_screen <- {
 	{
 		if (this.m.StashIsChanged) this.World.State.getPlayer().forceRecalculateStashModifier();
 		if (this.m.BannerIsChanged) this.updatePlayerBannerOnAllThings();
-		if (this.m.IDToShowOnMap != null)
-		{
-			local entity = this.World.getEntityByID(this.m.IDToShowOnMap);
-			local entityTile = entity.getTile();
-			this.World.uncoverFogOfWar(entityTile.Pos, 500.0);
-			this.World.getCamera().Zoom = 1.0;
-			this.World.getCamera().setPos(entityTile.getPos());
-			this.m.IDToShowOnMap = null;
-		}
+		if (this.m.IDToShowOnMap == null) return;
+
+		local entity = this.World.getEntityByID(this.m.IDToShowOnMap);
+
+		if (entity == null) return;
+		local entityTile = entity.getTile();
+		entity.setDiscovered(true);
+		this.World.uncoverFogOfWar(entityTile.Pos, 500.0);
+		this.World.getCamera().Zoom = 1.0;
+		this.World.getCamera().setPos(entityTile.Pos);
+		this.m.IDToShowOnMap = null;
 	}
 
 	function onCloseButtonPressed()
@@ -172,6 +174,21 @@ this.world_editor_screen <- {
 		if (this.m.StashIsChanged) this.World.State.getPlayer().forceRecalculateStashModifier();
 		if (this.m.BannerIsChanged) this.updatePlayerBannerOnAllThings();
 		this.m.JSHandle.asyncCall("loadFromData", this.convertToUIData());
+	}
+
+	function onGetBuildingEntries( _id )
+	{
+		return this.Woditor.Helper.convertBuildingEntriesToUIData(_id);
+	}
+
+	function onGetAttachedLocationEntries( _id )
+	{
+		return this.Woditor.Helper.convertAttachedLocationEntriesToUIData(_id);
+	}
+
+	function onGetSituationEntries( _id )
+	{
+		return this.Woditor.Helper.convertSituationEntriesToUIData(_id);
 	}
 
 	function onGetTroopEntries( _data )
@@ -355,6 +372,188 @@ this.world_editor_screen <- {
 	function onChangeScenario( _id )
 	{
 		this.World.Assets.m.Origin = this.Const.ScenarioManager.getScenario(_id);
+	}
+
+	function onChangeActiveStatusOfSettlement( _data )
+	{
+		this.World.getEntityByID(_data[0]).setActive(_data[1], false);
+	}
+
+	function onRefreshSettlementShop( _id )
+	{
+		this.World.getEntityByID(_id).resetShop();
+	}
+
+	function onRefreshSettlementRoster( _id )
+	{
+		this.World.getEntityByID(_id).resetRoster(true);
+	}
+
+	function onAddBuildingToSlot( _data )
+	{
+		local entity = this.World.getEntityByID(_data[0]);
+		local slot = _data[1];
+
+		if (entity.m.Buildings[slot] != null)
+		{
+			entity.m.Buildings[slot].m.Settlement = null;
+			entity.m.Buildings[slot] = null;
+		}
+
+		local building = this.new(_data[2]);
+		building.setSettlement(entity);
+		entity.m.Buildings[slot] = building;
+
+		if ("getStash" in building)
+		{
+			building.onUpdateShopList();
+		}
+		
+		this.m.JSHandle.asyncCall("updateSettlementBuildingSlot", {
+			Slot = _data[1],
+			Data = {
+				ID = building.getID(),
+				ImagePath = building.m.UIImage + ".png",
+				TooltipId = building.m.Tooltip,
+			},
+		});
+	}
+
+	function onRemoveBuilding( _data )
+	{
+		local entity = this.World.getEntityByID(_data[0]);
+		local slot = _data[1];
+		local id = _data[2];
+
+		if (entity.m.Buildings[slot] == null || entity.m.Buildings[slot].getID() != id) return;
+
+		entity.m.Buildings[slot].m.Settlement = null;
+		entity.m.Buildings[slot] = null;
+		this.m.JSHandle.asyncCall("updateSettlementBuildingSlot", {
+			Slot = _data[1],
+			Data = null,
+		});
+	}
+
+	function onRemoveAttachedLocation( _data )
+	{
+		local entity = this.World.getEntityByID(_data[0]);
+		local id = _data[1];
+		local find;
+
+		foreach(i, attachment in entity.getAttachedLocations() )
+		{
+			if (attachment.getTypeID() == id)
+			{
+				find = i;
+				break;
+			}
+		}
+
+		if (find == null) return;
+
+		local result = [];
+		local remove = entity.getAttachedLocations().remove(find);
+		remove.die();
+
+		foreach( attachment in entity.getAttachedLocations() )
+		{
+			if (attachment.getTypeID() == "attached_location.harbor")
+			{
+				continue;
+			}
+
+			result.push({
+				ID = attachment.getTypeID(),
+				ImagePath = attachment.getUIImage(),
+			});
+		}
+
+		this.m.JSHandle.asyncCall("updateAttachmentList", {
+			Data = result,
+			IsUpdating = true
+		});
+	}
+
+	function onAddSituationToSlot( _data )
+	{
+		local entity = this.World.getEntityByID(_data[0]);
+		local result = [];
+
+		foreach (script in _data[1])
+		{
+			local situation = this.new(script);
+			entity.addSituation(situation);
+
+			result.push({
+				ID = situation.getID(),
+				ImagePath = situation.getIcon()
+			});
+		}
+		
+		this.m.JSHandle.asyncCall("updateSituationList", {
+			Data = result,
+			IsUpdating = true
+		});
+	}
+
+	function onRemoveSituation( _data )
+	{
+		local entity = this.World.getEntityByID(_data[0]);
+		local result = [];
+		entity.removeSituationByID(_data[1]);
+
+		foreach( situation in entity.getSituations() )
+		{
+			result.push({
+				ID = situation.getID(),
+				ImagePath = situation.getIcon()
+			});
+		}
+
+		this.m.JSHandle.asyncCall("updateSituationList", {
+			Data = result,
+			IsUpdating = true
+		});
+	}
+
+	function onUpdateResourseValue( _data )
+	{
+		local entity = this.World.getEntityByID(_data[0]);
+		entity.setResources(_data[1]);
+
+		if (entity.isLocationType(this.Const.World.LocationType.Settlement))
+		{
+			this.m.JSHandle.asyncCall("updateSettlementWealth", entity.getWealth());
+		}
+	}
+
+	function onUpdateWealthValue( _data )
+	{
+		local entity = this.World.getEntityByID(_data[0]);
+		local baseLevel = 0.0;
+
+		if (entity.isMilitary()) baseLevel = baseLevel + 50.0;
+		if (this.isKindOf(entity, "city_state")) baseLevel = baseLevel + 100;
+
+		switch(entity.getSize())
+		{
+		case 1:
+			baseLevel = baseLevel + 100.0;
+			break;
+
+		case 2:
+			baseLevel = baseLevel + 150.0;
+			break;
+
+		case 3:
+			baseLevel = baseLevel + 200.0;
+			break;
+		}
+
+		local resources = this.Math.round(_data[1] * baseLevel / 100);
+		entity.setResources(resources);
+		this.m.JSHandle.asyncCall("updateSettlementResources", resources);
 	}
 
 	function onUpdateAssetsValue( _data )

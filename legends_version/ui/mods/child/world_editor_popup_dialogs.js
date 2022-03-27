@@ -1,5 +1,7 @@
 
-// Scenario selection dialog
+/*
+    Choose Scenario
+*/
 WorldEditorScreen.prototype.createScenarioPopupDialog = function() 
 {
     var self = this;
@@ -732,4 +734,157 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
 
         _subTitle.html('Selected: ' + self.mTroop.Selected.length);
     });
+};
+
+
+
+/*
+    Choose Building
+*/
+WorldEditorScreen.prototype.createAttachedLocationPopupDialog = function(_isAttach) 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog(_isAttach === true ? 'What To Build' : 'Choose a Situation', null, null, 'choose-building-popup');
+    this.mCurrentPopupDialog.findPopupDialogTitle().removeClass('font-bottom-shadow').removeClass('font-color-subtitle').addClass('font-color-ink');
+
+    var result = this.createBuildingPopupDialogContent(this.mCurrentPopupDialog); 
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // add scroll bar, due to how the ui works, it has to be created rather in the content function
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var listScrollContainer = result.ListContainer.findListScrollContainer();
+    
+    // add footer buttons
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        if (_isAttach === true) {
+            var selectedEntry = listScrollContainer.find('.is-selected:first');
+            self.notifyBackendAttachedLocationToSlot(selectedEntry.data('script'));
+        }
+        else {
+            var scripts = [];
+            listScrollContainer.find('.is-selected').each(function (_index, _element) {
+                scripts.push($(_element).data('script'));
+            });
+            self.notifyBackendAddSituationToSlot(scripts);
+        }
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    
+    // add building entries so you can pick one
+    if (_isAttach === true)
+        this.notifyBackendGetAttachedLocationEntries(listScrollContainer);
+    else
+        this.notifyBackendGetSituationEntries(listScrollContainer);
+};
+WorldEditorScreen.prototype.createBuildingPopupDialog = function(_slot) 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('What To Build', null, null, 'choose-building-popup');
+    this.mCurrentPopupDialog.findPopupDialogTitle().removeClass('font-bottom-shadow').removeClass('font-color-subtitle').addClass('font-color-ink');
+
+    var result = this.createBuildingPopupDialogContent(this.mCurrentPopupDialog); 
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // add scroll bar, due to how the ui works, it has to be created rather in the content function
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var listScrollContainer = result.ListContainer.findListScrollContainer();
+    
+    // add footer buttons
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        var selectedEntry = listScrollContainer.find('.is-selected:first');
+        if (selectedEntry.length > 0) {
+            self.notifyBackendAddBuildingToSlot(_slot, selectedEntry.data('script'));
+        }
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    
+    // add building entries so you can pick one
+    this.notifyBackendGetBuildingEntries(listScrollContainer);
+};
+WorldEditorScreen.prototype.createBuildingPopupDialogContent = function(_dialog) 
+{
+    var self = this;
+    var content = $('<div class="b-content-container"/>');
+
+    var container = $('<div class="l-list-container"></div>');
+    content.append(container);
+
+    var listContainer = $('<div class="ui-control list has-frame"/>');
+    container.append(listContainer);
+    var scrollContainer = $('<div class="scroll-container"/>');
+    listContainer.append(scrollContainer);
+
+    return {
+        Content: content,
+        ListContainer: listContainer
+    };
+};
+WorldEditorScreen.prototype.addSituationEntriesToPopupDialog = function(_data, _listScrollContainer) 
+{
+    for (var i = 0; i < _data.length; i++) {
+        var entry = _data[i];
+        var slot = $('<div class="is-situation-slot"/>');
+        slot.data('script', entry.Script);
+        _listScrollContainer.append(slot);
+
+        var image = slot.createImage(Path.GFX + entry.ImagePath, function(_image) {
+            _image.centerImageWithinParent(0, 0, 1.0);
+            _image.removeClass('opacity-none');
+        }, null, 'opacity-none');
+
+        // set up event listeners
+        slot.click(this, function(_event) {
+            var div = $(this);
+            if (div.hasClass('is-selected') === false)
+                div.removeClass('is-selected');
+            else
+                div.addClass('is-selected');
+        });
+        //image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId });
+    }
+};
+WorldEditorScreen.prototype.addBuildingEntriesToPopupDialog = function(_data, _listScrollContainer) 
+{
+    for (var i = 0; i < _data.length; i++) {
+        var entry = _data[i];
+        var slot = $('<div class="is-building-slot"/>');
+        slot.data('script', entry.Script);
+        _listScrollContainer.append(slot);
+
+        if (i == 0)
+            slot.addClass('is-selected');
+
+        var image = slot.createImage(Path.GFX + entry.ImagePath, function(_image) {
+            _image.centerImageWithinParent(0, 0, 1.0);
+            _image.removeClass('opacity-none');
+        }, null, 'opacity-none');
+
+        // set up event listeners
+        slot.click(this, function(_event) {
+            var div = $(this);
+            if (div.hasClass('is-selected') === false) {
+                _listScrollContainer.find('.is-selected').each(function (_index, _element) {
+                    $(_element).removeClass('is-selected');
+                });
+                div.addClass('is-selected');
+            }
+        });
+        image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId });
+    }
 };
