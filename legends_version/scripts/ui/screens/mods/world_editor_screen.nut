@@ -8,7 +8,7 @@ this.world_editor_screen <- {
 		OnDisconnectedListener = null,
 		OnClosePressedListener = null,
 
-		//
+		// some stuffs to help
 		IDToShowOnMap = null,
 		TemporaryModel = null,
 		StashCapacityBefore = 0,
@@ -435,6 +435,42 @@ this.world_editor_screen <- {
 		});
 	}
 
+	function onAddAttachedLocationToSlot( _data )
+	{
+		local entity = this.World.getEntityByID(_data[0]);
+		local nearRoad = this.Const.NearRoadAttachedLocations.find(_data[1]) != null;
+		local additionalTile = this.Math.rand(0, 1);
+		local attachment = this.buildAttachedLocation(entity, _data[1], additionalTile, nearRoad);
+		local tries = 0
+
+		while(attachment == null && tries < 6)
+		{
+			++additionalTile;
+			attachment = this.buildAttachedLocation(entity, _data[1], additionalTile, nearRoad);
+		}
+
+		if (attachment == null) return;
+		entity.updateProduce();
+
+		foreach( attachment in entity.getAttachedLocations() )
+		{
+			if (attachment.getTypeID() == "attached_location.harbor")
+			{
+				continue;
+			}
+
+			result.push({
+				ID = attachment.getTypeID(),
+				ImagePath = attachment.getUIImage(),
+			});
+		}
+
+		this.m.JSHandle.asyncCall("updateAttachmentList", {
+			Data = result,
+			IsUpdating = true
+		});
+	}
+
 	function onRemoveAttachedLocation( _data )
 	{
 		local entity = this.World.getEntityByID(_data[0]);
@@ -483,8 +519,11 @@ this.world_editor_screen <- {
 		foreach (script in _data[1])
 		{
 			local situation = this.new(script);
-			entity.addSituation(situation);
+			entity.addSituation(situation, 7);
+		}
 
+		foreach( situation in entity.getSituations() )
+		{
 			result.push({
 				ID = situation.getID(),
 				ImagePath = situation.getIcon()
@@ -712,6 +751,79 @@ this.world_editor_screen <- {
 				}
 			}
 		}
+	}
+
+	function buildAttachedLocation(_settlement, _script, _additionalDistance = 0, _mustBeNearRoad = false, _clearTile = true)
+	{
+		local tries = 0;
+		local myTile = _settlement.getTile();
+		local entity;
+
+		while (tries++ < 1000)
+		{
+			local x = this.Math.rand(myTile.SquareCoords.X - 2 - _additionalDistance, myTile.SquareCoords.X + 2 + _additionalDistance);
+			local y = this.Math.rand(myTile.SquareCoords.Y - 2 - _additionalDistance, myTile.SquareCoords.Y + 2 + _additionalDistance);
+
+			if (!this.World.isValidTileSquare(x, y))
+			{
+				continue;
+			}
+
+			local tile = this.World.getTileSquare(x, y);
+
+			if (tile.IsOccupied)
+			{
+				continue;
+			}
+
+			if (_mustBeNearRoad && tile.HasRoad)
+			{
+				continue;
+			}
+
+			if (tile.getDistanceTo(myTile) == 1 && _additionalDistance >= 0 || tile.getDistanceTo(myTile) < _additionalDistance)
+			{
+				continue;
+			}
+
+			if (tile.getDistanceTo(myTile) > 2)
+			{
+				local navSettings = this.World.getNavigator().createSettings();
+				navSettings.ActionPointCosts = this.Const.World.TerrainTypeNavCost_Flat;
+				local path = this.World.getNavigator().findPath(myTile, tile, navSettings, 0);
+
+				if (path.isEmpty())
+				{
+					continue;
+				}
+			}
+
+			if (_clearTile)
+			{
+				tile.clearAllBut(this.Const.World.DetailType.Shore);
+			}
+			else
+			{
+				tile.clear(this.Const.World.DetailType.NotCompatibleWithRoad);
+			}
+
+			entity = this.World.spawnLocation(_script, tile.Coords);
+			entity.setSettlement(_settlement);
+
+			if (entity.onBuild())
+			{
+				_settlement.m.AttachedLocations.push(entity);
+				break;
+			}
+			else
+			{
+				entity.die();
+				entity = null;
+				continue;
+			}
+		}
+
+		return entity;
 	}
 
 };

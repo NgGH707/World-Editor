@@ -403,7 +403,7 @@ WorldEditorScreen.prototype.addSituationEntry = function (_data, _parentDiv)
         this.classList.remove('is-highlighted');
     });
 
-    image.bindTooltip({ contentType: 'settlement-status-effect', statusEffectId: _data.ID });
+    image.bindTooltip({ contentType: 'ui-element', elementId: _data.ID , elementOwner: 'woditor.situations'});
 };
 
 WorldEditorScreen.prototype.addAttachmentEntry = function (_data)

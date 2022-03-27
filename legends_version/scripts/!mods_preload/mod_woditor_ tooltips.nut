@@ -2,33 +2,6 @@ this.getroottable().Woditor.hookTooltips <- function ()
 {
 	::mods_hookNewObjectOnce("ui/screens/tooltip/tooltip_events", function( obj ) 
 	{
-		local querySettlementStatusEffectTooltip = obj.general_querySettlementStatusEffectTooltipData
-		obj.general_querySettlementStatusEffectTooltipData = function( _statusEffectId )
-		{
-			local tooltip = querySettlementStatusEffectTooltip(_statusEffectId);
-
-			if (tooltip != null)
-			{
-				return tooltip;
-			}
-			else
-			{
-				foreach (settlement in this.World.EntityManager.getSettlements())
-				{
-					local statusEffect = settlement.getSituationByID(_statusEffectId);
-
-					if (statusEffect != null)
-					{
-						tooltip = statusEffect.getTooltip();
-						this.Const.AddSituationHints(tooltip);
-						return tooltip;
-					}
-				}
-			}
-
-			return null;
-		};
-
 	 	local queryTooltipData = obj.general_queryUIElementTooltipData;
 	 	obj.general_queryUIElementTooltipData = function(_entityId, _elementId, _elementOwner)
 	 	{
@@ -74,30 +47,48 @@ this.getroottable().Woditor.hookTooltips <- function ()
 					}
 				}
 
-				if (_elementOwner == "woditor.attached_location")
-	 			{
-	 				local tooltip = this.getAttachedLocationTooltip(_elementId);
+				if (_elementId != null)
+				{
+					if (_elementOwner == "woditor.buildings")
+		 			{
+		 				local tooltip = this.Woditor.Buildings.Tooltip[_elementId].getTooltip();
 
-	 				if (tooltip != null)
-	 				{
-	 					this.Const.AddAttachedLocationHints(tooltip);
-	 				}
+		 				if (_entityId == null)
+		 				{
+		 					this.Const.AddBuildingHints(tooltip);
+		 				}
+		 				
+		 				return tooltip;
+		 			}
 
-	 				return tooltip;
+					if (_elementOwner == "woditor.attached_location")
+		 			{
+		 				local tooltip = this.Woditor.AttachedLocations.Tooltip[_elementId].world_entity.getTooltip();
+		 				
+		 				if (_entityId == null)
+		 				{
+		 					this.Const.AddAttachedLocationHints(tooltip);
+		 				}
+
+		 				return tooltip;
+		 			}
+
+		 			if (_elementOwner == "woditor.situations" )
+		 			{
+		 				local tooltip = this.Woditor.Situations.Tooltip[_elementId].getTooltip();
+		 				
+		 				if (_entityId == null)
+		 				{
+		 					this.Const.AddSituationHints(tooltip);
+		 				}
+
+		 				return tooltip;
+		 			}
 	 			}
 	 		}
 
 			local tooltip = queryTooltipData(_entityId, _elementId, _elementOwner);
-
-			if (tooltip != null)
-			{
-				if (_elementOwner != null && _elementOwner == "woditor.buildings")
-				{
-					this.Const.AddBuildingHints(tooltip);
-				}
-
-				return tooltip;
-			} 
+			if (tooltip != null) return tooltip;
 
 			switch (_elementId) 
 			{

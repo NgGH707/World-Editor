@@ -1,12 +1,21 @@
 this.getroottable().Woditor.createLib <- function ()
 {
 	local gt = this.getroottable();
-	gt.Const.WoditorEntries <- {};
 
 	// fix the broken icon of Sato manhunters (please fix it Sato, don't make me include it in this)
 	gt.Const.EntityIcon[this.Const.EntityType.SatoManhunter] = "nomad_02_orientation";
 	gt.Const.EntityIcon[this.Const.EntityType.SatoManhunterVeteran] = "nomad_05_orientation";
 
+	//
+	gt.Const.NearRoadAttachedLocations <- [
+		"scripts/entity/world/attached_location/stone_watchtower_oriental_location",
+		"scripts/entity/world/attached_location/wooden_watchtower_location",
+		"scripts/entity/world/attached_location/militia_trainingcamp_oriental_location",
+		"scripts/entity/world/attached_location/militia_trainingcamp_location",
+		"scripts/entity/world/attached_location/stone_watchtower_location",
+		"scripts/entity/world/attached_location/fortified_outpost_location",
+		"scripts/entity/world/attached_location/wool_spinner_location",
+	];
 
 	// valid buildings for woditor
 	gt.Woditor.Buildings <- {
@@ -37,7 +46,7 @@ this.getroottable().Woditor.createLib <- function ()
 		gt.Woditor.Buildings.All.push(script);
 		gt.Woditor.Buildings.Stuff[script] <- building;
 
-		if (!(building.m.Tooltip in gt.Woditor.Buildings.Tooltip))
+		if (building.m.Tooltip != null && !(building.m.Tooltip in gt.Woditor.Buildings.Tooltip))
 		{
 			gt.Woditor.Buildings.Tooltip[building.m.Tooltip] <- building;
 		}
@@ -53,6 +62,7 @@ this.getroottable().Woditor.createLib <- function ()
 	};
 	local invaild = [
 		"scripts/entity/world/attached_location/harbor_location",
+		"scripts/entity/world/attached_location/guarded_checkpoint_location",
 	];
 	local attached_locations = this.IO.enumerateFiles("scripts/entity/world/attached_location/");
 	foreach ( script in attached_locations )
@@ -82,26 +92,27 @@ this.getroottable().Woditor.createLib <- function ()
 		All = [],
 	};
 	local invaild = [
-		"scripts/entity/world/settlements/situations",
+		"scripts/entity/world/settlements/situations/situation", 
+		"scripts/entity/world/settlements/situations/stronghold_well_supplied_ai_situation",
+		"scripts/entity/world/settlements/situations/stronghold_well_supplied_situation",
 		"scripts/entity/world/settlements/situations/pokebro_center_clickable_situation",
 	];
 	local situations = this.IO.enumerateFiles("scripts/entity/world/settlements/situations/");
 	foreach ( script in situations )
 	{
-		local situation = this.new(script);
-
 		if (invaild.find(script) == null)
 		{
+			local situation = this.new(script);
 			gt.Woditor.Situations.Valid.push(script);
+			gt.Woditor.Situations.Stuff[script] <- situation;
+
+			if (!(situation.getID() in gt.Woditor.Situations.Tooltip))
+			{
+				gt.Woditor.Situations.Tooltip[situation.getID()] <- situation;
+			}
 		}
 
 		gt.Woditor.Situations.All.push(script);
-		gt.Woditor.Situations.Stuff[script] <- situation;
-
-		if (!(situation.getID() in gt.Woditor.Situations.Tooltip))
-		{
-			gt.Woditor.Situations.Tooltip[situation.getID()] <- situation;
-		}
 	}
 
 

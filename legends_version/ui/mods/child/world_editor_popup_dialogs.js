@@ -746,7 +746,10 @@ WorldEditorScreen.prototype.createAttachedLocationPopupDialog = function(_isAtta
     var self = this;
     this.notifyBackendPopupDialogIsVisible(true);
     this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog(_isAttach === true ? 'What To Build' : 'Choose a Situation', null, null, 'choose-building-popup');
-    this.mCurrentPopupDialog.findPopupDialogTitle().removeClass('font-bottom-shadow').removeClass('font-color-subtitle').addClass('font-color-ink');
+    var title = this.mCurrentPopupDialog.findPopupDialogTitle();
+    title.removeClass('font-bottom-shadow');
+    title.removeClass('font-color-title');
+    title.addClass('font-color-ink');
 
     var result = this.createBuildingPopupDialogContent(this.mCurrentPopupDialog); 
     this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
@@ -789,7 +792,10 @@ WorldEditorScreen.prototype.createBuildingPopupDialog = function(_slot)
     var self = this;
     this.notifyBackendPopupDialogIsVisible(true);
     this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('What To Build', null, null, 'choose-building-popup');
-    this.mCurrentPopupDialog.findPopupDialogTitle().removeClass('font-bottom-shadow').removeClass('font-color-subtitle').addClass('font-color-ink');
+    var title = this.mCurrentPopupDialog.findPopupDialogTitle();
+    title.removeClass('font-bottom-shadow');
+    title.removeClass('font-color-title');
+    title.addClass('font-color-ink');
 
     var result = this.createBuildingPopupDialogContent(this.mCurrentPopupDialog); 
     this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
@@ -835,6 +841,35 @@ WorldEditorScreen.prototype.createBuildingPopupDialogContent = function(_dialog)
         ListContainer: listContainer
     };
 };
+WorldEditorScreen.prototype.addAttachedLocationEntriesToPopupDialog = function(_data, _listScrollContainer) 
+{
+    for (var i = 0; i < _data.length; i++) {
+        var entry = _data[i];
+        var slot = $('<div class="is-building-slot"/>');
+        slot.data('script', entry.Script);
+        _listScrollContainer.append(slot);
+
+        if (i == 0)
+            slot.addClass('is-selected');
+
+        var image = slot.createImage(Path.GFX + entry.ImagePath, function(_image) {
+            _image.centerImageWithinParent(0, 0, 1.0);
+            _image.removeClass('opacity-none');
+        }, null, 'opacity-none');
+
+        // set up event listeners
+        slot.click(this, function(_event) {
+            var div = $(this);
+            if (div.hasClass('is-selected') === false) {
+                _listScrollContainer.find('.is-selected').each(function (_index, _element) {
+                    $(_element).removeClass('is-selected');
+                });
+                div.addClass('is-selected');
+            }
+        });
+        image.bindTooltip({ contentType: 'ui-element', entityId: 0, elementId: entry.ID , elementOwner: 'woditor.attached_location'});
+    }
+};
 WorldEditorScreen.prototype.addSituationEntriesToPopupDialog = function(_data, _listScrollContainer) 
 {
     for (var i = 0; i < _data.length; i++) {
@@ -852,11 +887,11 @@ WorldEditorScreen.prototype.addSituationEntriesToPopupDialog = function(_data, _
         slot.click(this, function(_event) {
             var div = $(this);
             if (div.hasClass('is-selected') === false)
-                div.removeClass('is-selected');
-            else
                 div.addClass('is-selected');
+            else
+                div.removeClass('is-selected');
         });
-        //image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId });
+        image.bindTooltip({ contentType: 'ui-element', entityId: 0, elementId: entry.ID , elementOwner: 'woditor.situations'});
     }
 };
 WorldEditorScreen.prototype.addBuildingEntriesToPopupDialog = function(_data, _listScrollContainer) 
@@ -885,6 +920,6 @@ WorldEditorScreen.prototype.addBuildingEntriesToPopupDialog = function(_data, _l
                 div.addClass('is-selected');
             }
         });
-        image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId });
+        image.bindTooltip({ contentType: 'ui-element', entityId: 0, elementId: entry.TooltipId , elementOwner: 'woditor.buildings'});
     }
 };

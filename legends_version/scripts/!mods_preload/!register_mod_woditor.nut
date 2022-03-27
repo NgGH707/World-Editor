@@ -24,7 +24,6 @@ this.getroottable().Woditor.Name <- "mod_world_editor_legends";
 ::mods_queue(this.Woditor.Name, "mod_legends,>mod_nggh_assets", function()
 {	
 	// run hooks
-	this.Woditor.createLib();
 	this.Woditor.hookWorldState();
 	this.Woditor.hookAssetsManager();
 	this.Woditor.hookTooltips();
@@ -35,4 +34,5 @@ this.getroottable().Woditor.Name <- "mod_world_editor_legends";
 	this.Woditor.hookLocation();
 	this.Woditor.hookPlayerParty();
 	this.Woditor.hookAttachedLocation();
+	this.Woditor.createLib();
 });

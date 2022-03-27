@@ -515,7 +515,6 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                         this.mLocation.Resources.assignInputEventListener('focusout', function(_input, _event) {
                             var index = self.mLocation.Selected.data('index');
                             self.confirmResourcesChanges(_input, index, self.mLocation);
-                            _input.addPercentageToInput();
                         });
                     }
 
@@ -904,7 +903,6 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             this.mSettlement.Resources.assignInputEventListener('focusout', function(_input, _event) {
                                 var index = self.mSettlement.Selected.data('index');
                                 self.confirmResourcesChanges(_input, index, self.mSettlement);
-                                _input.addPercentageToInput();
                             });
                         }
 
@@ -1070,7 +1068,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                     var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
                     column20.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
-                        //self.();
+                        self.createAttachedLocationPopupDialog(true);
                     }, '', 6);
                     button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
                 }
@@ -2641,6 +2639,14 @@ WorldEditorScreen.prototype.notifyBackendRemoveBuilding = function(_buildingSlot
 
     var id = this.mSettlement.Selected.data('entry').ID;
     SQ.call(this.mSQHandle, 'onRemoveBuilding', [id, _buildingSlot, _buildingID]);
+}
+
+WorldEditorScreen.prototype.notifyBackendAttachedLocationToSlot = function(_attachmentScripts)
+{
+    if (_attachmentScripts.length === 0) return;
+
+    var id = this.mSettlement.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onAddAttachedLocationToSlot', [id, _attachmentScripts]);
 }
 
 WorldEditorScreen.prototype.notifyBackendRemoveAttachedLocation = function(_attachmentID)

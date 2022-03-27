@@ -70,7 +70,7 @@ this.world_editor_data_helper <- {
 			result.push({
 				Script = script,
 				ID = attached_location.getTypeID(),
-				ImagePath = attached_location.getIcon()
+				ImagePath = attached_location.getUIImage()
 			});
 		}
 
@@ -367,7 +367,7 @@ this.world_editor_data_helper <- {
 				}
 			}
 
-			foreach( a in settlement.getAttachedLocations() )
+			foreach(i, a in settlement.getAttachedLocations() )
 			{
 				if (a.getTypeID() == "attached_location.harbor")
 				{
