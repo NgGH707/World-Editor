@@ -83,6 +83,7 @@ var WorldEditorScreen = function(_parent)
 
         // fancy stuff
         IsExpanded          : false,
+        ExpandLabel         : null,
         ExpandButton        : null,
         ExpandableList      : null,
         ExpandableListScroll: null,
@@ -114,6 +115,7 @@ var WorldEditorScreen = function(_parent)
 
         // fancy stuff
         IsExpanded          : false,
+        ExpandLabel         : null,
         ExpandButton        : null,
         ExpandableList      : null,
         ExpandableListScroll: null,
@@ -388,35 +390,31 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
         var row90 = this.addRow(90, 'with-dialog-background');
         column.append(row90);
         {
-            // first layer
-            var layer = $('<div class="layer"/>');
-            row90.append(layer);
+            var slotContainer = $('<div class="below-container"/>');
+            row90.append(slotContainer);
+            var listContainerLayout = $('<div class="l-list-container"/>');
+            slotContainer.append(listContainerLayout);
+            this.mLocation.ListContainer = listContainerLayout.createList(2);
+            this.mLocation.ListScrollContainer = this.mLocation.ListContainer.findListScrollContainer();
+           
+            var scrollHeader = $('<div class="upper-container with-small-dialog-background"/>')
+            row90.append(scrollHeader);
             {
-                var slotContainer = $('<div class="below-list-container"/>');
-                layer.append(slotContainer);
-                var listContainerLayout = $('<div class="l-list-container"/>');
-                slotContainer.append(listContainerLayout);
-                this.mLocation.ListContainer = listContainerLayout.createList(2);
-                this.mLocation.ListScrollContainer = this.mLocation.ListContainer.findListScrollContainer();
-            }
+                var logLayout = $('<div class="expandable-container"/>'); 
+                scrollHeader.append(logLayout);
+                this.mLocation.ExpandableList = logLayout.createList(2);
+                this.mLocation.ExpandableListScroll = this.mLocation.ExpandableList.findListScrollContainer();
 
-            var layer = $('<div class="layer"/>');
-            row90.append(layer);
-            {
-                var scrollHeader = this.addContainer(null, 5.3, 'with-small-dialog-background');
-                layer.append(scrollHeader);
-                {
-                    var logLayout = $('<div class="expandable-container"/>'); 
-                    scrollHeader.append(logLayout);
-                    this.mLocation.ExpandableList = logLayout.createList(2);
-                    this.mLocation.ExpandableListScroll = this.mLocation.ExpandableList.findListScrollContainer();
+                this.mLocation.ExpandLabel = $('<div class="expandable-label-container"/>');
+                scrollHeader.append(this.mLocation.ExpandLabel);
+                var label = $('<div class="label text-font-normal font-bold font-color-ink">-Select Filter-</div>');
+                this.mLocation.ExpandLabel.append(label);
 
-                    var buttonLayout = $('<div class="expand-button"/>');
-                    scrollHeader.append(buttonLayout);
-                    this.mLocation.ExpandButton = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_OPEN_EVENTLOG, function() {
-                        self.expandExpandableList(!self.mLocation.IsExpanded, self.mLocation);
-                    }, '', 6);
-                }
+                var buttonLayout = $('<div class="expand-button"/>');
+                scrollHeader.append(buttonLayout);
+                this.mLocation.ExpandButton = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_OPEN_EVENTLOG, function() {
+                    self.expandExpandableList(!self.mLocation.IsExpanded, self.mLocation);
+                }, '', 6);
             }
         }
 
@@ -694,35 +692,31 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
         var row90 = this.addRow(90, 'with-dialog-background');
         column.append(row90);
         {
-            // first layer
-            var layer = $('<div class="layer"/>');
-            row90.append(layer);
+            var slotContainer = $('<div class="below-container"/>');
+            row90.append(slotContainer);
+            var listContainerLayout = $('<div class="l-list-container"/>');
+            slotContainer.append(listContainerLayout);
+            this.mSettlement.ListContainer = listContainerLayout.createList(2);
+            this.mSettlement.ListScrollContainer = this.mSettlement.ListContainer.findListScrollContainer();
+        
+            var scrollHeader = $('<div class="upper-container with-small-dialog-background"/>')
+            row90.append(scrollHeader);
             {
-                var slotContainer = $('<div class="below-list-container"/>');
-                layer.append(slotContainer);
-                var listContainerLayout = $('<div class="l-list-container"/>');
-                slotContainer.append(listContainerLayout);
-                this.mSettlement.ListContainer = listContainerLayout.createList(2);
-                this.mSettlement.ListScrollContainer = this.mSettlement.ListContainer.findListScrollContainer();
-            }
+                var logLayout = $('<div class="expandable-container"/>'); 
+                scrollHeader.append(logLayout);
+                this.mSettlement.ExpandableList = logLayout.createList(2);
+                this.mSettlement.ExpandableListScroll = this.mSettlement.ExpandableList.findListScrollContainer();
 
-            var layer = $('<div class="layer"/>');
-            row90.append(layer);
-            {
-                var scrollHeader = this.addContainer(null, 5.3, 'with-small-dialog-background');
-                layer.append(scrollHeader);
-                {
-                    var logLayout = $('<div class="expandable-container"/>'); 
-                    scrollHeader.append(logLayout);
-                    this.mSettlement.ExpandableList = logLayout.createList(2);
-                    this.mSettlement.ExpandableListScroll = this.mSettlement.ExpandableList.findListScrollContainer();
+                this.mSettlement.ExpandLabel = $('<div class="expandable-label-container"/>');
+                scrollHeader.append(this.mSettlement.ExpandLabel);
+                var label = $('<div class="label text-font-normal font-bold font-color-ink">-Select Filter-</div>');
+                this.mSettlement.ExpandLabel.append(label);
 
-                    var buttonLayout = $('<div class="expand-button"/>');
-                    scrollHeader.append(buttonLayout);
-                    this.mSettlement.ExpandButton = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_OPEN_EVENTLOG, function() {
-                        self.expandExpandableList(!self.mSettlement.IsExpanded, self.mSettlement);
-                    }, '', 6);
-                }
+                var buttonLayout = $('<div class="expand-button"/>');
+                scrollHeader.append(buttonLayout);
+                this.mSettlement.ExpandButton = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_OPEN_EVENTLOG, function() {
+                    self.expandExpandableList(!self.mSettlement.IsExpanded, self.mSettlement);
+                }, '', 6);
             }
         }
 
@@ -956,7 +950,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         row.append(buttonLayout);
                         this.mSettlement.SendCaravanButton = buttonLayout.createTextButton('Send Caravan', function ()
                         {
-                            //self.createSendCaravanPopupDialog();
+                            self.createSendCaravanPopupDialog(true);
                         }, '', 4);
 
                         var row = this.addContainer(null, 4.6);
@@ -966,7 +960,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         row.append(buttonLayout);
                         var button = buttonLayout.createTextButton('Send Mercenary', function ()
                         {
-                            //self.createSendMercenaryPopupDialog();
+                            self.createSendCaravanPopupDialog(false);
                         }, '', 4);
 
                         var row = this.addContainer(null, 4.6);
@@ -2328,6 +2322,34 @@ WorldEditorScreen.prototype.addFilterData = function (_data)
     this.addSettlementFilter(_data.Settlements);
     this.addLocationFilter(_data.Locations);
 };
+WorldEditorScreen.prototype.addExpandableContent = function (_data, _parent)
+{
+    _parent.ExpandableListScroll.empty();
+    var self = this;
+    var placeholderName = _parent.ExpandLabel.find('.label:first');
+
+    for (var i = 0; i < _data.length; i++) {
+        var entry = this.addExpandableEntry(_data[i], _data[i], _parent);
+        entry.click(this, function(_event) {
+            var div = $(this);
+            if (div.hasClass('is-selected') !== true) {
+                _parent.ExpandableList.deselectListEntries();
+                div.addClass('is-selected');
+                var label = div.data('label');
+                placeholderName.html(label);
+                self.expandExpandableList(false, _parent, 20.0);
+            }
+        });
+
+        if (i === 0) {
+            entry.addClass('is-selected');
+            placeholderName.html(_data[0]);
+        }
+    }
+
+    _parent.IsExpanded = false;
+    this.expandExpandableList(false, _parent);
+}
 WorldEditorScreen.prototype.addExpandableEntry = function (_data, _label, _parent)
 {
     var result = $('<div class="expandable-row"/>');
@@ -2342,12 +2364,42 @@ WorldEditorScreen.prototype.addExpandableEntry = function (_data, _label, _paren
     entry.append(label);
     return entry;
 };
-WorldEditorScreen.prototype.expandExpandableList = function (_value, _parent)
+WorldEditorScreen.prototype.expandExpandableList = function (_value, _parent, _maxHeight)
 {
-    var self = this;
+    // without animation
+    if (_parent.IsExpanded == _value) {
+        _parent.ExpandableListScroll.showThisDiv(false);
+        _parent.ExpandLabel.showThisDiv(true);
+        return;
+    }
 
-    if (_parent.IsExpanded == _value)
-    {
+    if (_maxHeight === undefined || _maxHeight === null)
+        _maxHeight = 55.3;
+
+    var count = _parent.ExpandableList.getListEntryCount('list-entry-for-expandable');
+    var minHeight = '4.3rem';
+    var maxHeight = count <= 1 ? '8.3rem' : Math.min(count * 4.3, _maxHeight) + 'rem';
+    _parent.ExpandableList.css('height', _value === true ? maxHeight : minHeight);
+
+    if (_value === false) {
+        _parent.ExpandableListScroll.showThisDiv(false);
+        _parent.ExpandLabel.showThisDiv(true);
+    }
+       
+    _parent.ExpandableList.trigger('update', true);
+
+    if (_value === true) {
+        _parent.ExpandLabel.showThisDiv(false);
+        _parent.ExpandableListScroll.showThisDiv(true);
+    }
+
+    // change button image
+    _parent.ExpandButton.changeButtonImage(Path.GFX + (_value === true ? Asset.BUTTON_CLOSE_EVENTLOG :  Asset.BUTTON_OPEN_EVENTLOG));
+    _parent.IsExpanded = !_parent.IsExpanded;
+
+    /* with animation
+    var self = this;
+    if (_parent.IsExpanded == _value) {
         _parent.ExpandableList.showListScrollbar(_value);
         return;
     }
@@ -2377,7 +2429,7 @@ WorldEditorScreen.prototype.expandExpandableList = function (_value, _parent)
         }
     });
 
-    _parent.IsExpanded = !_parent.IsExpanded;
+    _parent.IsExpanded = !_parent.IsExpanded;*/
 };
 
 WorldEditorScreen.prototype.notifyBackendOnConnected = function()
@@ -2711,6 +2763,81 @@ WorldEditorScreen.prototype.notifyBackendGetSituationEntries = function( _listSc
         }
 
         self.addSituationEntriesToPopupDialog(_data, _listScrollContainer);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendGetValidSettlementsToSendCaravan = function( _listScrollContainer )
+{
+    var self = this;
+    var id = this.mSettlement.Selected.data('entry').ID;
+
+    SQ.call(this.mSQHandle, 'onGetValidSettlementsToSendCaravan', id , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to get Valid Settlements To Send Caravan. Invalid data result.');
+            return;
+        }
+
+        self.addValidSettlementsToSendCavaran(_data, _listScrollContainer);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendSendCaravanTo = function( _result )
+{
+    var id = this.mSettlement.Selected.data('entry').ID;
+    var des = null;
+    var resources =  parseInt(_result.Input.getInputText());
+    var key = 'Peasants';
+    var no0 = _result.Checkbox[0].is(':checked');
+    var no1 = _result.Checkbox[1].is(':checked');
+    var no2 = _result.Checkbox[2].is(':checked');
+
+    var selectedEntry = _result.ListScrollContainer.find('.is-selected:first');
+    if (selectedEntry.length > 0) {
+        des = selectedEntry.data('ID');
+    }
+
+    var selectedEntry = _result.ExpandableListScroll.find('.is-selected:first');
+    if (selectedEntry.length > 0) {
+        key = selectedEntry.data('key');
+    }
+
+    SQ.call(this.mSQHandle, 'onSendCaravanTo', [id, des, resources, key, no0, no1, no2]);
+};
+
+WorldEditorScreen.prototype.notifyBackendSendMercenaryTo = function( _result )
+{
+    var id = this.mSettlement.Selected.data('entry').ID;
+    var des = null;
+    var resources =  parseInt(_result.Input.getInputText());
+    var key = 'Cultists';
+    var no0 = _result.Checkbox[0].is(':checked');
+    var no1 = _result.Checkbox[1].is(':checked');
+    var no2 = _result.Checkbox[2].is(':checked');
+
+    var selectedEntry = _result.ListScrollContainer.find('.is-selected:first');
+    if (selectedEntry.length > 0) {
+        des = selectedEntry.data('ID');
+    }
+
+    var selectedEntry = _result.ExpandableListScroll.find('.is-selected:first');
+    if (selectedEntry.length > 0) {
+        key = selectedEntry.data('key');
+    }
+
+    SQ.call(this.mSQHandle, 'onSendMercenaryTo', [id, des, resources, key, no0, no1, no2]);
+};
+
+WorldEditorScreen.prototype.notifyBackendGetTroopTemplate = function( _parent , _type)
+{
+    var self = this;
+
+    SQ.call(this.mSQHandle, 'onGetTroopTemplate', _type , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to get Valid Settlements To Send Caravan. Invalid data result.');
+            return;
+        }
+
+        self.addExpandableContent(_data, _parent);
     });
 };
 

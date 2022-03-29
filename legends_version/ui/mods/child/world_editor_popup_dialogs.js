@@ -41,7 +41,6 @@ WorldEditorScreen.prototype.createScenarioPopupDialog = function()
 };
 WorldEditorScreen.prototype.createScenarioDialogContent = function(_dialog) 
 {
-    var self = this;
     var content = $('<div class="scenarios-content-container"/>');
 
     var scenarioListContainerLayout = $('<div class="l-list-container"></div>');
@@ -234,7 +233,6 @@ WorldEditorScreen.prototype.createChooseFactionAlliancePopupDialog = function()
 };
 WorldEditorScreen.prototype.createChooseFactionAllianceDialogContent = function(_dialog) 
 {
-    var self = this;
     var content = $('<div class="alliance-content-container"/>');
 
     var tab = $('<div class="alliance-tab-container"/>');
@@ -335,7 +333,7 @@ WorldEditorScreen.prototype.createFactionAllianceEntry = function(_data, _listSc
     entry.append(rightColumn);
     
     // for name
-    var row = $('<div class="row"/>');
+    var row = $('<div class="row-half"/>');
     rightColumn.append(row);
     var name = $('<div class="troop-name title-font-normal font-bold font-color-title">' + _data.Name + '</div>');
     row.append(name);
@@ -412,7 +410,6 @@ WorldEditorScreen.prototype.createChooseFactionPopupDialog = function(_screen, _
 };
 WorldEditorScreen.prototype.createChooseFactionDialogContent = function(_dialog) 
 {
-    var self = this;
     var content = $('<div class="troops-content-container"/>');
 
     var tab = $('<div class="troops-tab-container"/>');
@@ -467,7 +464,7 @@ WorldEditorScreen.prototype.createChooseFactionEntry = function(_data, _listScro
     entry.append(rightColumn);
     
     // for name
-    var row = $('<div class="row"/>');
+    var row = $('<div class="row-half"/>');
     rightColumn.append(row);
     var name = $('<div class="troop-name title-font-normal font-bold font-color-title">' + _data.Name + '</div>');
     row.append(name);
@@ -602,7 +599,6 @@ WorldEditorScreen.prototype.createAddTroopPopupDialog = function()
 };
 WorldEditorScreen.prototype.createAddTroopDialogContent = function(_dialog) 
 {
-    var self = this;
     var content = $('<div class="troops-content-container"/>');
 
     var tab = $('<div class="troops-tab-container"/>');
@@ -662,7 +658,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     var rightColumn = $('<div class="column-is-75"/>');
     entry.append(rightColumn);
     
-    var row = $('<div class="row"/>');
+    var row = $('<div class="row-half"/>');
     rightColumn.append(row);
     
     // to display the cost of this troop entry
@@ -709,7 +705,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     }, null, 'opacity-none');
 
     // for name
-    var row = $('<div class="row"/>');
+    var row = $('<div class="row-half"/>');
     rightColumn.append(row);
     var name = $('<div class="troop-name title-font-normal font-bold font-color-white">' + _data.Name + '</div>');
     row.append(name);
@@ -745,7 +741,7 @@ WorldEditorScreen.prototype.createAttachedLocationPopupDialog = function(_isAtta
 {
     var self = this;
     this.notifyBackendPopupDialogIsVisible(true);
-    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog(_isAttach === true ? 'What To Build' : 'Choose a Situation', null, null, 'choose-building-popup');
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog(_isAttach === true ? 'What To Build' : 'Choose Situation', null, null, 'choose-building-popup');
     var title = this.mCurrentPopupDialog.findPopupDialogTitle();
     title.removeClass('font-bottom-shadow');
     title.removeClass('font-color-title');
@@ -781,7 +777,7 @@ WorldEditorScreen.prototype.createAttachedLocationPopupDialog = function(_isAtta
         self.notifyBackendPopupDialogIsVisible(false);
     });
     
-    // add building entries so you can pick one
+    // add entries so you can pick one
     if (_isAttach === true)
         this.notifyBackendGetAttachedLocationEntries(listScrollContainer);
     else
@@ -825,7 +821,6 @@ WorldEditorScreen.prototype.createBuildingPopupDialog = function(_slot)
 };
 WorldEditorScreen.prototype.createBuildingPopupDialogContent = function(_dialog) 
 {
-    var self = this;
     var content = $('<div class="b-content-container"/>');
 
     var container = $('<div class="l-list-container"></div>');
@@ -920,6 +915,267 @@ WorldEditorScreen.prototype.addBuildingEntriesToPopupDialog = function(_data, _l
                 div.addClass('is-selected');
             }
         });
-        image.bindTooltip({ contentType: 'ui-element', entityId: 0, elementId: entry.TooltipId , elementOwner: 'woditor.buildings'});
+        image.bindTooltip({ contentType: 'ui-element', elementId: entry.TooltipId});
     }
+};
+
+
+
+
+/*
+    Send Caravan
+*/
+WorldEditorScreen.prototype.createSendCaravanPopupDialog = function(_isCaravan) 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog(_isCaravan === true ? 'Send a Caravan To' : 'Send Mercenary To', null, null, 'send-caravan-popup');
+
+    // create: content
+    var result = this.createSendCaravanDialogContent(this.mCurrentPopupDialog);
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // create: drop down menu
+    result.ExpandableList.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: true});
+    result.ExpandableListScroll = result.ExpandableList.findListScrollContainer();
+
+    // create: button to toggle drop down menu
+    result.ExpandButton = result.ButtonLayout.createImageButton(Path.GFX + Asset.BUTTON_OPEN_EVENTLOG, function() {
+        self.expandExpandableList(!result.IsExpanded, result, 20.0);
+    }, '', 6);
+
+    // create: list
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: true});
+    result.ListScrollContainer = result.ListContainer.findListScrollContainer();
+
+    // give the default resources for the caravan
+    var resources = _isCaravan ? (this.mSettlement.Selected.data('entry').Resources * 0.5) : (150 + Math.floor(Math.random() * (350 - 60 + 1) ) + 60);
+    result.Input.val('' + resources + '');
+
+    // add the ok button
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        if (_isCaravan === true)
+            self.notifyBackendSendCaravanTo(result);
+        else
+            self.notifyBackendSendMercenaryTo(result);
+
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    
+    // add the cancel button
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.findPopupDialogCancelButton().addClass('move-to-left-abit');
+    this.mCurrentPopupDialog.findPopupDialogOkButton().addClass('move-to-right-abit');
+
+    // add building entries so you can pick one
+
+    if (_isCaravan === true) {
+        this.notifyBackendGetValidSettlementsToSendCaravan(result.ListScrollContainer);
+        this.notifyBackendGetTroopTemplate(result, 'caravan');
+    }
+    else {
+        this.addValidSettlementsToSendMercenary(result.ListScrollContainer);
+        this.notifyBackendGetTroopTemplate(result, 'mercenary');
+    }
+};
+WorldEditorScreen.prototype.createSendCaravanDialogContent = function(_dialog) 
+{
+    var self = this;
+    var content = $('<div class="s-content-container"/>');
+
+    var leftColumn = $('<div class="column-is-left"/>');
+    content.append(leftColumn);
+
+    // resouces input
+    var row = $('<div class="row"/>');
+    leftColumn.append(row);
+    var title = $('<div class="title title-font-big font-color-title">Resources</div>');
+    row.append(title);
+    var inputLayout = $('<div class="l-input-half-big"/>');
+    row.append(inputLayout);
+    var input = inputLayout.createInput('', 0, 5, 1, null, 'title-font-big font-bold font-color-brother-name');
+    input.css('background-size', '100% 4.0rem'); // simple solution to get a smaller input without much work :evilgrins
+    input.assignInputEventListener('focusout', function(_input, _event) {
+        var text = _input.getInputText();
+        var value = 0;
+        var isValid = true;
+        if (text.length <= 0) {
+            isValid = false;
+        }
+        else {
+            value = self.isValidNumber(text, 0, 99999);
+            if (value === null)
+                isValid = false;
+        }
+        if (isValid === true)
+            _input.val('' + value + '');
+        else 
+            _input.val('' + 100 + '');
+    });
+
+    var row = $('<div class="row"/>');
+    leftColumn.append(row);
+    var title = $('<div class="title title-font-big font-color-title">Guard Template</div>');
+    row.append(title);
+
+    var checkboxColumn = $('<div class="checkbox-column"/>');
+    leftColumn.append(checkboxColumn);
+    {
+        var checkbox1 = this.createCheckBoxDivForPopupDialog({Name: 'Is Attackable By AI', TooltipId: 'woditor.isattackablebyai'}, checkboxColumn, true);
+        var checkbox2 = this.createCheckBoxDivForPopupDialog({Name: 'Is Slower At Night', TooltipId: 'woditor.issloweratnight'}, checkboxColumn, true);
+        var checkbox3 = this.createCheckBoxDivForPopupDialog({Name: 'Is Dropping More Loot', TooltipId: 'woditor.isdroppingmoreloot'}, checkboxColumn, false);
+    }
+
+    var dropDownMenu = $('<div class="drop-down-menu-container"/>');
+    leftColumn.append(dropDownMenu);
+    {
+        var menuLayout = $('<div class="expandable-container"/>');
+        dropDownMenu.append(menuLayout);
+        var menuListContainer = $('<div class="ui-control list has-frame"/>');
+        menuLayout.append(menuListContainer);
+        var menuScrollContainer = $('<div class="scroll-container"/>');
+        menuListContainer.append(menuScrollContainer);
+
+        var labelContainer = $('<div class="expandable-label-container"/>');
+        dropDownMenu.append(labelContainer);
+        var label = $('<div class="label text-font-normal font-bold font-color-ink">-Select Filter-</div>');
+        labelContainer.append(label);
+
+        var buttonLayout = $('<div class="expand-button"/>');
+        dropDownMenu.append(buttonLayout);
+    }
+
+    var rightColumn = $('<div class="column-is-right"/>');
+    content.append(rightColumn);
+    {
+        var container = $('<div class="l-list-container"></div>');
+        rightColumn.append(container);
+
+        var listContainer = $('<div class="ui-control list has-frame"/>');
+        container.append(listContainer);
+        var scrollContainer = $('<div class="scroll-container"/>');
+        listContainer.append(scrollContainer);
+    }
+
+    return {
+        IsExpanded: false,
+        ExpandLabel: labelContainer,
+        ExpandButton: null,
+        ExpandableList: menuListContainer,
+        ExpandableListScroll: null,
+        Content: content,
+        Input: input,
+        ButtonLayout: buttonLayout,
+        ListContainer: listContainer,
+        ListScrollContainer: null,
+        Checkbox: [checkbox1, checkbox2, checkbox3],
+    };
+};
+WorldEditorScreen.prototype.addValidSettlementsToSendMercenary = function(_listScrollContainer) 
+{
+    var currentID = this.mSettlement.Selected.data('entry').ID;
+    var toLoad = this.mSettlement.Data;
+    var chosen = true;
+    for (var i = 0; i < toLoad.length; i++) {
+        var data = toLoad[i];
+        if (data.ID === currentID)
+            continue;
+
+        this.addSettlementEntriesToPopUpDialog(data, _listScrollContainer, chosen);
+        chosen = false;
+    }
+};
+WorldEditorScreen.prototype.addValidSettlementsToSendCavaran = function(_enemyIDs, _listScrollContainer) 
+{
+    var currentID = this.mSettlement.Selected.data('entry').ID;
+    var toLoad = this.mSettlement.Data;
+    var chosen = true;
+    for (var i = 0; i < toLoad.length; i++) {
+        var data = toLoad[i];
+        if (data.IsIsolated === true || data.ID === currentID || (_enemyIDs.length > 0 && _enemyIDs.indexOf(data.ID) >= 0))
+            continue;
+
+        this.addSettlementEntriesToPopUpDialog(data, _listScrollContainer, chosen);
+        chosen = false;
+    }
+};
+WorldEditorScreen.prototype.addSettlementEntriesToPopUpDialog = function(_data, _listScrollContainer, _isSelected) 
+{
+    var self = this;
+    var result = $('<div class="l-settlement-row"/>');
+    _listScrollContainer.append(result);
+
+    var entry = $('<div class="ui-control list-entry-fat"/>');
+    result.append(entry);
+    entry.data('ID', _data.ID);
+    entry.click(this, function(_event) {
+        var div = $(this);
+        if (div.hasClass('is-selected') === false) {
+            _listScrollContainer.find('.is-selected').each(function (_index, _element) {
+                $(_element).removeClass('is-selected');
+            });
+            div.addClass('is-selected');
+        }
+    });
+
+    if (_isSelected === true) {
+        entry.addClass('is-selected');
+    }
+
+    // settlement image
+    var imageContainer = $('<div class="l-settlement-image-container"/>');
+    entry.append(imageContainer);
+
+    imageContainer.createImage(Path.GFX + _data.ImagePath, function(_image) {
+        _image.centerImageWithinParent(0, 0, 1.0);
+        _image.removeClass('opacity-none');
+    }, null, 'opacity-none');
+
+    // banner image
+    var imageContainer = $('<div class="l-settlement-banner-container"/>');
+    entry.append(imageContainer);
+
+    var find = (_data.Owner !== undefined && _data.Owner !== null) ? _data.Owner : _data.Faction;
+    imageContainer.createImage(Path.GFX + this.mFaction.Data[find].ImagePath, function(_image) {
+        _image.centerImageWithinParent(0, 0, 1.0);
+        _image.removeClass('opacity-none');
+    }, null, 'opacity-none');
+
+    var name = $('<div class="name title-font-normal font-bold font-color-white">' + _data.Name + '</div>');
+    entry.append(name);
+
+    var buttonLayout = $('<div class="distance-button"/>');
+    entry.append(buttonLayout);
+    var button = buttonLayout.createTextButton('' + _data.Distance + '', null, 'display-block', 6);
+    button.enableButton(false);
+    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.distance' });
+};
+
+WorldEditorScreen.prototype.createCheckBoxDivForPopupDialog = function(_definition, _parentDiv, _isChecked) 
+{
+    var row = $('<div class="row"></div>');
+    _parentDiv.append(row);
+    var control = $('<div class="control"/>');
+    row.append(control);
+    var checkBox = $('<input type="checkbox" id="' + _definition.TooltipId + '"/>');
+    control.append(checkBox);
+    var checkBoxLabel = $('<label class="text-font-normal font-color-subtitle" for="' + _definition.TooltipId + '">' + _definition.Name + '</label>');
+    control.append(checkBoxLabel);
+    checkBox.iCheck({
+        checkboxClass: 'icheckbox_flat-orange',
+        radioClass: 'iradio_flat-orange',
+        increaseArea: '30%'
+    });
+
+    if (_isChecked === true)
+        checkBox.iCheck('check');
+
+    checkBoxLabel.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
+    return checkBox;
 };

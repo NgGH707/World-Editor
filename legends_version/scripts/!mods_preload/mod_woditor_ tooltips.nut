@@ -49,7 +49,7 @@ this.getroottable().Woditor.hookTooltips <- function ()
 
 				if (_elementId != null)
 				{
-					if (_elementOwner == "woditor.buildings")
+					/*if (_elementOwner == "woditor.buildings")
 		 			{
 		 				local tooltip = this.Woditor.Buildings.Tooltip[_elementId].getTooltip();
 
@@ -59,7 +59,7 @@ this.getroottable().Woditor.hookTooltips <- function ()
 		 				}
 		 				
 		 				return tooltip;
-		 			}
+		 			}*/
 
 					if (_elementOwner == "woditor.attached_location")
 		 			{
@@ -88,7 +88,16 @@ this.getroottable().Woditor.hookTooltips <- function ()
 	 		}
 
 			local tooltip = queryTooltipData(_entityId, _elementId, _elementOwner);
-			if (tooltip != null) return tooltip;
+
+			if (tooltip != null)
+			{
+				if (_elementOwner != null && _elementOwner == "woditor.buildings")
+				{
+					this.Const.AddBuildingHints(tooltip);
+				}
+
+				return tooltip;
+			} 
 
 			switch (_elementId) 
 			{
@@ -796,506 +805,36 @@ this.getroottable().Woditor.hookTooltips <- function ()
 						text = "This is not an input, please stop clicking on it XD."
 					},
 				];
+
+			case "woditor.isattackablebyai":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Is Attackable By AI"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Decide whether other AI roaming parties can target this party or not. Player can still attack this party."
+					},
+				];
+
+			case "woditor.issloweratnight":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Is Slower At Night"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Decide whether this party receives a penalty to movement speed when the night comes."
+					},
+				];
 			}
 			
-			return null;
-		}
-
-		obj.getAttachedLocationTooltip <- function( _elementId )
-		{
-			switch(_elementId)
-			{
-			case "attached_location.workshop":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Workshop"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "The workshop is proficient in making all kinds of tools and other supplies needed to keep carts and machines working."
-					},
-				];
-
-			case "attached_location.wool_spinner":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Wool Spinner"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "The wool of the sheep herded here is spun into wool and then shipped to the next settlement. Refined wares like these can be quite valuable."
-					},
-				];
-
-			case "attached_location.wooden_watchtower":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Wooden Watchtower"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "A wooden watchtower with a small garrison on watch duty."
-					},
-				];
-
-			case "attached_location.winery":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Winery"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "This winery is surrounded by a large vineyard. The wine produced here is a priced commodity in wealthier circles."
-					},
-				];
-
-			case "attached_location.wheat_fields":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Wheat Fields"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Golden wheat can be seen glistening in the sun from afar. Many people from the nearby settlement work here, farmhands and daytalers mostly."
-					},
-				];
-
-			case "attached_location.trapper":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Trapper"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Small huts provide shelter for the trappers living here and setting traps for animals with valuable furs."
-					},
-				];
-
-			case "attached_location.surface_iron_vein":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Surface Iron Vein"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "This surfaced iron vein attracted a small mining camp that is gathering the precious metal. Access to this resource increases the selection of weapons available in the next settlement."
-					},
-				];
-
-			case "attached_location.surface_copper_vein":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Surface Copper Vein"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "A mining camp has been set up to mine a surfaced copper vein and smelt the ore into ingots on the spot."
-					},
-				];
-
-			case "attached_location.stone_watchtower":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Stone Watchtower"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "A stone watchtower occupied by well trained soldiers on guard duty."
-					},
-				];
-
-			case "attached_location.silk_farm":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Silk Farm"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "In these huts the precious silk is spun from cocoons of small insects by secret methods."
-					},
-				];
-
-			case "attached_location.salt_mine":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Salt Mine"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "A mine in which precious rock salt is extracted and shipped off to only the most trustworthy traders."
-					},
-				];
-
-			case "attached_location.plantation":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Plantation"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "All kinds of wonderous spices and herbs are cultivated in this plantation. A small and rare fruitful spot in the barren desert"
-					},
-				];
-
-			case "attached_location.pig_farm":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Pig Farm"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "The smell of this pig farm is just as distinct as the squeeking sounds coming from the muddy pits. The pork chops produced here are usually sold in the nearby settlement."
-					},
-				];
-
-			case "attached_location.peat_pit":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Peat Pit"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "These peat pits produce a valuable fuel source once the peat has been dug up and dried."
-					},
-				];
-
-			case "attached_location.ore_smelters":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Ore Smelters"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "The burning hot ore smelters produce high quality metal ingots used by able weapon smiths to create the most sophisticated of arms."
-					},
-				];
-
-			case "attached_location.orchard":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Orchard"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Dense rows of trees with ripe fruit frame a small warehouse where everything is stored until offered on local markets."
-					},
-				];
-
-			case "attached_location.mushroom_grove":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Mushroom Grove"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Hidden in the mud and reed, the expert gatherer can find groves and caves full of precious mushrooms like these."
-					},
-				];
-
-			case "attached_location.militia_trainingcamp":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Militia Barracks"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "A large compound of militia barracks. This camp will turn ordinary peasants into somewhat able soldiers that can defend their home and their loved ones."
-					},
-				];
-
-			case "attached_location.lumber_camp":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Lumber Camp"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "This lumber camp is used as a base for lumberjacks on the search for the most precious and durable materials in the nearby woods."
-					},
-				];
-
-			case "attached_location.leather_tanner":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Leather Tanner"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "This leather tanner\'s workshop produces durable leather pieces from hides. The supply of this leather will increase the availability of light armor in the nearest settlement."
-					},
-				];
-
-			case "attached_location.incense_dryer":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Incense Dryer"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Tree sap is gathered from the surrounding trees and dried in the sun to create valuable incense."
-					},
-				];
-
-			case "attached_location.hunters_cabin":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Hunter\'s Cabin"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Hunters take shelter in these small huts while on the hunt. Chopped up game, venison and hides hung up to dry in the sun surround the huts."
-					},
-				];
-
-			case "attached_location.herbalists_grove":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Herbalist\'s Grove"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "In this remote grove the knowing herbalist collects all kinds of medicinal plants and roots."
-					},
-				];
-
-			case "attached_location.gold_mine":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Gold Mine"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "A deep mine build atop a gold ore vein. This rare metal has a tendency to bring out the worst in people."
-					},
-				];
-
-			case "attached_location.goat_herd":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Goat Pens"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "The goats held here are mainly used for their milk which is then turned into cheese to make it more durable."
-					},
-				];
-
-			case "attached_location.gem_mine":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Gem Mine"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "The shiny gems found in this mine are usually brought directly to the next settlement in well-guarded caravans for further refinement."
-					},
-				];
-
-			case "attached_location.gatherers_hut":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Gatherer\'s Hut"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Even in sparse environments an experienced gatherer can find berries, roots and other edible things. Although not the most delicious, it can still keep a man fed."
-					},
-				];
-
-			case "attached_location.fortified_outpost":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Barracks"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Large barracks housing a host of professional soldiers."
-					},
-				];
-
-			case "attached_location.fletchers_hut":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Arrow Maker\'s Shed"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "The arrow makers in these sheds produce all kinds of ranged ammunition which they then sell at the nearest settlement."
-					},
-				];
-
-			case "attached_location.fishing_huts":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Fishing Huts"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "A small group of huts surrounded by nets, spears, hooks and other fishing equipment. The smell from baskets of fish guts travels quite a distance."
-					},
-				];
-
-			case "attached_location.dye_maker":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Dye Maker"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "This dye maker creates precious dies from all kinds of ingredients. The recipes for these expensive goods are well-kept secrets."
-					},
-				];
-
-			case "attached_location.brewery":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Brewery"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "This brewery produces large quantities of beer for both local taverns and traders."
-					},
-				];
-
-			case "attached_location.blast_furnace":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Blast Furnace"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "The blast furnace produces the blazing temperatures needed to make the most durable of metal alloys. Handy armorsmiths will use these alloys to create sturdy armor in the nearest settlement."
-					},
-				];
-
-			case "attached_location.beekeeper":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Beekeeper"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Surrounded by humming bees, these small huts are home to beekeepers. The honey they produce is a precious ingredient to sweeten pastries and other foods."
-					},
-				];
-
-			case "attached_location.amber_collector":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Amber Collector"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "The collectors living in these huts search for valuable amber shards along the shore."
-					},
-				];
-			}
-
 			return null;
 		}
 	});

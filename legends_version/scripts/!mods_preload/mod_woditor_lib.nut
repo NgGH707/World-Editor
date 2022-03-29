@@ -141,12 +141,6 @@ this.getroottable().Woditor.createLib <- function ()
 			{
 				id = 11,
 				type = "hint",
-				icon = "ui/icons/mouse_left_button.png",
-				text = "Change attachment"
-			},
-			{
-				id = 11,
-				type = "hint",
 				icon = "ui/icons/mouse_left_button_ctrl.png",
 				text = "Discard attachment"
 			}
@@ -172,12 +166,6 @@ this.getroottable().Woditor.createLib <- function ()
 	gt.Const.AddSituationHints <- function( _tooltips )
 	{
 		_tooltips.extend([
-			{
-				id = 11,
-				type = "hint",
-				icon = "ui/icons/mouse_left_button.png",
-				text = "Change situation"
-			},
 			{
 				id = 11,
 				type = "hint",

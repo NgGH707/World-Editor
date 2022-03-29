@@ -1,3 +1,15 @@
+$.fn.showThisDiv = function(_value)
+{
+    if (_value === true)
+    {
+        this.addClass('display-block').removeClass('display-none');
+    }
+    else
+    {
+        this.addClass('display-none').removeClass('display-block');
+    }
+    return this;
+}
 
 // simple function to help bind event listener to a input
 $.fn.assignInputEventListener = function(_type, _callback)

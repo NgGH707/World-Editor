@@ -40,8 +40,7 @@ WorldEditorScreen.prototype.addSettlementFilter = function (_data)
     this.mSettlement.ExpandableListScroll.empty();
 
     // add the place holder
-    var placeholder = this.addExpandableEntry({NoFilter: true}, '-Select Filter-', this.mSettlement);
-    var placeholderName = placeholder.find('.label:first');
+    var placeholderName = this.mSettlement.ExpandLabel.find('.label:first');
 
     // add the filter-all option
     this.mSettlement.DefaultFilter = this.addExpandableEntry({NoFilter: true}, 'All', this.mSettlement);
@@ -111,7 +110,8 @@ WorldEditorScreen.prototype.addSettlementFilter = function (_data)
         });
     }
 
-    this.mSettlement.ExpandableList.showListScrollbar(false);
+    this.mSettlement.IsExpanded = false;
+    this.expandExpandableList(false, this.mSettlement);
 };
 
 WorldEditorScreen.prototype.filterSettlementsByType = function (_filter1, _value1, _filter2, _value2)
@@ -393,8 +393,6 @@ WorldEditorScreen.prototype.addSituationEntry = function (_data, _parentDiv)
 
         if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
             self.notifyBackendRemoveSituation(id);
-        //else
-            //self.createChooseBuildingPopupDialog(id);
     });
     image.mouseover(function() {
         this.classList.add('is-highlighted');
@@ -425,8 +423,6 @@ WorldEditorScreen.prototype.addAttachmentEntry = function (_data)
 
         if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
             self.notifyBackendRemoveAttachedLocation(id);
-        //else
-            //self.createChooseBuildingPopupDialog(id);
     });
     image.mouseover(function() {
         this.classList.add('is-highlighted');

@@ -196,9 +196,30 @@ this.world_editor_screen <- {
 		return this.Woditor.Helper.convertTroopEntriesToUIData(_data);
 	}
 
+	function onGetTroopTemplate( _type )
+	{
+		return this.Woditor.Helper.convertTroopTemplateToUIData(_type);
+	}
+
 	function onCollectAllianceData( _data )
 	{
 		return this.Woditor.Helper.convertFactionAllianceToUIData(_data);
+	}
+
+	function onGetValidSettlementsToSendCaravan( _id )
+	{
+		local entity = this.World.getEntityByID(_id);
+		local result = [];
+
+		foreach(settlement in this.World.EntityManager.getSettlements())
+		{
+			if (settlement.getID() == _id) continue;
+			if (entity.isAlliedWith(settlement)) continue;
+			if (settlement.getOwner() != null && !settlement.getOwner().isNull() && entity.isAlliedWith(settlement.getOwner())) continue;
+			result.push(settlement.getID());
+		}
+
+		return result;
 	}
 
 	function onUpdateFactionAlliance( _data )
@@ -670,6 +691,228 @@ this.world_editor_screen <- {
 	function onUpdataFactionRelationDeterioration( _data )
 	{
 		this.World.FactionManager.getFaction(_data[0]).getFlags().set("RelationDeterioration",_data[1]);
+	}
+
+	function onSendCaravanTo( _data )
+	{
+		local resources = _data[2];
+		local start = this.World.getEntityByID(_data[0]);
+		local destination = this.World.getEntityByID(_data[1]);
+		local faction =  this.World.FactionManager.getFaction(this.MSU.Array.getRandom(start.getFactions()));
+
+		if (_data[3].find("Noble") != null && faction.getType() != this.Const.FactionType.NobleHouse)
+		{
+			_data[3] = "CaravanSouthern";
+		}
+
+		local party = faction.spawnEntity(start.getTile(), "Trading Caravan", false, this.Const.World.Spawn[_data[3]], resources);
+		party.getSprite("banner").Visible = false;
+		party.getSprite("base").Visible = false;
+		party.setDescription("A trading caravan from " + start.getName() + " that is transporting all manner of goods between settlements.");
+		party.setFootprintType(this.Const.World.FootprintsType.Caravan);
+		party.setMirrored(true);
+		party.setAttackableByAI(_data[4]);
+		party.setSlowerAtNight(_data[5]);
+		party.setLootScale(_data[6] ? 2.0 : 1.0);
+		party.getFlags().set("IsCaravan", true);
+		party.getFlags().set("IsRandomlySpawned", true);
+
+		if (this.World.Assets.m.IsBrigand)
+		{
+			party.setVisibleInFogOfWar(true);
+			party.setImportant(true);
+			party.setDiscovered(true);
+		}
+
+		if (start.getProduce().len() == 0) start.updateProduce();
+	
+		local produce = 3
+		if(this.LegendsMod.Configs().LegendWorldEconomyEnabled())
+		{
+			produce = this.Math.max(3, 3 + this.Math.round(0.025 * resources));
+		}
+
+		for( local j = 0; j < produce; j = ++j )
+		{
+			party.addToInventory(start.getProduce()[this.Math.rand(0, start.getProduce().len() - 1)]);
+		}
+
+		party.getLoot().Money = this.Math.rand(0, 100);
+		party.getLoot().ArmorParts = this.Math.rand(0, 10);
+		party.getLoot().Medicine = this.Math.rand(0, 10);
+		party.getLoot().Ammo = this.Math.rand(0, 25);
+
+		if(this.LegendsMod.Configs().LegendWorldEconomyEnabled())
+		{
+			local investment = this.Math.max(1, this.Math.round(0.033 * resources));
+			start.setResources(this.Math.max(10, start.getResources() - investment));
+			party.setResources(investment);
+
+			local r = this.Math.rand(1,3);
+			for( local j = 0; j < r; j = ++j )
+			{
+				local items = [
+					[0, "supplies/bread_item"],
+					[0, "supplies/roots_and_berries_item"],
+					[0, "supplies/dried_fruits_item"],
+					[0, "supplies/ground_grains_item"],
+					[0, "supplies/dried_fish_item"],
+					[0, "supplies/beer_item"],
+					[0, "supplies/goat_cheese_item"],
+					[1, "supplies/legend_fresh_fruit_item"],
+					[1, "supplies/legend_fresh_meat_item"],
+					[1, "supplies/legend_pie_item"],
+					[1, "supplies/legend_porridge_item"],
+					[1, "supplies/legend_pudding_item"],
+					[0, "supplies/mead_item"],
+					[0, "supplies/medicine_item"],
+					[0, "supplies/pickled_mushrooms_item"],
+					[0, "supplies/preserved_mead_item"],
+					[0, "supplies/smoked_ham_item"],
+					[0, "supplies/wine_item"]
+				]
+
+				local item = this.Const.World.Common.pickItem(items)
+				party.addToInventory(item);
+			}
+		}
+		else
+		{
+			local supplies = ["bread_item", "roots_and_berries_item", "dried_fruits_item", "ground_grains_item"];
+			party.addToInventory("supplies/" + this.MSU.Array.getRandom(supplies));
+		}
+
+		local c = party.getController();
+		c.getBehavior(this.Const.World.AI.Behavior.ID.Attack).setEnabled(false);
+		c.getBehavior(this.Const.World.AI.Behavior.ID.Flee).setEnabled(false);
+		local move = this.new("scripts/ai/world/orders/move_order");
+		move.setDestination(destination.getTile());
+		move.setRoadsOnly(true);
+		local unload = this.new("scripts/ai/world/orders/unload_order");
+		local despawn = this.new("scripts/ai/world/orders/despawn_order");
+		c.addOrder(move);
+		c.addOrder(unload);
+		c.addOrder(despawn);
+	}
+
+	function onSendMercenaryTo( _data )
+	{
+		local resources = _data[2];
+		local start = this.World.getEntityByID(_data[0]);
+		local destination = this.World.getEntityByID(_data[1]);
+		local faction =  this.World.FactionManager.getFaction(this.MSU.Array.getRandom(start.getFactions()));
+		local party = this.World.spawnEntity("scripts/entity/world/party", start.getTile().Coords);
+		party.setPos(this.createVec(party.getPos().X - 50, party.getPos().Y - 50));
+		party.setDescription("A free mercenary company travelling the lands and lending their swords to the highest bidder.");
+		party.setFootprintType(this.Const.World.FootprintsType.Mercenaries);
+		party.setAttackableByAI(_data[4]);
+		party.setSlowerAtNight(_data[5]);
+		party.setLootScale(_data[6] ? 2.0 : 1.0);
+		party.getSprite("base").setBrush("world_base_07");
+		party.getFlags().set("IsMercenaries", true);
+
+		if (start.getFactions().len() == 1)
+		{
+			party.setFaction(start.getOwner().getID());
+		}
+		else
+		{
+			party.setFaction(start.getFactionOfType(this.Const.FactionType.Settlement).getID());
+		}
+
+		this.Const.World.Common.assignTroops(party, this.Const.World.Spawn[_data[3]], resources);
+		party.getLoot().Money = this.Math.rand(300, 600);
+		party.getLoot().ArmorParts = this.Math.rand(0, 25);
+		party.getLoot().Medicine = this.Math.rand(0, 10);
+		party.getLoot().Ammo = this.Math.rand(0, 50);
+
+		if (_data[3] == "Assassins")
+		{
+			party.getSprite("body").setBrush("figure_mercenary_0" + this.Math.rand(1, 2));
+		}
+
+		local supplies = ["bread_item", "roots_and_berries_item", "dried_fruits_item", "ground_grains_item"];
+		local loots = [
+			"silver_bowl_item", "jeweled_crown_item", "ancient_amber_item", "webbed_valuables_item", "looted_valuables_item",
+			"white_pearls_item", "rainbow_scale_item", "lindwurm_hoard_item", "silverware_item",
+		];
+		party.addToInventory("supplies/" + this.MSU.Array.getRandom(supplies));
+		party.addToInventory("loot/" + this.MSU.Array.getRandom(loots));
+
+		local c = party.getController();
+		local wait1 = this.new("scripts/ai/world/orders/wait_order");
+		wait1.setTime(this.Math.rand(5, 7) * 1.0);
+		local move = this.new("scripts/ai/world/orders/move_order");
+		move.setDestination(destination.getTile());
+		move.setRoadsOnly(false);
+		local wait2 = this.new("scripts/ai/world/orders/wait_order");
+		wait2.setTime(this.Math.rand(10, 60) * 1.0);
+		local mercenary = this.new("scripts/ai/world/orders/mercenary_order");
+		mercenary.setSettlement(destination);
+		c.addOrder(wait1);
+		c.addOrder(move);
+		c.addOrder(wait2);
+		c.addOrder(mercenary);
+
+		while (true)
+		{
+			local name = this.Const.Strings.MercenaryCompanyNames[this.Math.rand(0, this.Const.Strings.MercenaryCompanyNames.len() - 1)];
+
+			if (name == this.World.Assets.getName())
+			{
+				continue;
+			}
+
+			local abort = false;
+
+			foreach( p in this.World.EntityManager.m.Mercenaries )
+			{
+				if (p.getName() == name)
+				{
+					abort = true;
+					break;
+				}
+			}
+
+			if (abort)
+			{
+				continue;
+			}
+
+			party.setName(name);
+			break;
+		}
+
+		while (true)
+		{
+			local banner = this.Const.PlayerBanners[this.Math.rand(0, this.Const.PlayerBanners.len() - 1)];
+
+			if (banner == this.World.Assets.getBanner())
+			{
+				continue;
+			}
+
+			local abort = false;
+
+			foreach( p in this.World.EntityManager.m.Mercenaries )
+			{
+				if (p.getBanner() == banner)
+				{
+					abort = true;
+					break;
+				}
+			}
+
+			if (abort)
+			{
+				continue;
+			}
+
+			party.getSprite("banner").setBrush(banner);
+			break;
+		}
+
+		this.World.EntityManager.m.Mercenaries.push(this.WeakTableRef(party));
 	}
 
 	function convertToUIData()

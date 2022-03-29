@@ -327,7 +327,7 @@
 }
 .world-editor-screen .ui-control.popup-dialog.choose-building-popup .is-situation-slot.is-selected
 {
-    background-image: url("coui://gfx/ui/skin/situation_selection_frame.png");
+    background-image: url("coui://gfx/ui/skin/metal_edge_selection_56x56.png");
     background-size: 5.6rem 5.6rem;
     background-repeat: no-repeat;
     background-position: center;
@@ -341,19 +341,224 @@
 }
 .world-editor-screen .ui-control.popup-dialog.choose-building-popup .is-building-slot.is-selected
 {
-    background-image: url("coui://gfx/ui/skin/tactical_character_background.png");  /*custom_panel_180x120 popup_background_180x120*/
-    background-size: 100% 100%;                 /*18.0rem 12.0rem;*/
+    background-image: url("coui://gfx/ui/skin/metal_edge_selection.png");  /*custom_panel_180x120 popup_background_180x120*/
+    background-size: 18.0rem 12.0rem;               /* 100% 100%; */
     background-repeat: no-repeat; 
+}
+
+
+
+/*
+    Send Cavaran
+*/
+.world-editor-screen .ui-control.popup-dialog.send-caravan-popup
+{
+    width: 60.0rem;
+    height: 45.8rem;
+
+    background-image: url("coui://gfx/ui/skin/popup_background_600x458.png");
+    background-size: 60.0rem 45.8rem;
+    background-repeat: no-repeat;
+}
+.world-editor-screen .ui-control.popup-dialog.send-caravan-popup .s-content-container
+{
+    width: 100%;
+    height: 34.0rem;
+
+    position: relative;
+    overflow: hidden;
+}
+.world-editor-screen .ui-control.popup-dialog.send-caravan-popup .l-list-container
+{
+    width: 100%;
+    height: 100%;
+
+    position: relative;
+}
+.world-editor-screen .ui-control.popup-dialog.send-caravan-popup .l-list-container .scroll-container
+{
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+}
+.world-editor-screen .ui-control.popup-dialog.send-caravan-popup .drop-down-menu-container 
+{
+    top: 13.5rem;
+    left: 1.0rem;
+    width: 90%;
+    height: 5.3rem;
+    position: absolute;
+
+    background-image: url("coui://gfx/ui/skin/tactical_character_background.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.world-editor-screen .ui-control.popup-dialog.send-caravan-popup .checkbox-column 
+{
+    top: 21.0rem;
+    width: 100%;
+    height: 13.0rem;
+
+    position: absolute;
+}
+.world-editor-screen .ui-control.popup-dialog.send-caravan-popup .column-is-left
+{
+    width: 53%;
+    height: 100%;
+
+    float: left;
+    position: relative;
+}
+.world-editor-screen .ui-control.popup-dialog.send-caravan-popup .column-is-right
+{
+    width: 47%;
+    height: 100%;
+
+    float: left;
+    position: relative;
 }
 
 
 
 
 
-
-
-
 /******************/
+.world-editor-screen .ui-control.popup-dialog .move-to-left
+{
+    right: 20.0rem;
+}
+.world-editor-screen .ui-control.popup-dialog .move-to-right
+{
+    left: 20.0rem;
+}
+.world-editor-screen .ui-control.popup-dialog .move-to-left-abit
+{
+    right: 10.0rem;
+}
+.world-editor-screen .ui-control.popup-dialog .move-to-right-abit
+{
+    left: 10.0rem;
+}
+.world-editor-screen .ui-control.popup-dialog .layer
+{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+.world-editor-screen .ui-control.popup-dialog .expandable-container
+{
+    top: 0.5rem;
+    left: 1.0rem;
+    width: 23.0rem;
+    height: 4.3rem;
+
+    position: absolute;
+    z-index: 98;
+}
+.world-editor-screen .ui-control.popup-dialog .expandable-label-container
+{
+    top: 0.5rem;
+    left: 1.0rem;
+    width: 23.0rem;
+    height: 4.3rem;
+
+    position: absolute;
+    z-index: 99;
+}
+.world-editor-screen .ui-control.popup-dialog .expandable-label-container > .label
+{
+    top: 1.0rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 90%;
+    height: 90%;
+    position: absolute;
+
+    text-align: center;
+    overflow: hidden;
+    
+}
+.world-editor-screen .ui-control.popup-dialog .expand-button
+{
+    top: 0.7rem;
+    left: 24.0rem;
+    width: 4.5rem;
+    height: 4.1rem;
+
+    position: absolute;
+}
+
+.world-editor-screen .ui-control.popup-dialog .below-list-container
+{
+    top: 5.3rem;
+    width: 100%;
+    height: 47.0rem;
+
+    position: absolute;
+}
+
+.world-editor-screen .ui-control.popup-dialog .expandable-row
+{
+    width: 21.0rem;
+    height: 4.3rem;
+    position: relative;
+}
+
+.world-editor-screen .ui-control.popup-dialog .expandable-container .ui-control.list
+{
+    background-image: url("coui://gfx/ui/skin/tooltip_255_bottom.png");
+    background-size: 100% 55.3rem;
+    background-repeat: no-repeat;
+}
+.world-editor-screen .ui-control.popup-dialog .row
+{
+    width: 95%;
+    float: left;
+    position: relative;
+    padding-top : 0.5rem;
+    padding-left: 2.0rem;
+}
+.world-editor-screen .ui-control.popup-dialog .row .title
+{
+    width: 96%;
+    height: 2.0rem;
+    float: left;
+    margin-bottom: 2.0rem;
+
+    line-height: 2.0rem;
+
+    border-image: url("coui://gfx/ui/skin/line_gold.png") 0% 0% 100% 0%;
+    border-image-outset: 0 0 0.5rem 0;
+}
+.world-editor-screen .ui-control.popup-dialog .row .l-input-half-big
+{
+    width: 15.0rem;
+    height: 4.0rem;
+    margin-bottom: 1.0rem;
+    float: left;
+    position: relative;
+}
+.world-editor-screen .ui-control.popup-dialog .row .control
+{
+    float: left;
+    clear: left;
+    position: relative;
+    margin-left  : 1.0rem;
+    margin-bottom: 2.0rem;
+}
+
+.world-editor-screen .ui-control.popup-dialog .control label
+{
+    top: 0;
+    bottom: 0;
+    height: 2.0rem;
+    position: absolute;
+    margin: auto;
+    margin-left: 1.4rem;
+
+    white-space: nowrap;
+    line-height: 2.0rem;
+}
 .world-editor-screen .ui-control.popup-dialog .column-is-25
 {
     width: 25%;
@@ -389,7 +594,8 @@
     position: relative;
     float: left;
 }
-.world-editor-screen .ui-control.popup-dialog.troops-popup .row
+
+.world-editor-screen .ui-control.popup-dialog.troops-popup .row-half
 {
     height: 50%;
     width: 100%;
@@ -475,19 +681,73 @@
     margin: auto;
     position: absolute;
 }
-.world-editor-screen .ui-control.popup-dialog .move-to-left
+
+.world-editor-screen .ui-control.popup-dialog .l-settlement-row
 {
-    right: 20.0rem;
+    width: 26.0rem;
+    height: 17.5rem;
+    position: relative;
+    margin-bottom: 0.4rem;
+    margin-left: 0.1rem;
+
+    overflow: hidden;
 }
-.world-editor-screen .ui-control.popup-dialog .move-to-right
+.world-editor-screen .ui-control.popup-dialog .l-settlement-row:first-child
 {
+    margin-top: 1.0;
+}
+.world-editor-screen .ui-control.popup-dialog .l-settlement-row:last-child
+{
+    margin-bottom: 0;
+}
+.world-editor-screen .ui-control.popup-dialog .l-settlement-row .l-settlement-image-container
+{
+    width: 18.0rem;
+    height: 14.0rem;
+    top: 2.0rem;
+    left: 3.0rem;
+
+    position: absolute;
+}
+.world-editor-screen .ui-control.popup-dialog .l-settlement-row .l-settlement-image-container > img
+{
+    position: absolute;
+    display: block;
+}
+.world-editor-screen .ui-control.popup-dialog .l-settlement-row .l-settlement-banner-container
+{
+    width: 5.0rem;
+    height: 8.0rem;
+    top: 1.0rem;
+    left: 1.0rem;
+
+    position: absolute;
+}
+.world-editor-screen .ui-control.popup-dialog .l-settlement-row .l-settlement-banner-container > img
+{
+    position: absolute;
+    display: block;
+}
+.world-editor-screen .ui-control.popup-dialog .l-settlement-row .name
+{
+    top: 13.0rem;
+    width: 100%;
+    position: absolute;
+
+    white-space: nowrap;
+    text-align: center;
+    overflow: hidden;
+
+    line-height: 3.5rem;
+}
+.world-editor-screen .ui-control.popup-dialog .l-settlement-row .distance-button
+{
+    top: 0.8rem;
     left: 20.0rem;
-}
-.world-editor-screen .ui-control.popup-dialog .move-to-left-abit
-{
-    right: 10.0rem;
-}
-.world-editor-screen .ui-control.popup-dialog .move-to-right-abit
-{
-    left: 10.0rem;
+    width: 4.5rem;
+    height: 4.1rem;
+    position: absolute;
+
+    overflow: hidden;
+    line-height: 2.5rem;
 }

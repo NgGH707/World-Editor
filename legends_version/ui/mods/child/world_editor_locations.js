@@ -5,8 +5,7 @@ WorldEditorScreen.prototype.addLocationFilter = function (_data)
     this.mLocation.ExpandableListScroll.empty();
 
     // add the place holder
-    var placeholder = this.addExpandableEntry({NoFilter: true}, '-Select Filter-', this.mLocation);
-    var placeholderName = placeholder.find('.label:first');
+    var placeholderName = this.mLocation.ExpandLabel.find('.label:first');
 
     // add the filter-all option, not recommend cuz the map has lots of location
     var specialEntry = this.addExpandableEntry({NoFilter: true}, 'All', this.mLocation);
@@ -76,7 +75,8 @@ WorldEditorScreen.prototype.addLocationFilter = function (_data)
         });
     }
 
-    this.mLocation.ExpandableList.showListScrollbar(false);
+    this.mLocation.IsExpanded = false;
+    this.expandExpandableList(false, this.mLocation);
 };
 
 WorldEditorScreen.prototype.filterLocationsByType = function (_filter1, _value1, _filter2, _value2)

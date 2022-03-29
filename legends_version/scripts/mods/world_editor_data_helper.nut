@@ -130,6 +130,82 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
+	function convertTroopTemplateToUIData( _type )
+	{
+		local result = [];
+
+		switch (_type)
+		{
+		case "caravan":
+			foreach(key, value in this.Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Caravan") == null) continue;
+				result.push(key);
+			}
+			break;
+
+		case "mercenary":
+			foreach(key, value in this.Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Company") == null) continue;
+				result.push(key);
+			}
+			result.extend([
+				"Mercenaries",
+				"BountyHunters",
+				"Assassins",
+			]);
+			break;
+
+		case "bandit":
+			foreach(key, value in this.Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Bandit") == null) continue;
+				result.push(key);
+			}
+			break;
+
+		case "barbarian":
+			foreach(key, value in this.Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Barbarian") == null) continue;
+				result.push(key);
+			}
+			break;
+
+		case "goblin":
+			foreach(key, value in this.Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Goblin") == null) continue;
+				result.push(key);
+			}
+			break;
+
+		case "orc":
+			foreach(key, value in this.Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Orc") == null) continue;
+				result.push(key);
+			}
+			break;
+	
+		default: // all
+			foreach(key, value in this.Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				result.push(key);
+			}
+		}
+
+		return result;
+	}
+
 	function convertAvatarToUIData( _screen )
 	{
 		this.World.Assets.updateLook();
