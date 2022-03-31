@@ -72,6 +72,7 @@
 
 .world-editor-screen > .l-world-editor-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-save
 {
+    top: -0.1rem;
     left: 123.0rem;
     width: 4.5rem;
     height: 4.1rem;
@@ -405,6 +406,18 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
+.world-editor-screen > .l-world-editor-dialog-container .content .with-scroll-header-background
+{
+    background-image: url("coui://gfx/ui/skin/panel_quest_header2.png");
+    background-size: 100% 5.9rem;
+    background-repeat: no-repeat;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .with-scroll-tooltip2-background
+{
+    background-image: url("coui://gfx/ui/skin/tooltip_315_bottom.png");
+    background-size: 100% 55.3rem;
+    background-repeat: no-repeat;
+}
 .world-editor-screen > .l-world-editor-dialog-container .content .with-scroll-tooltip-background
 {
     background-image: url("coui://gfx/ui/skin/tooltip_315_bottom.png");
@@ -441,9 +454,22 @@
     width: 100%;
     height: 100%;
 
+    z-index: 15;
     position: absolute;
 }
+.world-editor-screen > .l-world-editor-dialog-container .content .centered-label
+{
+    top: 1.0rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 90%;
+    height: 90%;
+    position: absolute;
 
+    text-align: center;
+    overflow: hidden;
+}
 .world-editor-screen > .l-world-editor-dialog-container .content .expandable-container
 {
     top: 0.5rem;
@@ -503,7 +529,7 @@
 {
     top: 5.3rem;
     width: 100%;
-    height: 47.0rem;
+    height: 46.5rem;
 
     position: absolute;
     z-index: 98;
@@ -524,5 +550,27 @@
 }
 
 
+/*
+    Header stuffs
+*/
+.world-editor-screen > .l-world-editor-dialog-container .content .text-entry,
+.world-editor-screen > .l-world-editor-dialog-container .header .text-entry
+{
+    margin-left: 0.7rem;
+    margin-right: 0.2rem;
+}
+.world-editor-screen > .l-world-editor-dialog-container .header .log-container
+{
+    top: 0;
+    bottom: 0;
+    width: 33.0rem;
+    height: 90%;
+    position: absolute;
 
+    margin-bottom: auto;
+    margin-top: auto;
+    background-image: url("coui://gfx/ui/skin/combat_log_bottom.png");
+    background-size: 100% 41.1rem;
+    background-repeat: no-repeat;
+}
 

@@ -1,7 +1,5 @@
 this.world_editor_data_helper <- {
 	m = {},
-	//function create() {}
-
 	function convertFactionAllianceToUIData( _data )
 	{
 		local faction = this.World.FactionManager.getFaction(_data[0]);
@@ -332,7 +330,7 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
-	function convertLocationsToUIData( _factions )
+	function convertLocationsToUIData()
 	{
 		local result = [];
 		local playerTile = this.World.State.getPlayer().getTile();
@@ -395,11 +393,11 @@ this.world_editor_data_helper <- {
 			});
 		}
 
-		result.sort(this.onSortName);
+		result.sort(this.onSortLocations);
 		return result;
 	}
 
-	function convertSettlementsToUIData( _factions )
+	function convertSettlementsToUIData()
 	{
 		local result = [];
 		local playerTile = this.World.State.getPlayer().getTile();
@@ -407,10 +405,11 @@ this.world_editor_data_helper <- {
 		foreach(i, settlement in this.World.EntityManager.getSettlements())
 		{
 			local faction;
+			local owner;
 			local buildings = [];
 			local attached_locations = [];
 			local situations = [];
-			local owner = settlement.getOwner() != null && !settlement.getOwner().isNull() ? settlement.getOwner().getID() : null;
+			local draftlist = [];
 			local find = settlement.getFactionOfType(this.Const.FactionType.Settlement);
 
 			if (find != null)
@@ -422,6 +421,9 @@ this.world_editor_data_helper <- {
 				faction = settlement.getFactions()[0];
 			}
 
+			owner = settlement.getOwner() != null && !settlement.getOwner().isNull() ? settlement.getOwner().getID() : faction;
+
+			// processing build info
 			foreach(i, b in settlement.m.Buildings )
 			{
 				if (b == null || b.getID() == "building.crowd")
@@ -443,6 +445,7 @@ this.world_editor_data_helper <- {
 				}
 			}
 
+			// processing attached location info
 			foreach(i, a in settlement.getAttachedLocations() )
 			{
 				if (a.getTypeID() == "attached_location.harbor")
@@ -456,6 +459,7 @@ this.world_editor_data_helper <- {
 				});
 			}
 
+			// processing situation info
 			foreach( situation in settlement.getSituations() )
 			{
 				situations.push({
@@ -464,15 +468,25 @@ this.world_editor_data_helper <- {
 				});
 			}
 
+			// processing draft list
+			foreach( draft in settlement.getDraftList() )
+			{
+				draftlist.push({
+					Key = draft,
+					ImagePath = this.Woditor.Backgrounds.Stuff[draft].Icon
+				})
+			}
+
 			result.push({
 				ID = settlement.getID(),
 				Name = settlement.getName(),
 				Size = settlement.getSize(),
+				Owner = owner,
+				Faction = faction,
 				Buildings = buildings,
 				Attachments = attached_locations,
 				Situations = situations,
-				Owner = this.findIdIn(owner, _factions),
-				Faction = this.findIdIn(faction, _factions),
+				DraftList = draftlist,
 				ImagePath = settlement.getImagePath(),
 				Wealth = settlement.getWealth(),
 				Resources = settlement.getResources(),
@@ -485,6 +499,7 @@ this.world_editor_data_helper <- {
 			});
 		}
 
+		result.sort(this.onSortSettlements);
 		return result;
 	}
 
@@ -492,23 +507,21 @@ this.world_editor_data_helper <- {
 	{
 		local result = {Settlements = [], Locations = []};
 
-		foreach(i, f in _factions )
+		foreach( f in _factions )
 		{
-			if (f.SettlementNum <= 1) continue;
-			
 			if (!f.NoChangeName)
 			{
+				if (f.SettlementNum <= 1) continue;
+
 				result.Settlements.push({
 					ID = f.ID,
-					Index = i,
 					Num = f.SettlementNum
 				});
 			}
-			else
+			else if (f.SettlementNum > 0)
 			{
 				result.Locations.push({
 					ID = f.ID,
-					Index = i,
 					Num = f.SettlementNum
 				});
 			}
@@ -635,24 +648,6 @@ this.world_editor_data_helper <- {
 		return null;
 	}
 
-	function findIdIn( _id, _array )
-	{
-		if (_id == null)
-		{
-			return null;
-		}
-
-		foreach (i, a in _array )
-		{
-			if (a.ID == _id)
-			{
-				return i;
-			}
-		}
-
-		return null;
-	}
-
 	function onSortWithFaction( _f1, _f2 )
 	{
 		if (_f1.Faction < _f2.Faction)
@@ -685,18 +680,52 @@ this.world_editor_data_helper <- {
 		}
 	}
 
-	function onSortName( _f1, _f2 )
+	function onSortLocations( _l1, _l2 )
 	{
-		if (_f1.Name < _f2.Name)
+		if (_l1.Faction < _l2.Faction)
 		{
 			return -1;
 		}
-		else if (_f1.Name > _f2.Name)
+		else if (_l1.Faction > _l2.Faction)
 		{
 			return 1;
 		}
 		else
 		{
+			if (_l1.Distance < _l2.Distance)
+			{
+				return -1;
+			}
+			else if (_l1.Distance > _l2.Distance)
+			{
+				return 1;
+			}
+
+			return 0;
+		}
+	}
+
+	function onSortSettlements( _s1, _s2 )
+	{
+		if (_s1.Owner < _s2.Owner)
+		{
+			return -1;
+		}
+		else if (_s1.Owner > _s2.Owner)
+		{
+			return 1;
+		}
+		else
+		{
+			if (_s1.Distance < _s2.Distance)
+			{
+				return -1;
+			}
+			else if (_s1.Distance > _s2.Distance)
+			{
+				return 1;
+			}
+
 			return 0;
 		}
 	}

@@ -96,7 +96,8 @@ WorldEditorScreen.prototype.addSettlementFilter = function (_data)
 
     for (var i = 0; i < _data.length; i++) {
         var entryData = _data[i];
-        var entry = this.addExpandableEntry(entryData, this.mFaction.Data[entryData.Index].Name, this.mSettlement);
+        var faction = this.getFaction(entryData.ID);
+        var entry = this.addExpandableEntry(entryData, faction.Name, this.mSettlement);
         entry.click(this, function(_event) {
             var div = $(this);
             if (div.hasClass('is-selected') !== true) {
@@ -137,7 +138,7 @@ WorldEditorScreen.prototype.filterSettlementsByFaction = function (_filter)
     this.mSettlement.ListScrollContainer.empty();
 
     for(var i = 0; i < _data.length; ++i) {
-        if (NoFilter || _filter.Index == _data[i].Owner || _filter.Index == _data[i].Faction)
+        if (NoFilter || _filter.ID == _data[i].Owner || _filter.ID == _data[i].Faction)
             this.addSettlementListEntry(_data[i], i);
     }
 
@@ -191,7 +192,7 @@ WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
     var imageContainer = $('<div class="l-settlement-image-container"/>');
     entry.append(imageContainer);
 
-    imageContainer.createImage(Path.GFX + _data['ImagePath'], function(_image) {
+    imageContainer.createImage(Path.GFX + _data.ImagePath, function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
@@ -200,13 +201,14 @@ WorldEditorScreen.prototype.addSettlementListEntry = function(_data, _index)
     var imageContainer = $('<div class="l-settlement-banner-container"/>');
     entry.append(imageContainer);
 
-    var find = (_data.Owner !== undefined && _data.Owner !== null) ? _data.Owner : _data.Faction;
-    imageContainer.createImage(Path.GFX + this.mFaction.Data[find].ImagePath, function(_image) {
+    var factionID = (_data.Owner !== undefined && _data.Owner !== null) ? _data.Owner : _data.Faction;
+    var faction = this.getFaction(factionID);
+    imageContainer.createImage(Path.GFX + faction.ImagePath, function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
 
-    var name = $('<div class="name title-font-normal font-bold font-color-white">' + _data['Name'] + '</div>');
+    var name = $('<div class="name title-font-normal font-bold font-color-white">' + _data.Name + '</div>');
     entry.append(name);
 
     var buttonLayout = $('<div class="distance-button"/>');
@@ -340,13 +342,20 @@ WorldEditorScreen.prototype.updateSituationList = function (_data)
     // update situation list
     var row = $('<div class="situation-row"/>');
     this.mSettlement.Situations.append(row);
-    var containerLayout = $('<div class="l-situations-group-container"/>');
-    var container = $('<div class="l-situation-groups-container"/>');
-    containerLayout.append(container);
     for (var i = 0; i < _data.length; i++) {
-        this.addSituationEntry(_data[i], container);
+        this.addSituationEntry(_data[i], row);
     }
-    row.append(containerLayout);
+};
+
+WorldEditorScreen.prototype.updateDraftList = function (_data)
+{
+    this.mSettlement.DraftList.empty();
+    // update draft list
+    var row = $('<div class="draft-row"/>');
+    this.mSettlement.DraftList.append(row);
+    for (var i = 0; i < _data.length; i++) {
+        this.addDraftEntry(_data[i], row);
+    }
 };
 
 WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
@@ -363,18 +372,20 @@ WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
         this.mSettlement.SendCaravanButton.enableButton(!data.IsIsolated);
         this.updateSituationList(data.Situations);
         this.updateAttachmentList(data.Attachments);
+        this.updateDraftList(data.DraftList);
+
+        var faction = this.getFaction(data.Faction);
+        this.mSettlement.FactionBanner.attr('src', Path.GFX + faction.ImagePath);
+        this.mSettlement.FactionBanner.bindTooltip({ contentType: 'ui-element', elementId: faction.ID, elementOwner: 'woditor.factionbanner' });
+
+        var ownerFaction = (data.Owner !== undefined && data.Owner !== null) ? this.getFaction(data.Owner) : faction;
+        this.mSettlement.OwnerBanner.attr('src', Path.GFX + ownerFaction.ImagePath);
+        this.mSettlement.OwnerBanner.bindTooltip({ contentType: 'ui-element', elementId: ownerFaction.ID, elementOwner: 'woditor.factionbanner' });
         
         for (var i = 0; i < data.Buildings.length; i++) {
             var entry = data.Buildings[i];
             this.updateSettlementBuildingSlotImage(entry, i);
         }
-
-        this.mSettlement.FactionBanner.attr('src', Path.GFX + this.mFaction.Data[data.Faction].ImagePath);
-
-        if (data.Owner === undefined || data.Owner === null)
-            this.mSettlement.OwnerBanner.attr('src', Path.GFX + 'ui/banners/add_banner.png');
-        else 
-            this.mSettlement.OwnerBanner.attr('src', Path.GFX + this.mFaction.Data[data.Owner].ImagePath);
     }
 };
 
@@ -432,4 +443,14 @@ WorldEditorScreen.prototype.addAttachmentEntry = function (_data)
     });
 
     image.bindTooltip({ contentType: 'ui-element', elementId: _data.ID, elementOwner: 'woditor.attached_location' });
+};
+
+WorldEditorScreen.prototype.addDraftEntry = function (_data, _parentDiv)
+{
+    var self = this;
+    var image = $('<img/>');
+    image.attr('src', Path.GFX + _data.ImagePath);
+    _parentDiv.append(image);
+
+    image.bindTooltip({ contentType: 'ui-element', elementId: _data.Key , elementOwner: 'woditor.draftlist'});
 };

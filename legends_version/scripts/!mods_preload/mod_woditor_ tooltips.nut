@@ -49,17 +49,33 @@ this.getroottable().Woditor.hookTooltips <- function ()
 
 				if (_elementId != null)
 				{
-					/*if (_elementOwner == "woditor.buildings")
-		 			{
-		 				local tooltip = this.Woditor.Buildings.Tooltip[_elementId].getTooltip();
+					if (_elementOwner == "woditor.factionbanner")
+					{
+				       	return [
+							{
+								id = 1,
+								type = "title",
+								text = this.World.FactionManager.getFaction(_elementId).getName()
+							},
+							{
+								id = 10,
+								type = "hint",
+								icon = "ui/icons/mouse_left_button.png",
+								text = "Change to another faction"
+							},
+						];
+					}
 
-		 				if (_entityId == null)
-		 				{
-		 					this.Const.AddBuildingHints(tooltip);
-		 				}
-		 				
-		 				return tooltip;
-		 			}*/
+					if (_elementOwner == "woditor.draftlist")
+		 			{
+		 				return [
+			 				{
+								id = 1,
+								type = "title",
+								text = this.Woditor.Backgrounds.Stuff[_elementId].Name
+							}
+		 				]
+		 			}
 
 					if (_elementOwner == "woditor.attached_location")
 		 			{
@@ -717,20 +733,6 @@ this.getroottable().Woditor.hookTooltips <- function ()
 						id = 2,
 						type = "description",
 						text = "Choose a template so you can use \'Reroll Troops\' to create a random troop list."
-					},
-				];
-
-			case "woditor.choosefaction":
-		       	return [
-					{
-						id = 1,
-						type = "title",
-						text = "Choose Faction"
-					},
-					{
-						id = 2,
-						type = "description",
-						text = "Let you change to another faction."
 					},
 				];
 

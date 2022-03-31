@@ -1,4 +1,16 @@
 
+WorldEditorScreen.prototype.getFaction = function (_id)
+{
+    for (var i = 0; i < this.mFaction.Data.length; i++) {
+        var faction = this.mFaction.Data[i];
+        if (faction.ID === _id) {
+            return faction;
+        }
+    }
+
+    return null;
+}
+
 WorldEditorScreen.prototype.addFactionsData = function (_data)
 {
     this.mFaction.ListScrollContainer.empty();

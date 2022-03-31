@@ -39,6 +39,13 @@ var WorldEditorScreen = function(_parent)
         Contracts  : null,
     };
 
+    // log
+    this.mLog =
+    {
+        ListContainer      : null,
+        ListScrollContainer: null,
+    };
+
     // factions
     this.mFaction =
     {
@@ -73,6 +80,8 @@ var WorldEditorScreen = function(_parent)
         ListContainer      : null,
         ListScrollContainer: null,
         DetailsPanel       : null,
+        DraftList          : null,
+        
 
         // coordinate to place new location
         Coordinate:
@@ -319,7 +328,14 @@ WorldEditorScreen.prototype.createDIV = function(_parentDiv)
     // create: dialog
     this.mDialogContainer = dialogLayout.createDialog('World Editor', '', '', true, 'dialog-1280-768');
 
-    // create tabs
+    // create: header log
+    var logContainer = $('<div class="log-container"/>');
+    this.mDialogContainer.findDialogHeaderContainer().append(logContainer);
+    this.mLog.ListContainer = logContainer.createList(1);
+    this.mLog.ListScrollContainer = this.mLog.ListContainer.findListScrollContainer();
+    this.printLog('Initiate World Editor');
+
+    // create: tab content
     var tabContainer = $('<div class="l-tab-container"/>');
     this.mDialogContainer.findDialogTabContainer().append(tabContainer);
     {
@@ -337,7 +353,6 @@ WorldEditorScreen.prototype.createDIV = function(_parentDiv)
             index++;
         });
 
-
         // save changes button
         var buttonLayout = $('<div class="l-tab-button is-save"/>');
         buttonPanel.append(buttonLayout);
@@ -348,7 +363,7 @@ WorldEditorScreen.prototype.createDIV = function(_parentDiv)
     }
 
 
-    // create content
+    // create: content tabs
     var content = this.mDialogContainer.findDialogContentContainer();
     {
         // create content screens
@@ -359,17 +374,17 @@ WorldEditorScreen.prototype.createDIV = function(_parentDiv)
         });
     }
 
-    // create footer button bar
+    // create: footer button bar
+    var footer = this.mDialogContainer.findDialogFooterContainer();
     var footerButtonBar = $('<div class="l-button-bar"/>');
-    this.mDialogContainer.findDialogFooterContainer().append(footerButtonBar);
-    {
-        // create: buttons
-        var layout = $('<div class="l-leave-button"/>');
-        footerButtonBar.append(layout);
-        this.mCloseButton = layout.createTextButton("Close", function() {
-            self.notifyBackendCloseButtonPressed();
-        }, '', 1);
-    }
+    footer.append(footerButtonBar);
+
+    // create: buttons
+    var layout = $('<div class="l-leave-button"/>');
+    footerButtonBar.append(layout);
+    this.mCloseButton = layout.createTextButton("Close", function() {
+        self.notifyBackendCloseButtonPressed();
+    }, '', 1);
 
     this.mIsVisible = false;
 };
@@ -449,7 +464,7 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
             var leftColumn = this.addColumn(37.5);
             row40.append(leftColumn);
             {
-                var upperHalf = this.addRow(50);
+                var upperHalf = this.addRow(44);
                 leftColumn.append(upperHalf);
                 {
                     // name input
@@ -467,7 +482,7 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     });
                 }
 
-                var lowerHalf = this.addRow(50, 'with-small-dialog-background');
+                var lowerHalf = this.addRow(56, 'with-small-dialog-background');
                 leftColumn.append(lowerHalf);
                 {
                     // location image
@@ -495,7 +510,7 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
             var midColumn = this.addColumn(37.5, 'with-medium-dialog-background');
             row40.append(midColumn);
             {
-                var upperRow = this.addRow(40);
+                var upperRow = this.addRow(44);
                 midColumn.append(upperRow);
                 {
                     var resourcesColumn = this.addColumn(50);
@@ -534,27 +549,13 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     }
                 }
 
-                var lowerRow = this.addRow(60);
+                var lowerRow = this.addRow(56);
                 midColumn.append(lowerRow);
                 {
-                    var row = this.addContainer(null, 4.6);
-                    row.css('margin-top', '2.0rem');
-                    lowerRow.append(row);
-                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
-                    row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton('Reroll Loots', function ()
-                    {
-                        //self.();
-                    }, '', 4);
-
-                    var row = this.addContainer(null, 4.6);
-                    lowerRow.append(row);
-                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
-                    row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton('Refresh Loot Scale', function ()
-                    {
-                        //self.();
-                    }, '', 4);
+                    var logContainer = this.addLayout('90%', '95%', 'is-center with-scroll-tooltip2-background');
+                    lowerRow.append(logContainer);
+                    var logListContainer = logContainer.createList(15);
+                    var logScrollContainer = logListContainer.findListScrollContainer();
                 }
             }
 
@@ -754,12 +755,12 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                 var leftHalf = this.addColumn(50);
                 row75.append(leftHalf);
                 {
-                    var row25 = this.addRow(25);
-                    leftHalf.append(row25);
+                    var row22 = this.addRow(22);
+                    leftHalf.append(row22);
                     {
                         // name input
                         var row = $('<div class="row"/>');
-                        row25.append(row);
+                        row22.append(row);
                         var title = $('<div class="title title-font-big font-color-title">Settlement Name</div>');
                         row.append(title);
                         var inputLayout = $('<div class="l-input-big"/>');
@@ -772,12 +773,12 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         });
                     }
 
-                    var row30 = this.addRow(30, 'with-small-dialog-background');
-                    leftHalf.append(row30);
+                    var row33 = this.addRow(33, 'with-small-dialog-background');
+                    leftHalf.append(row33);
                     {
                         // settlement image
                         var column75 = this.addColumn(75);
-                        row30.append(column75);
+                        row33.append(column75);
                         var imageContainer = this.addLayout(16.0, 12.0, 'is-center');
                         column75.append(imageContainer);
                         this.mSettlement.Image = imageContainer.createImage(null, function(_image) {
@@ -786,7 +787,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
 
 
                         var column25 = this.addColumn(25);
-                        row30.append(column25);
+                        row33.append(column25);
                         {
                             // button
                             var buttonRow = this.addRow(50);
@@ -826,7 +827,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         }, null, '');
                         this.mSettlement.FactionBanner.click(function(_event) {
                             if (self.mSettlement.Selected !== null && self.mSettlement.Selected.length > 0)
-                                self.createChooseFactionPopupDialog('mSettlement', 'Faction');
+                                self.createChooseFactionPopupDialog(self.mSettlement, 'Faction');
                         });
                         this.mSettlement.FactionBanner.mouseover(function() {
                             this.classList.add('is-highlighted');
@@ -834,8 +835,6 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         this.mSettlement.FactionBanner.mouseout(function() {
                             this.classList.remove('is-highlighted');
                         });
-                        this.mSettlement.FactionBanner.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.choosefaction' });
-
 
                         // title
                         var column50 = this.addColumn(50);
@@ -852,7 +851,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         }, null, '');
                         this.mSettlement.OwnerBanner.click(function(_event) {
                             if (self.mSettlement.Selected !== null && self.mSettlement.Selected.length > 0)
-                                self.createChooseFactionPopupDialog('mSettlement', 'Owner');
+                                self.createChooseFactionPopupDialog(self.mSettlement, 'Owner');
                         });
                         this.mSettlement.OwnerBanner.mouseover(function() {
                             this.classList.add('is-highlighted');
@@ -860,7 +859,6 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         this.mSettlement.OwnerBanner.mouseout(function() {
                             this.classList.remove('is-highlighted');
                         });
-                        this.mSettlement.OwnerBanner.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.choosefaction' });
                     }
 
                     var row10 = this.addRow(10);
@@ -879,7 +877,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                 var rightHalf = this.addColumn(50, 'with-dialog-background');
                 row75.append(rightHalf);
                 {
-                    var upperRow = this.addRow(30);
+                    var upperRow = this.addRow(22);
                     rightHalf.append(upperRow);
                     {
                         var resourcesColumn = this.addColumn(50);
@@ -925,65 +923,97 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         }
                     }
 
-                    var lowerRow = this.addRow(70);
+                    var midRow = this.addRow(14);
+                    rightHalf.append(midRow);
+                    {
+                        var scrollHeader = this.addLayout('95%', '100%', 'is-center with-scroll-header-background');
+                        midRow.append(scrollHeader);
+                        var label = $('<div class="centered-label is-horizontal-center title-font-big font-color-ink">Draft List</div>');
+                        scrollHeader.append(label);
+                    }
+
+                    var lowerRow = this.addRow(64);
                     rightHalf.append(lowerRow);
                     {
-                        var row = this.addContainer(null, 4.6);
-                        lowerRow.append(row);
-                        // button
-                        var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
-                        row.append(buttonLayout);
-                        this.mSettlement.ActiveButton = buttonLayout.createTextButton('Shut Down', function ()
-                        {
-                            var index = self.mSettlement.Selected.data('index');
-                            var data = self.mSettlement.Data[index];
-                            data.IsActive = !data.IsActive;
-                            self.mSettlement.ActiveButton.changeButtonText(data.IsActive ? 'Shut Down' : 'Restart');
-                            self.notifyBackendChangeActiveStatusOfSettlement(data.ID, data.IsActive);
-                            self.mSettlement.Selected.data('entry', data);
-                        }, '', 4);
+                        var scrollContent = this.addLayout('90%', '95%', 'is-horizontal-center with-dirty-scroll-background display-none');
+                        lowerRow.append(scrollContent);
+                        var draftContainer = this.addLayout('100%', '95%');
+                        scrollContent.append(draftContainer);
+                        var draftListContainer = draftContainer.createList(15);
+                        this.mSettlement.DraftList = draftListContainer.findListScrollContainer();
 
-                        var row = this.addContainer(null, 4.6);
-                        lowerRow.append(row);
-                        // button button 
-                        var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
-                        row.append(buttonLayout);
-                        this.mSettlement.SendCaravanButton = buttonLayout.createTextButton('Send Caravan', function ()
+                        var layer = $('<div class="layer display-block"/>');
+                        lowerRow.append(layer);
                         {
-                            self.createSendCaravanPopupDialog(true);
-                        }, '', 4);
+                            var row = this.addContainer(null, 4.6);
+                            row.css('margin-top', '1.5rem');
+                            layer.append(row);
+                            // button
+                            var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                            row.append(buttonLayout);
+                            this.mSettlement.ActiveButton = buttonLayout.createTextButton('Shut Down', function ()
+                            {
+                                var index = self.mSettlement.Selected.data('index');
+                                var data = self.mSettlement.Data[index];
+                                data.IsActive = !data.IsActive;
+                                self.mSettlement.ActiveButton.changeButtonText(data.IsActive ? 'Shut Down' : 'Restart');
+                                self.notifyBackendChangeActiveStatusOfSettlement(data.ID, data.IsActive);
+                                self.mSettlement.Selected.data('entry', data);
+                            }, '', 4);
 
-                        var row = this.addContainer(null, 4.6);
-                        lowerRow.append(row);
-                        // button button button 
-                        var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
-                        row.append(buttonLayout);
-                        var button = buttonLayout.createTextButton('Send Mercenary', function ()
-                        {
-                            self.createSendCaravanPopupDialog(false);
-                        }, '', 4);
+                            var row = this.addContainer(null, 4.6);
+                            layer.append(row);
+                            // button button 
+                            var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                            row.append(buttonLayout);
+                            this.mSettlement.SendCaravanButton = buttonLayout.createTextButton('Send Caravan', function ()
+                            {
+                                self.createSendCaravanPopupDialog(true);
+                            }, '', 4);
 
-                        var row = this.addContainer(null, 4.6);
-                        lowerRow.append(row);
-                        // button button button button 
-                        var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
-                        row.append(buttonLayout);
-                        var button = buttonLayout.createTextButton('Refresh Shops', function ()
-                        {
-                            var data = self.mSettlement.Selected.data('entry');
-                            self.notifyBackendRefreshSettlementShop(data.ID);
-                        }, '', 4);
+                            var row = this.addContainer(null, 4.6);
+                            layer.append(row);
+                            // button button button 
+                            var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                            row.append(buttonLayout);
+                            var button = buttonLayout.createTextButton('Send Mercenary', function ()
+                            {
+                                self.createSendCaravanPopupDialog(false);
+                            }, '', 4);
 
-                        var row = this.addContainer(null, 4.6);
-                        lowerRow.append(row);
-                        // button button button button button 
-                        var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
-                        row.append(buttonLayout);
-                        var button = buttonLayout.createTextButton('Refresh Roster', function ()
-                        {
-                            var data = self.mSettlement.Selected.data('entry');
-                            self.notifyBackendToRefreshSettlementRoster(data.ID);
-                        }, '', 4);
+                            var row = this.addContainer(null, 4.6);
+                            layer.append(row);
+                            // button button button button 
+                            var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                            row.append(buttonLayout);
+                            var button = buttonLayout.createTextButton('Refresh Shops', function ()
+                            {
+                                var data = self.mSettlement.Selected.data('entry');
+                                self.notifyBackendRefreshSettlementShop(data.ID);
+                            }, '', 4);
+
+                            var row = this.addContainer(null, 4.6);
+                            layer.append(row);
+                            // button button button button button 
+                            var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
+                            row.append(buttonLayout);
+                            var button = buttonLayout.createTextButton('Refresh Roster', function ()
+                            {
+                                var data = self.mSettlement.Selected.data('entry');
+                                self.notifyBackendToRefreshSettlementRoster(data.ID);
+                            }, '', 4);
+                        }
+
+                        scrollHeader.click(this, function(_event) {
+                            if (scrollContent.hasClass('display-block')) {
+                                scrollContent.showThisDiv(false);
+                                layer.showThisDiv(true);
+                            }
+                            else {
+                                layer.showThisDiv(false);
+                                scrollContent.showThisDiv(true);
+                            }
+                        });
                     }
                 }
             }
@@ -2040,10 +2070,18 @@ WorldEditorScreen.prototype.addLayout = function(_width, _height, _class, _line,
         _class = '';
 
     var result = $('<div class="custom-layout-container ' + _class + '"/>');
-    result.css('width', _width + 'rem'); //only accept number, no %
-    result.css('height', _height + 'rem'); //only accept number, no %
 
-    if (_line !== undefined)
+    if (typeof _width === 'string')
+        result.css('width', _width); //only % in a string
+    else
+        result.css('width', _width + 'rem'); //only accept number, no %
+
+    if (typeof _height === 'string')
+        result.css('height', _height); //only % in a string
+    else
+        result.css('height', _height + 'rem'); //only accept number, no %
+
+    if (_line !== undefined && _line !== null)
         result.css('line-height', _line + 'rem'); //only accept number, no %
 
     if (_color !== undefined) // the border is only used for testing
@@ -2431,6 +2469,38 @@ WorldEditorScreen.prototype.expandExpandableList = function (_value, _parent, _m
 
     _parent.IsExpanded = !_parent.IsExpanded;*/
 };
+WorldEditorScreen.prototype.createLogEntryDIV = function (_text)
+{
+    if (_text === null || typeof(_text) != 'string')
+    {
+        return null;
+    }
+
+    var entry = $('<div class="text-entry text-font-small font-color-ink"></div>');
+    var parsedText = XBBCODE.process({
+        text: _text,
+        removeMisalignedTags: false,
+        addInLineBreaks: true
+    });
+
+    entry.html(parsedText.html);
+    return entry;
+};
+WorldEditorScreen.prototype.printLog = function(_text)
+{
+    var entry = this.createLogEntryDIV(_text);
+    if (entry !== null) {
+        if (this.mLog.ListScrollContainer.children().length > 25) {
+            var firstDiv = this.mLog.ListScrollContainer.children(':first');
+            if (firstDiv.length > 0) {
+                firstDiv.remove();
+            }
+        }
+
+        this.mLog.ListScrollContainer.append(entry);
+        this.mLog.ListContainer.scrollListToBottom();
+    }
+};
 
 WorldEditorScreen.prototype.notifyBackendOnConnected = function()
 {
@@ -2563,7 +2633,7 @@ WorldEditorScreen.prototype.notifyBackendToChangeName = function(_name, _key)
 
     case 'settlement':
         id = this.updateSettlementName(_name);
-        SQ.call(this.mSQHandle, 'onChangeWorldEntityName', [id], _name);
+        SQ.call(this.mSQHandle, 'onChangeWorldEntityName', [id, _name]);
         break;
 
     case 'faction':
@@ -2583,6 +2653,27 @@ WorldEditorScreen.prototype.notifyBackendUpdateFactionRelation = function( _valu
     var id = this.mFaction.Selected.data('entry').ID;
 
     SQ.call(this.mSQHandle, 'updateFactionRelation', [ id, _value ], function(_data) {
+        if (_data === undefined || _data === null || typeof _data !== 'object') {
+            console.error('ERROR: Failed to retrieve updated Faction Relation. Invalid data result.');
+            return;
+        }
+
+        self.updateFactionRelation(_data);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendUpdateNewFactionFor = function( _parent, _type , _selectedID )
+{
+    var self = this;
+    var element = _parent.Selected;
+    var index = element.data('index');
+    var data = _parent.Data[_index];
+    data[_type] = _selectedID;
+    element.data('entry', data);
+
+    if (_type === 'Owner')
+
+    SQ.call(this.mSQHandle, 'updateFactionRelation', [ id, _type, _selectedID ], function(_data) {
         if (_data === undefined || _data === null || typeof _data !== 'object') {
             console.error('ERROR: Failed to retrieve updated Faction Relation. Invalid data result.');
             return;

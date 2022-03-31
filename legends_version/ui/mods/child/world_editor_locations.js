@@ -61,7 +61,8 @@ WorldEditorScreen.prototype.addLocationFilter = function (_data)
 
     for (var i = 0; i < _data.length; i++) {
         var entryData = _data[i];
-        var entry = this.addExpandableEntry(entryData, this.mFaction.Data[entryData.Index].Name, this.mLocation);
+        var faction = this.getFaction(entryData.ID);
+        var entry = this.addExpandableEntry(entryData, faction.Name, this.mLocation);
         entry.click(this, function(_event) {
             var div = $(this);
             if (div.hasClass('is-selected') !== true) {

@@ -397,33 +397,42 @@ this.world_editor_screen <- {
 
 	function onChangeActiveStatusOfSettlement( _data )
 	{
-		this.World.getEntityByID(_data[0]).setActive(_data[1], false);
+		local world_entity = this.World.getEntityByID(_data[0]);
+		world_entity.setActive(_data[1], false);
+		this.log(this.Const.UI.getColorized(world_entity.getName(), "#1e468f") + " has become " + (_data[1] ? "active." : "inactive."));
 	}
 
 	function onRefreshSettlementShop( _id )
 	{
-		this.World.getEntityByID(_id).resetShop();
+		local world_entity = this.World.getEntityByID(_id)
+		world_entity.resetShop();
+		this.log(this.Const.UI.getColorized(world_entity.getName(), "#1e468f") + "\'s shops have refreshed their stocks.");
 	}
 
 	function onRefreshSettlementRoster( _id )
 	{
-		this.World.getEntityByID(_id).resetRoster(true);
+		local world_entity = this.World.getEntityByID(_id)
+		world_entity.resetRoster(true);
+		this.log(this.Const.UI.getColorized(world_entity.getName(), "#1e468f") + " has refreshed its recruit roster.");
 	}
 
 	function onAddBuildingToSlot( _data )
 	{
-		local entity = this.World.getEntityByID(_data[0]);
+		local world_entity = this.World.getEntityByID(_data[0]);
 		local slot = _data[1];
+		local logText = "Added ";
 
-		if (entity.m.Buildings[slot] != null)
+		if (world_entity.m.Buildings[slot] != null)
 		{
-			entity.m.Buildings[slot].m.Settlement = null;
-			entity.m.Buildings[slot] = null;
+			logText = "Replaced " + this.Const.UI.getColorized(world_entity.m.Buildings[slot].getName(), "#1e468f") + " with ";
+			world_entity.m.Buildings[slot].m.Settlement = null;
+			world_entity.m.Buildings[slot] = null;
 		}
 
 		local building = this.new(_data[2]);
 		building.setSettlement(entity);
-		entity.m.Buildings[slot] = building;
+		world_entity.m.Buildings[slot] = building;
+		logText += this.Const.UI.getColorized(building.getName(), "#1e468f");
 
 		if ("getStash" in building)
 		{
@@ -438,51 +447,62 @@ this.world_editor_screen <- {
 				TooltipId = building.m.Tooltip,
 			},
 		});
+		this.log(logText);
 	}
 
 	function onRemoveBuilding( _data )
 	{
-		local entity = this.World.getEntityByID(_data[0]);
+		local world_entity = this.World.getEntityByID(_data[0]);
 		local slot = _data[1];
 		local id = _data[2];
+		local name = "";
 
-		if (entity.m.Buildings[slot] == null || entity.m.Buildings[slot].getID() != id) return;
+		if (world_entity.m.Buildings[slot] == null || world_entity.m.Buildings[slot].getID() != id) return;
 
-		entity.m.Buildings[slot].m.Settlement = null;
-		entity.m.Buildings[slot] = null;
+		world_entity.m.Buildings[slot].m.Settlement = null;
+		name = this.Const.UI.getColorized(world_entity.m.Buildings[slot].getName(), "#1e468f");
+		world_entity.m.Buildings[slot] = null;
+
 		this.m.JSHandle.asyncCall("updateSettlementBuildingSlot", {
 			Slot = _data[1],
 			Data = null,
 		});
+		this.log("Removed " + name + " building");
 	}
 
 	function onAddAttachedLocationToSlot( _data )
 	{
-		local entity = this.World.getEntityByID(_data[0]);
+		local result = [];
+		local world_entity = this.World.getEntityByID(_data[0]);
 		local nearRoad = this.Const.NearRoadAttachedLocations.find(_data[1]) != null;
 		local additionalTile = this.Math.rand(0, 1);
-		local attachment = this.buildAttachedLocation(entity, _data[1], additionalTile, nearRoad);
+		local attachment = this.buildAttachedLocation(world_entity, _data[1], additionalTile, nearRoad);
 		local tries = 0
 
 		while(attachment == null && tries < 6)
 		{
 			++additionalTile;
-			attachment = this.buildAttachedLocation(entity, _data[1], additionalTile, nearRoad);
+			attachment = this.buildAttachedLocation(world_entity, _data[1], additionalTile, nearRoad);
 		}
 
-		if (attachment == null) return;
-		entity.updateProduce();
-
-		foreach( attachment in entity.getAttachedLocations() )
+		if (attachment == null) 
 		{
-			if (attachment.getTypeID() == "attached_location.harbor")
+			this.log(this.Const.UI.getColorized("Failed to add new attached location. Reason: can\'t find suitable tile to spawn", "#8f1e1e"));
+			return;
+		} 
+
+		world_entity.updateProduce();
+
+		foreach( attached in world_entity.getAttachedLocations() )
+		{
+			if (attached.getTypeID() == "attached_location.harbor")
 			{
 				continue;
 			}
 
 			result.push({
-				ID = attachment.getTypeID(),
-				ImagePath = attachment.getUIImage(),
+				ID = attached.getTypeID(),
+				ImagePath = attached.getUIImage(),
 			});
 		}
 
@@ -490,6 +510,7 @@ this.world_editor_screen <- {
 			Data = result,
 			IsUpdating = true
 		});
+		this.log("Added " + this.Const.UI.getColorized(attachment.getName(), "#1e468f") + " attached location");
 	}
 
 	function onRemoveAttachedLocation( _data )
@@ -507,10 +528,15 @@ this.world_editor_screen <- {
 			}
 		}
 
-		if (find == null) return;
+		if (find == null) 
+		{
+			this.log(this.Const.UI.getColorized("Failed to remove attached location. Reason: selected attached location don\'t exist", "#8f1e1e"));
+			return;
+		}
 
 		local result = [];
 		local remove = entity.getAttachedLocations().remove(find);
+		local name = remove.getName();
 		remove.die();
 
 		foreach( attachment in entity.getAttachedLocations() )
@@ -530,20 +556,23 @@ this.world_editor_screen <- {
 			Data = result,
 			IsUpdating = true
 		});
+		this.log("Removed " + this.Const.UI.getColorized(name, "#1e468f") + " attached location");
 	}
 
 	function onAddSituationToSlot( _data )
 	{
-		local entity = this.World.getEntityByID(_data[0]);
+		local world_entity = this.World.getEntityByID(_data[0]);
 		local result = [];
+		local added = _data[1].len();
+		local before = world_entity.getSituations().len();
 
 		foreach (script in _data[1])
 		{
 			local situation = this.new(script);
-			entity.addSituation(situation, 7);
+			world_entity.addSituation(situation, 7); // i set up the default duration of the situaton to be 7 days
 		}
 
-		foreach( situation in entity.getSituations() )
+		foreach (situation in world_entity.getSituations())
 		{
 			result.push({
 				ID = situation.getID(),
@@ -555,6 +584,16 @@ this.world_editor_screen <- {
 			Data = result,
 			IsUpdating = true
 		});
+
+		if (before + added > 10)
+		{
+			local overflow = before + added - 10;
+			this.log("Added " + this.Const.UI.getColorized(added, "#135213") + " situation" + (added > 1 ? "s" : "") + " and removed " + this.Const.UI.getColorized(overflow, "#8f1e1e") + " situation" + (overflow > 1 ? "s" : "") + " due to overflow");
+		}
+		else
+		{
+			this.log("Added " + this.Const.UI.getColorized(added, "#135213") + " situation" + (added > 1 ? "s" : ""));
+		}
 	}
 
 	function onRemoveSituation( _data )
@@ -575,6 +614,7 @@ this.world_editor_screen <- {
 			Data = result,
 			IsUpdating = true
 		});
+		this.log("Removed a situation");
 	}
 
 	function onUpdateResourseValue( _data )
@@ -702,7 +742,16 @@ this.world_editor_screen <- {
 
 		if (_data[3].find("Noble") != null && faction.getType() != this.Const.FactionType.NobleHouse)
 		{
-			_data[3] = "CaravanSouthern";
+			local owner = start.getOwner();
+
+			if (owner != null && !owner.isNull() && owner.getType() == this.Const.FactionType.NobleHouse)
+			{
+				faction = owner.get();
+			}
+			else
+			{
+				_data[3] = "CaravanSouthern";
+			}
 		}
 
 		local party = faction.spawnEntity(start.getTile(), "Trading Caravan", false, this.Const.World.Spawn[_data[3]], resources);
@@ -734,7 +783,7 @@ this.world_editor_screen <- {
 
 		for( local j = 0; j < produce; j = ++j )
 		{
-			party.addToInventory(start.getProduce()[this.Math.rand(0, start.getProduce().len() - 1)]);
+			party.addToInventory(this.MSU.Array.getRandom(start.getProduce()));
 		}
 
 		party.getLoot().Money = this.Math.rand(0, 100);
@@ -793,6 +842,8 @@ this.world_editor_screen <- {
 		c.addOrder(move);
 		c.addOrder(unload);
 		c.addOrder(despawn);
+
+		this.log("Successfully sent a caravan from " + this.Const.UI.getColorized(start.getName(), "#1e468f") + " to " + this.Const.UI.getColorized(destination.getName(), "#1e468f"));
 	}
 
 	function onSendMercenaryTo( _data )
@@ -913,6 +964,7 @@ this.world_editor_screen <- {
 		}
 
 		this.World.EntityManager.m.Mercenaries.push(this.WeakTableRef(party));
+		this.log("Successfully sent a mercenary company from " + this.Const.UI.getColorized(start.getName(), "#1e468f") + " to " + this.Const.UI.getColorized(destination.getName(), "#1e468f"));
 	}
 
 	function convertToUIData()
@@ -921,8 +973,8 @@ this.world_editor_screen <- {
 		result.Assets <- this.Woditor.Helper.convertAssetsToUIData();
 		result.Avatar <- this.Woditor.Helper.convertAvatarToUIData(this);
 		result.Factions <- this.Woditor.Helper.convertFactionsToUIData();
-		result.Settlements <- this.Woditor.Helper.convertSettlementsToUIData(result.Factions);
-		result.Locations <- this.Woditor.Helper.convertLocationsToUIData(result.Factions);
+		result.Settlements <- this.Woditor.Helper.convertSettlementsToUIData();
+		result.Locations <- this.Woditor.Helper.convertLocationsToUIData();
 		result.Filter <- this.Woditor.Helper.convertToUIFilterData(result.Factions);
 		result.Scenario <- this.Woditor.Helper.convertScenariosToUIData();
 		this.m.StashCapacityBefore = result.Assets.Stash;
@@ -998,6 +1050,22 @@ this.world_editor_screen <- {
 
 	function buildAttachedLocation(_settlement, _script, _additionalDistance = 0, _mustBeNearRoad = false, _clearTile = true)
 	{
+		local terrain = [
+			this.Const.World.TerrainType.Plains,
+			this.Const.World.TerrainType.Swamp,
+			this.Const.World.TerrainType.Hills,
+			this.Const.World.TerrainType.Forest,
+			this.Const.World.TerrainType.SnowyForest,
+			this.Const.World.TerrainType.LeaveForest,
+			this.Const.World.TerrainType.AutumnForest,
+			this.Const.World.TerrainType.Mountains,
+			this.Const.World.TerrainType.Snow,
+			this.Const.World.TerrainType.Badlands,
+			this.Const.World.TerrainType.Tundra,
+			this.Const.World.TerrainType.Steppe,
+			this.Const.World.TerrainType.Desert,
+			this.Const.World.TerrainType.Oasis,
+		];
 		local tries = 0;
 		local myTile = _settlement.getTile();
 		local entity;
@@ -1025,6 +1093,55 @@ this.world_editor_screen <- {
 			}
 
 			if (tile.getDistanceTo(myTile) == 1 && _additionalDistance >= 0 || tile.getDistanceTo(myTile) < _additionalDistance)
+			{
+				continue;
+			}
+
+			local terrainFits = false;
+
+			foreach( t in terrain )
+			{
+				if (t == tile.Type)
+				{
+					if (!_mustBeNearRoad)
+					{
+						terrainFits = true;
+					}
+					else
+					{
+						for( local i = 0; i < 6; ++i )
+						{
+							if (!tile.hasNextTile(i))
+							{
+							}
+							else
+							{
+								local next = tile.getNextTile(i);
+
+								if (_mustBeNearRoad && !next.HasRoad)
+								{
+								}
+								else
+								{
+									terrainFits = true;
+
+									if (terrainFits)
+									{
+										break;
+									}
+								}
+							}
+						}
+					}
+
+					if (terrainFits)
+					{
+						break;
+					}
+				}
+			}
+
+			if (!terrainFits)
 			{
 				continue;
 			}
@@ -1067,6 +1184,11 @@ this.world_editor_screen <- {
 		}
 
 		return entity;
+	}
+
+	function log(_text)
+	{
+		this.m.JSHandle.asyncCall("printLog", _text);
 	}
 
 };

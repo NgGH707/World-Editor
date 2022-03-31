@@ -367,17 +367,14 @@ WorldEditorScreen.prototype.createFactionAllianceEntry = function(_data, _listSc
 
 
 
-
-
 /*
     Choose Faction
 */
-WorldEditorScreen.prototype.createChooseFactionPopupDialog = function(_screen, _choose) 
+WorldEditorScreen.prototype.createChooseFactionPopupDialog = function(_parent, _type) 
 {
     var self = this;
-    var parent = self[_screen];
     this.notifyBackendPopupDialogIsVisible(true);
-    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Choose a Faction', '', null, 'troops-popup');
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Choose Faction', '', null, 'troops-popup');
 
     // create: content
     var result = this.createChooseFactionDialogContent(this.mCurrentPopupDialog);
@@ -389,7 +386,10 @@ WorldEditorScreen.prototype.createChooseFactionPopupDialog = function(_screen, _
 
     // add the ok button
     this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
-        //self.notifyBackendUpdateNewFactionFor(_screen, _choose);
+        var selectedEntry = listScrollContainer.find('.is-selected:first');
+        if (selectedEntry.length > 0)
+            self.notifyBackendUpdateNewFactionFor(_parent, _type);
+
         self.mCurrentPopupDialog = null;
         _dialog.destroyPopupDialog();
         self.notifyBackendPopupDialogIsVisible(false);
@@ -479,6 +479,7 @@ WorldEditorScreen.prototype.createChooseFactionEntry = function(_data, _listScro
         entryDiv.addClass('is-selected');
     });
 };
+
 
 
 
@@ -1141,8 +1142,9 @@ WorldEditorScreen.prototype.addSettlementEntriesToPopUpDialog = function(_data, 
     var imageContainer = $('<div class="l-settlement-banner-container"/>');
     entry.append(imageContainer);
 
-    var find = (_data.Owner !== undefined && _data.Owner !== null) ? _data.Owner : _data.Faction;
-    imageContainer.createImage(Path.GFX + this.mFaction.Data[find].ImagePath, function(_image) {
+    var factionID = (_data.Owner !== undefined && _data.Owner !== null) ? _data.Owner : _data.Faction;
+    var faction = this.getFaction(factionID);
+    imageContainer.createImage(Path.GFX + faction.ImagePath, function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');

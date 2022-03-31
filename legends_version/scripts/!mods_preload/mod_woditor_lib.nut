@@ -17,6 +17,46 @@ this.getroottable().Woditor.createLib <- function ()
 		"scripts/entity/world/attached_location/wool_spinner_location",
 	];
 
+
+	gt.Woditor.Backgrounds <- {
+		Stuff = {},
+		Key = [],
+	};
+	local invaild = [
+		"scripts/skills/backgrounds/character_background",
+		"scripts/skills/backgrounds/charmed_beast_background",
+		"scripts/skills/backgrounds/charmed_goblin_background",
+		"scripts/skills/backgrounds/charmed_human_background",
+		"scripts/skills/backgrounds/charmed_human_engineer_background",
+		"scripts/skills/backgrounds/charmed_orc_background",
+		"scripts/skills/backgrounds/nggh_banshee_background",
+		"scripts/skills/backgrounds/nggh_demon_hound_background",
+		"scripts/skills/backgrounds/nggh_ghost_background",
+		"scripts/skills/backgrounds/nggh_mummy_background",
+		"scripts/skills/backgrounds/nggh_skeleton_background",
+		"scripts/skills/backgrounds/nggh_skeleton_lich_background", 
+		"scripts/skills/backgrounds/nggh_vampire_background",
+		"scripts/skills/backgrounds/spider_eggs_background",
+		"scripts/skills/backgrounds/hexen_background",
+		"scripts/skills/backgrounds/lesser_hexen_background",
+		"scripts/skills/backgrounds/luft_background",
+		"scripts/skills/backgrounds/mc_mage_background", 
+	];
+	local prefix = "scripts/skills/backgrounds/";
+	local background = this.IO.enumerateFiles(prefix);
+	foreach ( script in background )
+	{
+		if (invaild.find(background) != null) continue;
+
+		local background = this.new(script);
+		local string = script.slice(prefix.len());
+		gt.Woditor.Backgrounds.Key.push(string);
+		gt.Woditor.Backgrounds.Stuff[string] <- {
+			Name = background.getName(),
+			Icon = background.getIcon()
+		};
+	}
+
 	// valid buildings for woditor
 	gt.Woditor.Buildings <- {
 		Tooltip = {},
@@ -444,7 +484,7 @@ this.getroottable().Woditor.createLib <- function ()
 			local entity = this.new(entry.Script);
 			if (entity.getFlags().has("human"))
 			{
-				if (key.find("Cultist") != null) // separate Taro Cultist and vanilla cultist
+				if (key.find("Cultist") != null) // separate Taro Cultist to be a subtype of human
 				{
 					cultist.push(key);
 				}

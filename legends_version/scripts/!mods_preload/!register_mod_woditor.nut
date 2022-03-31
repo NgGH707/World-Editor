@@ -21,7 +21,7 @@ this.getroottable().Woditor.Name <- "mod_world_editor_legends";
 
 // register hooks
 ::mods_registerMod(this.Woditor.Name, version, "NgGH's Hard Work");
-::mods_queue(this.Woditor.Name, "mod_legends,>mod_nggh_assets", function()
+::mods_queue(this.Woditor.Name, "mod_legends,>mod_legends_PTR", function()
 {	
 	// run hooks
 	this.Woditor.hookWorldState();

@@ -92,7 +92,13 @@
     float: left;
 }
 
-/****Situation Panel****/
+/****Situation and Draft Panel****/
+.world-editor-screen > .l-world-editor-dialog-container .content .draft-row
+{
+    padding-left: 1.5rem;
+    width: 100%;
+    float: left;
+}
 .world-editor-screen > .l-world-editor-dialog-container .content .situation-row
 {
     width: 100%;
@@ -108,7 +114,8 @@
     float: left;
     margin-bottom: 0.5rem;
 }
-.world-editor-screen > .l-situation-groups-container > img
+.world-editor-screen > .situation-row > img,
+.world-editor-screen > .draft-row > img
 {
     width: 6.0rem;
     height: 6.0rem;
