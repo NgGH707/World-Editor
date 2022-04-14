@@ -466,6 +466,56 @@ WorldEditorScreen.prototype.updateLocationDetailsPanel = function(_element)
     }
 };
 
+WorldEditorScreen.prototype.fillLocationSearchItemResult = function(_data)
+{   
+    var self = this;
+    this.mLocation.SearchResult.empty();
+    if (_data.length == 0) {
+        var foundNothingLabel = this.addContainer('100%', 5.0, 'text-font-normal font-bold font-color-ink');
+        foundNothingLabel.css('text-align', 'center');
+        foundNothingLabel.html('No Item Matches');
+        this.mLocation.SearchResult.append(foundNothingLabel);
+        return;
+    }
+
+    for (var i = 0; i < _data.length; i++) {
+        var itemContainer = $('<div class="item-container"/>');
+        this.mLocation.SearchResult.append(itemContainer);
+
+        var imageLayout = $('<div class="item-layout"/>');
+        itemContainer.append(imageLayout);
+        var image = imageLayout.createImage(Path.GFX + _data[i].ImagePath, null, null, '');
+        image.data('entry', _data[i]);
+
+        // set up event listeners
+        image.click(this, function(_event) {
+            var element = $(this);
+            var data = element.data('entry');
+            self.mLocation.SearchItem.attr('src', Path.GFX + data.ImagePath);
+            self.mLocation.SearchItem.data('script', data.Script);
+            self.mLocation.SearchItem.bindTooltip({ contentType: 'ui-element', elementId: data.ID, elementOwner: 'woditor.searchresult' });
+            if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true) {
+                self.notifyBackendAddItemToLoot(data.Script);
+            }
+        });
+
+        image.bindTooltip({ contentType: 'ui-element', elementId: _data[i].ID, elementOwner: 'woditor.searchresult' });
+
+        /*if (_data[i].LayerImagePath.length > 0) {
+            var imageLayout = $('<div class="item-layout"/>');
+            imageLayout.css('pointer-events', 'none');
+            itemContainer.append(imageLayout);
+            var image = imageLayout.createImage(Path.ITEMS + _data[i].LayerImagePath, null, null, '');
+            image.css('pointer-events', 'none');
+        }*/
+
+        if (_data[i].LayerImagePath.length > 0) {
+            var image = imageLayout.createImage(Path.ITEMS + _data[i].LayerImagePath, null, null, '');
+            image.css('pointer-events', 'none');
+        }
+    }
+}
+
 WorldEditorScreen.prototype.createTroopNumInputDIV = function(_key, _definition, _parentDiv, _index)
 {
     var self = this;
@@ -536,4 +586,60 @@ WorldEditorScreen.prototype.confirmTroopNumChanges = function(_input, _index)
     else {
         _input.val('' + data.Troops[_index].Num + '');
     }
+};
+
+WorldEditorScreen.prototype.changeSearchItemFilter = function(_button, _i, _change)
+{   
+    if (_change !== true) {
+        this.mLocation.SearchFilter = _button.data('filter');
+        return;
+    }
+
+    var index = _i;
+    var image;
+    switch(index)
+    {
+    case 1:
+        image = 'icons/special';
+        break;
+
+    case 2:
+        image = 'icons/ammo';
+        break;
+
+    case 3:
+        image = 'icons/tools';
+        break;
+
+    case 4:
+        image = 'icons/crafting';
+        break;
+
+    case 5:
+        image = 'icons/armor_body';
+        break;
+
+    case 6:
+        image = 'icons/armor_head';
+        break;
+
+    case 7:
+        image = 'icons/melee_skill';
+        break;
+
+    case 8:
+        image = 'icons/sturdiness';
+        break;
+
+    case 9:
+        image = 'icons/accessory';
+        break;
+
+    default:
+        image = 'buttons/filter_all';
+    }
+
+    _button.data('filter', index);
+    _button.changeButtonImage(Path.GFX + 'ui/' + image + '.png');
+    _button.bindTooltip({ contentType: 'ui-element', elementId: index, elementOwner: 'woditor.searchfilterbutton' });
 };

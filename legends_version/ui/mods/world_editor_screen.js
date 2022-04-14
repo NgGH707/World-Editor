@@ -122,6 +122,14 @@ var WorldEditorScreen = function(_parent)
         ListScrollContainer: null,
         DetailsPanel       : null,
 
+        // search item
+        SearchFilter       : 0,
+        SearchInput        : null,
+        SearchResult       : null,
+        SearchItem         : null,
+        ItemNumInput       : null,
+        AddToLootButton    : null,
+
         // coordinate to place new location
         Coordinate:
         {
@@ -629,17 +637,21 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     scrollHeader.append(column20);
                     var buttonLayout = this.addLayout(4.5, 4.1, 'is-center'); 
                     column20.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/open-inventory-button.png', function() {
                         //self.onPreviousBannerClicked();
                     }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
+                    //button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
                 }
 
                 var slotContainer = this.addContainer(null, 18.5);
                 rightColumn.append(slotContainer);
 
+                var container = this.addLayout('99%', '100%');
+                container.css('left', '0.2rem');
+                slotContainer.append(container);
+
                 var listContainerLayout = $('<div class="l-list-container"/>');
-                slotContainer.append(listContainerLayout);
+                container.append(listContainerLayout);
                 var listContainer = listContainerLayout.createList(1);
                 this.mLocation.Loots = listContainer.findListScrollContainer();
             }
@@ -725,9 +737,10 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     upperRow.append(column21);
                     var itemLayout = this.addLayout(7.0, 7.0, 'is-center'); 
                     column21.append(itemLayout);
-                    var item = itemLayout.createImage(Path.GFX + 'ui/items/slots/inventory_slot_bag.png', function(_image) {
+                    this.mLocation.SearchItem = itemLayout.createImage(Path.GFX + 'ui/items/slots/inventory_slot_bag.png', function(_image) {
                         _image.centerImageWithinParent(0, 0, 1.0);
                     }, null, '');
+                    this.mLocation.SearchItem.data('script', null);
 
                     var column79 = this.addColumn(79);
                     upperRow.append(column79);
@@ -739,13 +752,19 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     row.append(title);
                     var inputLayout = $('<div class="l-input-big"/>');
                     row.append(inputLayout);
-                    var input = inputLayout.createInput('', 0, 40, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                    var searchInput = inputLayout.createInput('', 0, 50, 1, function(_input) {
+                        if (_input.getInputTextLength() > 3) self.notifyBackendSeachItemBy(_input.getInputText());
+                    }, 'title-font-big font-bold font-color-brother-name' , function(_input) {
+                        self.notifyBackendSeachItemBy(_input.getInputText())
                     });
-                    //input.css('background-size', '100% 4.0rem');
+                    searchInput.assignInputEventListener('click', function(_input, _event) {
+                        _input.val('');
+                    });
 
                     var buttonLayout = $('<div class="search-button"/>');
                     column79.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/search_icon.png', function() {
+                        self.notifyBackendSeachItemBy(searchInput.getInputText());
                     }, '', 6);
                 }
 
@@ -754,13 +773,64 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                 {
                     var column21 = this.addColumn(21);
                     lowerRow.append(column21);
+                    {
+                        var buttonLayout = this.addLayout(9.8, 4.3, 'is-horizontal-center');
+                        column21.append(buttonLayout);
+                        //var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/plus.png', function(_button) {
+                        var button = buttonLayout.createTextButton('Add', function(_button) {
+                            var script = self.mLocation.SearchItem.data('script');
+                            self.notifyBackendAddItemToLoot(script);
+                        }, '', /*6*/ 2);
+                        var label = button.find('.label:first');
+                        label.css('top', '0.4rem');
+
+                        // first column
+                        for (var i = 0; i < 5; i++) {
+                            var buttonLayout = this.addLayout(4.5, 4.1);
+                            buttonLayout.css('left', '0.5rem');
+                            buttonLayout.css('top', (4.6 + i * 4.1) + 'rem');
+                            column21.append(buttonLayout);
+                            var imageButton = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function(_button) {
+                                self.changeSearchItemFilter(_button, i);
+                                if (searchInput.getInputTextLength() >= 3) {
+                                    self.notifyBackendSeachItemBy(searchInput.getInputText());
+                                }
+                                else {
+                                    self.notifyBackendShowAllItems();
+                                }
+                            }, '', 6);
+                            this.changeSearchItemFilter(imageButton, i, true);
+                        }
+
+                        for (var j = 5; j < 10; j++) {
+                            var buttonLayout = this.addLayout(4.5, 4.1);
+                            buttonLayout.css('left', '5.5rem');
+                            buttonLayout.css('top', (4.6 + (j - 5) * 4.1) + 'rem');
+                            column21.append(buttonLayout);
+                            var imageButton = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function(_button) {
+                                self.changeSearchItemFilter(_button, j);
+                                if (searchInput.getInputTextLength() >= 3) {
+                                    self.notifyBackendSeachItemBy(searchInput.getInputText());
+                                }
+                                else {
+                                    self.notifyBackendShowAllItems();
+                                }
+                            }, '', 6);
+                            this.changeSearchItemFilter(imageButton, j, true);
+                        }
+                    }
 
                     var column79 = this.addColumn(79, 'with-scroll-tooltip-background');
                     lowerRow.append(column79);
+                    var container = this.addLayout('98%', '99%', 'is-center');
+                    column79.append(container);
+                    var listContainerLayout = $('<div class="l-list-container"/>');
+                    container.append(listContainerLayout);
+                    var listContainer = listContainerLayout.createList(1);
+                    this.mLocation.SearchResult = listContainer.findListScrollContainer();
                 }
             }
         }
-
     }
 };
 
@@ -1061,8 +1131,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             // button
                             var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                             row.append(buttonLayout);
-                            this.mSettlement.ActiveButton = buttonLayout.createTextButton('Shut Down', function ()
-                            {
+                            this.mSettlement.ActiveButton = buttonLayout.createTextButton('Shut Down', function() {
                                 var index = self.mSettlement.Selected.data('index');
                                 var data = self.mSettlement.Data[index];
                                 data.IsActive = !data.IsActive;
@@ -1076,8 +1145,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             // button button 
                             var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                             row.append(buttonLayout);
-                            this.mSettlement.SendCaravanButton = buttonLayout.createTextButton('Send Caravan', function ()
-                            {
+                            this.mSettlement.SendCaravanButton = buttonLayout.createTextButton('Send Caravan', function() {
                                 self.createSendCaravanPopupDialog(true);
                             }, '', 4);
 
@@ -1086,8 +1154,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             // button button button 
                             var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                             row.append(buttonLayout);
-                            var button = buttonLayout.createTextButton('Send Mercenary', function ()
-                            {
+                            var button = buttonLayout.createTextButton('Send Mercenary', function() {
                                 self.createSendCaravanPopupDialog(false);
                             }, '', 4);
 
@@ -1096,8 +1163,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             // button button button button 
                             var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                             row.append(buttonLayout);
-                            var button = buttonLayout.createTextButton('Refresh Shops', function ()
-                            {
+                            var button = buttonLayout.createTextButton('Refresh Shops', function() {
                                 var data = self.mSettlement.Selected.data('entry');
                                 self.notifyBackendRefreshSettlementShop(data.ID);
                             }, '', 4);
@@ -1107,8 +1173,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             // button button button button button 
                             var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                             row.append(buttonLayout);
-                            var button = buttonLayout.createTextButton('Refresh Roster', function ()
-                            {
+                            var button = buttonLayout.createTextButton('Refresh Roster', function() {
                                 var data = self.mSettlement.Selected.data('entry');
                                 self.notifyBackendToRefreshSettlementRoster(data.ID);
                             }, '', 4);
@@ -3023,6 +3088,12 @@ WorldEditorScreen.prototype.notifyBackendAddRandomNamedItem = function()
     SQ.call(this.mSQHandle, 'onAddRandomNamedItem', id);
 };
 
+WorldEditorScreen.prototype.notifyBackendAddItemToLoot = function(_script)
+{
+    var id = this.mLocation.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onAddItemToLoot', [ id, _script ]);
+};
+
 WorldEditorScreen.prototype.notifyBackendConvertTroopToChampion = function(_data)
 {
     var id = this.mLocation.Selected.data('entry').ID;
@@ -3259,6 +3330,50 @@ WorldEditorScreen.prototype.notifyBackendGetTroopEntries = function( _result )
         }
 
         self.addTroopEntriesToPopupDialog(_data, _result.ListScrollContainer, _result.SubTitle);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendSeachItemBy = function( _text )
+{
+    var self = this;
+    var filter = this.mLocation.SearchFilter;
+
+    if (_text.length <= 1) {
+        this.mLocation.SearchResult.empty();
+        return;
+    }
+
+    SQ.call(this.mSQHandle, 'onSeachItemBy', [ _text, filter ], function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to search for item. Invalid data result.');
+            this.mLocation.SearchResult.empty();
+            var foundNothingLabel = this.addContainer('100%', 5.0, 'text-font-normal font-bold font-color-negative-value');
+            foundNothingLabel.css('text-align', 'center');
+            foundNothingLabel.html('Error!!! Can not process input');
+            this.mLocation.SearchResult.append(foundNothingLabel);
+            return;
+        }
+
+        self.fillLocationSearchItemResult(_data);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendShowAllItems = function()
+{
+    var self = this;
+    var filter = this.mLocation.SearchFilter;
+    SQ.call(this.mSQHandle, 'onShowAllItems', filter , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to search for item. Invalid data result.');
+            self.mLocation.SearchResult.empty();
+            var foundNothingLabel = self.addContainer('100%', 5.0, 'text-font-normal font-bold font-color-negative-value');
+            foundNothingLabel.css('text-align', 'center');
+            foundNothingLabel.html('Error!!! Can not process input');
+            self.mLocation.SearchResult.append(foundNothingLabel);
+            return;
+        }
+
+        self.fillLocationSearchItemResult(_data);
     });
 };
 

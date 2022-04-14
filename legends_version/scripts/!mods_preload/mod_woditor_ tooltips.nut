@@ -79,19 +79,136 @@
 
 				if (_elementId != null)
 				{
+					if (_elementOwner == "woditor.searchfilterbutton")
+					{
+						switch (_elementId)
+						{
+						case 1:
+							return [{
+								id = 1,
+								type = "title",
+								text = "Filter Named/Legendary"
+							}];
+
+						case 2:
+							return [{
+								id = 1,
+								type = "title",
+								text = "Filter Tool/Ammo/Usable"
+							}];
+
+						case 3:
+							return [{
+								id = 1,
+								type = "title",
+								text = "Filter Supply"
+							}];
+
+						case 4:
+							return [{
+								id = 1,
+								type = "title",
+								text = "Filter Crafting/Trading"
+							}];
+
+						case 5:
+							return [{
+								id = 1,
+								type = "title",
+								text = "Filter Armor"
+							}];
+
+						case 6:
+							return [{
+								id = 1,
+								type = "title",
+								text = "Filter Helmet"
+							}];
+
+						case 7:
+							return [{
+								id = 1,
+								type = "title",
+								text = "Filter Weapon"
+							}];
+
+						case 8:
+							return [{
+								id = 1,
+								type = "title",
+								text = "Filter Shield"
+							}];
+
+						case 9:
+							return [{
+								id = 1,
+								type = "title",
+								text = "Filter Accessory"
+							}];
+					
+						default:
+							return [{
+								id = 1,
+								type = "title",
+								text = "Filter All"
+							}];
+						}
+						return null;
+					}
+
+					if (_elementOwner == "woditor.searchresult")
+					{
+						foreach (item in ::Woditor.Items[::Woditor.ItemFilter.All])
+						{
+							if (item.ID == _elementId)
+							{
+								return [
+									{
+										id = 1,
+										type = "title",
+										text = item.Name
+									},
+									{
+										id = 10,
+										type = "description",
+										text = item.Description
+									},
+									{
+										id = 6,
+										type = "text",
+										text = "ID: [color=#8f1e1e]" + item.ID + "[/color]"
+									},
+									{
+										id = 11,
+										type = "hint",
+										icon = "ui/icons/mouse_left_button.png",
+										text = "Select"
+									}
+									{
+										id = 11,
+										type = "hint",
+										icon = "ui/icons/mouse_left_button_ctrl.png",
+										text = "Add to loot"
+									}
+								];
+							}
+						}
+
+						return null;
+					}
+
 					if (_elementOwner == "woditor.factionbanner")
 					{
 				       	return [
 							{
 								id = 1,
 								type = "title",
-								text = this.World.FactionManager.getFaction(_elementId).getName()
+								text = "Reroll " + (_elementOwner != null ? "(chance: " + _elementOwner + "%)" : "")
 							},
 							{
-								id = 10,
-								type = "hint",
-								icon = "ui/icons/mouse_left_button.png",
-								text = "Change to another faction"
+								id = 2,
+								type = "description",
+								text = "Refresh the current loot pool. The chance to roll for named items is depending on the Resouces value."
 							},
 						];
 					}

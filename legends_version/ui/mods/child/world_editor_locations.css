@@ -119,7 +119,7 @@
     float: left;
     width: 6.3rem;
     height: 6.3rem;
-    margin: 0.5rem;
+    margin: 0.3rem;
 
     background-image: url("coui://gfx/ui/skin/inventory_slot.png");
     background-size: 100% 100%;
@@ -137,9 +137,9 @@
 
 .world-editor-screen > .l-world-editor-dialog-container .content .item-icon-layout .label
 {
-    left: 0.2rem;
+    left: 0.4rem;
     right: 0;
-    bottom: -0.4rem;
+    bottom: 0.4rem;
     height: 1.2rem;
     position: absolute;
 
@@ -152,8 +152,6 @@
 .world-editor-screen > .l-world-editor-dialog-container .content .item-icon-layout > img
 {
     position: absolute;
-    left: 0;
-    top: 0;
 }
 
 .world-editor-screen > .l-world-editor-dialog-container .content .search-button
@@ -162,6 +160,35 @@
     left: 32.0rem;
     width: 4.5rem;
     height: 4.1rem;
+    position: absolute;
+}
+
+.world-editor-screen > .l-world-editor-dialog-container .content .item-container
+{
+    position: relative;
+    float: left;
+    width: 7.4rem;
+    height: 7.4rem;
+    margin: 0.5rem;
+
+    background-image: url("coui://gfx/ui/skin/inventory_slot.png");
+    background-size: 7.4rem 7.4rem;
+    background-repeat: no-repeat;
+}
+
+.world-editor-screen > .l-world-editor-dialog-container .content .item-layout
+{
+    width: 7.0rem;
+    height: 7.0rem;
+
+    margin: auto;
+    position: absolute;
+}
+
+.world-editor-screen > .l-world-editor-dialog-container .content .item-layout > img
+{
+    width: 100%;
+    height: 100%;
     position: absolute;
 }
 

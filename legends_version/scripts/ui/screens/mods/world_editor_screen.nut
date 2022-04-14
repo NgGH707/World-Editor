@@ -176,6 +176,16 @@ this.world_editor_screen <- {
 		this.m.JSHandle.asyncCall("loadFromData", this.convertToUIData());
 	}
 
+	function onShowAllItems( _filter )
+	{
+		return ::Woditor.Items[_filter];
+	}
+
+	function onSeachItemBy( _data )
+	{
+		return ::Woditor.SearchItems(_data[0], _data[1]);
+	}
+
 	function onGetBuildingEntries( _id )
 	{
 		return ::Woditor.Helper.convertBuildingEntriesToUIData(_id);
@@ -772,6 +782,28 @@ this.world_editor_screen <- {
 			IsUpdating = true
 		});
 		this.log("Loots has been refreshed!");
+	}
+
+	function onAddItemToLoot( _data )
+	{
+		local world_entity = this.World.getEntityByID(_data[0]);
+		local newItem = this.new(_data[1]);
+		local result = [];
+		world_entity.getLoot().add(newItem);
+
+		foreach ( item in world_entity.getLoot().m.Items )
+		{
+			if (item != null)
+			{
+				result.push(::Woditor.Helper.convertItemToUIData(item, _data[0]));
+			}
+		}
+
+		this.m.JSHandle.asyncCall("updateLocationLoots", {
+			Loots = result,
+			IsUpdating = true
+		});
+		this.log("Added " + this.Const.UI.getColorized(newItem.getName(), "#135213") + " to loot pool");
 	}
 
 	function onAddRandomNamedItem( _id )

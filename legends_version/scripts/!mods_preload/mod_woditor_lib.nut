@@ -4,7 +4,7 @@
 	::Const.EntityIcon[::Const.EntityType.SatoManhunter] = "nomad_02_orientation";
 	::Const.EntityIcon[::Const.EntityType.SatoManhunterVeteran] = "nomad_05_orientation";
 
-	//
+	// list of attached location really need to be spawned near road
 	::Const.NearRoadAttachedLocations <- [
 		"scripts/entity/world/attached_location/stone_watchtower_oriental_location",
 		"scripts/entity/world/attached_location/wooden_watchtower_location",
@@ -14,151 +14,6 @@
 		"scripts/entity/world/attached_location/fortified_outpost_location",
 		"scripts/entity/world/attached_location/wool_spinner_location",
 	];
-
-	// get all location sprites
-	::Woditor.ValidLocationSprites <- [];
-	local locations_directory = "gfx/ui/locations/";
-	foreach (i, directory in this.IO.enumerateFiles("gfx/ui/locations/") )
-	{
-		::Woditor.ValidLocationSprites.push(directory.slice(locations_directory.len()));
-	}
-
-	::Woditor.Backgrounds <- {
-		Stuff = {},
-		Key = [],
-	};
-	local invaild = [
-		"scripts/skills/backgrounds/character_background",
-		"scripts/skills/backgrounds/charmed_beast_background",
-		"scripts/skills/backgrounds/charmed_goblin_background",
-		"scripts/skills/backgrounds/charmed_human_background",
-		"scripts/skills/backgrounds/charmed_human_engineer_background",
-		"scripts/skills/backgrounds/charmed_orc_background",
-		"scripts/skills/backgrounds/nggh_banshee_background",
-		"scripts/skills/backgrounds/nggh_demon_hound_background",
-		"scripts/skills/backgrounds/nggh_ghost_background",
-		"scripts/skills/backgrounds/nggh_mummy_background",
-		"scripts/skills/backgrounds/nggh_skeleton_background",
-		"scripts/skills/backgrounds/nggh_skeleton_lich_background", 
-		"scripts/skills/backgrounds/nggh_vampire_background",
-		"scripts/skills/backgrounds/spider_eggs_background",
-		"scripts/skills/backgrounds/hexen_background",
-		"scripts/skills/backgrounds/lesser_hexen_background",
-		"scripts/skills/backgrounds/luft_background",
-		"scripts/skills/backgrounds/mc_mage_background", 
-	];
-	local prefix = "scripts/skills/backgrounds/";
-	local background = this.IO.enumerateFiles(prefix);
-	foreach ( script in background )
-	{
-		if (invaild.find(background) != null) continue;
-
-		local background = this.new(script);
-		local string = script.slice(prefix.len());
-		::Woditor.Backgrounds.Key.push(string);
-		::Woditor.Backgrounds.Stuff[string] <- {
-			Name = background.getName(),
-			Icon = background.getIcon()
-		};
-	}
-
-	// valid buildings for woditor
-	::Woditor.Buildings <- {
-		Tooltip = {},
-		Stuff = {},
-		Valid = [],
-		All = [],
-	};
-	local invaild = [
-		"scripts/entity/world/settlements/buildings/building",
-		"scripts/entity/world/settlements/buildings/crowd_building",
-		"scripts/entity/world/settlements/buildings/crowd_oriental_building",
-		"scripts/entity/world/settlements/buildings/port_oriental_building",
-		"scripts/entity/world/settlements/buildings/stronghold_management_building",
-		"scripts/entity/world/settlements/buildings/stronghold_storage_building"
-	];
-	local buildings = this.IO.enumerateFiles("scripts/entity/world/settlements/buildings/");
-	foreach ( script in buildings )
-	{
-		local building = this.new(script);
-
-		if (invaild.find(script) == null)
-		{
-			::Woditor.Buildings.Valid.push(script);
-		}
-
-		::Woditor.Buildings.All.push(script);
-		::Woditor.Buildings.Stuff[script] <- building;
-
-		if (building.m.Tooltip != null && !(building.m.Tooltip in ::Woditor.Buildings.Tooltip))
-		{
-			::Woditor.Buildings.Tooltip[building.m.Tooltip] <- building;
-		}
-	}
-
-
-	// valid attached locations for woditor
-	::Woditor.AttachedLocations <- {
-		Tooltip = {},
-		Stuff = {},
-		Valid = [],
-		All = [],
-	};
-	local invaild = [
-		"scripts/entity/world/attached_location/harbor_location",
-		"scripts/entity/world/attached_location/guarded_checkpoint_location",
-	];
-	local attached_locations = this.IO.enumerateFiles("scripts/entity/world/attached_location/");
-	foreach ( script in attached_locations )
-	{
-		local attached_location = this.new(script);
-
-		if (invaild.find(script) == null)
-		{
-			::Woditor.AttachedLocations.Valid.push(script);
-		}
-
-		::Woditor.AttachedLocations.All.push(script);
-		::Woditor.AttachedLocations.Stuff[script] <- attached_location;
-
-		if (!(attached_location.getTypeID() in ::Woditor.AttachedLocations.Tooltip))
-		{
-			::Woditor.AttachedLocations.Tooltip[attached_location.getTypeID()] <- attached_location;
-		}
-	}
-
-
-	// valid situations for woditor
-	::Woditor.Situations <- {
-		Tooltip = {},
-		Stuff = {},
-		Valid = [],
-		All = [],
-	};
-	local invaild = [
-		"scripts/entity/world/settlements/situations/situation", 
-		"scripts/entity/world/settlements/situations/stronghold_well_supplied_ai_situation",
-		"scripts/entity/world/settlements/situations/stronghold_well_supplied_situation",
-		"scripts/entity/world/settlements/situations/pokebro_center_clickable_situation",
-	];
-	local situations = this.IO.enumerateFiles("scripts/entity/world/settlements/situations/");
-	foreach ( script in situations )
-	{
-		if (invaild.find(script) == null)
-		{
-			local situation = this.new(script);
-			::Woditor.Situations.Valid.push(script);
-			::Woditor.Situations.Stuff[script] <- situation;
-
-			if (!(situation.getID() in ::Woditor.Situations.Tooltip))
-			{
-				::Woditor.Situations.Tooltip[situation.getID()] <- situation;
-			}
-		}
-
-		::Woditor.Situations.All.push(script);
-	}
-
 
 	// something to add to the tooltips
 	::Const.PercentageNoteString <- " The value is calculated in percentage. The default value is 100 which means 100%."
@@ -232,6 +87,7 @@
 
 		::Const.OtherBanner.push("ui/banners/factions/banner_" + (i < 10 ? "0" + i : i) + ".png");
 	}
+
 
 	// lib for avatar changer
 	::Const.WorldSockets <- [
@@ -437,6 +293,7 @@
 		"figure_white_direwolf_01",
 	]);
 
+	
 	// the orc group type
 	::Const.IsOrcs <- [
 		this.Const.EntityType.OrcYoung,
@@ -446,196 +303,6 @@
 		this.Const.EntityType.LegendOrcElite,
 		this.Const.EntityType.LegendOrcBehemoth,
 	];
-	::Woditor.sortByName <- function(_a, _b)
-	{
-	 	if (_a < _b) return -1;
-		else if (_a > _b) return 1;
-		else return 0;
-	};
-	::Woditor.TroopTypeFilter <- {
-		All = 0,
-		Human = 1,
-		Undead = 2,
-		Greenskin = 3,
-		Misc = 4,
-		COUNT = 5
-	}
-
-	// processing the spawnlist so i can add them as entry to the mod ui
-	::Woditor.ValidTroops <- [
-		[], // all
-		[], // human
-		[], // undead
-		[], // greenskin
-		[], // misc
-	];
-	::Woditor.TroopKeys <- {};
-	::Woditor.TroopNames <- {};
-	local cultist = [];
-
-	foreach (key, entry in this.Const.World.Spawn.Troops)
-	{
-		if (key == "BanditOutrider")
-		{
-			continue;
-		}
-
-		if (!(entry.Script in ::Woditor.TroopKeys))
-		{
-			::Woditor.TroopKeys[entry.Script] <- key;
-			
-			// attempting to filter out all entries by enemy type group
-			local entity = this.new(entry.Script);
-			if (entity.getFlags().has("human"))
-			{
-				if (key.find("Cultist") != null) // separate Taro Cultist to be a subtype of human
-				{
-					cultist.push(key);
-				}
-				else
-				{
-					::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Human].push(key);
-				}
-			}
-			else if (entity.getFlags().has("undead"))
-			{
-				::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Undead].push(key);
-			}
-			else if (entity.getFlags().has("goblin") || this.Const.IsOrcs.find(entity.getType()) != null)
-			{
-				::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Greenskin].push(key);
-			}
-			else
-			{
-				::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Misc].push(key);
-			}
-		}
-		else
-		{
-			continue;
-		}
-
-		local prefix = "";
-		local postfix = "";
-		local isGhoul = key.find("Ghoul") != null;
-		local isSandGolem = key.find("SandGolem") != null;
-		local isWeak = entry.Script.slice(entry.Script.len() - 4) == "_low";
-		local isBodyGuard = key.find("Bodyguard") != null;
-		local hasRanged = key.find("Ranged") != null;
-		local hasPolearm = key.find("Polearm") != null;
-		local isFrenzied = key == "DirewolfHIGH" || key == "HyenaHIGH";
-		local isArmored = key == "ArmoredWardog";
-		local isFake = entry.Script.find("bandit_raider_wolf") != null;
-
-		switch (true)
-		{
-		case isGhoul:
-		case isSandGolem:
-			if (entry.Script.find("_med") != null) postfix += " (M)";
-			else if (entry.Script.find("_high") != null) postfix += " (L)";
-			else postfix += " (S)";
-			break;
-
-		case isWeak:
-			postfix += " (W)";
-			break;
-
-		case isBodyGuard:
-			postfix += " (B)";
-			break;
-
-		case hasRanged:
-			postfix += " (R)";
-			break;
-
-		case hasPolearm:
-			postfix += " (P)";
-			break;
-
-		case isFrenzied:
-			prefix += "Frenzied ";
-			break;
-
-		case isArmored:
-			prefix += "Armored ";
-			break;
-
-		case isFake:
-			prefix += "Faked ";
-			break;
-		}
-
-		::Woditor.TroopNames[entry.Script] <- prefix + ::Const.Strings.EntityName[entry.ID] + postfix;
-	}
-
-	// try my best to sorting the entries, still look a bit chaotic though
-	cultist.sort(::Woditor.sortByName);
-	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Human].sort(::Woditor.sortByName);
-	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Undead].sort(::Woditor.sortByName);
-	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Greenskin].sort(::Woditor.sortByName);
-	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Misc].sort(::Woditor.sortByName);
-
-	// add all entry to the all list
-	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Human].extend(cultist);
-	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.All].extend(::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Human]);
-	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.All].extend(::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Undead]);
-	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.All].extend(::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Greenskin]);
-	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.All].extend(::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Misc]);
-
-	// function to assist getting ui data from troop entry from world map location/party
-	::Woditor.getTroopKey <- function(_entry)
-	{
-		return ::Woditor.TroopKeys[_entry.Script];
-	};
-	::Woditor.getTroopName <- function(_entry)
-	{
-		return ::Woditor.TroopNames[_entry.Script];
-	};
-	::Woditor.getTroopIcon <- function(_entry)
-	{
-		return "ui/orientation/" + this.Const.EntityIcon[_entry.ID] + ".png";
-	};
-
-	// UI Processing Helper for Woditor
-	::Woditor.Helper <- this.new("scripts/mods/world_editor_data_helper");
-
-	// Assets Properties
-	::Woditor.AssetsProperties <- {
-		Mult = [
-			"BusinessReputationRate",
-			"XPMult",
-			"HitpointsPerHourMult",
-			"RepairSpeedMult",
-			"VisionRadiusMult",
-			"FootprintVision",
-			"MovementSpeedMult",
-			"RelationDecayGoodMult",
-			"RelationDecayBadMult",
-			"NegotiationAnnoyanceMult",
-			"ContractPaymentMult",
-			"HiringCostMult",
-			"TryoutPriceMult",
-			"DailyWageMult",
-			"TrainingPriceMult",
-			"TaxidermistPriceMult",
-			"BuyPriceMult",
-			"SellPriceMult",
-			"BuyPriceTradeMult",
-			"SellPriceTradeMult",
-			"MovementSpeedMult",
-			"AdvancePaymentCap",
-		],
-		Additive = [
-			"FoodAdditionalDays",
-			"BrothersScaleMax",
-			"BrothersScaleMin",
-			"RosterSizeAdditionalMax",
-			"RosterSizeAdditionalMin",
-			"ChampionChanceAdditional",
-			"ExtraLootChance",
-			"EquipmentLootChance"
-		]
-	};
 
 	delete ::Woditor.createLib;
 }
