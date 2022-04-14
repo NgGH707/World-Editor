@@ -1,7 +1,37 @@
-this.getroottable().Woditor.hookTooltips <- function ()
+::Woditor.hookTooltips <- function()
 {
 	::mods_hookNewObjectOnce("ui/screens/tooltip/tooltip_events", function( obj ) 
 	{
+		local queryUIItemTooltipData = obj.onQueryUIItemTooltipData;
+		obj.onQueryUIItemTooltipData = function( _entityId, _itemId, _itemOwner )
+		{
+			if (_itemOwner == "woditor.loot")
+			{
+				local world_entity = this.World.getEntityByID(_entityId);
+
+				if (world_entity != null)
+				{
+					local loot = world_entity.getLoot().getItemByInstanceID(_itemId);
+
+					if (loot != null)
+					{
+						local tooltip = loot.item.getTooltip();
+						tooltip.push({
+							id = 11,
+							type = "hint",
+							icon = "ui/icons/mouse_left_button_ctrl.png",
+							text = "Discard item"
+						});
+						return tooltip;
+					}
+				}
+
+				return null;
+			}
+
+			return queryUIItemTooltipData(_entityId, _itemId, _itemOwner);
+		};
+
 	 	local queryTooltipData = obj.general_queryUIElementTooltipData;
 	 	obj.general_queryUIElementTooltipData = function(_entityId, _elementId, _elementOwner)
 	 	{
@@ -72,14 +102,14 @@ this.getroottable().Woditor.hookTooltips <- function ()
 			 				{
 								id = 1,
 								type = "title",
-								text = this.Woditor.Backgrounds.Stuff[_elementId].Name
+								text = ::Woditor.Backgrounds.Stuff[_elementId].Name
 							}
 		 				]
 		 			}
 
 					if (_elementOwner == "woditor.attached_location")
 		 			{
-		 				local tooltip = this.Woditor.AttachedLocations.Tooltip[_elementId].world_entity.getTooltip();
+		 				local tooltip = ::Woditor.AttachedLocations.Tooltip[_elementId].world_entity.getTooltip();
 		 				
 		 				if (_entityId == null)
 		 				{
@@ -91,7 +121,7 @@ this.getroottable().Woditor.hookTooltips <- function ()
 
 		 			if (_elementOwner == "woditor.situations" )
 		 			{
-		 				local tooltip = this.Woditor.Situations.Tooltip[_elementId].getTooltip();
+		 				local tooltip = ::Woditor.Situations.Tooltip[_elementId].getTooltip();
 		 				
 		 				if (_entityId == null)
 		 				{
@@ -117,6 +147,62 @@ this.getroottable().Woditor.hookTooltips <- function ()
 
 			switch (_elementId) 
 			{
+			case "woditor.refreshloot":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Reroll " + (_elementOwner != null ? "(chance: " + _elementOwner + "%)" : "")
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Refresh the current loot pool. The chance to roll for named items is depending on the Resouces value."
+					},
+				];
+
+			case "woditor.randomnameditem":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Add Random Item"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Randomly pick a named item and add it too the loot pool"
+					},
+				];
+
+			case "woditor.housecount":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "House"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "The number of house tile of the current settlement. The more houses the settlement has the more income resources it gains."
+					},
+				];
+
+			case "woditor.nofaction":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "No Faction"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "This entity is not belong to any faction on the world."
+					},
+				];
+
 			case "woditor.rostertier":
 		       	local ret = [
 					{
@@ -595,6 +681,20 @@ this.getroottable().Woditor.hookTooltips <- function ()
 					},
 				];
 
+			case "woditor.reload_leader":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Reroll"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Replace the current leadership figures of the current faction with someone else."
+					},
+				];
+
 			case "woditor.fixedrelation":
 		       	return [
 					{
@@ -718,7 +818,7 @@ this.getroottable().Woditor.hookTooltips <- function ()
 					{
 						id = 2,
 						type = "description",
-						text = "Discard the current troops list then use the current template and resources to create a new one. If no template is chosen, it will only discard the troop list."
+						text = "Refresh the current troops list with a given troop template. If no troop template is chosen, the default template will be used. If no default template is found then it does nothing."
 					},
 				];
 
@@ -732,7 +832,7 @@ this.getroottable().Woditor.hookTooltips <- function ()
 					{
 						id = 2,
 						type = "description",
-						text = "Choose a template so you can use \'Reroll Troops\' to create a random troop list."
+						text = "Choose a template so you can use \'Reroll Troops\' to refresh the troop list."
 					},
 				];
 
@@ -746,7 +846,7 @@ this.getroottable().Woditor.hookTooltips <- function ()
 					{
 						id = 2,
 						type = "description",
-						text = "There is some notes i have left in the troop name to identify them. Here is what they stand for:"
+						text = "[color=#8f1e1e]Please remember that a location/party can only hold 255 units at most, anymore than that can brick your save[/color] .There is some notes i have left in the troop name to identify them. Here is what they stand for:"
 					},
 					{
 						id = 3,
@@ -841,5 +941,5 @@ this.getroottable().Woditor.hookTooltips <- function ()
 		}
 	});
 	
-	delete this.Woditor.hookTooltips;
+	delete ::Woditor.hookTooltips;
 };

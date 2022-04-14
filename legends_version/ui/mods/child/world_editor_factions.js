@@ -7,8 +7,25 @@ WorldEditorScreen.prototype.getFaction = function (_id)
             return faction;
         }
     }
-
     return null;
+}
+
+WorldEditorScreen.prototype.updateFactionData = function(_newData)
+{
+    var element = this.mFaction.Selected;
+    var index = element.data('index');
+    var data = this.mFaction.Data[index];
+    $.each(_newData, function(_key, _definition) {
+        if (_key !== 'IsUpdating') {
+            data[_key] = _definition;
+        }
+    });
+    element.data('entry', data);
+
+    return {
+        Element: element,
+        Data: data
+    };
 }
 
 WorldEditorScreen.prototype.addFactionsData = function (_data)
@@ -63,14 +80,14 @@ WorldEditorScreen.prototype.addFactionListEntry = function (_data, _index)
     var name = $('<div class="name title-font-normal font-bold font-color-brother-name">' + _data['Name'] + '</div>');
     row.append(name);
 
-    if('Landlord' in _data && _data.Landlord !== undefined && _data.Landlord !== null)
+    /*if('Landlord' in _data && _data.Landlord !== undefined && _data.Landlord !== null) quite redundant
     {
         var landlordImageContainer = $('<div class="f-landlord-container"/>');
         row.append(landlordImageContainer);
         var landlordImage = landlordImageContainer.createImage(Path.GFX + _data.Landlord, function(_image) {
             _image.fitImageToParent(0, 0);
         }, null,'');
-    }
+    }*/
 
     // bottom row
     row = $('<div class="faction-row is-bottom"/>');
@@ -121,27 +138,20 @@ WorldEditorScreen.prototype.selectFactionListEntry = function(_element, _scrollT
 
 WorldEditorScreen.prototype.updateFactionName = function(_name)
 {
-    var element = this.mFaction.Selected;
-    var index = element.data('index');
-    var name = element.find('.name:first');
+    var result = this.updateFactionData({Name: _name});
+    var name = result.Element.find('.name:first');
     if (name.length > 0) {
         name.html(_name);
     }
-    var data = this.mFaction.Data[index];
-    data.Name = _name;
-    element.data('entry', data);
-    return data.ID;
+    return result.Data.ID;
 }
 
 WorldEditorScreen.prototype.updateFactionBanner = function(_imagePath)
 {
-    var element = this.mFaction.Selected;
-    var index = element.data('index');
-    var data = this.mFaction.Data[index];
-    data.ImagePath = _imagePath;
-
+    var result = this.updateFactionData({ImagePath: _imagePath});
+  
     // update banner in list container
-    var column = element.find('.faction-column:first');
+    var column = result.Element.find('.faction-column:first');
     if (column.length > 0) {
         var image = column.find('img:first');
         if (image.length > 0) {
@@ -151,36 +161,25 @@ WorldEditorScreen.prototype.updateFactionBanner = function(_imagePath)
 
     // update banner image in detail panel
     this.mFaction.Banner.attr('src', Path.GFX + _imagePath);
-    element.data('entry', data);
 }
 
 WorldEditorScreen.prototype.updateFactionRelation = function(_data)
 {
-    var element = this.mFaction.Selected;
-    var index = element.data('index');
-    var progressbar = element.find('.stats-progressbar:first');
+    var result = this.updateFactionData(_data);
+    var progressbar = result.Element.find('.stats-progressbar:first');
     if (progressbar.length > 0) {
         var newWidth = (_data.RelationNum / 100.0) * 100;
         progressbar.css('width', newWidth + '%');
     }
-    var label = element.find('.stats-progressbar-label:first');
+    var label = result.Element.find('.stats-progressbar-label:first');
     if (label.length > 0) {
         label.html(_data.Relation);
     }
-    var data = this.mFaction.Data[index];
-    data.RelationNum = _data.RelationNum;
-    data.Relation = _data.Relation;
-    element.data('entry', data);
 }
 
 WorldEditorScreen.prototype.updateFactionRelationDeterioration = function(_isChecked)
 {
-    var element = this.mFaction.Selected;
-    var index = element.data('index');
-    var data = this.mFaction.Data[index];
-    data.FactionFixedRelation = _isChecked;
-    element.data('entry', data);
-    return data.ID;
+    return this.updateFactionData({FactionFixedRelation: _isChecked}).Data.ID;
 }
 
 WorldEditorScreen.prototype.updateFactionDetailsPanel = function(_element)
@@ -190,12 +189,14 @@ WorldEditorScreen.prototype.updateFactionDetailsPanel = function(_element)
         var data = _element.data('entry');
         this.mIsUpdating = true;
         this.mFaction.Name.setInputText(data.Name);
+        this.mFaction.Motto.setInputText(data.Motto);
         this.mFaction.Banner.attr('src', Path.GFX + data.ImagePath);
         this.mFaction.PrevButton.enableButton(data.NoChangeName !== true);
         this.mFaction.NextButton.enableButton(data.NoChangeName !== true);
 
         this.mFactionRelation.Control.val(data.RelationNum);
         this.mFactionRelation.Label.text('' + data.RelationNum + this.mFactionRelation.Postfix);
+        this.mFactionRelation.Label.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.RelationsScreen.Relations, entityId: data.ID });
 
         if (this.mFactionFixedRelation.Checkbox.is(':checked') === true && data.FactionFixedRelation === false)
             this.mFactionFixedRelation.Checkbox.iCheck('uncheck');
@@ -219,13 +220,9 @@ WorldEditorScreen.prototype.updateFactionContracts = function(_data)
 
 WorldEditorScreen.prototype.resetContractInFactionDetail = function() 
 {
-    var element = this.mFaction.Selected;
-    var index = element.data('index');
-    var data = this.mFaction.Data[index];
-    data.Contracts = [];
+    var result = this.updateFactionData({Contracts: []});
     this.mFaction.Contracts.empty();
-    element.data('entry', data);
-    return data.ID;
+    return result.Data.ID;
 }
 
 WorldEditorScreen.prototype.addContractToFactionDetail = function(_data) 

@@ -1,4 +1,4 @@
-this.getroottable().Woditor.hookScenarios <- function ()
+::Woditor.hookScenarios <- function ()
 {
 	::mods_hookBaseClass("scenarios/world/starting_scenario", function( obj )
 	{
@@ -78,5 +78,5 @@ this.getroottable().Woditor.hookScenarios <- function ()
 		}
 	});
 
-	delete this.Woditor.hookScenarios;
+	delete ::Woditor.hookScenarios;
 }

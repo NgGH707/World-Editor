@@ -1,7 +1,7 @@
 local version = 3.0;
-this.getroottable().Woditor <- {};
-this.getroottable().Woditor.Version <- version;
-this.getroottable().Woditor.Name <- "mod_world_editor_legends";
+::Woditor <- {};
+::Woditor.Version <- version;
+::Woditor.Name <- "mod_world_editor_legends";
 
 // register CSS
 ::mods_registerCSS("world_editor_screen.css");
@@ -20,19 +20,20 @@ this.getroottable().Woditor.Name <- "mod_world_editor_legends";
 ::mods_registerJS("child/world_editor_popup_dialogs.js");
 
 // register hooks
-::mods_registerMod(this.Woditor.Name, version, "NgGH's Hard Work");
-::mods_queue(this.Woditor.Name, "mod_legends,>mod_legends_PTR", function()
+::mods_registerMod(::Woditor.Name, version, "NgGH's Hard Work");
+::mods_queue(::Woditor.Name, "mod_legends,>mod_legends_PTR", function()
 {	
 	// run hooks
-	this.Woditor.hookWorldState();
-	this.Woditor.hookAssetsManager();
-	this.Woditor.hookTooltips();
-	this.Woditor.hookScenarios();
-	this.Woditor.hookFaction();
-	this.Woditor.hookContracts();
-	this.Woditor.hookBuildings();
-	this.Woditor.hookLocation();
-	this.Woditor.hookPlayerParty();
-	this.Woditor.hookAttachedLocation();
-	this.Woditor.createLib();
+	::Woditor.hookWorldState();
+	::Woditor.hookAssetsManager();
+	::Woditor.hookFollowers();
+	::Woditor.hookTooltips();
+	::Woditor.hookScenarios();
+	::Woditor.hookFaction();
+	::Woditor.hookContracts();
+	::Woditor.hookBuildings();
+	::Woditor.hookLocation();
+	::Woditor.hookPlayerParty();
+	::Woditor.hookAttachedLocation();
+	::Woditor.createLib();
 });

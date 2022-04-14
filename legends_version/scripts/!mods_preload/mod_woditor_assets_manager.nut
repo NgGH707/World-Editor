@@ -1,4 +1,4 @@
-this.getroottable().Woditor.hookAssetsManager <- function ()
+::Woditor.hookAssetsManager <- function ()
 {
 	::mods_hookNewObject("states/world/asset_manager", function ( obj )
 	{	
@@ -6,12 +6,12 @@ this.getroottable().Woditor.hookAssetsManager <- function ()
 		obj.m.EquipmentLootChance <- 0;
 		obj.m.MovementSpeedMult <- 1.0;
 
-		foreach (key in this.Woditor.AssetsProperties.Mult)
+		foreach (key in ::Woditor.AssetsProperties.Mult)
 		{
 			obj.m.BaseProperties[key] <- 1.0;
 		}
 
-		foreach (key in this.Woditor.AssetsProperties.Additive)
+		foreach (key in ::Woditor.AssetsProperties.Additive)
 		{
 			obj.m.BaseProperties[key] <- 0;
 		}
@@ -21,12 +21,12 @@ this.getroottable().Woditor.hookAssetsManager <- function ()
 		{
 			ws_resetToDefaults();
 
-			foreach (key in this.Woditor.AssetsProperties.Mult)
+			foreach (key in ::Woditor.AssetsProperties.Mult)
 			{
 				if (this.World.Flags.has(key)) this.m[key] *= this.World.Flags.getAsFloat(key); 
 			}
 
-			foreach (key in this.Woditor.AssetsProperties.Additive)
+			foreach (key in ::Woditor.AssetsProperties.Additive)
 			{
 				this.m[key] += this.World.Flags.getAsInt(key);
 			}
@@ -39,12 +39,12 @@ this.getroottable().Woditor.hookAssetsManager <- function ()
 
 		obj.updateBaseProperties <- function()
 		{
-			foreach (key in this.Woditor.AssetsProperties.Mult)
+			foreach (key in ::Woditor.AssetsProperties.Mult)
 			{
 				if (this.World.Flags.has(key)) this.m.BaseProperties[key] = this.m[key] / this.World.Flags.getAsFloat(key);
 			}
 
-			foreach (key in this.Woditor.AssetsProperties.Additive)
+			foreach (key in ::Woditor.AssetsProperties.Additive)
 			{
 				this.m.BaseProperties[key] = this.m[key] - this.World.Flags.getAsInt(key);
 			}
@@ -95,5 +95,5 @@ this.getroottable().Woditor.hookAssetsManager <- function ()
 		}*/
 	});
 
-	delete this.Woditor.hookAssetsManager;
+	delete ::Woditor.hookAssetsManager;
 }

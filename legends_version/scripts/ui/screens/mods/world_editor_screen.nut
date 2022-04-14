@@ -168,7 +168,7 @@ this.world_editor_screen <- {
 
 	function onReloadButtonPressed()
 	{
-		this.m.Retinue.update();
+		this.World.Retinue.update();
 		this.World.Assets.updateLook();
 		this.World.State.updateTopbarAssets();
 		if (this.m.StashIsChanged) this.World.State.getPlayer().forceRecalculateStashModifier();
@@ -178,32 +178,59 @@ this.world_editor_screen <- {
 
 	function onGetBuildingEntries( _id )
 	{
-		return this.Woditor.Helper.convertBuildingEntriesToUIData(_id);
+		return ::Woditor.Helper.convertBuildingEntriesToUIData(_id);
 	}
 
 	function onGetAttachedLocationEntries( _id )
 	{
-		return this.Woditor.Helper.convertAttachedLocationEntriesToUIData(_id);
+		return ::Woditor.Helper.convertAttachedLocationEntriesToUIData(_id);
 	}
 
 	function onGetSituationEntries( _id )
 	{
-		return this.Woditor.Helper.convertSituationEntriesToUIData(_id);
+		return ::Woditor.Helper.convertSituationEntriesToUIData(_id);
+	}
+
+	function onGetLocationSpriteEntries( _id )
+	{
+		return ::Woditor.Helper.convertLocationSpriteEntriesToUIData(_id);
 	}
 
 	function onGetTroopEntries( _data )
 	{
-		return this.Woditor.Helper.convertTroopEntriesToUIData(_data);
+		return ::Woditor.Helper.convertTroopEntriesToUIData(_data);
 	}
 
 	function onGetTroopTemplate( _type )
 	{
-		return this.Woditor.Helper.convertTroopTemplateToUIData(_type);
+		return ::Woditor.Helper.convertTroopTemplateToUIData(_type);
+	}
+
+	function onGetFactionLeaders( _id )
+	{
+		return ::Woditor.Helper.convertFactionLeadersToUIData(_id);
 	}
 
 	function onCollectAllianceData( _data )
 	{
-		return this.Woditor.Helper.convertFactionAllianceToUIData(_data);
+		return ::Woditor.Helper.convertFactionAllianceToUIData(_data);
+	}
+
+	function onGetAllNonHostileFactionsOfThisFaction( _factionID )
+	{
+		local faction = this.World.FactionManager.getFaction(_factionID);
+		local allies = faction.getAllies();
+		local valid = [_factionID];
+
+		foreach ( id in allies )
+		{
+			if (id > 2 && valid.find(id) == null) 
+			{
+				valid.push(id);
+			}
+		}
+
+		return valid;
 	}
 
 	function onGetValidSettlementsToSendCaravan( _id )
@@ -220,6 +247,48 @@ this.world_editor_screen <- {
 		}
 
 		return result;
+	}
+
+	function onUpdateNewOwnerFor( _data )
+	{
+		local world_entity = this.World.getEntityByID(_data[0]);
+		local faction = this.World.FactionManager.getFaction(_data[1]);
+		local currentOwner = world_entity.getOwner();
+
+		if (currentOwner != null && world_entity.getFactions().len() > 1)
+		{
+			world_entity.removeFaction(currentOwner.getID());
+		}
+
+		world_entity.setOwner(faction);
+		this.m.JSHandle.asyncCall("updateSettlementNewOwner", {Owner = _data[1]});
+	}
+
+	function onUpdateNewFactionFor( _data )
+	{
+		local world_entity = this.World.getEntityByID(_data[0]);
+
+		if (world_entity.isLocationType(this.Const.World.LocationType.Settlement))
+		{
+			if (world_entity.getOwner() != null && world_entity.getOwner().getID() != _data[2])
+			{
+				world_entity.removeFaction(_data[2]);
+			}
+
+			world_entity.addFaction(_data[1]);
+			this.m.JSHandle.asyncCall("updateSettlementNewFaction", {Faction = _data[1]});
+		}
+		else
+		{
+			world_entity.setFaction(_data[1]);
+
+			foreach ( troop in world_entity.getTroops() )
+			{
+				troop.Faction = world_entity.getFaction();
+			}
+
+			this.m.JSHandle.asyncCall("updateLocationNewFaction", {Faction = _data[1]});
+		}
 	}
 
 	function onUpdateFactionAlliance( _data )
@@ -239,6 +308,8 @@ this.world_editor_screen <- {
 			f.removeAlly(_data[0]);
 			faction.removeAlly(id);
 		}
+
+
 	}
 
 	function onUpdateAvatarModel( _data )
@@ -309,12 +380,17 @@ this.world_editor_screen <- {
 			banner.Visible = true;
 		}
 
-		this.m.JSHandle.asyncCall("updateFactionContracts", this.Woditor.Helper.getContractsUI(faction));
+		this.m.JSHandle.asyncCall("updateFactionContracts", ::Woditor.Helper.getContractsUI(faction));
 	}
 
 	function onChangeFactionName( _data )
 	{
 		this.World.FactionManager.getFaction(_data[0]).setName(_data[1]);
+	}
+
+	function onChangeFactionMotto( _data )
+	{
+		this.World.FactionManager.getFaction(_data[0]).setMotto(_data[1]);
 	}
 
 	function onDespawnFactionTroops( _id )
@@ -332,7 +408,7 @@ this.world_editor_screen <- {
 		faction.m.Units = new;
 	}
 
-	function onRefreshFactionOwningCharacter( _id )
+	function onRefreshFactionLeader( _id )
 	{
 		local faction = this.World.FactionManager.getFaction(_id);
 		faction.getRoster().clear();
@@ -342,6 +418,8 @@ this.world_editor_screen <- {
 		{
 			contract.setEmployerID(faction.getRandomCharacter().getID());
 		}
+
+		return ::Woditor.Helper.convertFactionLeadersToUIData(_id);
 	}
 
 	function onRefreshFactionActions( _id )
@@ -390,6 +468,11 @@ this.world_editor_screen <- {
 		this.World.getEntityByID(_data[0]).setName(_data[1]);
 	}
 
+	function onChangeLocationSprite( _data )
+	{
+		this.World.getEntityByID(_data[0]).getSprite("body").setBrush(_data[1]);
+	}
+
 	function onChangeScenario( _id )
 	{
 		this.World.Assets.m.Origin = this.Const.ScenarioManager.getScenario(_id);
@@ -411,9 +494,30 @@ this.world_editor_screen <- {
 
 	function onRefreshSettlementRoster( _id )
 	{
-		local world_entity = this.World.getEntityByID(_id)
+		local world_entity = this.World.getEntityByID(_id);
 		world_entity.resetRoster(true);
 		this.log(this.Const.UI.getColorized(world_entity.getName(), "#1e468f") + " has refreshed its recruit roster.");
+	}
+
+	function onAddHouse( _data )
+	{
+		local world_entity = this.World.getEntityByID(_data[0]);
+		local isAddHouse = _data[1];
+
+		if (isAddHouse)
+		{
+			if (!world_entity.buildHouse())
+			{
+				this.log(this.Const.UI.getColorized("Failed to build house. Reason: can\'t find suitable tile to build", "#8f1e1e"));
+			}
+		}
+		else
+		{
+			if (!world_entity.destroyHouse())
+			{
+				this.log(this.Const.UI.getColorized("Failed to destroy house. Reason: there is no house", "#8f1e1e"));
+			}
+		}
 	}
 
 	function onAddBuildingToSlot( _data )
@@ -430,7 +534,7 @@ this.world_editor_screen <- {
 		}
 
 		local building = this.new(_data[2]);
-		building.setSettlement(entity);
+		building.setSettlement(world_entity);
 		world_entity.m.Buildings[slot] = building;
 		logText += this.Const.UI.getColorized(building.getName(), "#1e468f");
 
@@ -507,7 +611,7 @@ this.world_editor_screen <- {
 		}
 
 		this.m.JSHandle.asyncCall("updateAttachmentList", {
-			Data = result,
+			Attachments = result,
 			IsUpdating = true
 		});
 		this.log("Added " + this.Const.UI.getColorized(attachment.getName(), "#1e468f") + " attached location");
@@ -553,7 +657,7 @@ this.world_editor_screen <- {
 		}
 
 		this.m.JSHandle.asyncCall("updateAttachmentList", {
-			Data = result,
+			Attachments = result,
 			IsUpdating = true
 		});
 		this.log("Removed " + this.Const.UI.getColorized(name, "#1e468f") + " attached location");
@@ -581,7 +685,7 @@ this.world_editor_screen <- {
 		}
 		
 		this.m.JSHandle.asyncCall("updateSituationList", {
-			Data = result,
+			Situations = result,
 			IsUpdating = true
 		});
 
@@ -611,32 +715,384 @@ this.world_editor_screen <- {
 		}
 
 		this.m.JSHandle.asyncCall("updateSituationList", {
-			Data = result,
+			Situations = result,
 			IsUpdating = true
 		});
 		this.log("Removed a situation");
 	}
 
+	function onRemoveLoot( _data )
+	{
+		local world_entity = this.World.getEntityByID(_data[0]);
+		local remove = world_entity.getLoot().getItemByInstanceID(_data[1]);
+		local result = [];
+
+		if (remove == null) 
+		{
+			return this.log(this.Const.UI.getColorized("Failed to remove the item from loot pool. Reason: can\'t find item", "#8f1e1e"));
+		}
+		else
+		{
+			world_entity.getLoot().removeByIndex(remove.index);
+			world_entity.getLoot().sort();
+		}
+
+		foreach ( item in world_entity.getLoot().m.Items )
+		{
+			if (item != null)
+			{
+				result.push(::Woditor.Helper.convertItemToUIData(item, _data[0]));
+			}
+		}
+
+		this.m.JSHandle.asyncCall("updateLocationLoots", {
+			Loots = result,
+			IsUpdating = true
+		});
+		this.log("Removed " + this.Const.UI.getColorized(remove.item.getName(), "#135213") + " from loot pool");
+	}
+
+	function onRerollLoots( _id )
+	{
+		local world_entity = this.World.getEntityByID(_id);
+		local result = [];
+		world_entity.getLoot().clear();
+		world_entity.location.onSpawned();
+
+		foreach ( item in world_entity.getLoot().m.Items )
+		{
+			if (item != null)
+			{
+				result.push(::Woditor.Helper.convertItemToUIData(item, _id));
+			}
+		}
+
+		this.m.JSHandle.asyncCall("updateLocationLoots", {
+			Loots = result,
+			IsUpdating = true
+		});
+		this.log("Loots has been refreshed!");
+	}
+
+	function onAddRandomNamedItem( _id )
+	{
+		local world_entity = this.World.getEntityByID(_id);
+		local result = [];
+		local items = [];
+		local pick;
+
+		switch (this.Math.rand(1, 4))
+		{
+		case 1:
+			items.extend(this.Const.Items.NamedHelmets);
+			if (world_entity.m.NamedHelmetsList != null && world_entity.m.NamedHelmetsList.len() != 0)
+			{
+				items.extend(world_entity.m.NamedHelmetsList);
+				items.extend(world_entity.m.NamedHelmetsList);
+			}
+			if (this.LegendsMod.Configs().LegendArmorsEnabled())
+			{
+				local weightName = this.Const.World.Common.convNameToList(items);
+				pick = this.Const.World.Common.pickHelmet(weightName);
+			}
+			break;
+
+		case 2:
+			items.extend(this.Const.Items.NamedArmors);
+			if (world_entity.m.NamedArmorsList != null && world_entity.m.NamedArmorsList.len() != 0)
+			{
+				items.extend(world_entity.m.NamedArmorsList);
+				items.extend(world_entity.m.NamedArmorsList);
+			}
+			if (this.LegendsMod.Configs().LegendArmorsEnabled())
+			{
+				local weightName = this.Const.World.Common.convNameToList(items);
+				pick = this.Const.World.Common.pickArmor(weightName);
+			}
+			break;
+
+		case 3:
+			items.extend(this.Const.Items.NamedShields);
+			if (world_entity.m.NamedShieldsList != null && world_entity.m.NamedShieldsList.len() != 0)
+			{
+				items.extend(world_entity.m.NamedShieldsList);
+				items.extend(world_entity.m.NamedShieldsList);
+			}
+			break;
+
+		default:
+			items.extend(this.Const.Items.NamedWeapons);
+			if (world_entity.m.NamedWeaponsList != null && world_entity.m.NamedWeaponsList.len() != 0)
+			{
+				items.extend(world_entity.m.NamedWeaponsList);
+				items.extend(world_entity.m.NamedWeaponsList);
+			}
+		}
+
+		if (pick == null)
+		{
+			if (items.len() > 0)
+			{
+				pick = this.new("scripts/items/" + this.MSU.Array.getRandom(items));
+			}
+			else
+			{
+				return this.log(this.Const.UI.getColorized("Failed to add a random named item. Reason: the named item table is empty", "#8f1e1e"));
+			}
+		}
+			
+		world_entity.getLoot().add(pick);
+
+		foreach ( item in world_entity.getLoot().m.Items )
+		{
+			if (item != null)
+			{
+				result.push(::Woditor.Helper.convertItemToUIData(item, _id));
+			}
+		}
+
+		this.m.JSHandle.asyncCall("updateLocationLoots", {
+			Loots = result,
+			IsUpdating = true
+		});
+		this.log("Randomly picked and added " + this.Const.UI.getColorized(pick.getName(), "#135213") + " to loot pool");
+	}
+
+	function onRerollTroop( _id )
+	{
+		local world_entity = this.World.getEntityByID(_id);
+		world_entity.m.LastSpawnTime = 0.0;
+		world_entity.createDefenders();
+		this.m.JSHandle.asyncCall("updateLocationTroops", {
+			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
+			IsUpdating = true
+		});
+		this.log("Troop list has been refreshed!");
+	}
+
+	function onRemoveTroop( _data )
+	{
+		local world_entity = this.World.getEntityByID(_data[0]);
+		local troop = _data[1];
+		local new = [];
+
+		foreach ( t in world_entity.getTroops() )
+		{
+			if (troop.Key == ::Woditor.getTroopKey(t) && troop.IsChampion == (t.Variant != 0)) 
+			{
+				continue;
+			}
+
+			new.push(t);
+		}
+
+		world_entity.m.Troops = new;
+		world_entity.updateStrength();
+		this.m.JSHandle.asyncCall("updateLocationTroops", {
+			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
+			IsUpdating = true
+		});
+		this.log("Removed " + this.Const.UI.getColorized(troop.Name, "#135213") + " from troop list, " + this.Const.UI.getColorized(troop.Num, "#135213") + " in total");
+	}
+
+	function onAddRandomTroop( _data )
+	{
+		local list = clone ::Woditor.ValidTroops[::Woditor.TroopTypeFilter.All];
+		local world_entity = this.World.getEntityByID(_data[0]);
+		local result = [];
+
+		foreach( key in _data[1] )
+		{
+			local i = list.find(key);
+
+			if (i != null)
+			{
+				list.remove(i);
+			}
+		}
+
+		local t = clone this.Const.World.Spawn.Troops[::MSU.Array.getRandom(list)];
+		t.Party <- this.WeakTableRef(world_entity);
+		t.Faction <- world_entity.getFaction();
+		t.Name <- "";
+		t.Variant = 0;
+		world_entity.getTroops().push(t);
+		world_entity.updateStrength();
+		this.m.JSHandle.asyncCall("updateLocationTroops", {
+			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
+			IsUpdating = true
+		});
+		this.log("Randomly picked and added " + this.Const.UI.getColorized(::Woditor.getTroopName(t), "#135213") + " to troop list");
+	}
+
+	function onAddNewTroop( _data )
+	{
+		local world_entity = this.World.getEntityByID(_data[0]);
+
+		foreach( key in _data[1] )
+		{
+			local t = clone this.Const.World.Spawn.Troops[key];
+			t.Party <- this.WeakTableRef(world_entity);
+			t.Faction <- world_entity.getFaction();
+			t.Name <- "";
+			t.Variant = 0;
+			world_entity.getTroops().push(t);
+			this.log("Added " + this.Const.UI.getColorized(::Woditor.getTroopName(t), "#135213") + " to troop list");
+		}
+
+		world_entity.updateStrength();
+		this.m.JSHandle.asyncCall("updateLocationTroops", {
+			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
+			IsUpdating = true
+		});
+	}
+
+	function onChangeTroopNum( _data )
+	{
+		local world_entity = this.World.getEntityByID(_data[0]);
+		local troops = world_entity.getTroops();
+		local troop = _data[1];
+		local different = _data[2];
+		local text = "";
+		
+		if (different > 0)
+		{
+			text = "Removed " + different + " " + this.Const.UI.getColorized(troop.Name, "#135213") + " from troop list";
+			for (local i = troops.len() - 1; i >= 0; --i) 
+			{
+		        local t = troops[i];
+
+		        if (troop.Key == ::Woditor.getTroopKey(t) && troop.IsChampion == (t.Variant != 0)) 
+				{
+					troops.remove(i);
+
+					if (--different == 0)
+					{
+						break;
+					}
+				}
+		    }
+		}
+		else
+		{
+			text = "Added " + this.Math.abs(different) + " more " + this.Const.UI.getColorized(troop.Name, "#135213") + " to troop list";
+			while (different < 0)
+			{
+				local t = clone this.Const.World.Spawn.Troops[troop.Key];
+				t.Party <- this.WeakTableRef(world_entity);
+				t.Faction <- world_entity.getFaction();
+				t.Name <- "";
+				t.Variant = 0;
+
+				if (troop.IsChampion)
+				{
+					if ("NameList" in this.Const.World.Spawn.Troops[troop.Key])
+					{
+						t.Name = this.Const.World.Common.generateName(this.Const.World.Spawn.Troops[troop.Key].NameList) + ((this.Const.World.Spawn.Troops[troop.Key].TitleList != null) ? " " + this.Const.World.Spawn.Troops[troop.Key].TitleList[this.Math.rand(0, this.Const.World.Spawn.Troops[troop.Key].TitleList.len() - 1)] : "");
+					}
+					else
+					{
+						t.Name = "Champion " + this.Const.Strings.EntityName[t.ID];
+					}
+
+					t.Variant = this.Math.rand(1, 255);
+					t.Strength = this.Math.round(t.Strength * 1.35);
+				}
+
+				world_entity.getTroops().push(t);
+				++different;
+			}
+		}
+
+		world_entity.updateStrength();
+		this.log(text);
+	}
+
+	function onConvertTroopToChampion( _data )
+	{
+		local world_entity = this.World.getEntityByID(_data[0]);
+		local troop = _data[1];
+		local text = "";
+
+		if (!troop.IsChampion)
+		{
+			text = "Convert a " + this.Const.UI.getColorized(troop.Name, "#135213") + " into a champion";
+			foreach ( t in world_entity.getTroops() )
+			{
+				local key = ::Woditor.getTroopKey(t);
+
+				if (t.Variant == 0 && troop.Key == key)
+				{
+					if ("NameList" in this.Const.World.Spawn.Troops[key])
+					{
+						t.Name = this.Const.World.Common.generateName(this.Const.World.Spawn.Troops[key].NameList) + ((this.Const.World.Spawn.Troops[key].TitleList != null) ? " " + this.Const.World.Spawn.Troops[key].TitleList[this.Math.rand(0, this.Const.World.Spawn.Troops[key].TitleList.len() - 1)] : "");
+					}
+					else
+					{
+						t.Name = "Champion " + this.Const.Strings.EntityName[t.ID];
+					}
+
+					t.Variant = this.Math.rand(1, 255);
+					t.Strength = this.Math.round(t.Strength * 1.35);
+					break;
+				}
+			}
+		}
+		else
+		{
+			text = "Revert a champion " + this.Const.UI.getColorized(troop.Name, "#135213") + " back to a normal one";
+			foreach ( t in world_entity.getTroops() )
+			{
+				local key = ::Woditor.getTroopKey(t);
+
+				if (t.Variant != 0 && troop.Key == key)
+				{
+					t.Name = "";
+					t.Variant = 0;
+					t.Strength = this.Const.World.Spawn.Troops[key].Strength;
+					break;
+				}
+			}
+		}
+
+		world_entity.updateStrength();
+		this.m.JSHandle.asyncCall("updateLocationTroops", {
+			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
+			IsUpdating = true
+		});
+		this.log(text);
+	}
+
 	function onUpdateResourseValue( _data )
 	{
-		local entity = this.World.getEntityByID(_data[0]);
-		entity.setResources(_data[1]);
+		local world_entity = this.World.getEntityByID(_data[0]);
+		world_entity.setResources(_data[1]);
 
-		if (entity.isLocationType(this.Const.World.LocationType.Settlement))
+		if (world_entity.isLocationType(this.Const.World.LocationType.Settlement))
 		{
-			this.m.JSHandle.asyncCall("updateSettlementWealth", entity.getWealth());
+			this.m.JSHandle.asyncCall("updateSettlementWealth", {
+				Wealth = world_entity.getWealth(),
+				IsUpdating = true
+			});
+		}
+		else
+		{
+			this.m.JSHandle.asyncCall("updateLocationNamedItemChance", {
+				NamedItemChance = world_entity.getNameItemChance(),
+				IsUpdating = true
+			});
 		}
 	}
 
 	function onUpdateWealthValue( _data )
 	{
-		local entity = this.World.getEntityByID(_data[0]);
+		local world_entity = this.World.getEntityByID(_data[0]);
 		local baseLevel = 0.0;
 
-		if (entity.isMilitary()) baseLevel = baseLevel + 50.0;
-		if (this.isKindOf(entity, "city_state")) baseLevel = baseLevel + 100;
+		if (world_entity.isMilitary()) baseLevel = baseLevel + 50.0;
+		if (this.isKindOf(world_entity, "city_state")) baseLevel = baseLevel + 100;
 
-		switch(entity.getSize())
+		switch(world_entity.getSize())
 		{
 		case 1:
 			baseLevel = baseLevel + 100.0;
@@ -652,8 +1108,11 @@ this.world_editor_screen <- {
 		}
 
 		local resources = this.Math.round(_data[1] * baseLevel / 100);
-		entity.setResources(resources);
-		this.m.JSHandle.asyncCall("updateSettlementResources", resources);
+		world_entity.setResources(resources);
+		this.m.JSHandle.asyncCall("updateSettlementResources", {
+			Resources = resources,
+			IsUpdating = true
+		});
 	}
 
 	function onUpdateAssetsValue( _data )
@@ -679,8 +1138,8 @@ this.world_editor_screen <- {
 		local key = _data[0];
 		local value = _data[1];
 		local baseValue = this.World.Assets.getBaseProperties()[key];
-		local isMult = this.Woditor.AssetsProperties.Mult.find(key) != null;
-		local isAdditive = this.Woditor.AssetsProperties.Additive.find(key) != null;
+		local isMult = ::Woditor.AssetsProperties.Mult.find(key) != null;
+		local isAdditive = ::Woditor.AssetsProperties.Additive.find(key) != null;
 
 		if (isMult) this.World.Flags.set(key, value / baseValue * 100);
 		else if (isAdditive) this.World.Flags.set(key, value - baseValue);
@@ -970,13 +1429,13 @@ this.world_editor_screen <- {
 	function convertToUIData()
 	{
 		local result = {};
-		result.Assets <- this.Woditor.Helper.convertAssetsToUIData();
-		result.Avatar <- this.Woditor.Helper.convertAvatarToUIData(this);
-		result.Factions <- this.Woditor.Helper.convertFactionsToUIData();
-		result.Settlements <- this.Woditor.Helper.convertSettlementsToUIData();
-		result.Locations <- this.Woditor.Helper.convertLocationsToUIData();
-		result.Filter <- this.Woditor.Helper.convertToUIFilterData(result.Factions);
-		result.Scenario <- this.Woditor.Helper.convertScenariosToUIData();
+		result.Assets <- ::Woditor.Helper.convertAssetsToUIData();
+		result.Avatar <- ::Woditor.Helper.convertAvatarToUIData(this);
+		result.Factions <- ::Woditor.Helper.convertFactionsToUIData();
+		result.Settlements <- ::Woditor.Helper.convertSettlementsToUIData();
+		result.Locations <- ::Woditor.Helper.convertLocationsToUIData();
+		result.Filter <- ::Woditor.Helper.convertToUIFilterData(result.Factions);
+		result.Scenario <- ::Woditor.Helper.convertScenariosToUIData();
 		this.m.StashCapacityBefore = result.Assets.Stash;
 		return result;
 	}

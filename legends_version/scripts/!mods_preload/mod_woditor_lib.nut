@@ -1,13 +1,11 @@
-this.getroottable().Woditor.createLib <- function ()
+::Woditor.createLib <- function ()
 {
-	local gt = this.getroottable();
-
 	// fix the broken icon of Sato manhunters (please fix it Sato, don't make me include it in this)
-	gt.Const.EntityIcon[this.Const.EntityType.SatoManhunter] = "nomad_02_orientation";
-	gt.Const.EntityIcon[this.Const.EntityType.SatoManhunterVeteran] = "nomad_05_orientation";
+	::Const.EntityIcon[::Const.EntityType.SatoManhunter] = "nomad_02_orientation";
+	::Const.EntityIcon[::Const.EntityType.SatoManhunterVeteran] = "nomad_05_orientation";
 
 	//
-	gt.Const.NearRoadAttachedLocations <- [
+	::Const.NearRoadAttachedLocations <- [
 		"scripts/entity/world/attached_location/stone_watchtower_oriental_location",
 		"scripts/entity/world/attached_location/wooden_watchtower_location",
 		"scripts/entity/world/attached_location/militia_trainingcamp_oriental_location",
@@ -17,8 +15,15 @@ this.getroottable().Woditor.createLib <- function ()
 		"scripts/entity/world/attached_location/wool_spinner_location",
 	];
 
+	// get all location sprites
+	::Woditor.ValidLocationSprites <- [];
+	local locations_directory = "gfx/ui/locations/";
+	foreach (i, directory in this.IO.enumerateFiles("gfx/ui/locations/") )
+	{
+		::Woditor.ValidLocationSprites.push(directory.slice(locations_directory.len()));
+	}
 
-	gt.Woditor.Backgrounds <- {
+	::Woditor.Backgrounds <- {
 		Stuff = {},
 		Key = [],
 	};
@@ -50,15 +55,15 @@ this.getroottable().Woditor.createLib <- function ()
 
 		local background = this.new(script);
 		local string = script.slice(prefix.len());
-		gt.Woditor.Backgrounds.Key.push(string);
-		gt.Woditor.Backgrounds.Stuff[string] <- {
+		::Woditor.Backgrounds.Key.push(string);
+		::Woditor.Backgrounds.Stuff[string] <- {
 			Name = background.getName(),
 			Icon = background.getIcon()
 		};
 	}
 
 	// valid buildings for woditor
-	gt.Woditor.Buildings <- {
+	::Woditor.Buildings <- {
 		Tooltip = {},
 		Stuff = {},
 		Valid = [],
@@ -68,7 +73,6 @@ this.getroottable().Woditor.createLib <- function ()
 		"scripts/entity/world/settlements/buildings/building",
 		"scripts/entity/world/settlements/buildings/crowd_building",
 		"scripts/entity/world/settlements/buildings/crowd_oriental_building",
-		"scripts/entity/world/settlements/buildings/port_building",
 		"scripts/entity/world/settlements/buildings/port_oriental_building",
 		"scripts/entity/world/settlements/buildings/stronghold_management_building",
 		"scripts/entity/world/settlements/buildings/stronghold_storage_building"
@@ -80,21 +84,21 @@ this.getroottable().Woditor.createLib <- function ()
 
 		if (invaild.find(script) == null)
 		{
-			gt.Woditor.Buildings.Valid.push(script);
+			::Woditor.Buildings.Valid.push(script);
 		}
 
-		gt.Woditor.Buildings.All.push(script);
-		gt.Woditor.Buildings.Stuff[script] <- building;
+		::Woditor.Buildings.All.push(script);
+		::Woditor.Buildings.Stuff[script] <- building;
 
-		if (building.m.Tooltip != null && !(building.m.Tooltip in gt.Woditor.Buildings.Tooltip))
+		if (building.m.Tooltip != null && !(building.m.Tooltip in ::Woditor.Buildings.Tooltip))
 		{
-			gt.Woditor.Buildings.Tooltip[building.m.Tooltip] <- building;
+			::Woditor.Buildings.Tooltip[building.m.Tooltip] <- building;
 		}
 	}
 
 
 	// valid attached locations for woditor
-	gt.Woditor.AttachedLocations <- {
+	::Woditor.AttachedLocations <- {
 		Tooltip = {},
 		Stuff = {},
 		Valid = [],
@@ -111,21 +115,21 @@ this.getroottable().Woditor.createLib <- function ()
 
 		if (invaild.find(script) == null)
 		{
-			gt.Woditor.AttachedLocations.Valid.push(script);
+			::Woditor.AttachedLocations.Valid.push(script);
 		}
 
-		gt.Woditor.AttachedLocations.All.push(script);
-		gt.Woditor.AttachedLocations.Stuff[script] <- attached_location;
+		::Woditor.AttachedLocations.All.push(script);
+		::Woditor.AttachedLocations.Stuff[script] <- attached_location;
 
-		if (!(attached_location.getTypeID() in gt.Woditor.AttachedLocations.Tooltip))
+		if (!(attached_location.getTypeID() in ::Woditor.AttachedLocations.Tooltip))
 		{
-			gt.Woditor.AttachedLocations.Tooltip[attached_location.getTypeID()] <- attached_location;
+			::Woditor.AttachedLocations.Tooltip[attached_location.getTypeID()] <- attached_location;
 		}
 	}
 
 
 	// valid situations for woditor
-	gt.Woditor.Situations <- {
+	::Woditor.Situations <- {
 		Tooltip = {},
 		Stuff = {},
 		Valid = [],
@@ -143,22 +147,22 @@ this.getroottable().Woditor.createLib <- function ()
 		if (invaild.find(script) == null)
 		{
 			local situation = this.new(script);
-			gt.Woditor.Situations.Valid.push(script);
-			gt.Woditor.Situations.Stuff[script] <- situation;
+			::Woditor.Situations.Valid.push(script);
+			::Woditor.Situations.Stuff[script] <- situation;
 
-			if (!(situation.getID() in gt.Woditor.Situations.Tooltip))
+			if (!(situation.getID() in ::Woditor.Situations.Tooltip))
 			{
-				gt.Woditor.Situations.Tooltip[situation.getID()] <- situation;
+				::Woditor.Situations.Tooltip[situation.getID()] <- situation;
 			}
 		}
 
-		gt.Woditor.Situations.All.push(script);
+		::Woditor.Situations.All.push(script);
 	}
 
 
 	// something to add to the tooltips
-	gt.Const.PercentageNoteString <- " The value is calculated in percentage. The default value is 100 which means 100%."
-	gt.Const.AddContractHints <- function( _tooltips )
+	::Const.PercentageNoteString <- " The value is calculated in percentage. The default value is 100 which means 100%."
+	::Const.AddContractHints <- function( _tooltips )
 	{
 		_tooltips.extend([
 			{
@@ -175,7 +179,7 @@ this.getroottable().Woditor.createLib <- function ()
 			}
 		]);
 	};
-	gt.Const.AddAttachedLocationHints <- function( _tooltips )
+	::Const.AddAttachedLocationHints <- function( _tooltips )
 	{
 		_tooltips.extend([
 			{
@@ -186,7 +190,7 @@ this.getroottable().Woditor.createLib <- function ()
 			}
 		]);
 	};
-	gt.Const.AddBuildingHints <- function( _tooltips )
+	::Const.AddBuildingHints <- function( _tooltips )
 	{
 		_tooltips.extend([
 			{
@@ -203,7 +207,7 @@ this.getroottable().Woditor.createLib <- function ()
 			}
 		]);
 	};
-	gt.Const.AddSituationHints <- function( _tooltips )
+	::Const.AddSituationHints <- function( _tooltips )
 	{
 		_tooltips.extend([
 			{
@@ -217,20 +221,20 @@ this.getroottable().Woditor.createLib <- function ()
 
 
 	// faction banner lib
-	gt.Const.NobleBanners <- [];
-	gt.Const.OtherBanner <- [];
+	::Const.NobleBanners <- [];
+	::Const.OtherBanner <- [];
 	for (local i = 0; i < 15; ++i)
 	{
 		if (i < 11)
 		{
-			gt.Const.NobleBanners.push("ui/banners/factions/banner_" + (i < 10 ? "0" + i : i) + ".png");
+			::Const.NobleBanners.push("ui/banners/factions/banner_" + (i < 10 ? "0" + i : i) + ".png");
 		}
 
-		gt.Const.OtherBanner.push("ui/banners/factions/banner_" + (i < 10 ? "0" + i : i) + ".png");
+		::Const.OtherBanner.push("ui/banners/factions/banner_" + (i < 10 ? "0" + i : i) + ".png");
 	}
 
 	// lib for avatar changer
-	gt.Const.WorldSockets <- [
+	::Const.WorldSockets <- [
 		"world_base_01",
 		"world_base_02",
 		"world_base_03",
@@ -244,7 +248,7 @@ this.getroottable().Woditor.createLib <- function ()
 		"world_base_13",
 		"world_base_14",
 	];
-	gt.Const.WorldSpritesNames <- [
+	::Const.WorldSpritesNames <- [
 		"Player",
 		"Civilian",
 		"Noble",
@@ -254,8 +258,8 @@ this.getroottable().Woditor.createLib <- function ()
 		"Greenskin",
 		"Misc"
 	];
-	gt.Const.WorldSprites <- [];
-	gt.Const.WorldSprites.push([
+	::Const.WorldSprites <- [];
+	::Const.WorldSprites.push([
 		"figure_player_01",
 		"figure_player_02",
 		"figure_player_03",
@@ -292,7 +296,7 @@ this.getroottable().Woditor.createLib <- function ()
 	]);
 	if (::mods_getRegisteredMod("mod_nggh_magic_concept") != null)
 	{
-		gt.Const.WorldSprites[0].extend([
+		::Const.WorldSprites[0].extend([
 			"figure_player_9991",
 			"figure_player_9992",
 			"figure_player_9993",
@@ -304,7 +308,7 @@ this.getroottable().Woditor.createLib <- function ()
 			"figure_player_9999",
 		]);
 	}
-	gt.Const.WorldSprites.push([
+	::Const.WorldSprites.push([
 		"figure_civilian_01",
 		"figure_civilian_02",
 		"figure_civilian_03",
@@ -316,7 +320,7 @@ this.getroottable().Woditor.createLib <- function ()
 		"figure_militia_01",
 		"figure_militia_02",
 	]);
-	gt.Const.WorldSprites.push([
+	::Const.WorldSprites.push([
 		"figure_noble_01",
 		"figure_noble_02",
 		"figure_noble_03",
@@ -351,7 +355,7 @@ this.getroottable().Woditor.createLib <- function ()
 		"figure_noble_03_09",
 		"figure_noble_03_10",
 	]);
-	gt.Const.WorldSprites.push([
+	::Const.WorldSprites.push([
 		"figure_bandit_01",
 		"figure_bandit_02",
 		"figure_bandit_03",
@@ -361,7 +365,7 @@ this.getroottable().Woditor.createLib <- function ()
 		"figure_wildman_03",
 		"figure_wildman_04",
 	]);
-	gt.Const.WorldSprites.push([
+	::Const.WorldSprites.push([
 		"figure_refugee_01",
 		"figure_refugee_02",
 		"figure_slave_01",
@@ -376,7 +380,7 @@ this.getroottable().Woditor.createLib <- function ()
 		"figure_nomad_04",
 		"figure_nomad_05",
 	]);
-	gt.Const.WorldSprites.push([
+	::Const.WorldSprites.push([
 		"figure_necromancer_01",
 		"figure_necromancer_02",
 		"figure_ghost_01",
@@ -392,7 +396,7 @@ this.getroottable().Woditor.createLib <- function ()
 		"figure_skeleton_04",
 		"figure_mummy_01",
 	]);
-	gt.Const.WorldSprites.push([
+	::Const.WorldSprites.push([
 		"figure_goblin_01",
 		"figure_goblin_02",
 		"figure_goblin_03",
@@ -405,7 +409,7 @@ this.getroottable().Woditor.createLib <- function ()
 		"figure_orc_05",
 		"figure_orc_06",
 	]);
-	gt.Const.WorldSprites.push([
+	::Const.WorldSprites.push([
 		"figure_hexe_01",
 		"figure_hexe_leader_01",
 		"figure_alp_01",
@@ -434,7 +438,7 @@ this.getroottable().Woditor.createLib <- function ()
 	]);
 
 	// the orc group type
-	gt.Const.IsOrcs <- [
+	::Const.IsOrcs <- [
 		this.Const.EntityType.OrcYoung,
 		this.Const.EntityType.OrcBerserker,
 		this.Const.EntityType.OrcWarrior,
@@ -442,13 +446,13 @@ this.getroottable().Woditor.createLib <- function ()
 		this.Const.EntityType.LegendOrcElite,
 		this.Const.EntityType.LegendOrcBehemoth,
 	];
-	gt.Woditor.sortByName <- function(_a, _b)
+	::Woditor.sortByName <- function(_a, _b)
 	{
 	 	if (_a < _b) return -1;
 		else if (_a > _b) return 1;
 		else return 0;
 	};
-	gt.Woditor.TroopTypeFilter <- {
+	::Woditor.TroopTypeFilter <- {
 		All = 0,
 		Human = 1,
 		Undead = 2,
@@ -458,15 +462,15 @@ this.getroottable().Woditor.createLib <- function ()
 	}
 
 	// processing the spawnlist so i can add them as entry to the mod ui
-	gt.Woditor.ValidTroops <- [
+	::Woditor.ValidTroops <- [
 		[], // all
 		[], // human
 		[], // undead
 		[], // greenskin
 		[], // misc
 	];
-	gt.Woditor.TroopKeys <- {};
-	gt.Woditor.TroopNames <- {};
+	::Woditor.TroopKeys <- {};
+	::Woditor.TroopNames <- {};
 	local cultist = [];
 
 	foreach (key, entry in this.Const.World.Spawn.Troops)
@@ -476,9 +480,9 @@ this.getroottable().Woditor.createLib <- function ()
 			continue;
 		}
 
-		if (!(entry.Script in gt.Woditor.TroopKeys))
+		if (!(entry.Script in ::Woditor.TroopKeys))
 		{
-			gt.Woditor.TroopKeys[entry.Script] <- key;
+			::Woditor.TroopKeys[entry.Script] <- key;
 			
 			// attempting to filter out all entries by enemy type group
 			local entity = this.new(entry.Script);
@@ -490,20 +494,20 @@ this.getroottable().Woditor.createLib <- function ()
 				}
 				else
 				{
-					gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human].push(key);
+					::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Human].push(key);
 				}
 			}
 			else if (entity.getFlags().has("undead"))
 			{
-				gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead].push(key);
+				::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Undead].push(key);
 			}
 			else if (entity.getFlags().has("goblin") || this.Const.IsOrcs.find(entity.getType()) != null)
 			{
-				gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin].push(key);
+				::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Greenskin].push(key);
 			}
 			else
 			{
-				gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Misc].push(key);
+				::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Misc].push(key);
 			}
 		}
 		else
@@ -561,42 +565,42 @@ this.getroottable().Woditor.createLib <- function ()
 			break;
 		}
 
-		gt.Woditor.TroopNames[entry.Script] <- prefix + gt.Const.Strings.EntityName[entry.ID] + postfix;
+		::Woditor.TroopNames[entry.Script] <- prefix + ::Const.Strings.EntityName[entry.ID] + postfix;
 	}
 
 	// try my best to sorting the entries, still look a bit chaotic though
-	cultist.sort(this.Woditor.sortByName);
-	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human].sort(this.Woditor.sortByName);
-	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead].sort(this.Woditor.sortByName);
-	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin].sort(this.Woditor.sortByName);
-	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Misc].sort(this.Woditor.sortByName);
+	cultist.sort(::Woditor.sortByName);
+	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Human].sort(::Woditor.sortByName);
+	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Undead].sort(::Woditor.sortByName);
+	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Greenskin].sort(::Woditor.sortByName);
+	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Misc].sort(::Woditor.sortByName);
 
 	// add all entry to the all list
-	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human].extend(cultist);
-	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Human]);
-	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Undead]);
-	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Greenskin]);
-	gt.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.All].extend(this.Woditor.ValidTroops[this.Woditor.TroopTypeFilter.Misc]);
+	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Human].extend(cultist);
+	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.All].extend(::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Human]);
+	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.All].extend(::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Undead]);
+	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.All].extend(::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Greenskin]);
+	::Woditor.ValidTroops[::Woditor.TroopTypeFilter.All].extend(::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Misc]);
 
 	// function to assist getting ui data from troop entry from world map location/party
-	gt.Woditor.getTroopKey <- function(_entry)
+	::Woditor.getTroopKey <- function(_entry)
 	{
-		return this.Woditor.TroopKeys[_entry.Script];
+		return ::Woditor.TroopKeys[_entry.Script];
 	};
-	gt.Woditor.getTroopName <- function(_entry)
+	::Woditor.getTroopName <- function(_entry)
 	{
-		return this.Woditor.TroopNames[_entry.Script];
+		return ::Woditor.TroopNames[_entry.Script];
 	};
-	gt.Woditor.getTroopIcon <- function(_entry)
+	::Woditor.getTroopIcon <- function(_entry)
 	{
 		return "ui/orientation/" + this.Const.EntityIcon[_entry.ID] + ".png";
 	};
 
 	// UI Processing Helper for Woditor
-	gt.Woditor.Helper <- this.new("scripts/mods/world_editor_data_helper");
+	::Woditor.Helper <- this.new("scripts/mods/world_editor_data_helper");
 
 	// Assets Properties
-	gt.Woditor.AssetsProperties <- {
+	::Woditor.AssetsProperties <- {
 		Mult = [
 			"BusinessReputationRate",
 			"XPMult",
@@ -633,5 +637,5 @@ this.getroottable().Woditor.createLib <- function ()
 		]
 	};
 
-	delete this.Woditor.createLib;
+	delete ::Woditor.createLib;
 }

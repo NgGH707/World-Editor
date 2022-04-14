@@ -145,6 +145,64 @@ WorldEditorScreen.prototype.updateScenarioDescription = function (_data)
 
 
 
+/*
+    Faction Leaders
+*/
+WorldEditorScreen.prototype.createFactionLeadersPopupDialog = function() 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    var result = this.createFactionLeadersDialogContent(this.mCurrentPopupDialog)
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Faction Leadership', null, null, 'leader-popup');
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+    this.notifyBackendGetFactionLeaders(result.Character);
+
+    var button = result.ButtonLayout.createImageButton(Path.GFX + 'ui/icons/cursor_rotate.png', function () {
+        self.notifyBackendRefreshFactionLeader(result.Character);
+    }, '', 6);
+    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.reload_leader' });
+
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+};
+WorldEditorScreen.prototype.createFactionLeadersDialogContent = function(_dialog) 
+{
+    var self = this;
+    var content = $('<div class="leader-content-container"/>');
+    var characterContainer = $('<div class="character-container"/>');
+    content.append(characterContainer);
+    var buttonLayout = $('<div class="reset-leader-button"/>');
+    content.append(buttonLayout);
+
+    return {
+        Content: content,
+        Character: characterContainer,
+        ButtonLayout: buttonLayout
+    }
+};
+WorldEditorScreen.prototype.addFactionLeaderToPopup = function(_data, _container) 
+{
+    _container.empty();
+
+    for (var i = 0; i < _data.length; i++) {
+        var entry = _data[i];
+        var character = $('<div class="character"/>');
+        character.css('left', (3.0 + 12.0 * i) + 'rem');
+        var characterImage = character.createImage(Path.PROCEDURAL + entry.ImagePath, function(_image) {
+            _image.centerImageWithinParent(0, 0, 1.0);
+        }, null, '');
+
+        characterImage.centerImageWithinParent(0, 0, 1.0);
+        characterImage.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.CharacterNameAndTitles, entityId: entry.ID });
+        _container.append(character);
+    }
+};
+
+
+
 
 /*
     Faction Alliance
@@ -370,7 +428,7 @@ WorldEditorScreen.prototype.createFactionAllianceEntry = function(_data, _listSc
 /*
     Choose Faction
 */
-WorldEditorScreen.prototype.createChooseFactionPopupDialog = function(_parent, _type) 
+WorldEditorScreen.prototype.createChooseFactionPopupDialog = function(_selectedEntryData, _isChoosingOwner, _isLocation) 
 {
     var self = this;
     this.notifyBackendPopupDialogIsVisible(true);
@@ -387,8 +445,12 @@ WorldEditorScreen.prototype.createChooseFactionPopupDialog = function(_parent, _
     // add the ok button
     this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
         var selectedEntry = listScrollContainer.find('.is-selected:first');
-        if (selectedEntry.length > 0)
-            self.notifyBackendUpdateNewFactionFor(_parent, _type);
+        if (selectedEntry.length > 0) {
+            if (_isChoosingOwner === true)
+                self.notifyBackendUpdateNewOwnerFor(_selectedEntryData.ID , selectedEntry.data('ID'));
+            else
+                self.notifyBackendUpdateNewFactionFor(_selectedEntryData.ID , selectedEntry.data('ID'), _selectedEntryData.Faction);
+        }
 
         self.mCurrentPopupDialog = null;
         _dialog.destroyPopupDialog();
@@ -406,7 +468,11 @@ WorldEditorScreen.prototype.createChooseFactionPopupDialog = function(_parent, _
     var button = this.mCurrentPopupDialog.findPopupDialogOkButton();
     button.addClass('move-to-right');
     button.enableButton(false);
-    this.addFactionToPopupDialog(this.mFaction.Data, listScrollContainer, button, this.mFaction.Data[parent.Selected.data('entry')[_choose]]);
+
+    if (_isLocation === true)
+        this.addFactionToPopupDialog([], listScrollContainer, button, _selectedEntryData.Faction);
+    else
+        this.notifyBackendGetAllNonHostileFactionsOfThisFaction(listScrollContainer, button, _isChoosingOwner === true ? _selectedEntryData.Owner : _selectedEntryData.Faction);
 };
 WorldEditorScreen.prototype.createChooseFactionDialogContent = function(_dialog) 
 {
@@ -428,14 +494,18 @@ WorldEditorScreen.prototype.createChooseFactionDialogContent = function(_dialog)
         ListContainer: listContainer
     };
 };
-WorldEditorScreen.prototype.addFactionToPopupDialog = function(_entries, _listScrollContainer, _button, _selected) 
+WorldEditorScreen.prototype.addFactionToPopupDialog = function(_IDs, _listScrollContainer, _button, _selectedID) 
 {
     _listScrollContainer.empty();
 
-    for (var i = 0; i < _entries.length; ++i)
+    for (var i = 0; i < this.mFaction.Data.length; ++i)
     {
-        var data = _entries[i];
-        this.createChooseFactionEntry(data, _listScrollContainer, _button, data.ID === _selected);
+        var data = this.mFaction.Data[i];
+
+        if (_IDs.length > 0 && _IDs.indexOf(data.ID) < 0)
+            continue;
+        else
+            this.createChooseFactionEntry(data, _listScrollContainer, _button, data.ID === _selectedID);
     }
 };
 WorldEditorScreen.prototype.createChooseFactionEntry = function(_data, _listScrollContainer, _button, _isSelected) 
@@ -445,7 +515,7 @@ WorldEditorScreen.prototype.createChooseFactionEntry = function(_data, _listScro
 
     var entry = $('<div class="ui-control troop-panel"/>');
     result.append(entry);
-    entry.data('entry', _data);
+    entry.data('ID', _data.ID);
 
     if (_isSelected === true)
         entry.addClass('is-selected');
@@ -472,12 +542,82 @@ WorldEditorScreen.prototype.createChooseFactionEntry = function(_data, _listScro
     // set up event listener
     entry.click(this, function(_event) {
         var entryDiv = $(this);
-        _button.enableButton(true);
-        _listScrollContainer.find('.is-selected').each(function (_index, _element) {
-            $(_element).removeClass('is-selected');
-        });
-        entryDiv.addClass('is-selected');
+        if (entryDiv.hasClass('is-selected') === false) {
+            _button.enableButton(true);
+            _listScrollContainer.find('.is-selected').each(function (_index, _element) {
+                $(_element).removeClass('is-selected');
+            });
+            entryDiv.addClass('is-selected');
+        }
     });
+};
+
+
+/*
+    Change Location Sprite
+*/
+WorldEditorScreen.prototype.createChangeLocationSpritePopupDialog = function() 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Change Sprite', null, null, 'choose-building-popup');
+    var title = this.mCurrentPopupDialog.findPopupDialogTitle();
+    title.removeClass('font-bottom-shadow');
+    title.removeClass('font-color-title');
+    title.addClass('font-color-ink');
+
+    var result = this.createBuildingPopupDialogContent(this.mCurrentPopupDialog); 
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // add scroll bar, due to how the ui works, it has to be created rather in the content function
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var listScrollContainer = result.ListContainer.findListScrollContainer();
+    
+    // add footer buttons
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        var selectedEntry = listScrollContainer.find('.is-selected:first');
+        if (selectedEntry.length > 0) {
+            self.notifyBackendChangeLocationSprite(selectedEntry.data('sprite'));
+        }
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    
+    // add building entries so you can pick one
+    this.notifyBackendGetLocationSpriteEntries(listScrollContainer);
+};
+WorldEditorScreen.prototype.addLocationSpriteEntriesToPopupDialog = function(_data, _listScrollContainer) 
+{
+    for (var i = 0; i < _data.length; i++) {
+        var entry = $('<div class="is-building-slot"/>');
+        entry.data('sprite', _data[i].Sprite);
+        _listScrollContainer.append(entry);
+
+        if (i == 0)
+            entry.addClass('is-selected');
+
+        var image = entry.createImage(Path.GFX + _data[i].ImagePath, function(_image) {
+            _image.centerImageWithinParent(0, 0, 1.0);
+            _image.removeClass('opacity-none');
+        }, null, 'opacity-none');
+
+        // set up event listeners
+        entry.click(this, function(_event) {
+            var div = $(this);
+            if (div.hasClass('is-selected') === false) {
+                _listScrollContainer.find('.is-selected').each(function (_index, _element) {
+                    $(_element).removeClass('is-selected');
+                });
+                div.addClass('is-selected');
+            }
+        });
+    }
 };
 
 
@@ -575,7 +715,7 @@ WorldEditorScreen.prototype.createAddTroopPopupDialog = function()
 
     // add the ok button
     this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
-        //self.notifyBackendUpdateCurrentTroopList();
+        self.notifyBackendAddNewTroop();
         self.mTroop.Selected = [];
         self.mCurrentPopupDialog = null;
         _dialog.destroyPopupDialog();
@@ -621,12 +761,9 @@ WorldEditorScreen.prototype.createAddTroopDialogContent = function(_dialog)
 };
 WorldEditorScreen.prototype.addTroopEntriesToPopupDialog = function(_entries, _listScrollContainer, _subTitle) 
 {
-    if (_entries !== null && jQuery.isArray(_entries))
-    {
+    if (_entries !== null && jQuery.isArray(_entries)) {
         _listScrollContainer.empty();
-
-        for (var i = 0; i < _entries.length; ++i)
-        {
+        for (var i = 0; i < _entries.length; ++i) {
             var data = _entries[i];
             this.createTroopEntry(data, _listScrollContainer, _subTitle);
         }
@@ -650,8 +787,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     entry.append(leftColumn);
     var iconLayout = $('<div class="troop-icon"/>');  
     leftColumn.append(iconLayout);
-    var icon = iconLayout.createImage(Path.GFX + _data.Icon, function(_image)
-    {
+    var icon = iconLayout.createImage(Path.GFX + _data.Icon, function(_image) {
         _image.fitImageToParent(0, 0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
@@ -667,8 +803,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     row.append(column);
     var iconLayout = $('<div class="strength-icon"/>');
     column.append(iconLayout);
-    var image = iconLayout.createImage(Path.GFX + 'ui/icons/money2.png', function(_image)
-    {
+    var image = iconLayout.createImage(Path.GFX + 'ui/icons/money2.png', function(_image) {
         _image.fitImageToParent(0, 0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
@@ -681,8 +816,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     row.append(column);
     var iconLayout = $('<div class="strength-icon"/>');
     column.append(iconLayout);
-    var image = iconLayout.createImage(Path.GFX + 'ui/icons/fist.png', function(_image)
-    {
+    var image = iconLayout.createImage(Path.GFX + 'ui/icons/fist.png', function(_image) {
         _image.fitImageToParent(0, 0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
@@ -699,8 +833,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     row.append(column);
     var iconLayout = $('<div class="check-image"/>');
     column.append(iconLayout);
-    var check = iconLayout.createImage(Path.GFX + (isSelected === true ? 'ui/skin/hud_button_01_checked.png' : 'ui/skin/hud_button_01_default.png'), function(_image)
-    {
+    var check = iconLayout.createImage(Path.GFX + (isSelected === true ? 'ui/skin/hud_button_01_checked.png' : 'ui/skin/hud_button_01_default.png'), function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
@@ -715,7 +848,6 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     entry.click(this, function(_event) {
         var self = _event.data;
         var entryDiv = $(this);
-
         if (entryDiv.hasClass('is-selected') === true) {
             var index = self.mTroop.Selected.indexOf(_data.Key);
             entryDiv.removeClass('is-selected');
@@ -728,7 +860,6 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
             check.attr('src', Path.GFX + 'ui/skin/hud_button_01_checked.png');
             self.mTroop.Selected.push(_data.Key);
         }
-
         _subTitle.html('Selected: ' + self.mTroop.Selected.length);
     });
 };

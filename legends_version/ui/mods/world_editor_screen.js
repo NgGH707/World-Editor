@@ -52,6 +52,7 @@ var WorldEditorScreen = function(_parent)
         Data               : null,
         Name               : null,
         Banner             : null,
+        Motto              : null,
         Selected           : null,
         Contracts          : null,
         NextButton         : null,
@@ -68,7 +69,10 @@ var WorldEditorScreen = function(_parent)
         Name               : null,
         Image              : null,
         Selected           : null,
+        Terrain            : null,
         Wealth             : null,
+        House              : null,
+        HouseImage         : null,
         Resources          : null,
         Buildings          : null,
         Situations         : null,
@@ -81,7 +85,6 @@ var WorldEditorScreen = function(_parent)
         ListScrollContainer: null,
         DetailsPanel       : null,
         DraftList          : null,
-        
 
         // coordinate to place new location
         Coordinate:
@@ -107,10 +110,14 @@ var WorldEditorScreen = function(_parent)
         Image              : null,
         Loots              : null,
         Troops             : null,
+        Terrain            : null,
         Selected           : null,
         Strength           : null,
         Resources          : null,
-        FilterButton       : null,
+        TroopsLabel        : null,
+        Fortification      : null,
+        NamedItemChance    : null,
+        FactionBanner      : null,
         ListContainer      : null,
         ListScrollContainer: null,
         DetailsPanel       : null,
@@ -333,7 +340,7 @@ WorldEditorScreen.prototype.createDIV = function(_parentDiv)
     this.mDialogContainer.findDialogHeaderContainer().append(logContainer);
     this.mLog.ListContainer = logContainer.createList(1);
     this.mLog.ListScrollContainer = this.mLog.ListContainer.findListScrollContainer();
-    this.printLog('Initiate World Editor');
+    this.printLog('[color=#8f1e1e]Initializing World Editor[/color]');
 
     // create: tab content
     var tabContainer = $('<div class="l-tab-container"/>');
@@ -397,7 +404,6 @@ WorldEditorScreen.prototype.createContractsScreenDIV = function(_parentDiv)
 WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv) 
 {
     var self = this;
-
     // divide into 2 column - 23% and 77%
     var column = this.addColumn(23);
     _parentDiv.append(column);
@@ -447,11 +453,11 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
 
             var column40 = this.addColumn(40);
             row10.append(column40);
-            this.createSmallInputDIV('X:', this.mLocation.Coordinate.X ,column40);
+            //this.createSmallInputDIV('X:', this.mLocation.Coordinate.X ,column40);
 
             var column40 = this.addColumn(40);
             row10.append(column40);
-            this.createSmallInputDIV('Y:', this.mLocation.Coordinate.Y ,column40);
+            //this.createSmallInputDIV('Y:', this.mLocation.Coordinate.Y ,column40);
         }
     }
 
@@ -467,10 +473,14 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                 var upperHalf = this.addRow(44);
                 leftColumn.append(upperHalf);
                 {
+                    // terrain background
+                    this.mLocation.Terrain = $('<div class="terrain-background"/>');
+                    upperHalf.append(this.mLocation.Terrain);
+
                     // name input
                     var row = $('<div class="row"/>');
                     upperHalf.append(row);
-                    var title = $('<div class="title title-font-big font-color-title">Location Name</div>');
+                    var title = $('<div class="title-black title-font-big font-color-ink">Location Name</div>');
                     row.append(title);
                     var inputLayout = $('<div class="l-input-big"/>');
                     row.append(inputLayout);
@@ -478,84 +488,108 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                         if (_input.getInputTextLength() === 0)
                             _input.val(self.mLocation.Selected.data('entry').Name);
                         else
-                            self.notifyBackendToChangeName(_input.getInputText(), 'location');
+                            self.notifyBackendChangeName(_input.getInputText(), 'location');
                     });
                 }
-
+                
                 var lowerHalf = this.addRow(56, 'with-small-dialog-background');
                 leftColumn.append(lowerHalf);
                 {
                     // location image
-                    var column65 = this.addColumn(65);
-                    lowerHalf.append(column65);
+                    var column75 = this.addColumn(70);
+                    lowerHalf.append(column75);
                     var imageContainer = this.addLayout(16.0, 12.0, 'is-center');
-                    column65.append(imageContainer);
+                    column75.append(imageContainer);
                     this.mLocation.Image = imageContainer.createImage(null, function(_image) {
                         _image.fitImageToParent(0, 0);
                     }, null, '');
 
-                    var column35 = this.addColumn(35);
-                    lowerHalf.append(column35);
-                    {
-                        // button
-                        var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
-                        column35.append(buttonLayout);
-                        var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
-                            //self.();
-                        }, '', 6);
-                    }
+                    var column25 = this.addColumn(30);
+                    lowerHalf.append(column25);
+                    var flexboxContainer = $('<div class="flexbox-column-container"/>');
+                    column25.append(flexboxContainer);
+
+                    var imageLayout = this.addFlexboxItem(4.6, 4.6);
+                    flexboxContainer.append(imageLayout);
+                    this.mLocation.Fortification = imageLayout.createImage(Path.GFX + 'ui/icons/fortification_false.png', function(_image) {
+                        _image.centerImageWithinParent(0, 0, 1.0);
+                    }, null, '');
+
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
+                        self.createChangeLocationSpritePopupDialog();
+                    }, '', 6);
                 }
             }
 
             var midColumn = this.addColumn(37.5, 'with-medium-dialog-background');
             row40.append(midColumn);
             {
-                var upperRow = this.addRow(44);
-                midColumn.append(upperRow);
+                var resourcesColumn = this.addColumn(50);
+                midColumn.append(resourcesColumn);
                 {
-                    var resourcesColumn = this.addColumn(50);
-                    upperRow.append(resourcesColumn);
-                    {
-                        // name input
-                        var row = $('<div class="row"/>');
-                        resourcesColumn.append(row);
-                        var title = $('<div class="title title-font-big font-color-title">Resources</div>');
-                        row.append(title);
-                        var inputLayout = $('<div class="l-input-half-big"/>');
-                        row.append(inputLayout);
-                        this.mLocation.Resources = inputLayout.createInput('', 0, 4, 1, null, 'title-font-big font-bold font-color-brother-name');
-                        this.mLocation.Resources.css('background-size', '100% 4.0rem');
-                        this.mLocation.Resources.assignInputEventListener('focusout', function(_input, _event) {
-                            var index = self.mLocation.Selected.data('index');
-                            self.confirmResourcesChanges(_input, index, self.mLocation);
-                        });
-                    }
+                    // name input
+                    var row = $('<div class="row"/>');
+                    resourcesColumn.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Resources</div>');
+                    row.append(title);
+                    var inputLayout = $('<div class="l-input-half-big"/>');
+                    row.append(inputLayout);
+                    this.mLocation.Resources = inputLayout.createInput('', 0, 4, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                        var index = self.mLocation.Selected.data('index');
+                        self.confirmResourcesChanges(_input, index, self.mLocation);
+                    });
+                    this.mLocation.Resources.assignInputEventListener('focusout', function(_input, _event) {
+                        var index = self.mLocation.Selected.data('index');
+                        self.confirmResourcesChanges(_input, index, self.mLocation);
+                    });
+                    this.mLocation.Resources.assignInputEventListener('click', function(_input, _event) {
+                        _input.data('IsUpdated', false);
+                    });
+                    this.mLocation.Resources.css('background-size', '100% 4.0rem');
 
-                    var strengthColumn = this.addColumn(50);
-                    upperRow.append(strengthColumn);
-                    {
-                        // name input
-                        var row = $('<div class="row"/>');
-                        strengthColumn.append(row);
-                        var title = $('<div class="title title-font-big font-color-title">Strength</div>');
-                        row.append(title);
-                        var row = $('<div class="row"/>');
-                        strengthColumn.append(row);
-                        var inputLayout = $('<div class="strength-label-container with-input-box"/>');
-                        row.append(inputLayout);
-                        this.mLocation.Strength = $('<div class="strength-title is-vertical-center title-font-big font-bold font-color-brother-name"></div>');
-                        inputLayout.append(this.mLocation.Strength);
-                        this.mLocation.Strength.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.notaninput' });
-                    }
+                    // name input
+                    var row = $('<div class="row"/>');
+                    resourcesColumn.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Strength</div>');
+                    row.append(title);
+                    var row = $('<div class="row"/>');
+                    resourcesColumn.append(row);
+                    var inputLayout = $('<div class="strength-label-container with-input-box"/>');
+                    row.append(inputLayout);
+                    this.mLocation.Strength = $('<div class="strength-title is-vertical-center title-font-big font-bold font-color-brother-name"></div>');
+                    inputLayout.append(this.mLocation.Strength);
+                    this.mLocation.Strength.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.notaninput' });
                 }
 
-                var lowerRow = this.addRow(56);
-                midColumn.append(lowerRow);
+                var factionColumn = this.addColumn(50);
+                midColumn.append(factionColumn);
                 {
-                    var logContainer = this.addLayout('90%', '95%', 'is-center with-scroll-tooltip2-background');
-                    lowerRow.append(logContainer);
-                    var logListContainer = logContainer.createList(15);
-                    var logScrollContainer = logListContainer.findListScrollContainer();
+                    var row = $('<div class="row"/>');
+                    factionColumn.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Faction</div>');
+                    row.append(title);
+                    // faction image banner
+                    var imageContainer = $('<div class="faction-landlord-container"/>');
+                    imageContainer.css('top', '5.0rem');
+                    factionColumn.append(imageContainer);
+                    this.mLocation.FactionBanner = imageContainer.createImage(null, function(_image) {
+                        _image.fitImageToParent(0, 0);
+                    }, null, '');
+                    this.mLocation.FactionBanner.click(function(_event) {
+                        var element = self.mLocation.Selected;
+                        if (element !== null && element.length > 0) {
+                            var data = element.data('entry');
+                            self.createChooseFactionPopupDialog(data, false, true);
+                        }
+                    });
+                    this.mLocation.FactionBanner.mouseover(function() {
+                        this.classList.add('is-highlighted');
+                    });
+                    this.mLocation.FactionBanner.mouseout(function() {
+                        this.classList.remove('is-highlighted');
+                    });
                 }
             }
 
@@ -565,12 +599,31 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                 var scrollHeader = this.addContainer(null, 4.3);
                 rightColumn.append(scrollHeader);
                 {
-                    var column80 = this.addColumn(80);
-                    scrollHeader.append(column80);
-                    var buttonLayout = this.addLayout(17.4, 4.3, 'is-center', 3.0);
-                    column80.append(buttonLayout);
-                    var button = buttonLayout.createTextButton('Loots', null, '', 7);
+                    var column40 = this.addColumn(40);
+                    scrollHeader.append(column40);
+
+                    var buttonLayout = this.addLayout(9.8, 4.3, 'is-center', 3.0);
+                    column40.append(buttonLayout);
+                    var button = buttonLayout.createTextButton('Loots', null, '', 2);
                     button.enableButton(false);
+
+                    var column20 = this.addColumn(20);
+                    scrollHeader.append(column20);
+                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center'); 
+                    column20.append(buttonLayout);
+                    this.mLocation.NamedItemChance = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
+                        self.notifyBackendRerollLoots();
+                    }, '', 6);
+                    this.mLocation.NamedItemChance.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.refreshloot' });
+
+                    var column20 = this.addColumn(20);
+                    scrollHeader.append(column20);
+                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
+                    column20.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/icon_dice.png', function() {
+                        self.notifyBackendAddRandomNamedItem();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.randomnameditem' });
 
                     var column20 = this.addColumn(20);
                     scrollHeader.append(column20);
@@ -595,72 +648,57 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
         var row60 = this.addRow(60);
         this.mLocation.DetailsPanel.append(row60);
         {
-            var leftHalf = this.addColumn(50);
-            row60.append(leftHalf);
-            {
-
-            }
-
             var rightHalf = this.addColumn(50, 'with-scroll-tooltip-background');
             row60.append(rightHalf);
             {
                 var scrollHeader = this.addContainer(null, 4.3);
                 rightHalf.append(scrollHeader);
+                var flexboxContainer = $('<div class="flexbox-row-container"/>');
+                scrollHeader.append(flexboxContainer);
                 {
                     // button
-                    var column = this.addColumn(10);
-                    scrollHeader.append(column);
-                    var buttonLayout = this.addLayout(3.9, 3.9, 'is-center');
-                    column.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/info.png', function() {
-                        //self.();
-                    }, '', 10);
+                    var buttonLayout = this.addFlexboxItem(3.9, 3.9);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/info.png', null, '', 10);
                     button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.troopsinfo' });
 
                     // not button
-                    var column = this.addColumn(50);
-                    scrollHeader.append(column);
-                    var buttonLayout = this.addLayout(23.0, 4.3, 'is-horizontal-center', 3.0);
-                    buttonLayout.css('bottom', '0.3rem'); // css is retarded, fuck it
-                    column.append(buttonLayout);
-                    var button = buttonLayout.createTextButton('Defenders', null, '', 4);
-                    button.enableButton(false);
+                    var flexItem = this.addFlexboxItem(23.0, 4.3);
+                    flexboxContainer.append(flexItem);
+                    var imageLayout = $('<div class="defenders-label-container"/>');
+                    flexItem.append(imageLayout);
+                    this.mLocation.TroopsLabel = $('<div class="defenders-label is-center text-font-normal">Defenders</div>');
+                    imageLayout.append(this.mLocation.TroopsLabel);
 
                     // button button
-                    var column = this.addColumn(10);
-                    scrollHeader.append(column);
-                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
-                    column.append(buttonLayout);
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/sort-button.png', function() {
                         //self.();
                     }, '', 6);
                     button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.picktrooptemplate' });
 
                     // button button button
-                    var column = this.addColumn(10);
-                    scrollHeader.append(column);
-                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
-                    column.append(buttonLayout);
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
-                        //self.();
+                        if(self.mLocation.Selected !== null && self.mLocation.Selected.length > 0)
+                            self.notifyBackendRerollTroop();
                     }, '', 6);
                     button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.refreshtroops' });
 
                     // button button button button
-                    var column = this.addColumn(10);
-                    scrollHeader.append(column);
-                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
-                    column.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/unknown_traits.png', function() {
-                        //self.();
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/icon_dice.png', function() {
+                        if(self.mLocation.Selected !== null && self.mLocation.Selected.length > 0)
+                            self.notifyBackendAddRandomTroop();
                     }, '', 6);
                     button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addrandomtroop' });
 
                     // button button button button button
-                    var column = this.addColumn(10);
-                    scrollHeader.append(column);
-                    var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
-                    column.append(buttonLayout);
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
                         if(self.mLocation.Selected !== null && self.mLocation.Selected.length > 0)
                             self.createAddTroopPopupDialog();
@@ -677,6 +715,50 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                 this.mLocation.Troops = listContainer.findListScrollContainer();
             }
 
+            var leftHalf = this.addColumn(50, 'with-dialog-background');
+            row60.append(leftHalf);
+            {
+                var upperRow = this.addRow(28);
+                leftHalf.append(upperRow);
+                {
+                    var column21 = this.addColumn(21, 'inventory_bag_slot');
+                    upperRow.append(column21);
+                    var itemLayout = this.addLayout(7.0, 7.0, 'is-center'); 
+                    column21.append(itemLayout);
+                    var item = itemLayout.createImage(Path.GFX + 'ui/items/slots/inventory_slot_bag.png', function(_image) {
+                        _image.centerImageWithinParent(0, 0, 1.0);
+                    }, null, '');
+
+                    var column79 = this.addColumn(79);
+                    upperRow.append(column79);
+                    // input name
+                    var row = $('<div class="row"/>');
+                    row.css('padding-left', '1.0rem');
+                    column79.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Search Item</div>');
+                    row.append(title);
+                    var inputLayout = $('<div class="l-input-big"/>');
+                    row.append(inputLayout);
+                    var input = inputLayout.createInput('', 0, 40, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                    });
+                    //input.css('background-size', '100% 4.0rem');
+
+                    var buttonLayout = $('<div class="search-button"/>');
+                    column79.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/search_icon.png', function() {
+                    }, '', 6);
+                }
+
+                var lowerRow = this.addRow(72);
+                leftHalf.append(lowerRow);
+                {
+                    var column21 = this.addColumn(21);
+                    lowerRow.append(column21);
+
+                    var column79 = this.addColumn(79, 'with-scroll-tooltip-background');
+                    lowerRow.append(column79);
+                }
+            }
         }
 
     }
@@ -735,11 +817,11 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
 
             var column40 = this.addColumn(40);
             row10.append(column40);
-            this.createSmallInputDIV('X:', this.mSettlement.Coordinate.X ,column40);
+            //this.createSmallInputDIV('X:', this.mSettlement.Coordinate.X ,column40);
 
             var column40 = this.addColumn(40);
             row10.append(column40);
-            this.createSmallInputDIV('Y:', this.mSettlement.Coordinate.Y ,column40);
+            //this.createSmallInputDIV('Y:', this.mSettlement.Coordinate.Y ,column40);
         }
     }
 
@@ -758,10 +840,14 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                     var row22 = this.addRow(22);
                     leftHalf.append(row22);
                     {
+                        // terrain background
+                        this.mSettlement.Terrain = $('<div class="terrain-background"/>');
+                        row22.append(this.mSettlement.Terrain);
+
                         // name input
                         var row = $('<div class="row"/>');
                         row22.append(row);
-                        var title = $('<div class="title title-font-big font-color-title">Settlement Name</div>');
+                        var title = $('<div class="title-black title-font-big font-color-ink">Settlement Name</div>');
                         row.append(title);
                         var inputLayout = $('<div class="l-input-big"/>');
                         row.append(inputLayout);
@@ -769,7 +855,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             if (_input.getInputTextLength() === 0)
                                 _input.val(self.mSettlement.Selected.data('entry').Name);
                             else
-                                self.notifyBackendToChangeName(_input.getInputText(), 'settlement');
+                                self.notifyBackendChangeName(_input.getInputText(), 'settlement');
                         });
                     }
 
@@ -777,36 +863,47 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                     leftHalf.append(row33);
                     {
                         // settlement image
-                        var column75 = this.addColumn(75);
-                        row33.append(column75);
+                        var column50 = this.addColumn(50);
+                        row33.append(column50);
                         var imageContainer = this.addLayout(16.0, 12.0, 'is-center');
-                        column75.append(imageContainer);
+                        column50.append(imageContainer);
                         this.mSettlement.Image = imageContainer.createImage(null, function(_image) {
                             _image.fitImageToParent(0, 0);
                         }, null, '');
 
+                        var column35 = this.addColumn(35);
+                        row33.append(column35);
+                         var imageContainer = this.addLayout(13.0, 9.0, 'is-center');
+                        column35.append(imageContainer);
+                        this.mSettlement.HouseImage = imageContainer.createImage(null, function(_image) {
+                            _image.fitImageToParent(0, 0);
+                        }, null, '');
 
-                        var column25 = this.addColumn(25);
-                        row33.append(column25);
-                        {
-                            // button
-                            var buttonRow = this.addRow(50);
-                            column25.append(buttonRow);
-                            var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
-                            buttonRow.append(buttonLayout);
-                            var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_retract.png', function() {
-                                //self.onPreviousBannerClicked();
-                            }, '', 6);
+                        var column15 = this.addColumn(15);
+                        row33.append(column15);
+                        var flexboxContainer = $('<div class="flexbox-center-column-container"/>');
+                        column15.append(flexboxContainer);
 
-                            // button button
-                            var buttonRow = this.addRow(50);
-                            column25.append(buttonRow);
-                            var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
-                            buttonRow.append(buttonLayout);
-                            var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_expand.png', function() {
-                                //self.onPreviousBannerClicked();
-                            }, '', 6);
-                        }
+                        var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                        flexboxContainer.append(buttonLayout);
+                        var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_retract.png', function() {
+                            self.notifyBackendAddHouse(true);
+                        }, '', 6);
+
+                        var houseLabelContainer = this.addFlexboxItem(4.5, 4.1);
+                        houseLabelContainer.css('background-image', 'url("coui://gfx/ui/skin/hud_button_01_inactive.png")');
+                        houseLabelContainer.css('background-size', '4.5rem 4.1rem');
+                        houseLabelContainer.css('background-repeat', 'no-repeat');
+                        flexboxContainer.append(houseLabelContainer);
+                        this.mSettlement.House = $('<div class="house-num-label is-center title-font-small font-bold font-color-brother-name">0</div>');
+                        houseLabelContainer.append(this.mSettlement.House);
+                        this.mSettlement.House.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.housecount' });
+
+                        var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                        flexboxContainer.append(buttonLayout);
+                        var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_expand.png', function() {
+                            self.notifyBackendAddHouse(false);
+                        }, '', 6);
                     }
 
                     var row35 = this.addRow(35);
@@ -826,8 +923,11 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             _image.fitImageToParent(0, 0);
                         }, null, '');
                         this.mSettlement.FactionBanner.click(function(_event) {
-                            if (self.mSettlement.Selected !== null && self.mSettlement.Selected.length > 0)
-                                self.createChooseFactionPopupDialog(self.mSettlement, 'Faction');
+                            var element = self.mSettlement.Selected;
+                            if (element !== null && element.length > 0) {
+                                var data = element.data('entry');
+                                self.createChooseFactionPopupDialog(data, false);
+                            }
                         });
                         this.mSettlement.FactionBanner.mouseover(function() {
                             this.classList.add('is-highlighted');
@@ -850,8 +950,11 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             _image.fitImageToParent(0, 0);
                         }, null, '');
                         this.mSettlement.OwnerBanner.click(function(_event) {
-                            if (self.mSettlement.Selected !== null && self.mSettlement.Selected.length > 0)
-                                self.createChooseFactionPopupDialog(self.mSettlement, 'Owner');
+                            var element = self.mSettlement.Selected;
+                            if (element !== null && element.length > 0) {
+                                var data = element.data('entry');
+                                self.createChooseFactionPopupDialog(data, true);
+                            }
                         });
                         this.mSettlement.OwnerBanner.mouseover(function() {
                             this.classList.add('is-highlighted');
@@ -890,12 +993,18 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             row.append(title);
                             var inputLayout = $('<div class="l-input-half-big"/>');
                             row.append(inputLayout);
-                            this.mSettlement.Resources = inputLayout.createInput('', 0, 5, 1, null, 'title-font-big font-bold font-color-brother-name');
-                            this.mSettlement.Resources.css('background-size', '100% 4.0rem'); // simple solution to get a smaller input without much work :evilgrins
+                            this.mSettlement.Resources = inputLayout.createInput('', 0, 5, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                                var index = self.mSettlement.Selected.data('index');
+                                self.confirmResourcesChanges(_input, index, self.mSettlement);
+                            });
                             this.mSettlement.Resources.assignInputEventListener('focusout', function(_input, _event) {
                                 var index = self.mSettlement.Selected.data('index');
                                 self.confirmResourcesChanges(_input, index, self.mSettlement);
                             });
+                            this.mSettlement.Resources.assignInputEventListener('click', function(_input, _event) {
+                                _input.data('IsUpdated', false);
+                            });
+                            this.mSettlement.Resources.css('background-size', '100% 4.0rem'); // simple solution to get a smaller input without much work :evilgrins
                         }
 
                         var wealthColumn = this.addColumn(50);
@@ -908,18 +1017,19 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             row.append(title);
                             var inputLayout = $('<div class="l-input-half-big"/>');
                             row.append(inputLayout);
-                            this.mSettlement.Wealth = inputLayout.createInput('', 0, 4, 1, null, 'title-font-big font-bold font-color-brother-name');
-                            this.mSettlement.Wealth.css('background-size', '100% 4.0rem');
-
-                            // set up fun event listeners
+                            this.mSettlement.Wealth = inputLayout.createInput('', 0, 4, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                                self.confirmWealthChanges(_input);
+                                _input.addPercentageToInput();
+                            });
                             this.mSettlement.Wealth.assignInputEventListener('focusout', function(_input, _event) {
-                                var index = self.mSettlement.Selected.data('index');
-                                self.confirmWealthChanges(_input, index);
+                                self.confirmWealthChanges(_input);
                                 _input.addPercentageToInput();
                             });
                             this.mSettlement.Wealth.assignInputEventListener('click', function(_input, _event) {
                                 _input.removePercentageFromInput();
+                                _input.data('IsUpdated', false);
                             });
+                            this.mSettlement.Wealth.css('background-size', '100% 4.0rem');
                         }
                     }
 
@@ -1149,12 +1259,28 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                         if (_input.getInputTextLength() === 0)
                             _input.val(self.mFaction.Selected.data('entry').Name);
                         else
-                            self.notifyBackendToChangeName(_input.getInputText(), 'faction');
+                            self.notifyBackendChangeName(_input.getInputText(), 'faction');
+                    });
+
+                    // motto
+                    var row = $('<div class="row"/>');
+                    row90.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Motto</div>');
+                    row.append(title);
+                    var inputLayout = $('<div class="l-input-big"/>');
+                    row.append(inputLayout);
+                    this.mFaction.Motto = inputLayout.createInput('', 0, 100, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                        self.notifyBackendChangeFactionMotto(_input.getInputText());
                     });
                     
                     // relation stuffs
                     this.createSliderControlDIV(this.mFactionRelation, 'Relation', row90);
                     this.createCheckBoxControlDIV(this.mFactionFixedRelation, row90, 'relation');
+
+                    /*var mottoContainer = this.addContainer(30, 13.5, '', 'green');
+                    row.append(mottoContainer);
+                    var mottoListContainer = mottoContainer.createList(10, 'description-font-medium font-bottom-shadow font-color-description', true);
+                    this.mFaction.Motto = mottoListContainer.findListScrollContainer();*/
                 }
 
                 var row10 = this.addRow(10);
@@ -1235,8 +1361,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row60.append(row);
                     var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton('View Settlements', function ()
-                    {
+                    var button = buttonLayout.createTextButton('View Settlements', function() {
                         var element = self.mFaction.Selected;
                         var data = element.data('entry');
                         var index = element.data('index');
@@ -1244,7 +1369,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
 
                         if (isSettlement) {
                             self.switchScreen('Settlements');
-                            self.filterSettlementsByFaction({Index: index});
+                            self.filterSettlementsByFaction({ID: data.ID});
                             self.mSettlement.ExpandableList.deselectListEntries();
                         }
                         else {
@@ -1259,19 +1384,18 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row60.append(row);
                     var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton('View Alliance', function ()
-                    {
+                    var button = buttonLayout.createTextButton('View Alliance', function() {
                         self.createChooseFactionAlliancePopupDialog();
                     }, '', 4);
 
-                    // button button button
+                     // button button button 
                     var row = this.addContainer(null, 4.6);
                     row60.append(row);
                     var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton('Despawn Troops', function ()
-                    {
-                        self.notifyBackendDespawnFactionTroops();
+                    var button = buttonLayout.createTextButton('View Leaderships', function() {
+                        //self.notifyBackendRefreshFactionOwningCharacter();
+                        self.createFactionLeadersPopupDialog();
                     }, '', 4);
 
                     // button button button button
@@ -1279,9 +1403,8 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row60.append(row);
                     var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton('Refresh Roster', function ()
-                    {
-                        self.notifyBackendRefreshFactionOwningCharacter();
+                    var button = buttonLayout.createTextButton('Despawn Troops', function() {
+                        self.notifyBackendDespawnFactionTroops();
                     }, '', 4);
 
                     // button button button button button 
@@ -1289,8 +1412,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row60.append(row);
                     var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton('Refresh Actions', function ()
-                    {
+                    var button = buttonLayout.createTextButton('Refresh Actions', function() {
                         self.notifyBackendRefreshFactionActions();
                     }, '', 4);
 
@@ -1299,8 +1421,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     row60.append(row);
                     var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
-                    var button = buttonLayout.createTextButton('Refresh Contracts', function ()
-                    {
+                    var button = buttonLayout.createTextButton('Refresh Contracts', function() {
                         self.notifyBackendRefreshFactionContracts();
                     }, '', 4);
                 }
@@ -1339,7 +1460,6 @@ WorldEditorScreen.prototype.createPropertiesScreenDIV = function(_parentDiv)
                     self.createRadioControlDIV(_definition, row, count, 'combat-difficulty'); 
                     count++;
                 });
-
 
                 var row = $('<div class="row"/>');
                 subColumn50.append(row);
@@ -1598,7 +1718,7 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                 if (_input.getInputTextLength() === 0)
                     _input.val(self.mAssetsData.Name);
                 else
-                    self.notifyBackendToChangeName(_input.getInputText(), 'company');
+                    self.notifyBackendChangeName(_input.getInputText(), 'company');
             });
             this.mCompanyName.setInputText('Battle Brothers');
 
@@ -1795,6 +1915,7 @@ WorldEditorScreen.prototype.createSliderControlDIV = function(_definition, _titl
 WorldEditorScreen.prototype.createInputDIV = function(_key, _definition, _parentDiv, _type)
 {
     var self = this;
+    var isPercentage = _definition.IsPercentage;
     var inputRow = $('<div class="row input-row"/>');
     _parentDiv.append(inputRow);
 
@@ -1810,41 +1931,39 @@ WorldEditorScreen.prototype.createInputDIV = function(_key, _definition, _parent
     
     var inputLayout = $('<div class="l-input"/>');
     inputRowLayout.append(inputLayout);
-    _definition.Input = inputLayout.createInput(_definition.Value, _definition.Min, _definition.Max, null, null, 'title-font-medium font-bold font-color-brother-name');
-    _definition.Input.css('background-image', 'url("coui://gfx/ui/skin/barber_textbox.png")');
-    _definition.Input.css('background-size', '14.2rem 3.2rem');
-    _definition.Input.css('text-align', 'center');
+    _definition.Input = inputLayout.createInput(_definition.Value, _definition.Min, _definition.Max, null, null, 'title-font-medium font-bold font-color-brother-name', function(_input) {
+        if (_type === 'mAssets')
+            self.confirmAssetChanges(_input, _key);
+        else
+            self.confirmPropertyChanges(_input, _key);
 
+        if (isPercentage === true)
+            _input.addPercentageToInput();
+    });
+    _definition.Input.assignInputEventListener('focusout', function(_input, _event) {
+        if (_type === 'mAssets')
+            self.confirmAssetChanges(_input, _key);
+        else
+            self.confirmPropertyChanges(_input, _key);
+
+        if (isPercentage === true)
+            _input.addPercentageToInput();
+    });
+    _definition.Input.assignInputEventListener('click', function(_input, _event) {
+        if (isPercentage === true)
+            _input.removePercentageFromInput();
+
+        _input.data('IsUpdated', false);
+    });
     _definition.Input.assignInputEventListener('mouseover', function(_input, _event) {
         _input.css('background-image', 'url("coui://gfx/ui/skin/barber_textbox.png")');
     });
     _definition.Input.assignInputEventListener('mouseout', function(_input, _event) {
         _input.css('background-image', 'url("coui://gfx/ui/skin/barber_textbox.png")');
     });
-
-    if (_definition.IsPercentage === true)
-    {
-        _definition.Input.assignInputEventListener('focusout', function(_input, _event) {
-            if (_type === 'mAssets')
-                self.confirmAssetChanges(_input, _key);
-            else
-                self.confirmPropertyChanges(_input, _key);
-
-            _input.addPercentageToInput();
-        });
-        _definition.Input.assignInputEventListener('click', function(_input, _event) {
-            _input.removePercentageFromInput();
-        });
-    }
-    else
-    {
-        _definition.Input.assignInputEventListener('focusout', function(_input, _event) {
-            if (_type === 'mAssets')
-                self.confirmAssetChanges(_input, _key);
-            else
-                self.confirmPropertyChanges(_input, _key);
-        });
-    }
+    _definition.Input.css('background-image', 'url("coui://gfx/ui/skin/barber_textbox.png")');
+    _definition.Input.css('background-size', '14.2rem 3.2rem');
+    _definition.Input.css('text-align', 'center');
 }
 
 WorldEditorScreen.prototype.destroyDIV = function()
@@ -2064,6 +2183,24 @@ WorldEditorScreen.prototype.isVisible = function()
 };
 
 // simple functions so i don't have to prepare so many css elements
+WorldEditorScreen.prototype.addFlexboxItem = function(_width, _height, _allowShrink, _color)
+{
+    var result = $('<div class="custom-flexbox-item"/>');
+    result.css('width', _width + 'rem'); //only accept number, no %
+    result.css('height', _height + 'rem'); //only accept number, no %
+
+    if (_allowShrink === true) {
+        result.css('flex-shrink', 1);
+        result.css('min-width', _width + 'rem');
+        result.css('min-height', _height + 'rem');
+    }
+
+    if (_color !== undefined) // the border is only used for testing
+        result.css('border', '1px solid ' + _color);
+
+    return result;
+};
+
 WorldEditorScreen.prototype.addLayout = function(_width, _height, _class, _line, _color)
 {
     if (_class === undefined || _class === null)
@@ -2139,9 +2276,27 @@ WorldEditorScreen.prototype.addRow = function(_height, _class, _color)
 
     return result;
 };
+WorldEditorScreen.prototype.isValidNumber = function(_inputText, _min, _max)
+{
+    var convertedText = parseInt(_inputText);
+
+    if(isNaN(convertedText)) 
+        return null;
+
+    if (convertedText < _min) 
+        return _min;
+
+    if (convertedText > _max) 
+        return _max;
+
+    return convertedText;
+};
 
 WorldEditorScreen.prototype.confirmAssetChanges = function(_input, _keyName)
 {
+    if (_input.data('IsUpdated') === true)
+        return;
+
     var definition = this.mAssets[_keyName];
     var text = _input.getInputText();
     var value = 0;
@@ -2158,6 +2313,7 @@ WorldEditorScreen.prototype.confirmAssetChanges = function(_input, _keyName)
 
     if (isValid === true) {
         _input.val('' + value + '');
+        _input.data('IsUpdated', true);
         this.notifyBackendUpdateAssetsValue(_keyName, value);
     }
     else {
@@ -2166,6 +2322,9 @@ WorldEditorScreen.prototype.confirmAssetChanges = function(_input, _keyName)
 };
 WorldEditorScreen.prototype.confirmPropertyChanges = function(_input, _keyName)
 {
+    if (_input.data('IsUpdated') === true)
+        return;
+
     var self = this;
     var definition = null;
 
@@ -2189,6 +2348,7 @@ WorldEditorScreen.prototype.confirmPropertyChanges = function(_input, _keyName)
 
     if (isValid === true) {
         _input.val('' + value + '');
+        _input.data('IsUpdated', true);
         this.notifyBackendUpdateAssetsPropertyValue(_keyName, value);
     }
     else {
@@ -2197,6 +2357,9 @@ WorldEditorScreen.prototype.confirmPropertyChanges = function(_input, _keyName)
 };
 WorldEditorScreen.prototype.confirmResourcesChanges = function(_input, _index, _parent)
 {
+    if (_input.data('IsUpdated') === true)
+        return;
+
     var text = _input.getInputText();
     var value = 0;
     var isValid = true;
@@ -2212,14 +2375,18 @@ WorldEditorScreen.prototype.confirmResourcesChanges = function(_input, _index, _
 
     if (isValid === true) {
         _input.val('' + value + '');
+        _input.data('IsUpdated', true);
         this.notifyBackendUpdateResourseValue(value, _index,_parent);
     }
     else {
         _input.val('' + _parent.Data.Resources + '');
     }
 };
-WorldEditorScreen.prototype.confirmWealthChanges = function(_input, _index)
+WorldEditorScreen.prototype.confirmWealthChanges = function(_input)
 {
+    if (_input.data('IsUpdated') === true)
+        return;
+
     var text = _input.getInputText();
     var value = 0;
     var isValid = true;
@@ -2235,26 +2402,12 @@ WorldEditorScreen.prototype.confirmWealthChanges = function(_input, _index)
 
     if (isValid === true) { // apply new value
         _input.val('' + value + '');
-        this.notifyBackendUpdateWealthValue(value, _index);
+        _input.data('IsUpdated', true);
+        this.notifyBackendUpdateWealthValue(value);
     }
     else { // revert back to the old value
         _input.val('' + this.mSettlement.Data.Wealth + '');
     }
-};
-WorldEditorScreen.prototype.isValidNumber = function(_inputText, _min, _max)
-{
-    var convertedText = parseInt(_inputText);
-
-    if(isNaN(convertedText)) 
-        return null;
-
-    if (convertedText < _min) 
-        return _min;
-
-    if (convertedText > _max) 
-        return _max;
-
-    return convertedText;
 };
 
 WorldEditorScreen.prototype.updateAssetsData = function(_data)
@@ -2620,7 +2773,13 @@ WorldEditorScreen.prototype.notifyBackendChangeFactionBanner = function(_imagePa
     SQ.call(this.mSQHandle, 'onChangeFactionBanner', [_index, _id]);
 };
 
-WorldEditorScreen.prototype.notifyBackendToChangeName = function(_name, _key)
+WorldEditorScreen.prototype.notifyBackendChangeFactionMotto = function(_text)
+{
+    var result = this.updateFactionData({Motto: _text});
+    SQ.call(this.mSQHandle, 'onChangeFactionMotto', [ result.Data.ID, _text ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendChangeName = function(_name, _key)
 {
     var id = null;
 
@@ -2647,11 +2806,23 @@ WorldEditorScreen.prototype.notifyBackendToChangeName = function(_name, _key)
     }
 };
 
+WorldEditorScreen.prototype.notifyBackendGetAllNonHostileFactionsOfThisFaction = function( _listScrollContainer, _button , _factionID )
+{
+    var self = this;
+    SQ.call(this.mSQHandle, 'onGetAllNonHostileFactionsOfThisFaction', _factionID, function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to get list of faction. Invalid data result.');
+            return;
+        }
+
+        self.addFactionToPopupDialog(_data, _listScrollContainer, _button, _factionID);
+    });
+};
+
 WorldEditorScreen.prototype.notifyBackendUpdateFactionRelation = function( _value )
 {
     var self = this;
     var id = this.mFaction.Selected.data('entry').ID;
-
     SQ.call(this.mSQHandle, 'updateFactionRelation', [ id, _value ], function(_data) {
         if (_data === undefined || _data === null || typeof _data !== 'object') {
             console.error('ERROR: Failed to retrieve updated Faction Relation. Invalid data result.');
@@ -2662,37 +2833,20 @@ WorldEditorScreen.prototype.notifyBackendUpdateFactionRelation = function( _valu
     });
 };
 
-WorldEditorScreen.prototype.notifyBackendUpdateNewFactionFor = function( _parent, _type , _selectedID )
+WorldEditorScreen.prototype.notifyBackendUpdateNewFactionFor = function(_entityID , _factionID , _oldFactionID)
 {
-    var self = this;
-    var element = _parent.Selected;
-    var index = element.data('index');
-    var data = _parent.Data[_index];
-    data[_type] = _selectedID;
-    element.data('entry', data);
+    SQ.call(this.mSQHandle, 'onUpdateNewFactionFor', [ _entityID, _factionID , (_oldFactionID === undefined ? null : _oldFactionID) ]);
+};
 
-    if (_type === 'Owner')
-
-    SQ.call(this.mSQHandle, 'updateFactionRelation', [ id, _type, _selectedID ], function(_data) {
-        if (_data === undefined || _data === null || typeof _data !== 'object') {
-            console.error('ERROR: Failed to retrieve updated Faction Relation. Invalid data result.');
-            return;
-        }
-
-        self.updateFactionRelation(_data);
-    });
+WorldEditorScreen.prototype.notifyBackendUpdateNewOwnerFor = function(_entityID , _factionID )
+{
+    SQ.call(this.mSQHandle, 'onUpdateNewOwnerFor', [ _entityID, _factionID ]);
 };
 
 WorldEditorScreen.prototype.notifyBackendDespawnFactionTroops = function()
 {
     var id = this.mFaction.Selected.data('entry').ID;
     SQ.call(this.mSQHandle, 'onDespawnFactionTroops', id);
-};
-
-WorldEditorScreen.prototype.notifyBackendRefreshFactionOwningCharacter = function()
-{
-    var id = this.mFaction.Selected.data('entry').ID;
-    SQ.call(this.mSQHandle, 'onRefreshFactionOwningCharacter', id);
 };
 
 WorldEditorScreen.prototype.notifyBackendRefreshFactionActions = function()
@@ -2715,12 +2869,39 @@ WorldEditorScreen.prototype.notifyBackendUpdateScenario = function( _index )
     SQ.call(this.mSQHandle, 'onChangeScenario', data.ID);
 };
 
+WorldEditorScreen.prototype.notifyBackendRefreshFactionLeader = function(_container)
+{
+    var self = this;
+    var id = this.mFaction.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onRefreshFactionLeader', id ,function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to retrieve Faction Leaderships. Invalid data result.');
+            return;
+        }
+
+        self.addFactionLeaderToPopup(_data, _container);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendGetFactionLeaders = function(_container)
+{
+    var self = this;
+    var id = this.mFaction.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onGetFactionLeaders', id ,function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to retrieve Faction Leaderships. Invalid data result.');
+            return;
+        }
+
+        self.addFactionLeaderToPopup(_data, _container);
+    });
+};
+
 WorldEditorScreen.prototype.notifyBackendToCollectAllianceData = function( _listContainers )
 {
     var self = this;
     var id = this.mFaction.Selected.data('entry').ID;
     var index = this.mFaction.Selected.data('index');
-
     SQ.call(this.mSQHandle, 'onCollectAllianceData', [ id, index, this.mFaction.Data ], function(_data) {
         if (_data === undefined || _data === null || typeof _data !== 'object') {
             console.error('ERROR: Failed to retrieve Faction Alliance Data. Invalid data result.');
@@ -2729,30 +2910,35 @@ WorldEditorScreen.prototype.notifyBackendToCollectAllianceData = function( _list
 
         self.addFactionAllianceToPopupDialog(_data, _listContainers);
     });
-}
+};
 
 WorldEditorScreen.prototype.notifyBackendChangeActiveStatusOfSettlement = function(_id, _value)
 {
     SQ.call(this.mSQHandle, 'onChangeActiveStatusOfSettlement', [ _id, _value ]);
-}
+};
 
 WorldEditorScreen.prototype.notifyBackendRefreshSettlementShop = function(_id)
 {
     SQ.call(this.mSQHandle, 'onRefreshSettlementShop', _id);
-}
+};
 
 WorldEditorScreen.prototype.notifyBackendToRefreshSettlementRoster = function(_id)
 {
     SQ.call(this.mSQHandle, 'onRefreshSettlementRoster', _id);
-}
+};
+
+WorldEditorScreen.prototype.notifyBackendChangeLocationSprite = function(_sprite)
+{
+    var imagePath = 'ui/locations/' + _sprite + '.png';
+    var data = this.updateLocationImage({ImagePath: imagePath});
+    SQ.call(this.mSQHandle, 'onChangeLocationSprite', [ data.ID, _sprite ]);
+};
 
 WorldEditorScreen.prototype.notifyBackendUpdateWealthValue = function(_value, _index)
 {
-    var data = this.mSettlement.Data[_index];
-    data.Wealth = _value;
-    this.mSettlement.Selected.data('entry', data);
-    SQ.call(this.mSQHandle, 'onUpdateWealthValue', [ data.ID, _value ]);
-}
+    var result = this.updateSettlementData({Wealth: _value});
+    SQ.call(this.mSQHandle, 'onUpdateWealthValue', [ result.Data.ID, _value ]);
+};
 
 WorldEditorScreen.prototype.notifyBackendUpdateResourseValue = function(_value, _index, _parent)
 {
@@ -2760,63 +2946,152 @@ WorldEditorScreen.prototype.notifyBackendUpdateResourseValue = function(_value, 
     data.Resources = _value;
     _parent.Selected.data('entry', data);
     SQ.call(this.mSQHandle, 'onUpdateResourseValue', [ data.ID, _value ]);
-}
+};
 
 WorldEditorScreen.prototype.notifyBackendUpdateFactionAlliance = function( _data )
 {
-    var self = this;
     var id = this.mFaction.Selected.data('entry').ID;
     SQ.call(this.mSQHandle, 'onUpdateFactionAlliance', [ id, _data ]);
-}
+};
 
 WorldEditorScreen.prototype.notifyBackendAddBuildingToSlot = function( _slot, _script )
 {
-    var self = this;
     var id = this.mSettlement.Selected.data('entry').ID;
     SQ.call(this.mSQHandle, 'onAddBuildingToSlot', [ id, _slot, _script ]);
-}
+};
 
 WorldEditorScreen.prototype.notifyBackendRemoveBuilding = function(_buildingSlot, _buildingID)
 {
-    if (_buildingID === null) return;
-
-    var id = this.mSettlement.Selected.data('entry').ID;
-    SQ.call(this.mSQHandle, 'onRemoveBuilding', [id, _buildingSlot, _buildingID]);
-}
+    if (_buildingID === null) {
+        this.printLog('[color=#8f1e1e]Can not remove building. Reason: selected building does not exist[/color]');
+    }
+    else {
+        var id = this.mSettlement.Selected.data('entry').ID;
+        SQ.call(this.mSQHandle, 'onRemoveBuilding', [ id, _buildingSlot, _buildingID ]);
+    }
+};
 
 WorldEditorScreen.prototype.notifyBackendAttachedLocationToSlot = function(_attachmentScripts)
 {
-    if (_attachmentScripts.length === 0) return;
-
-    var id = this.mSettlement.Selected.data('entry').ID;
-    SQ.call(this.mSQHandle, 'onAddAttachedLocationToSlot', [id, _attachmentScripts]);
-}
+    if (_attachmentScripts.length === 0) {
+        this.printLog('[color=#8f1e1e]Can not add attached location. Reason: undefined attached location script[/color]');
+    }
+    else {
+        var id = this.mSettlement.Selected.data('entry').ID;
+        SQ.call(this.mSQHandle, 'onAddAttachedLocationToSlot', [ id, _attachmentScripts ]);
+    }
+};
 
 WorldEditorScreen.prototype.notifyBackendRemoveAttachedLocation = function(_attachmentID)
 {
     var id = this.mSettlement.Selected.data('entry').ID;
-    SQ.call(this.mSQHandle, 'onRemoveAttachedLocation', [id, _attachmentID]);
-}
+    SQ.call(this.mSQHandle, 'onRemoveAttachedLocation', [ id, _attachmentID ]);
+};
 
 WorldEditorScreen.prototype.notifyBackendAddSituationToSlot = function(_situationScripts)
 {
-    if (_situationScripts.length === 0) return;
-
-    var id = this.mSettlement.Selected.data('entry').ID;
-    SQ.call(this.mSQHandle, 'onAddSituationToSlot', [id, _situationScripts]);
-}
+    if (_situationScripts.length === 0) {
+        this.printLog('[color=#8f1e1e]Can not add situation. Reason: undefined situation script[/color]');
+    }
+    else {
+        var id = this.mSettlement.Selected.data('entry').ID;
+        SQ.call(this.mSQHandle, 'onAddSituationToSlot', [ id, _situationScripts ]);
+    }
+};
 
 WorldEditorScreen.prototype.notifyBackendRemoveSituation = function(_situationID)
 {
     var id = this.mSettlement.Selected.data('entry').ID;
-    SQ.call(this.mSQHandle, 'onRemoveSituation', [id, _situationID]);
+    SQ.call(this.mSQHandle, 'onRemoveSituation', [ id, _situationID ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendRemoveLoot = function(_itemID)
+{
+    var id = this.mLocation.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onRemoveLoot', [ id, _itemID ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendRerollLoots = function()
+{
+    var id = this.mLocation.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onRerollLoots', id);
+};
+
+WorldEditorScreen.prototype.notifyBackendAddRandomNamedItem = function()
+{
+    var id = this.mLocation.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onAddRandomNamedItem', id);
+};
+
+WorldEditorScreen.prototype.notifyBackendConvertTroopToChampion = function(_data)
+{
+    var id = this.mLocation.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onConvertTroopToChampion', [ id, _data ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendRerollTroop = function()
+{
+    var data = this.mLocation.Selected.data('entry');
+    var id = data.ID;
+
+    if (data.IsSpawningTroop === false)
+        this.printLog('[color=#8f1e1e]Can not refresh troop. Reason: this world entity has no troop spawnlist[/color]');
+    else
+        SQ.call(this.mSQHandle, 'onRerollTroop', id);
+};
+
+WorldEditorScreen.prototype.notifyBackendRemoveTroop = function(_data)
+{
+    var id = this.mLocation.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onRemoveTroop', [ id, _data ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendAddNewTroop = function()
+{
+    var keys = this.mTroop.Selected;
+    var id = this.mLocation.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onAddNewTroop', [ id, keys ]);
 }
 
-WorldEditorScreen.prototype.notifyBackendGetBuildingEntries = function( _listScrollContainer )
+WorldEditorScreen.prototype.notifyBackendAddRandomTroop = function()
+{
+    var self = this;
+    var data = this.mLocation.Selected.data('entry');
+    var id = data.ID;
+    var keys = [];
+
+    data.Troops.forEach(function (_definition) {
+        keys.push(_definition.Key);
+    });
+
+    SQ.call(this.mSQHandle, 'onAddRandomTroop', [ id, keys ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendChangeTroopNum = function(_data, _index, _different)
+{
+    var num = 0;
+    var strength = 0;
+    var id = this.mLocation.Selected.data('entry').ID;
+    var entries = this.mLocation.Troops.find('.troop-row');
+    if (entries.length > 0 && _index >= 0 && _index < entries.length) {
+        var element = $(entries[_index]);
+        var label = element.find('.strength-label');
+        if (label.length > 0) {
+            label.html('' + (_data[_index].Strength * _data[_index].Num) + '')
+        }
+    }
+    for (var i = 0; i < _data.length; i++) {
+       strength += _data[i].Strength * _data[i].Num;
+       num += _data[i].Num;
+    }
+    this.updateLocationTroopsLabel(strength, num);
+    SQ.call(this.mSQHandle, 'onChangeTroopNum', [ id, _data[_index], _different ]);
+}
+
+WorldEditorScreen.prototype.notifyBackendGetBuildingEntries = function(_listScrollContainer)
 {
     var self = this;
     var id = this.mSettlement.Selected.data('entry').ID;
-
     SQ.call(this.mSQHandle, 'onGetBuildingEntries', id , function(_data) {
         if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
             console.error('ERROR: Failed to get Building Entries. Invalid data result.');
@@ -2827,11 +3102,10 @@ WorldEditorScreen.prototype.notifyBackendGetBuildingEntries = function( _listScr
     });
 };
 
-WorldEditorScreen.prototype.notifyBackendGetAttachedLocationEntries = function( _listScrollContainer )
+WorldEditorScreen.prototype.notifyBackendGetAttachedLocationEntries = function(_listScrollContainer)
 {
     var self = this;
     var id = this.mSettlement.Selected.data('entry').ID;
-
     SQ.call(this.mSQHandle, 'onGetAttachedLocationEntries', id , function(_data) {
         if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
             console.error('ERROR: Failed to get Attached Location Entries. Invalid data result.');
@@ -2842,11 +3116,10 @@ WorldEditorScreen.prototype.notifyBackendGetAttachedLocationEntries = function( 
     });
 };
 
-WorldEditorScreen.prototype.notifyBackendGetSituationEntries = function( _listScrollContainer )
+WorldEditorScreen.prototype.notifyBackendGetSituationEntries = function(_listScrollContainer)
 {
     var self = this;
     var id = this.mSettlement.Selected.data('entry').ID;
-
     SQ.call(this.mSQHandle, 'onGetSituationEntries', id , function(_data) {
         if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
             console.error('ERROR: Failed to get Situations Entries. Invalid data result.');
@@ -2857,11 +3130,34 @@ WorldEditorScreen.prototype.notifyBackendGetSituationEntries = function( _listSc
     });
 };
 
-WorldEditorScreen.prototype.notifyBackendGetValidSettlementsToSendCaravan = function( _listScrollContainer )
+WorldEditorScreen.prototype.notifyBackendAddHouse = function(_isAddHouse)
+{
+    var index = this.mSettlement.Selected.data('index');
+    var data = this.mSettlement.Data[index];
+    var id = data.ID;
+
+    if (_isAddHouse === true) {
+        if (data.House == data.HouseMax) 
+            return;
+        else 
+            ++data.House;
+    }
+    else {
+        if (data.House == 0)
+            return;
+        else
+            --data.House;
+    }
+
+    this.mSettlement.Selected.data('entry', data);
+    this.mSettlement.House.html('' + data.House + '');
+    SQ.call(this.mSQHandle, 'onAddHouse', [ id, _isAddHouse ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendGetValidSettlementsToSendCaravan = function(_listScrollContainer)
 {
     var self = this;
     var id = this.mSettlement.Selected.data('entry').ID;
-
     SQ.call(this.mSQHandle, 'onGetValidSettlementsToSendCaravan', id , function(_data) {
         if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
             console.error('ERROR: Failed to get Valid Settlements To Send Caravan. Invalid data result.');
@@ -2876,7 +3172,7 @@ WorldEditorScreen.prototype.notifyBackendSendCaravanTo = function( _result )
 {
     var id = this.mSettlement.Selected.data('entry').ID;
     var des = null;
-    var resources =  parseInt(_result.Input.getInputText());
+    var resources = parseInt(_result.Input.getInputText());
     var key = 'Peasants';
     var no0 = _result.Checkbox[0].is(':checked');
     var no1 = _result.Checkbox[1].is(':checked');
@@ -2892,14 +3188,14 @@ WorldEditorScreen.prototype.notifyBackendSendCaravanTo = function( _result )
         key = selectedEntry.data('key');
     }
 
-    SQ.call(this.mSQHandle, 'onSendCaravanTo', [id, des, resources, key, no0, no1, no2]);
+    SQ.call(this.mSQHandle, 'onSendCaravanTo', [ id, des, resources, key, no0, no1, no2 ]);
 };
 
 WorldEditorScreen.prototype.notifyBackendSendMercenaryTo = function( _result )
 {
     var id = this.mSettlement.Selected.data('entry').ID;
     var des = null;
-    var resources =  parseInt(_result.Input.getInputText());
+    var resources = parseInt(_result.Input.getInputText());
     var key = 'Cultists';
     var no0 = _result.Checkbox[0].is(':checked');
     var no1 = _result.Checkbox[1].is(':checked');
@@ -2915,13 +3211,26 @@ WorldEditorScreen.prototype.notifyBackendSendMercenaryTo = function( _result )
         key = selectedEntry.data('key');
     }
 
-    SQ.call(this.mSQHandle, 'onSendMercenaryTo', [id, des, resources, key, no0, no1, no2]);
+    SQ.call(this.mSQHandle, 'onSendMercenaryTo', [ id, des, resources, key, no0, no1, no2 ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendGetLocationSpriteEntries = function(_listScrollContainer)
+{
+    var self = this;
+    var id = this.mLocation.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onGetLocationSpriteEntries', id , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to get Location Sprite Entries. Invalid data result.');
+            return;
+        }
+
+        self.addLocationSpriteEntriesToPopupDialog(_data, _listScrollContainer);
+    });
 };
 
 WorldEditorScreen.prototype.notifyBackendGetTroopTemplate = function( _parent , _type)
 {
     var self = this;
-
     SQ.call(this.mSQHandle, 'onGetTroopTemplate', _type , function(_data) {
         if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
             console.error('ERROR: Failed to get Valid Settlements To Send Caravan. Invalid data result.');
@@ -2937,13 +3246,13 @@ WorldEditorScreen.prototype.notifyBackendGetTroopEntries = function( _result )
     var self = this;
     var filter = this.mTroop.Filter;
     var troop_data = this.mLocation.Selected.data('entry').Troops;
-    var key = [];
+    var keys = [];
 
     troop_data.forEach(function (_definition) {
-        key.push(_definition.Key);
+        keys.push(_definition.Key);
     });
 
-    SQ.call(this.mSQHandle, 'onGetTroopEntries', [ key, filter ], function(_data) {
+    SQ.call(this.mSQHandle, 'onGetTroopEntries', [ keys, filter ], function(_data) {
         if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
             console.error('ERROR: Failed to get Troops Entries. Invalid data result.');
             return;

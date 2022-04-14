@@ -2,7 +2,7 @@ this.temp_model <- this.inherit("scripts/entity/tactical/entity", {
 	m = {},
 	function getName()
 	{
-		return "Avatar Model";
+		return "Dressing Doll";
 	}
 
 	function getDescription()

@@ -1,4 +1,4 @@
-this.getroottable().Woditor.hookPlayerParty <- function ()
+::Woditor.hookPlayerParty <- function ()
 {
 	::mods_hookExactClass("entity/world/player_party", function ( obj )
 	{
@@ -29,5 +29,5 @@ this.getroottable().Woditor.hookPlayerParty <- function ()
 		}
 	});
 
-	delete this.Woditor.hookPlayerParty;
+	delete ::Woditor.hookPlayerParty;
 }

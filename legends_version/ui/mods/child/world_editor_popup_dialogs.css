@@ -63,6 +63,55 @@
 
 
 /*
+    Faction Leaders
+*/
+.world-editor-screen .ui-control.popup-dialog.leader-popup
+{
+    width: 60.0rem;
+    height: 30.0rem;
+
+    background-image: url("coui://gfx/ui/skin/popup_background_600x300.png");
+    background-size: 60.0rem 30.0rem;
+    background-repeat: no-repeat;
+}
+.world-editor-screen .ui-control.popup-dialog.leader-popup .leader-content-container
+{
+    width: 100%;
+    height: 18.0rem;
+
+    position: relative;
+    overflow: hidden;
+}
+.world-editor-screen .ui-control.popup-dialog.leader-popup .reset-leader-button
+{
+    top: -0.1rem;
+    left: 54.0rem;
+    width: 4.5rem;
+    height: 4.1rem;
+
+    position: absolute;
+}
+.world-editor-screen .ui-control.popup-dialog.leader-popup .character-container
+{
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 90%;
+
+    position: absolute;
+    margin: auto;
+}
+.world-editor-screen .ui-control.popup-dialog .character
+{
+    position: absolute;
+    
+    width: 12.0rem;
+    height: 18.0rem;
+}
+
+
+/*
     Faction Alliance
 */
 .world-editor-screen .ui-control.popup-dialog.alliance-popup

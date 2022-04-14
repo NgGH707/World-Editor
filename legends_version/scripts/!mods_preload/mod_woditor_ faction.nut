@@ -1,4 +1,4 @@
-this.getroottable().Woditor.hookFaction <- function ()
+::Woditor.hookFaction <- function ()
 {
 	::mods_hookExactClass("factions/faction", function( obj ) 
 	{
@@ -34,5 +34,5 @@ this.getroottable().Woditor.hookFaction <- function ()
 		}
 	});
 
-	delete this.Woditor.hookFaction;
+	delete ::Woditor.hookFaction;
 }

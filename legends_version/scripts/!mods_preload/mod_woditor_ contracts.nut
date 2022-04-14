@@ -1,4 +1,4 @@
-this.getroottable().Woditor.hookContracts <- function ()
+::Woditor.hookContracts <- function ()
 {
 	::mods_hookNewObject("contracts/contract_manager", function( obj ) 
 	{
@@ -63,5 +63,5 @@ this.getroottable().Woditor.hookContracts <- function ()
 		}
 	});
 
-	delete this.Woditor.hookContracts;
+	delete ::Woditor.hookContracts;
 }

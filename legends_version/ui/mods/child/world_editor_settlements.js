@@ -1,4 +1,22 @@
 
+WorldEditorScreen.prototype.updateSettlementData = function(_newData)
+{
+    var element = this.mSettlement.Selected;
+    var index = element.data('index');
+    var data = this.mSettlement.Data[index];
+    $.each(_newData, function(_key, _definition) {
+        if (_key !== 'IsUpdating') {
+            data[_key] = _definition;
+        }
+    });
+    element.data('entry', data);
+
+    return {
+        Element: element,
+        Data: data
+    };
+}
+
 WorldEditorScreen.prototype.createSettlementBuildingSlot = function (_index, _parentDiv)
 {
     var self = this;
@@ -23,12 +41,10 @@ WorldEditorScreen.prototype.createSettlementBuildingSlot = function (_index, _pa
         else
             self.createBuildingPopupDialog(index);
     });
-    this.mSettlement.Buildings[_index].mouseover(function()
-    {
+    this.mSettlement.Buildings[_index].mouseover(function() {
         this.classList.add('is-highlighted');
     });
-    this.mSettlement.Buildings[_index].mouseout(function()
-    {
+    this.mSettlement.Buildings[_index].mouseout(function() {
         this.classList.remove('is-highlighted');
     });
     this.mSettlement.Buildings[_index].bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
@@ -241,38 +257,26 @@ WorldEditorScreen.prototype.selectSettlementListEntry = function(_element, _scro
     }
 };
 
-WorldEditorScreen.prototype.updateSettlementResources = function(_value)
+WorldEditorScreen.prototype.updateSettlementResources = function(_data)
 {
-    var element = this.mSettlement.Selected;
-    var index = element.data('index');
-    var data = this.mSettlement.Data[index];
-    data.Resources = _value;
-    element.data('entry', data);
-    this.mSettlement.Resources.val('' + _value + '');
+    var result = this.updateSettlementData(_data);
+    this.mSettlement.Resources.val('' + result.Data.Resources + '');
 }
 
-WorldEditorScreen.prototype.updateSettlementWealth = function(_value)
+WorldEditorScreen.prototype.updateSettlementWealth = function(_data)
 {
-    var element = this.mSettlement.Selected;
-    var index = element.data('index');
-    var data = this.mSettlement.Data[index];
-    data.Wealth = _value;
-    element.data('entry', data);
-    this.mSettlement.Wealth.val('' + _value + '%');
+    var result = this.updateSettlementData(_data);
+    this.mSettlement.Wealth.val('' + result.Data.Wealth + '%');
 }
 
 WorldEditorScreen.prototype.updateSettlementName = function(_name)
 {
-    var element = this.mSettlement.Selected;
-    var index = element.data('index');
-    var name = element.find('.name:first');
+    var result = this.updateSettlementData({Name: _name});
+    var name = result.Element.find('.name:first');
     if (name.length > 0) {
         name.html(_name);
     }
-    var data = this.mSettlement.Data[index];
-    data.Name = _name;
-    element.data('entry', data);
-    return data.ID;
+    return result.Data.ID;
 }
 
 WorldEditorScreen.prototype.updateSettlementBuildingSlot = function(_data)
@@ -285,6 +289,71 @@ WorldEditorScreen.prototype.updateSettlementBuildingSlot = function(_data)
     data.Buildings[_data.Slot] = _data.Data;
     this.updateSettlementBuildingSlotImage(_data.Data, _data.Slot);
     element.data('entry', data);
+};
+
+WorldEditorScreen.prototype.updateAttachmentList = function (_data)
+{
+    if (typeof _data === 'object' && 'IsUpdating' in _data) {
+        var result = this.updateSettlementData(_data);
+        _data = result.Data.Attachments;
+    }
+
+    this.mSettlement.Attachments.empty();
+    // update attached location list
+    for (var i = 0; i < _data.length; i++) {
+        this.addAttachmentEntry(_data[i], i);
+    }
+}
+
+WorldEditorScreen.prototype.updateSituationList = function (_data)
+{
+    if (typeof _data === 'object' && 'IsUpdating' in _data) {
+        var result = this.updateSettlementData(_data);
+        _data = result.Data.Situations;
+    }
+
+    this.mSettlement.Situations.empty();
+    // update situation list
+    var row = $('<div class="situation-row"/>');
+    this.mSettlement.Situations.append(row);
+    for (var i = 0; i < _data.length; i++) {
+        this.addSituationEntry(_data[i], row);
+    }
+};
+
+WorldEditorScreen.prototype.updateDraftList = function (_data)
+{
+    this.mSettlement.DraftList.empty();
+    // update draft list
+    var row = $('<div class="draft-row"/>');
+    this.mSettlement.DraftList.append(row);
+    for (var i = 0; i < _data.length; i++) {
+        this.addDraftEntry(_data[i], row);
+    }
+};
+
+WorldEditorScreen.prototype.updateSettlementNewOwner = function (_data)
+{
+    var result = this.updateSettlementData(_data);
+    var faction = this.getFaction(result.Data.Owner);
+    this.mSettlement.OwnerBanner.attr('src', Path.GFX + faction.ImagePath);
+    this.mSettlement.OwnerBanner.bindTooltip({ contentType: 'ui-element', elementId: faction.ID, elementOwner: 'woditor.factionbanner' });
+
+    var container = element.find('.l-settlement-banner-container:first');
+    if (container.length > 0) {
+        var banner = container.find('img:first');
+        if (banner.length > 0) {
+            banner.attr('src', Path.GFX + faction.ImagePath);
+        }
+    }
+};
+
+WorldEditorScreen.prototype.updateSettlementNewFaction = function (_data)
+{
+    var result = this.updateSettlementData(_data);
+    var faction = this.getFaction(result.Data.Faction);
+    this.mSettlement.FactionBanner.attr('src', Path.GFX + faction.ImagePath);
+    this.mSettlement.FactionBanner.bindTooltip({ contentType: 'ui-element', elementId: faction.ID, elementOwner: 'woditor.factionbanner' });
 };
 
 WorldEditorScreen.prototype.updateSettlementBuildingSlotImage = function(_data, _slot)
@@ -309,55 +378,6 @@ WorldEditorScreen.prototype.updateSettlementBuildingSlotImage = function(_data, 
     }
 }
 
-WorldEditorScreen.prototype.updateAttachmentList = function (_data)
-{
-    if (typeof _data === 'object' && 'IsUpdating' in _data) {
-        var element = this.mSettlement.Selected;
-        var index = element.data('index');
-        var data = this.mSettlement.Data[index];
-        data.Attachments = _data.Data;
-        element.data('entry', data);
-        _data = data.Attachments;
-    }
-
-    this.mSettlement.Attachments.empty();
-    // update attached location list
-    for (var i = 0; i < _data.length; i++) {
-        this.addAttachmentEntry(_data[i], i);
-    }
-}
-
-WorldEditorScreen.prototype.updateSituationList = function (_data)
-{
-    if (typeof _data === 'object' && 'IsUpdating' in _data) {
-        var element = this.mSettlement.Selected;
-        var index = element.data('index');
-        var data = this.mSettlement.Data[index];
-        data.Situations = _data.Data;
-        element.data('entry', data);
-        _data = data.Situations;
-    }
-
-    this.mSettlement.Situations.empty();
-    // update situation list
-    var row = $('<div class="situation-row"/>');
-    this.mSettlement.Situations.append(row);
-    for (var i = 0; i < _data.length; i++) {
-        this.addSituationEntry(_data[i], row);
-    }
-};
-
-WorldEditorScreen.prototype.updateDraftList = function (_data)
-{
-    this.mSettlement.DraftList.empty();
-    // update draft list
-    var row = $('<div class="draft-row"/>');
-    this.mSettlement.DraftList.append(row);
-    for (var i = 0; i < _data.length; i++) {
-        this.addDraftEntry(_data[i], row);
-    }
-};
-
 WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
 {
     if(_element !== null && _element.length > 0)
@@ -368,6 +388,9 @@ WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
         this.mSettlement.Resources.val('' + data.Resources + '');
         this.mSettlement.Wealth.val('' + data.Wealth + '%');
         this.mSettlement.Image.attr('src', Path.GFX + data.ImagePath);
+        this.mSettlement.HouseImage.attr('src', Path.GFX + data.HouseImage);
+        this.mSettlement.House.html('' + data.House + '');
+        this.mSettlement.Terrain.css('background-image', 'url("' + Path.GFX + data.Terrain + '")');
         this.mSettlement.ActiveButton.changeButtonText(data.IsActive ? 'Shut Down' : 'Restart');
         this.mSettlement.SendCaravanButton.enableButton(!data.IsIsolated);
         this.updateSituationList(data.Situations);

@@ -1,5 +1,13 @@
-this.getroottable().Woditor.hookBuildings <- function ()
+::Woditor.hookBuildings <- function ()
 {
+	::mods_hookExactClass("entity/world/settlements/buildings/port_building", function( obj ) 
+	{
+		obj.isHidden = function()
+		{
+			return false;
+		}
+	});
+
 	::mods_hookNewObject("ui/screens/world/modules/world_town_screen/town_training_dialog_module", function(obj) 
 	{
 		obj.queryRosterInformation = function()
@@ -138,5 +146,5 @@ this.getroottable().Woditor.hookBuildings <- function ()
 		}
 	});
 
-	delete this.Woditor.hookBuildings;
+	delete ::Woditor.hookBuildings;
 }

@@ -1,4 +1,4 @@
-this.getroottable().Woditor.hookWorldState <- function ()
+::Woditor.hookWorldState <- function ()
 {
 	::mods_hookNewObjectOnce("states/world_state", function( obj ) 
 	{
@@ -79,5 +79,5 @@ this.getroottable().Woditor.hookWorldState <- function ()
 		}
 	});
 
-	delete this.Woditor.hookWorldState;
+	delete ::Woditor.hookWorldState;
 }

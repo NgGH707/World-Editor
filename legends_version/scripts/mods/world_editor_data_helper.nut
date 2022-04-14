@@ -25,29 +25,33 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
+	function convertFactionLeadersToUIData( _id )
+	{
+		local faction = this.World.FactionManager.getFaction(_id);
+		local result = [];
+
+		foreach( character in faction.getRoster().getAll() )
+		{
+			result.push({
+				ImagePath = character.getImagePath(),
+				ID = character.getID()
+			});
+		}
+
+		return result;
+	}
+
 	function convertBuildingEntriesToUIData( _id )
 	{
 		local settlement = this.World.getEntityByID(_id);
 		local result = [];
 
-		foreach( script in this.Woditor.Buildings.Valid)
+		foreach( script in ::Woditor.Buildings.Valid)
 		{
-			local building = this.Woditor.Buildings.Stuff[script];
+			local building = ::Woditor.Buildings.Stuff[script];
 
 			result.push({
 				Script = script,
-				ID = building.getID(),
-				ImagePath = building.m.UIImage + ".png",
-				TooltipId = building.m.Tooltip,
-			});
-		}
-
-		if (settlement.isCoastal())
-		{
-			local building = this.Woditor.Buildings.Stuff["scripts/entity/world/settlements/buildings/port_building"];
-
-			result.push({
-				Script = "scripts/entity/world/settlements/buildings/port_building",
 				ID = building.getID(),
 				ImagePath = building.m.UIImage + ".png",
 				TooltipId = building.m.Tooltip,
@@ -61,9 +65,9 @@ this.world_editor_data_helper <- {
 	{
 		local result = [];
 
-		foreach( script in this.Woditor.AttachedLocations.Valid )
+		foreach( script in ::Woditor.AttachedLocations.Valid )
 		{
-			local attached_location = this.Woditor.AttachedLocations.Stuff[script];
+			local attached_location = ::Woditor.AttachedLocations.Stuff[script];
 
 			result.push({
 				Script = script,
@@ -80,9 +84,9 @@ this.world_editor_data_helper <- {
 		local settlement = this.World.getEntityByID(_id);
 		local result = [];
 
-		foreach( script in this.Woditor.Situations.Valid )
+		foreach( script in ::Woditor.Situations.Valid )
 		{
-			local situation = this.Woditor.Situations.Stuff[script];
+			local situation = ::Woditor.Situations.Stuff[script];
 			if (settlement.hasSituation(situation.getID())) continue;
 
 			result.push({
@@ -95,11 +99,40 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
+	function convertLocationSpriteEntriesToUIData( _id )
+	{
+		local world_entity = this.World.getEntityByID(_id);
+		local body = world_entity.getSprite("body");
+		local result = [];
+		local valid = [];
+		valid.extend(::Woditor.ValidLocationSprites);
+
+		if (body.HasBrush)
+		{
+			local find = valid.find(body.getBrush().Name);
+
+			if (find != null)
+			{
+				valid.remove(find);
+			}
+		}
+
+		foreach (sprite in valid )
+		{
+			result.push({
+				ImagePath = "ui/locations/" + sprite + ".png",
+				Sprite = sprite
+			});
+		}
+
+		return result;
+	}
+
 	function convertTroopEntriesToUIData( _data )
 	{
 		local exclude = _data[0];
 		local filter = _data[1];
-		local list = clone this.Woditor.ValidTroops[filter];
+		local list = clone ::Woditor.ValidTroops[filter];
 		local result = [];
 
 		foreach( key in exclude )
@@ -117,8 +150,8 @@ this.world_editor_data_helper <- {
 			local troop = this.Const.World.Spawn.Troops[key];
 
 			result.push({
-				Name = this.Woditor.getTroopName(troop),
-				Icon = this.Woditor.getTroopIcon(troop),
+				Name = ::Woditor.getTroopName(troop),
+				Icon = ::Woditor.getTroopIcon(troop),
 				Strength = troop.Strength,
 				Cost = troop.Cost,
 				Key = key,
@@ -317,12 +350,12 @@ this.world_editor_data_helper <- {
 		result.ArmorParts <- this.World.Assets.getArmorParts();
 		result.Medicine <- this.World.Assets.getMedicine();
 		
-		foreach (key in this.Woditor.AssetsProperties.Mult)
+		foreach (key in ::Woditor.AssetsProperties.Mult)
 		{
 			result[key] <- this.Math.floor(this.World.Assets.m[key] * 100);
 		}
 
-		foreach (key in this.Woditor.AssetsProperties.Additive)
+		foreach (key in ::Woditor.AssetsProperties.Additive)
 		{
 			result[key] <- this.World.Assets.m[key];
 		}
@@ -350,34 +383,17 @@ this.world_editor_data_helper <- {
 			local isLair = location.isLocationType(this.Const.World.LocationType.Lair);
 			local isPassive = location.isLocationType(this.Const.World.LocationType.Passive);
 			local loots = [];
-			local troops = [];
 
-			foreach ( troop in location.getTroops() )
+			foreach ( item in location.getLoot().m.Items )
 			{
-				local key = this.Woditor.getTroopKey(troop);
-				local isMiniBoss = troop.Variant != 0;
-				local i = this.lookForTroop(key, troops, isMiniBoss);
-
-				if (i != null)
+				if (item != null)
 				{
-					++troops[i].Num;
-				}
-				else
-				{
-					troops.push({
-						Name = this.Woditor.getTroopName(troop),
-						Icon = this.Woditor.getTroopIcon(troop),
-						Strength = troop.Strength,
-						IsChampion = isMiniBoss,
-						Key = key,
-						Num = 1,
-					});
+					loots.push(this.convertItemToUIData(item, location.getID()));
 				}
 			}
 
 			result.push({
 				Loots = loots,
-				Troops = troops,
 				ID = location.getID(),
 				Type = location.getTypeID(),
 				Name = location.getName(),
@@ -386,10 +402,15 @@ this.world_editor_data_helper <- {
 				Banner = location.getUIBanner(),
 				ImagePath = location.getUIImage(),
 				Resources = location.getResources(),
+				Terrain = location.getTerrainImage(),
+				Troops = this.convertTroopsToUIData(location),
+				NamedItemChance = location.getNameItemChance(),
+				Distance = playerTile.getDistanceTo(location.getTile()),
+				IsSpawningTroop = location.getDefenderSpawnList() != null,
+				Fortification = location.getCombatLocation().Fortification != 0,
 				IsPassive = isPassive && !isLair,
 				IsCamp =  isLair && !isUnique,
 				IsLegendary = isUnique,
-				Distance = playerTile.getDistanceTo(location.getTile()),
 			});
 		}
 
@@ -473,7 +494,7 @@ this.world_editor_data_helper <- {
 			{
 				draftlist.push({
 					Key = draft,
-					ImagePath = this.Woditor.Backgrounds.Stuff[draft].Icon
+					ImagePath = ::Woditor.Backgrounds.Stuff[draft].Icon
 				})
 			}
 
@@ -487,6 +508,10 @@ this.world_editor_data_helper <- {
 				Attachments = attached_locations,
 				Situations = situations,
 				DraftList = draftlist,
+				House = settlement.m.HousesTiles.len(),
+				HouseMax = settlement.getHouseMax(),
+				HouseImage = settlement.getHouseUIImage(),
+				Terrain = settlement.getTerrainImage(),
 				ImagePath = settlement.getImagePath(),
 				Wealth = settlement.getWealth(),
 				Resources = settlement.getResources(),
@@ -580,6 +605,7 @@ this.world_editor_data_helper <- {
 			local faction = {
 				ID = f.getID(),
 				Name = ("getNameOnly" in f) ? f.getNameOnly() : f.getName(),
+				Motto = f.getMotto(),
 				Relation = f.getPlayerRelationAsText(),
 				RelationNum = this.Math.round(f.getPlayerRelation())
 				RelationNumSimplified = this.Math.min(this.Const.Strings.Relations.len() - 1, f.getPlayerRelation() / 10),
@@ -604,6 +630,49 @@ this.world_editor_data_helper <- {
 			result.push(faction);
 		}
 
+		return result;
+	}
+
+	function convertItemToUIData( _item, _owner )
+	{
+		local result = {};
+		result.ID <- _item.getInstanceID();
+		result.ShowAmount <- _item.isAmountShown();
+		result.Amount <- _item.getAmountString();
+		result.AmountColor <- _item.getAmountColor();
+		result.ImagePath <- "ui/items/" + _item.m.Icon;
+		result.Owner <- _owner;
+		return result;
+	}
+
+	function convertTroopsToUIData( _worldEntity )
+	{
+		local result = [];
+
+		foreach ( troop in _worldEntity.getTroops() )
+		{
+			local key = ::Woditor.getTroopKey(troop);
+			local isMiniBoss = troop.Variant != 0;
+			local i = this.lookForTroop(key, result, isMiniBoss);
+
+			if (i != null)
+			{
+				++result[i].Num;
+			}
+			else
+			{
+				result.push({
+					Name = ::Woditor.getTroopName(troop),
+					Icon = ::Woditor.getTroopIcon(troop),
+					Strength = troop.Strength,
+					IsChampion = isMiniBoss,
+					Key = key,
+					Num = 1,
+				});
+			}
+		}
+
+		result.sort(this.onSortTroop);
 		return result;
 	}
 
@@ -635,17 +704,42 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
-	function lookForTroop( _key, _troops, _isChampion )
+	function lookForTroop( _key, _troops, _isMiniboss )
 	{
 		foreach (i, troop in _troops )
 		{
-			if (troop.Key == _key && (!_isChampion || troop.IsChampion))
+			if (_isMiniboss == troop.IsChampion && troop.Key == _key)
 			{
 				return i;
 			}
 		}
 
 		return null;
+	}
+
+	function onSortTroop( _t1, _t2 )
+	{
+		if (_t1.Key < _t2.Key)
+		{
+			return -1;
+		}
+		else if (_t1.Key > _t2.Key)
+		{
+			return 1;
+		}
+		else
+		{
+			if (!_t1.IsChampion && _t2.IsChampion)
+			{
+				return -1;
+			}
+			else if (_t1.IsChampion && !_t2.IsChampion)
+			{
+				return 1;
+			}
+			
+			return 0;
+		}
 	}
 
 	function onSortWithFaction( _f1, _f2 )

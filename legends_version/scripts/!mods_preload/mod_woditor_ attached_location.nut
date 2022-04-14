@@ -1,4 +1,4 @@
-this.getroottable().Woditor.hookAttachedLocation <- function ()
+::Woditor.hookAttachedLocation <- function ()
 {
 	::mods_hookExactClass("entity/world/attached_location", function( obj ) 
 	{
@@ -21,5 +21,5 @@ this.getroottable().Woditor.hookAttachedLocation <- function ()
 		};
 	});
 
-	delete this.Woditor.hookAttachedLocation;
+	delete ::Woditor.hookAttachedLocation;
 }
