@@ -425,6 +425,11 @@ this.world_editor_data_helper <- {
 
 		foreach(i, settlement in this.World.EntityManager.getSettlements())
 		{
+			if (settlement.getFactionOfType(this.Const.FactionType.Settlement) != null)
+			{
+				continue;
+			}
+
 			local faction;
 			local owner;
 			local buildings = [];
@@ -564,7 +569,6 @@ this.world_editor_data_helper <- {
 			this.Const.FactionType.OrientalCityState,
 			this.Const.FactionType.NobleHouse,
 			this.Const.FactionType.Settlement,
-			this.Const.FactionType.Player,
 		];
 		local factions = clone this.World.FactionManager.getFactions(false);
 		local factions_southern = [];
@@ -573,7 +577,7 @@ this.world_editor_data_helper <- {
 
 		foreach( f in factions )
 		{
-			if (f == null)
+			if (f == null || f.getType() == this.Const.FactionType.Player)
 			{
 				continue;
 			}
@@ -617,19 +621,54 @@ this.world_editor_data_helper <- {
 			if (valid.find(f.getType()) != null)
 			{
 				faction.ImagePath <- f.getUIBanner();
-				faction.Contracts <- this.getContractsUI(f);
 				faction.NoChangeName <- false;
 			}
 			else
 			{
 			    faction.ImagePath <- "ui/banners/banner_unknow.png";
-			    faction.Contracts <- [];
 			    faction.NoChangeName <- true;
 			}
 
 			result.push(faction);
 		}
 
+		return result;
+	}
+
+	function convertContractsToUIData()
+	{
+		local result = [];
+
+		foreach( contract in this.World.Contracts.getOpenContracts() )
+		{
+			if (contract.getFaction() == this.Const.FactionType.Player)
+			{
+				continue;
+			}
+
+			local daysLeft = this.Math.max(1, this.Math.abs(this.Time.getVirtualTimeF() - contract.m.TimeOut) / this.World.getTime().SecondsPerDay);
+			local originID = (contract.getOrigin() != null && !contract.getOrigin().isNull()) ? contract.getOrigin().getID() : null;
+			local homeID = (contract.getHome() != null && !contract.getHome().isNull()) ? contract.getHome().getID() : null;
+			local employeImagePath = contract.getCharacter().getImagePath();
+
+			result.push({
+				ID = contract.getID(),
+				Name = contract.getName(),
+				Type = contract.getType(),
+				Icon = contract.getBanner() + ".png",
+				Faction = contract.getFaction(),
+				IsNegotiated = contract.isNegotiated(),
+				DifficultyIcon = contract.getUIDifficultySmall() + ".png",
+				DifficultyMult = this.Math.floor(contract.getDifficultyMult() * 100),
+				PaymentMult = this.Math.floor(contract.getPaymentMult() * 100),
+				Employer = employeImagePath,
+				Expire = daysLeft,
+				Origin = originID,
+				Home = homeID
+			});
+		}
+
+		result.sort(this.onSortWithFaction);
 		return result;
 	}
 
@@ -674,34 +713,6 @@ this.world_editor_data_helper <- {
 		}
 
 		result.sort(this.onSortTroop);
-		return result;
-	}
-
-	function getContractsUI( _faction )
-	{
-		if (_faction.getType() == this.Const.FactionType.Player)
-		{
-			return [];
-		}
-
-		local contracts = _faction.getContracts();
-		local result = [];
-
-		foreach ( c in contracts ) 
-		{
-			if (c.isActive())
-			{
-				continue;
-			}
-
-			result.push({
-				ID = c.getID(),
-				Icon = c.getBanner(),
-				IsNegotiated = c.isNegotiated(),
-				DifficultyIcon = c.getUIDifficultySmall(),
-			});
-		}
-
 		return result;
 	}
 

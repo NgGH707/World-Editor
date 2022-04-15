@@ -1,4 +1,15 @@
 
+WorldEditorScreen.prototype.getLocation = function (_id)
+{
+    for (var i = 0; i < this.mLocation.Data.length; i++) {
+        var result = this.mLocation.Data[i];
+        if (result.ID === _id) {
+            return result;
+        }
+    }
+    return null;
+}
+
 WorldEditorScreen.prototype.updateLocationData = function(_newData)
 {
     var element = this.mLocation.Selected;
@@ -129,13 +140,15 @@ WorldEditorScreen.prototype.filterLocationsByFaction = function (_filter)
     this.expandExpandableList(false, this.mLocation);
 };
 
-WorldEditorScreen.prototype.addLocationsData = function(_data)
+WorldEditorScreen.prototype.addLocationsData = function(_data, _isLoaded)
 {
     var self = this;
     this.mLocation.ListScrollContainer.empty();
     this.mLocation.ExpandableList.deselectListEntries();
     this.mLocation.DefaultFilter.addClass('is-selected');
-    this.mLocation.Data = _data;
+
+    if (_isLoaded !== true)
+        this.mLocation.Data = _data;
 
     // load back and scroll to the position where you have left to see a location
     if (this.mShowEntityOnMap !== null && this.mShowEntityOnMap.Type === 'location')
@@ -516,10 +529,10 @@ WorldEditorScreen.prototype.fillLocationSearchItemResult = function(_data)
             
             if (data.LayerImagePath.length > 0) {
                 if (self.mLocation.SearchItemOverlay != null) {
-                    self.mLocation.SearchItemOverlay.attr('src', Path.GFX + data.LayerImagePath);
+                    self.mLocation.SearchItemOverlay.attr('src', Path.ITEMS + data.LayerImagePath);
                 }
                 else {
-                    self.mLocation.SearchItemOverlay = this.mLocation.SearchItemContainer.createImage(Path.ITEMS + data.LayerImagePath, null, null, '');
+                    self.mLocation.SearchItemOverlay = self.mLocation.SearchItemContainer.createImage(Path.ITEMS + data.LayerImagePath, null, null, '');
                     self.mLocation.SearchItemOverlay.css('pointer-events', 'none');
                 }
             }

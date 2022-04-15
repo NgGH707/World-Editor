@@ -2,9 +2,9 @@
 WorldEditorScreen.prototype.getFaction = function (_id)
 {
     for (var i = 0; i < this.mFaction.Data.length; i++) {
-        var faction = this.mFaction.Data[i];
-        if (faction.ID === _id) {
-            return faction;
+        var result = this.mFaction.Data[i];
+        if (result.ID === _id) {
+            return result;
         }
     }
     return null;
@@ -28,10 +28,12 @@ WorldEditorScreen.prototype.updateFactionData = function(_newData)
     };
 }
 
-WorldEditorScreen.prototype.addFactionsData = function (_data)
+WorldEditorScreen.prototype.addFactionsData = function (_data, _isLoaded)
 {
     this.mFaction.ListScrollContainer.empty();
-    this.mFaction.Data = _data;
+
+    if (_isLoaded !== true)
+        this.mFaction.Data = _data;
 
     for(var i = 0; i < _data.length; ++i)
     {
@@ -44,18 +46,13 @@ WorldEditorScreen.prototype.addFactionsData = function (_data)
 WorldEditorScreen.prototype.addFactionListEntry = function (_data, _index)
 {
     var result = $('<div class="l-row"/>');
-
-    if (_index === 0)
-        result.css('margin-top', '0.3rem');
-
     this.mFaction.ListScrollContainer.append(result);
 
     var entry = $('<div class="ui-control list-entry"/>');
     result.append(entry);
     entry.data('entry', _data);
     entry.data('index', _index);
-    entry.click(this, function(_event)
-    {
+    entry.click(this, function(_event) {
         _event.data.selectFactionListEntry($(this));
     });
 
@@ -63,11 +60,9 @@ WorldEditorScreen.prototype.addFactionListEntry = function (_data, _index)
     var column = $('<div class="faction-column is-left"/>');
     entry.append(column);
 
-    column.createImage(Path.GFX + _data['ImagePath'], function (_image)
-    {
+    column.createImage(Path.GFX + _data.ImagePath, function(_image) {
         _image.centerImageWithinParent(0, 0, 0.5);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
 
     // right column
     column = $('<div class="faction-column is-right"/>');
@@ -79,15 +74,6 @@ WorldEditorScreen.prototype.addFactionListEntry = function (_data, _index)
 
     var name = $('<div class="name title-font-normal font-bold font-color-brother-name">' + _data['Name'] + '</div>');
     row.append(name);
-
-    /*if('Landlord' in _data && _data.Landlord !== undefined && _data.Landlord !== null) quite redundant
-    {
-        var landlordImageContainer = $('<div class="f-landlord-container"/>');
-        row.append(landlordImageContainer);
-        var landlordImage = landlordImageContainer.createImage(Path.GFX + _data.Landlord, function(_image) {
-            _image.fitImageToParent(0, 0);
-        }, null,'');
-    }*/
 
     // bottom row
     row = $('<div class="faction-row is-bottom"/>');
@@ -203,69 +189,62 @@ WorldEditorScreen.prototype.updateFactionDetailsPanel = function(_element)
         else if (this.mFactionFixedRelation.Checkbox.is(':checked') === false && data.FactionFixedRelation === true)
             this.mFactionFixedRelation.Checkbox.iCheck('check');
 
-        this.addContractToFactionDetail(data.Contracts);
+        this.addContractToFactionDetail(data.ID);
         this.mIsUpdating = false;
     }
 };
 
-WorldEditorScreen.prototype.updateFactionContracts = function(_data) 
+WorldEditorScreen.prototype.updateFactionContracts = function() 
 {
-    if (_data === undefined || _data === null || !jQuery.isArray(_data)) return;
-
-    var index = this.mFaction.Selected.data('index');
-    this.mFaction.Data[index] = _data;
-    this.mFaction.Selected.data('entry', this.mFaction.Data[index]);
-    this.addContractToFactionDetail(_data);
+    if(this.mFaction.Selected !== null && this.mFaction.Selected.length > 0) {
+        var data = this.mFaction.Selected.data('entry');
+        this.addContractToFactionDetail(data.ID);
+    }
 }
 
-WorldEditorScreen.prototype.resetContractInFactionDetail = function() 
-{
-    var result = this.updateFactionData({Contracts: []});
-    this.mFaction.Contracts.empty();
-    return result.Data.ID;
-}
-
-WorldEditorScreen.prototype.addContractToFactionDetail = function(_data) 
+WorldEditorScreen.prototype.addContractToFactionDetail = function(_id) 
 {
     var self = this;
+    var count = 0;
     this.mFaction.Contracts.empty();
 
-    if (_data !== undefined && _data !== null && jQuery.isArray(_data))
-    {
-        for (var i = 0; i < _data.length; ++i)
-        {
-            var entry = _data[i];
-            var a = 2.0 + i * 6.0;
-            var contract = this.mFaction.Contracts.createImage(Path.GFX + entry.Icon + '.png', null, null, 'display-block is-contract');
-            var scroll = this.mFaction.Contracts.createImage(Path.GFX + 'ui/icons/scroll_0' + (_data.IsNegotiated ? 1 : 2) + '.png', null, null, 'display-block is-scroll');
-            var difficulty = this.mFaction.Contracts.createImage(Path.GFX + entry.DifficultyIcon + '.png', null, null, 'display-block is-difficulty');
+    if (this.mContract.Data === null || this.mContract.Data === undefined)
+        return;
 
-            contract.css('left', a + 'rem');
-            scroll.css('left', a + 'rem');
-            difficulty.css('left', a + 'rem');
+    for (var i = 0; i < this.mContract.Data.length; i++) {
+        var data = this.mContract.Data[i];
+        if (data.Faction !== _id)
+            continue;
 
-            // set up event listeners
-            contract.click(function(_event) {
-                //if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
-                    //self.(_data.ID);
-                //else
-                    //self.(_data.ID);
-            });
-            contract.mouseover(function() {
-                this.classList.add('is-highlighted');
-                scroll.addClass('is-highlighted');
-                difficulty.addClass('is-highlighted');
-            });
-            contract.mouseout(function() {
-                this.classList.remove('is-highlighted');
-                scroll.removeClass('is-highlighted');
-                difficulty.removeClass('is-highlighted');
-            });
+        var a = 2.0 + count * 6.0;
+        var contract = this.mFaction.Contracts.createImage(Path.GFX + data.Icon, null, null, 'display-block is-contract');
+        var scroll = this.mFaction.Contracts.createImage(Path.GFX + 'ui/icons/scroll_0' + (data.IsNegotiated ? 1 : 2) + '.png', null, null, 'display-block is-scroll');
+        var difficulty = this.mFaction.Contracts.createImage(Path.GFX + data.DifficultyIcon, null, null, 'display-block is-difficulty');
 
-            contract.bindTooltip({ contentType: 'ui-element', elementId: entry.ID, elementOwner: 'woditor.faction_contracts' });
+        contract.css('left', a + 'rem');
+        scroll.css('left', a + 'rem');
+        difficulty.css('left', a + 'rem');
 
-            if (i === 11)
-                break;
-        }
+        // set up event listeners
+        contract.click(function(_event) {
+            //if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+                //self.(_data.ID);
+            //else
+                //self.(_data.ID);
+        });
+        contract.mouseover(function() {
+            this.classList.add('is-highlighted');
+            scroll.addClass('is-highlighted');
+            difficulty.addClass('is-highlighted');
+        });
+        contract.mouseout(function() {
+            this.classList.remove('is-highlighted');
+            scroll.removeClass('is-highlighted');
+            difficulty.removeClass('is-highlighted');
+        });
+        contract.bindTooltip({ contentType: 'ui-element', elementId: data.ID, elementOwner: 'woditor.faction_contracts' });
+
+        if (++count == 11)
+            break;
     }
 };

@@ -57,7 +57,7 @@
 							{
 								id = 2,
 								type = "description",
-								text = "The employer is [color=#0b0084]" + contract.getCharacter().getName() + "[/color] of [color=#0b0084]" + faction.getName() + "[/color]. Expires in [color=" + this.Const.UI.Color.NegativeValue + "]" + (this.Math.round(this.Math.abs(this.Time.getVirtualTimeF() - contract.m.TimeOut) / this.World.getTime().SecondsPerDay)) + "[/color] days."
+								text = "The employer is [color=#0b0084]" + contract.getCharacter().getName() + "[/color] of [color=#0b0084]" + faction.getName() + "[/color]. Expires in [color=" + this.Const.UI.Color.NegativeValue + "]" + (this.Math.max(1, this.Math.abs(this.Time.getVirtualTimeF() - contract.m.TimeOut) / this.World.getTime().SecondsPerDay)) + "[/color] days."
 							},
 							{
 								id = 3,
@@ -203,12 +203,13 @@
 							{
 								id = 1,
 								type = "title",
-								text = "Reroll " + (_elementOwner != null ? "(chance: " + _elementOwner + "%)" : "")
+								text = this.World.FactionManager.getFaction(_elementId).getName()
 							},
 							{
-								id = 2,
-								type = "description",
-								text = "Refresh the current loot pool. The chance to roll for named items is depending on the Resouces value."
+								id = 10,
+								type = "hint",
+								icon = "ui/icons/mouse_left_button.png",
+								text = "Change to another faction"
 							},
 						];
 					}
@@ -264,6 +265,20 @@
 
 			switch (_elementId) 
 			{
+			case "woditor.contractexpiration":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Time Left"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Displays how many days you have before this contract expires. If you haven\'t this contract before the it expires, the contract will be discarded."
+					},
+				];
+
 			case "woditor.refreshloot":
 		       	return [
 					{

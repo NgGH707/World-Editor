@@ -57,17 +57,21 @@
 {
     left: 33.0rem;
 }
-.world-editor-screen > .l-world-editor-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-settlements
+.world-editor-screen > .l-world-editor-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-contracts
 {
     left: 49.5rem;
 }
-.world-editor-screen > .l-world-editor-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-locations
+.world-editor-screen > .l-world-editor-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-settlements
 {
     left: 66.0rem;
 }
-.world-editor-screen > .l-world-editor-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-contracts
+.world-editor-screen > .l-world-editor-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-locations
 {
     left: 82.5rem;
+}
+.world-editor-screen > .l-world-editor-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-units
+{
+    left: 99.0rem;
 }
 
 .world-editor-screen > .l-world-editor-dialog-container .l-tab-container .tab-button-panel .l-tab-button.is-save

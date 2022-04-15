@@ -471,6 +471,9 @@ this.world_editor_screen <- {
 				this.World.Contracts.m.LastShown = null;
 			}
 		}
+
+		this.m.JSHandle.asyncCall("addContractsData", ::Woditor.Helper.convertContractsToUIData());
+		this.log("Refreshed contracts of faction " + this.Const.UI.getColorized(faction.getName(), "#1e468f") + "!");
 	}
 
 	function onChangeWorldEntityName( _data )
@@ -1486,6 +1489,7 @@ this.world_editor_screen <- {
 		result.Assets <- ::Woditor.Helper.convertAssetsToUIData();
 		result.Avatar <- ::Woditor.Helper.convertAvatarToUIData(this);
 		result.Factions <- ::Woditor.Helper.convertFactionsToUIData();
+		result.Contracts <- ::Woditor.Helper.convertContractsToUIData();
 		result.Settlements <- ::Woditor.Helper.convertSettlementsToUIData();
 		result.Locations <- ::Woditor.Helper.convertLocationsToUIData();
 		result.Filter <- ::Woditor.Helper.convertToUIFilterData(result.Factions);

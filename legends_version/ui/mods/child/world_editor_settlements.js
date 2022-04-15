@@ -1,4 +1,15 @@
 
+WorldEditorScreen.prototype.getSettlement = function (_id)
+{
+    for (var i = 0; i < this.mSettlement.Data.length; i++) {
+        var result = this.mSettlement.Data[i];
+        if (result.ID === _id) {
+            return result;
+        }
+    }
+    return null;
+}
+
 WorldEditorScreen.prototype.updateSettlementData = function(_newData)
 {
     var element = this.mSettlement.Selected;
@@ -162,15 +173,17 @@ WorldEditorScreen.prototype.filterSettlementsByFaction = function (_filter)
     this.expandExpandableList(false, this.mSettlement);
 };
 
-WorldEditorScreen.prototype.addSettlementsData = function (_data)
+WorldEditorScreen.prototype.addSettlementsData = function (_data, _isLoaded)
 {
     var self = this;
     this.mSettlement.ListScrollContainer.empty();
     this.mSettlement.ExpandableList.deselectListEntries();
     this.mSettlement.DefaultFilter.addClass('is-selected');
-    this.mSettlement.Data = _data;
-    this.filterSettlementsByType();
 
+    if (_isLoaded !== true)
+        this.mSettlement.Data = _data;
+    
+    this.filterSettlementsByType();
     // load back and scroll to the position where you have left to see a settlement
     if (this.mShowEntityOnMap !== null && this.mShowEntityOnMap.Type === 'settlement')
     {

@@ -2,8 +2,8 @@
 
 var WorldEditor =
 {
-    Screens  : ['General'   , 'Properties'      , 'Factions'   , 'Settlements'   , 'Locations'   , 'Contracts'   ],
-    Classes  : ['is-general', 'is-properties'   , 'is-factions', 'is-settlements', 'is-locations', 'is-contracts'],
+    Screens  : ['General'   , 'Properties'      , 'Factions'   , 'Contracts'   , 'Settlements'   , 'Locations'   , 'Units'   ],
+    Classes  : ['is-general', 'is-properties'   , 'is-factions', 'is-contracts', 'is-settlements', 'is-locations', 'is-units'],
     RadioBox : ['IsGender'  , 'CombatDifficulty', 'EconomicDifficulty'],
     Locations: ['Locations' , 'Legendary'       , 'Misc'],
 };
@@ -23,9 +23,10 @@ var WorldEditorScreen = function(_parent)
         General    : null,
         Properties : null,
         Factions   : null,
+        Contracts  : null,
         Settlements: null,
         Locations  : null,
-        Contracts  : null,
+        Units      : null,
     };
 
     // screens
@@ -34,9 +35,10 @@ var WorldEditorScreen = function(_parent)
         General    : null,
         Properties : null,
         Factions   : null,
+        Contracts  : null,
         Settlements: null,
         Locations  : null,
-        Contracts  : null,
+        Units      : null,
     };
 
     // log
@@ -58,6 +60,25 @@ var WorldEditorScreen = function(_parent)
         NextButton         : null,
         PrevButton         : null,
         Settlement         : null,
+        ListContainer      : null,
+        ListScrollContainer: null,
+    };
+
+    // contracts
+    this.mContract =
+    {
+        Data               : null,
+        Name               : null,
+        Selected           : null,
+        Payment            : null,
+        PaymentMult        : null,
+        DifficultyMult     : null,
+        Expiration         : null,
+        FactionBanner      : null,
+        Employer           : null,
+        Origin             : null,
+        Home               : null,
+        Objective          : null,
         ListContainer      : null,
         ListScrollContainer: null,
     };
@@ -145,8 +166,8 @@ var WorldEditorScreen = function(_parent)
         DefaultFilter       : null,
     };
 
-    // contracts
-    this.mContract =
+    // units
+    this.mUnit =
     {
         Data               : null,
         Name               : null,
@@ -403,7 +424,7 @@ WorldEditorScreen.prototype.createDIV = function(_parentDiv)
     this.mIsVisible = false;
 };
 
-WorldEditorScreen.prototype.createContractsScreenDIV = function(_parentDiv) 
+WorldEditorScreen.prototype.createUnitsScreenDIV = function(_parentDiv) 
 {
     var self = this;
 };
@@ -734,12 +755,20 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                 {
                     var column21 = this.addColumn(21, 'inventory_bag_slot');
                     upperRow.append(column21);
-                    this.mLocation.SearchItemContainer = this.addLayout(7.0, 7.0, 'is-center'); 
+                    this.mLocation.SearchItemContainer = $('<div class="item-layout is-center"/>');
                     column21.append(this.mLocation.SearchItemContainer);
-                    this.mLocation.SearchItem = this.mLocation.SearchItemContainer.createImage(Path.GFX + 'ui/items/slots/inventory_slot_bag.png', function(_image) {
-                        _image.centerImageWithinParent(0, 0, 1.0);
-                    }, null, '');
+                    this.mLocation.SearchItem = this.mLocation.SearchItemContainer.createImage(Path.GFX + 'ui/items/slots/inventory_slot_bag.png', null, null, '');
                     this.mLocation.SearchItem.data('script', null);
+                    this.mLocation.SearchItem.click(this, function(_event) {
+                        var element = $(this);
+                        var data = element.data('script');
+
+                        if (data === undefined || data === null)
+                            return;
+            
+                        if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+                            self.notifyBackendAddItemToLoot(data);
+                    });
 
                     var column79 = this.addColumn(79);
                     upperRow.append(column79);
@@ -1281,6 +1310,194 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                 slotContainer.append(listContainerLayout);
                 var listContainer = listContainerLayout.createList(1);
                 this.mSettlement.Attachments = listContainer.findListScrollContainer();
+            }
+        }
+    }
+};
+
+WorldEditorScreen.prototype.createContractsScreenDIV = function(_parentDiv) 
+{
+    var self = this;
+
+    var column25 = this.addColumn(25, 'with-dialog-background');
+    column25.css('padding-top', '0.9rem');
+    _parentDiv.append(column25);
+    {
+        var listContainerLayout = $('<div class="l-list-container"/>');
+        column25.append(listContainerLayout);
+        this.mContract.ListContainer = listContainerLayout.createList(2);
+        this.mContract.ListScrollContainer = this.mContract.ListContainer.findListScrollContainer();
+    }
+
+    var column75 = this.addColumn(75);
+    _parentDiv.append(column75);
+    {
+        var column40 = this.addColumn(40);
+        column75.append(column40);
+        {
+            var nameContainer = this.addRow(10, 'with-scroll-header-background');
+            column40.append(nameContainer);
+            var row = $('<div class="row"/>');
+            row.css('padding-top', '1.0rem');
+            nameContainer.append(row);
+            this.mContract.Name = $('<div class="title-black title-font-big font-align-center font-color-ink">Contract Name</div>');
+            row.append(this.mContract.Name);
+
+            var below = this.addRow(90);
+            column40.append(below);
+            {
+                var insideScroll = this.addLayout('98%', '100%','is-horizontal-center with-scroll-background');
+                below.append(insideScroll);
+
+                // difficulty mult input
+                var row = $('<div class="row"/>');
+                row.css('padding-top', '2.0rem');
+                insideScroll.append(row);
+                var title = $('<div class="title-black title-font-big font-color-ink">Difficulty Mult</div>');
+                row.append(title);
+                var inputLayout = $('<div class="l-input-big"/>');
+                row.append(inputLayout);
+                this.mContract.DifficultyMult = inputLayout.createInput('', 0, 10, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                    //var index = self.mSettlement.Selected.data('index');
+                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
+                });
+                this.mContract.DifficultyMult.assignInputEventListener('focusout', function(_input, _event) {
+                    //var index = self.mSettlement.Selected.data('index');
+                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
+                });
+                this.mContract.DifficultyMult.assignInputEventListener('click', function(_input, _event) {
+                    _input.data('IsUpdated', false);
+                });
+
+                // payment input
+                var row = $('<div class="row"/>');
+                insideScroll.append(row);
+                var title = $('<div class="title-black title-font-big font-color-ink">Payment Mult</div>');
+                row.append(title);
+                var inputLayout = $('<div class="l-input-big"/>');
+                row.append(inputLayout);
+                this.mContract.PaymentMult = inputLayout.createInput('', 0, 10, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                    //var index = self.mSettlement.Selected.data('index');
+                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
+                });
+                this.mContract.PaymentMult.assignInputEventListener('focusout', function(_input, _event) {
+                    //var index = self.mSettlement.Selected.data('index');
+                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
+                });
+                this.mContract.PaymentMult.assignInputEventListener('click', function(_input, _event) {
+                    _input.data('IsUpdated', false);
+                });
+
+                // expiration
+                var row = $('<div class="row"/>');
+                insideScroll.append(row);
+                var title = $('<div class="title-black title-font-big font-color-ink">Expiration</div>');
+                row.append(title);
+                var inputLayout = $('<div class="l-input-big"/>');
+                row.append(inputLayout);
+                this.mContract.Expiration = inputLayout.createInput('', 0, 10, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                    //var index = self.mSettlement.Selected.data('index');
+                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
+                });
+                this.mContract.Expiration.assignInputEventListener('focusout', function(_input, _event) {
+                    //var index = self.mSettlement.Selected.data('index');
+                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
+                });
+                this.mContract.Expiration.assignInputEventListener('click', function(_input, _event) {
+                    _input.data('IsUpdated', false);
+                });
+            }
+        }
+
+        var column60 = this.addColumn(60);
+        column75.append(column60);
+        {
+            var leftPart = this.addColumn(52);
+            column60.append(leftPart);
+            {
+                var upperRow = this.addRow(30, 'with-medium-dialog-background');
+                leftPart.append(upperRow);
+                {
+                    var column57 = this.addColumn(43);
+                    upperRow.append(column57);
+                    var row = $('<div class="row"/>');
+                    column57.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Faction</div>');
+                    row.append(title);
+                    // faction image banner
+                    var imageContainer = $('<div class="faction-landlord-container"/>');
+                    imageContainer.css('top', '5.0rem');
+                    upperRow.append(imageContainer);
+                    this.mContract.FactionBanner = imageContainer.createImage(null, function(_image) {
+                        _image.fitImageToParent(0, 0);
+                    }, null, '');
+                    /*this.mContract.FactionBanner.click(function(_event) {
+                        var element = self.mLocation.Selected;
+                        if (element !== null && element.length > 0) {
+                            var data = element.data('entry');
+                            self.createChooseFactionPopupDialog(data, false, true);
+                        }
+                    });*/
+                    this.mContract.FactionBanner.mouseover(function() {
+                        this.classList.add('is-highlighted');
+                    });
+                    this.mContract.FactionBanner.mouseout(function() {
+                        this.classList.remove('is-highlighted');
+                    });
+
+
+                    var column43 = this.addColumn(57);
+                    upperRow.append(column43);
+                    var row = $('<div class="row"/>');
+                    column43.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Employer</div>');
+                    row.append(title);
+                    var employerContainer = $('<div class="employer-image-container is-horizontal-center"/>');
+                    column43.append(employerContainer);
+                    this.mContract.Employer = employerContainer.createImage(null, function(_image) {
+                        _image.centerImageWithinParent(0, 0, 1.0);
+                    }, null, '');
+                }
+            }
+
+            var rightPart = this.addColumn(48);
+            column60.append(rightPart);
+            {
+                var originContainer = this.addRow(30, 'with-scroll-tooltip-background');
+                rightPart.append(originContainer);
+                var row = $('<div class="row"/>');
+                originContainer.append(row);
+                var title = $('<div class="title-black title-font-big font-color-ink">Origin</div>');
+                row.append(title);
+                var originImageLayout = $('<div class="contract-origin-image-container is-horizontal-center"/>');
+                originContainer.append(originImageLayout);
+                this.mContract.Origin = originImageLayout.createImage(Path.GFX + 'ui/images/undiscovered_opponent.png', function(_image) {
+                    _image.centerImageWithinParent(0, 0, 1.0);
+                }, null, '');
+
+                var originContainer = this.addRow(30, 'with-scroll-tooltip-background');
+                rightPart.append(originContainer);
+                var row = $('<div class="row"/>');
+                originContainer.append(row);
+                var title = $('<div class="title-black title-font-big font-color-ink">Home</div>');
+                row.append(title);
+                var originImageLayout = $('<div class="contract-origin-image-container is-horizontal-center"/>');
+                originContainer.append(originImageLayout);
+                this.mContract.Home = originImageLayout.createImage(Path.GFX + 'ui/images/undiscovered_opponent.png', function(_image) {
+                    _image.centerImageWithinParent(0, 0, 1.0);
+                }, null, '');
+
+                var originContainer = this.addRow(30, 'with-scroll-tooltip-background');
+                rightPart.append(originContainer);
+                var row = $('<div class="row"/>');
+                originContainer.append(row);
+                var title = $('<div class="title-black title-font-big font-color-ink">Objective</div>');
+                row.append(title);
+                var originImageLayout = $('<div class="contract-origin-image-container is-horizontal-center"/>');
+                originContainer.append(originImageLayout);
+                this.mContract.Objective = originImageLayout.createImage(Path.GFX + 'ui/images/undiscovered_opponent.png', function(_image) {
+                    _image.centerImageWithinParent(0, 0, 1.0);
+                }, null, '');
             }
         }
     }
@@ -1866,7 +2083,7 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
         }
 
         // roster slider
-        this.createSliderControlDIV(this.mRosterTier, 'Roster Tier', rightColumn);
+        this.createSliderControlDIV(this.mRosterTier, 'Starting Roster Tier', rightColumn);
     }
 };
 
@@ -2544,31 +2761,47 @@ WorldEditorScreen.prototype.updateAvatarImage = function(_imagePath)
     this.mAvatar.Image.attr('src', Path.PROCEDURAL + _imagePath);
 }
 
-WorldEditorScreen.prototype.loadFromData = function(_data) 
+WorldEditorScreen.prototype.loadFromData = function(_data)
 {
+    var hasFactions = 'Factions' in _data && _data.Factions !== undefined && _data.Factions !== null && jQuery.isArray(_data.Factions);
+    var hasContracts = 'Contracts' in _data && _data.Contracts !== undefined && _data.Contracts !== null && jQuery.isArray(_data.Contracts);
+    var hasSettlements = 'Settlements' in _data && _data.Settlements !== undefined && _data.Settlements !== null && jQuery.isArray(_data.Settlements);
+    var hasLocations = 'Locations' in _data && _data.Locations !== undefined && _data.Locations !== null && jQuery.isArray(_data.Locations);
+    var validToPreload = hasFactions && hasContracts && hasSettlements && hasLocations;
+
+    if (validToPreload) {
+        this.mFaction.Data = _data.Factions;
+        this.mContract.Data = _data.Contracts;
+        this.mSettlement.Data = _data.Settlements;
+        this.mLocation.Data = _data.Locations;
+    }
+
     if ('Assets' in _data && _data.Assets !== undefined && _data.Assets !== null && typeof _data.Assets === 'object')
         this.updateAssetsData(_data.Assets);
 
     if ('Avatar' in _data && _data.Avatar !== undefined && _data.Avatar !== null && typeof _data.Avatar === 'object')
         this.updateAvatarData(_data.Avatar);
 
-    if ('Factions' in _data && _data.Factions !== undefined && _data.Factions !== null && jQuery.isArray(_data.Factions))
-        this.addFactionsData(_data.Factions);
-
     if ('Filter' in _data && _data.Filter !== undefined && _data.Filter !== null && typeof _data.Filter === 'object')
         this.addFilterData(_data.Filter);
-
-    if ('Settlements' in _data && _data.Settlements !== undefined && _data.Settlements !== null && jQuery.isArray(_data.Settlements))
-        this.addSettlementsData(_data.Settlements);
-
-    if ('Locations' in _data && _data.Locations !== undefined && _data.Locations !== null && jQuery.isArray(_data.Locations))
-        this.addLocationsData(_data.Locations);
 
     if ('Scenario' in _data && _data.Scenario !== undefined && _data.Scenario !== null && typeof _data.Scenario === 'object') {
         this.mScenario.Data = _data.Scenario.Data;
         this.mScenario.Selected = _data.Scenario.Selected;
         this.mScenario.Image.attr('src', Path.GFX + this.mScenario.Data[this.mScenario.Selected].Image);
     }
+
+    if (hasFactions)
+        this.addFactionsData(_data.Factions, validToPreload);
+
+    if (hasContracts)
+        this.addContractsData(_data.Contracts, validToPreload);
+
+    if (hasSettlements)
+        this.addSettlementsData(_data.Settlements, validToPreload);
+
+    if (hasLocations)
+        this.addLocationsData(_data.Locations, validToPreload);
 };
 
 WorldEditorScreen.prototype.addFilterData = function (_data)
@@ -2921,7 +3154,7 @@ WorldEditorScreen.prototype.notifyBackendRefreshFactionActions = function()
 
 WorldEditorScreen.prototype.notifyBackendRefreshFactionContracts = function()
 {
-    var id = this.resetContractInFactionDetail();
+    var id = this.mFaction.Selected.data('entry').ID;
     SQ.call(this.mSQHandle, 'onRefreshFactionContracts', id);
 };
 

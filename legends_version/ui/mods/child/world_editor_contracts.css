@@ -1,0 +1,105 @@
+
+.world-editor-screen > .l-world-editor-dialog-container .content .scroll-container .contract-row
+{
+    width: 29.0rem;
+    height: 10.7rem;
+    position: relative;
+    margin-bottom: -0.1rem;
+    margin-left: 1.0rem;
+
+    overflow: hidden;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .scroll-container .contract-row:first-child
+{
+    margin-top: 0.3rem;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .scroll-container .contract-row:last-child
+{
+    margin-bottom: 0;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .contract-row .contract-column-left
+{
+    width: 9.0rem;
+    height: 100%;
+    position: relative;
+    float: left;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .contract-row .contract-column-left > img
+{
+    position: absolute;
+    display: block;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .contract-row .contract-column-left > img.is-contract-difficulty
+{
+    top: 1.5rem;
+    left: 2.4rem;
+    pointer-events: none;
+    position: absolute;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .contract-row .contract-column-right
+{
+    left : 8.0rem;
+    width: 20.0rem;
+    height: 100%;
+    position: absolute;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .contract-row .contract-column-right .name
+{
+    top: 3.0rem;
+    height: 6.0rem;
+    position: absolute;
+    overflow: hidden;
+    line-height: 3.0rem;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .contract-row .contract-column-right .expiration-container
+{
+    top: 0.8rem;
+    left: 15.3rem;
+    width: 6.0rem;
+    height: 3.0rem;
+    position: absolute;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .contract-row .contract-column-right .expiration-container img
+{
+    left: 0;
+    bottom: 0.1rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    position: absolute;
+
+    display: block;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .contract-row .contract-column-right .expiration-container > .time-left
+{
+    left: 2.9rem;
+    right: 0;
+    bottom: 0.2rem;
+    height: 2.6rem;
+    position: absolute;
+
+    line-height: 3.0rem;
+}
+
+.world-editor-screen > .l-world-editor-dialog-container .content .contract-origin-image-container
+{
+    top: 3.0rem;
+    width: 18.0rem;
+    height: 14.0rem;
+    position: absolute;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .employer-image-container
+{
+    top: 3.0rem;
+    width: 12.0rem;
+    height: 14.0rem;
+    position: absolute;
+}
+.world-editor-screen > .l-world-editor-dialog-container .content .employer-image-container > img,
+.world-editor-screen > .l-world-editor-dialog-container .content .contract-origin-image-container > img
+{
+    position: absolute;
+    display: block;
+}
+
+
+
