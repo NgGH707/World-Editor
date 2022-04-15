@@ -334,13 +334,27 @@ WorldEditorScreen.prototype.addLootEntry = function(_data, _parentDiv)
     itemContainer.append(imageLayout);
     var image = imageLayout.createImage(Path.GFX + _data.ImagePath, function(_image) {
         _image.fitImageToParent(0, 0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+        _image.removeClass('');
+    }, null, '');
     image.data('ID', _data.ID);
+
+    var overlays = _data.ImageOverlayPath;
+    if (overlays !== undefined && overlays !== '' && overlays.length > 0)
+    {
+        overlays.forEach(function (_imagePath) {
+            if (_imagePath === '') return;
+
+            var overlayImage = imageLayout.createImage(Path.ITEMS + _imagePath, function(_image) {
+                _image.fitImageToParent(0, 0);
+                _image.removeClass('');
+            }, null, '');
+            overlayImage.css('pointer-events', 'none');
+        });
+    }
 
     if (_data.ShowAmount === true)
     {
-        var amountLabel = $('<div class="label text-font-very-small font-shadow-outline font-size-15"/>');
+        var amountLabel = $('<div class="label text-font-very-small font-shadow-outline"/>'); //font-size-13
         imageLayout.append(amountLabel);
         amountLabel.html(_data.Amount);
         amountLabel.css('color', _data.AmountColor);
@@ -487,6 +501,11 @@ WorldEditorScreen.prototype.fillLocationSearchItemResult = function(_data)
         var image = imageLayout.createImage(Path.GFX + _data[i].ImagePath, null, null, '');
         image.data('entry', _data[i]);
 
+        if (_data[i].LayerImagePath.length > 0) {
+            var overlayImage = imageLayout.createImage(Path.ITEMS + _data[i].LayerImagePath, null, null, '');
+            overlayImage.css('pointer-events', 'none');
+        }
+
         // set up event listeners
         image.click(this, function(_event) {
             var element = $(this);
@@ -494,25 +513,26 @@ WorldEditorScreen.prototype.fillLocationSearchItemResult = function(_data)
             self.mLocation.SearchItem.attr('src', Path.GFX + data.ImagePath);
             self.mLocation.SearchItem.data('script', data.Script);
             self.mLocation.SearchItem.bindTooltip({ contentType: 'ui-element', elementId: data.ID, elementOwner: 'woditor.searchresult' });
+            
+            if (data.LayerImagePath.length > 0) {
+                if (self.mLocation.SearchItemOverlay != null) {
+                    self.mLocation.SearchItemOverlay.attr('src', Path.GFX + data.LayerImagePath);
+                }
+                else {
+                    self.mLocation.SearchItemOverlay = this.mLocation.SearchItemContainer.createImage(Path.ITEMS + data.LayerImagePath, null, null, '');
+                    self.mLocation.SearchItemOverlay.css('pointer-events', 'none');
+                }
+            }
+            else if (self.mLocation.SearchItemOverlay != null) {
+                self.mLocation.SearchItemOverlay.remove();
+            }
+
             if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true) {
                 self.notifyBackendAddItemToLoot(data.Script);
             }
         });
 
         image.bindTooltip({ contentType: 'ui-element', elementId: _data[i].ID, elementOwner: 'woditor.searchresult' });
-
-        /*if (_data[i].LayerImagePath.length > 0) {
-            var imageLayout = $('<div class="item-layout"/>');
-            imageLayout.css('pointer-events', 'none');
-            itemContainer.append(imageLayout);
-            var image = imageLayout.createImage(Path.ITEMS + _data[i].LayerImagePath, null, null, '');
-            image.css('pointer-events', 'none');
-        }*/
-
-        if (_data[i].LayerImagePath.length > 0) {
-            var image = imageLayout.createImage(Path.ITEMS + _data[i].LayerImagePath, null, null, '');
-            image.css('pointer-events', 'none');
-        }
     }
 }
 

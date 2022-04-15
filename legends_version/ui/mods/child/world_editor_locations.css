@@ -112,7 +112,7 @@
     line-height: 2.0rem;
 }
 
-
+/****For The Loots UI****/
 .world-editor-screen > .l-world-editor-dialog-container .content .item-icon-container
 {
     position: relative;
@@ -125,7 +125,6 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
-
 .world-editor-screen > .l-world-editor-dialog-container .content .item-icon-layout
 {
     width: 6.0rem;
@@ -134,7 +133,6 @@
     margin: auto;
     position: absolute;
 }
-
 .world-editor-screen > .l-world-editor-dialog-container .content .item-icon-layout .label
 {
     left: 0.4rem;
@@ -148,12 +146,14 @@
 
     pointer-events: none;
 }
-
 .world-editor-screen > .l-world-editor-dialog-container .content .item-icon-layout > img
 {
+    width: 100%;
+    height: 100%;
     position: absolute;
 }
 
+/****For The Search UI****/
 .world-editor-screen > .l-world-editor-dialog-container .content .search-button
 {
     top: 4.7rem;
@@ -162,7 +162,6 @@
     height: 4.1rem;
     position: absolute;
 }
-
 .world-editor-screen > .l-world-editor-dialog-container .content .item-container
 {
     position: relative;
@@ -175,7 +174,6 @@
     background-size: 7.4rem 7.4rem;
     background-repeat: no-repeat;
 }
-
 .world-editor-screen > .l-world-editor-dialog-container .content .item-layout
 {
     width: 7.0rem;
@@ -184,7 +182,6 @@
     margin: auto;
     position: absolute;
 }
-
 .world-editor-screen > .l-world-editor-dialog-container .content .item-layout > img
 {
     width: 100%;

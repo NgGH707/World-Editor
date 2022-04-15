@@ -283,12 +283,26 @@
 					{
 						id = 1,
 						type = "title",
-						text = "Add Random Item"
+						text = "Add Random Named Item"
 					},
 					{
 						id = 2,
 						type = "description",
 						text = "Randomly pick a named item and add it too the loot pool"
+					},
+				];
+
+			case "woditor.randomlootitem":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Add Random Treasure Item"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Randomly pick a treasure item and add it too the loot pool"
 					},
 				];
 

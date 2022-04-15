@@ -15,6 +15,38 @@
 		"scripts/entity/world/attached_location/wool_spinner_location",
 	];
 
+	::Const.RandomTreasure <- [
+		"trade/incense_item",
+		"trade/dies_item",
+		"trade/silk_item",
+		"trade/spices_item",
+		"trade/furs_item",
+		"trade/copper_ingots_item",
+		"trade/cloth_rolls_item",
+		"trade/salt_item",
+		"trade/amber_shards_item",
+		"trade/iron_ingots_item",
+		"trade/tin_ingots_item",
+		"trade/gold_ingots_item",
+		"trade/uncut_gems_item",
+		"loot/white_pearls_item"
+		"loot/silverware_item",
+		"loot/silver_bowl_item",
+		"loot/signet_ring_item"
+		"loot/bone_figurines_item",
+		"loot/valuable_furs_item",
+		"loot/bead_necklace_item",
+		"loot/looted_valuables_item",
+		"loot/ancient_gold_coins_item",
+		"loot/golden_chalice_item",
+		"loot/gemstones_item",
+		"loot/jeweled_crown_item",
+		"loot/ornate_tome_item",
+		"loot/goblin_carved_ivory_iconographs_item",
+		"loot/goblin_minted_coins_item",
+		"loot/goblin_rank_insignia_item",
+	];
+
 	// something to add to the tooltips
 	::Const.PercentageNoteString <- " The value is calculated in percentage. The default value is 100 which means 100%."
 	::Const.AddContractHints <- function( _tooltips )

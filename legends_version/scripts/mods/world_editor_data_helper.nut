@@ -641,6 +641,7 @@ this.world_editor_data_helper <- {
 		result.Amount <- _item.getAmountString();
 		result.AmountColor <- _item.getAmountColor();
 		result.ImagePath <- "ui/items/" + _item.m.Icon;
+		result.ImageOverlayPath <- _item.getIconOverlay();
 		result.Owner <- _owner;
 		return result;
 	}

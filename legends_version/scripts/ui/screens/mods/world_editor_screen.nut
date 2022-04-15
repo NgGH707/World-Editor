@@ -890,6 +890,28 @@ this.world_editor_screen <- {
 		this.log("Randomly picked and added " + this.Const.UI.getColorized(pick.getName(), "#135213") + " to loot pool");
 	}
 
+	function onAddRandomLootItem( _id )
+	{
+		local world_entity = this.World.getEntityByID(_id);
+		local pick = this.new("scripts/items/" + this.MSU.Array.getRandom(::Const.RandomTreasure));
+		local result = [];
+		world_entity.getLoot().add(pick);
+
+		foreach ( item in world_entity.getLoot().m.Items )
+		{
+			if (item != null)
+			{
+				result.push(::Woditor.Helper.convertItemToUIData(item, _id));
+			}
+		}
+
+		this.m.JSHandle.asyncCall("updateLocationLoots", {
+			Loots = result,
+			IsUpdating = true
+		});
+		this.log("Randomly picked and added " + this.Const.UI.getColorized(pick.getName(), "#135213") + " to loot pool");
+	}
+
 	function onRerollTroop( _id )
 	{
 		local world_entity = this.World.getEntityByID(_id);

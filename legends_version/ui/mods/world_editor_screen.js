@@ -124,11 +124,10 @@ var WorldEditorScreen = function(_parent)
 
         // search item
         SearchFilter       : 0,
-        SearchInput        : null,
         SearchResult       : null,
         SearchItem         : null,
-        ItemNumInput       : null,
-        AddToLootButton    : null,
+        SearchItemOverlay  : null,
+        SearchItemContainer: null,
 
         // coordinate to place new location
         Coordinate:
@@ -638,9 +637,9 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     var buttonLayout = this.addLayout(4.5, 4.1, 'is-center'); 
                     column20.append(buttonLayout);
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/open-inventory-button.png', function() {
-                        //self.onPreviousBannerClicked();
+                        self.notifyBackendAddRandomLootItem();
                     }, '', 6);
-                    //button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.randomlootitem' });
                 }
 
                 var slotContainer = this.addContainer(null, 18.5);
@@ -735,9 +734,9 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                 {
                     var column21 = this.addColumn(21, 'inventory_bag_slot');
                     upperRow.append(column21);
-                    var itemLayout = this.addLayout(7.0, 7.0, 'is-center'); 
-                    column21.append(itemLayout);
-                    this.mLocation.SearchItem = itemLayout.createImage(Path.GFX + 'ui/items/slots/inventory_slot_bag.png', function(_image) {
+                    this.mLocation.SearchItemContainer = this.addLayout(7.0, 7.0, 'is-center'); 
+                    column21.append(this.mLocation.SearchItemContainer);
+                    this.mLocation.SearchItem = this.mLocation.SearchItemContainer.createImage(Path.GFX + 'ui/items/slots/inventory_slot_bag.png', function(_image) {
                         _image.centerImageWithinParent(0, 0, 1.0);
                     }, null, '');
                     this.mLocation.SearchItem.data('script', null);
@@ -3086,6 +3085,12 @@ WorldEditorScreen.prototype.notifyBackendAddRandomNamedItem = function()
 {
     var id = this.mLocation.Selected.data('entry').ID;
     SQ.call(this.mSQHandle, 'onAddRandomNamedItem', id);
+};
+
+WorldEditorScreen.prototype.notifyBackendAddRandomLootItem = function()
+{
+    var id = this.mLocation.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onAddRandomLootItem', id);
 };
 
 WorldEditorScreen.prototype.notifyBackendAddItemToLoot = function(_script)
