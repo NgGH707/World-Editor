@@ -2,6 +2,10 @@
 {
 	::mods_hookExactClass("entity/world/settlement", function( obj ) 
 	{
+		obj.getUIImagePath <- function()
+		{
+			return this.getImagePath();
+		}
 		obj.getHouseUIImage <- function()
 		{
 			return "ui/settlement_sprites/world_houses_0" + this.m.HousesType + "_01.png";

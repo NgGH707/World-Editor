@@ -1,5 +1,14 @@
-::Woditor.hookPlayerParty <- function ()
+::Woditor.hookParty <- function ()
 {
+	::mods_hookExactClass("entity/world/party", function ( obj )
+	{
+		obj.getUIImagePath <- function()
+		{
+			return "ui/images/undiscovered_opponent.png";
+			//return "ui/attached_locations/" + this.m.Sprite + ".png";
+		};
+	});
+
 	::mods_hookExactClass("entity/world/player_party", function ( obj )
 	{
 		local ws_getStrength = obj.getStrength;
@@ -8,7 +17,6 @@
 			local mult = this.World.Flags.has("DifficultyMult") ? this.World.Flags.getAsFloat("DifficultyMult") : 1.0;
 			return ws_getStrength() * mult;
 		}
-
 		obj.forceRecalculateStashModifier <- function()
 		{
 			local s = this.Const.LegendMod.MaxResources[this.World.Assets.getEconomicDifficulty()].Stash
@@ -29,5 +37,5 @@
 		}
 	});
 
-	delete ::Woditor.hookPlayerParty;
+	delete ::Woditor.hookParty;
 }

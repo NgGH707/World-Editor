@@ -28,7 +28,7 @@
 		{
 			return "ui/" + this.Const.World.TerrainTacticalImage[this.getTile().TacticalType] + (!this.World.getTime().IsDaytime ? "_night.png" : ".png");
 		};
-		obj.getUIImage <- function()
+		obj.getUIImagePath <- function()
 		{
 			local body = this.getSprite("body");
 
@@ -37,7 +37,7 @@
 				return "ui/locations/" + body.getBrush().Name + ".png";
 			}
 			
-			return null;
+			return "ui/images/undiscovered_opponent.png";
 		};
 		obj.getUIBanner <- function()
 		{

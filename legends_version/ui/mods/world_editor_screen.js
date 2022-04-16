@@ -3615,6 +3615,32 @@ WorldEditorScreen.prototype.notifyBackendShowAllItems = function()
     });
 };
 
+WorldEditorScreen.prototype.notifyBackendGetWolrdEntityImagePath = function(_id, _image)
+{
+    if (_id === null) {
+        _image.attr('src', Path.GFX + 'ui/images/undiscovered_opponent.png');
+        return;
+    }
+
+    var find = this.getWorldLocation(_id);
+    if (find != null) {
+        _image.attr('src', Path.GFX + find.ImagePath);
+        return;
+    }
+
+    SQ.call(this.mSQHandle, 'onGetWolrdEntityImagePath', _id , function(_data) {
+        if (_data === undefined || _data === null || typeof _data !== 'string') {
+            console.error('ERROR: Failed to Get Wolrd Entity ImagePath. Invalid data result.');
+            return;
+        }
+
+        if (_data.length === 0)
+            _image.attr('src', Path.GFX + 'ui/images/undiscovered_opponent.png');
+        else
+            _image.attr('src', Path.GFX + _data);
+    });
+};
+
 
 
 registerScreen("WorldEditorScreen", new WorldEditorScreen());

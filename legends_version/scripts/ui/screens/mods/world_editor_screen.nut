@@ -186,6 +186,11 @@ this.world_editor_screen <- {
 		return ::Woditor.SearchItems(_data[0], _data[1]);
 	}
 
+	function onGetWolrdEntityImagePath( _id )
+	{
+		return ::Woditor.Helper.getWolrdEntityImagePath(_id);
+	}
+
 	function onGetBuildingEntries( _id )
 	{
 		return ::Woditor.Helper.convertBuildingEntriesToUIData(_id);
@@ -228,7 +233,7 @@ this.world_editor_screen <- {
 
 	function onGetAllNonHostileFactionsOfThisFaction( _factionID )
 	{
-		local faction = this.World.FactionManager.getFaction(_factionID);
+		local faction = ::World.FactionManager.getFaction(_factionID);
 		local allies = faction.getAllies();
 		local valid = [_factionID];
 
@@ -245,10 +250,10 @@ this.world_editor_screen <- {
 
 	function onGetValidSettlementsToSendCaravan( _id )
 	{
-		local entity = this.World.getEntityByID(_id);
+		local entity = ::World.getEntityByID(_id);
 		local result = [];
 
-		foreach(settlement in this.World.EntityManager.getSettlements())
+		foreach(settlement in ::World.EntityManager.getSettlements())
 		{
 			if (settlement.getID() == _id) continue;
 			if (entity.isAlliedWith(settlement)) continue;
@@ -261,8 +266,8 @@ this.world_editor_screen <- {
 
 	function onUpdateNewOwnerFor( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
-		local faction = this.World.FactionManager.getFaction(_data[1]);
+		local world_entity = ::World.getEntityByID(_data[0]);
+		local faction = ::World.FactionManager.getFaction(_data[1]);
 		local currentOwner = world_entity.getOwner();
 
 		if (currentOwner != null && world_entity.getFactions().len() > 1)
@@ -276,9 +281,9 @@ this.world_editor_screen <- {
 
 	function onUpdateNewFactionFor( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 
-		if (world_entity.isLocationType(this.Const.World.LocationType.Settlement))
+		if (world_entity.isLocationType(::Const.World.LocationType.Settlement))
 		{
 			if (world_entity.getOwner() != null && world_entity.getOwner().getID() != _data[2])
 			{
@@ -303,18 +308,18 @@ this.world_editor_screen <- {
 
 	function onUpdateFactionAlliance( _data )
 	{
-		local faction = this.World.FactionManager.getFaction(_data[0]);
+		local faction = ::World.FactionManager.getFaction(_data[0]);
 
 		foreach(id in _data[1].Allies)
 		{
-			local f = this.World.FactionManager.getFaction(id);
+			local f = ::World.FactionManager.getFaction(id);
 			f.addAlly(_data[0]);
 			faction.addAlly(id);
 		}
 
 		foreach(id in _data[1].Hostile)
 		{
-			local f = this.World.FactionManager.getFaction(id);
+			local f = ::World.FactionManager.getFaction(id);
 			f.removeAlly(_data[0]);
 			faction.removeAlly(id);
 		}
@@ -327,27 +332,27 @@ this.world_editor_screen <- {
 		switch (_data[0])
 		{
 		case "avatar":
-			this.World.Flags.set("AvatarSprite", _data[1]);
+			::World.Flags.set("AvatarSprite", _data[1]);
 			this.m.TemporaryModel.getSprite("body").setBrush(_data[1]);
 			break;
 
 		case "socket":
-			this.World.Flags.set("AvatarSocket", _data[1]);
+			::World.Flags.set("AvatarSocket", _data[1]);
 			this.m.TemporaryModel.getSprite("base").setBrush(_data[1]);
 			break;
 	
 		case "flip":
-			this.World.Flags.set("AvatarIsFlippedHorizontally", _data[1]);
+			::World.Flags.set("AvatarIsFlippedHorizontally", _data[1]);
 			this.m.TemporaryModel.setFlipped(_data[1]);
 			break;
 
 		default: // reset sprite back to scenario default
-			this.World.Flags.remove("AvatarSprite");
-			this.World.Flags.remove("AvatarSocket");
-			this.World.Flags.remove("AvatarIsFlippedHorizontally");
-			this.World.Assets.updateLook();
-			this.m.TemporaryModel.getSprite("base").setBrush(this.World.State.getPlayer().getSprite("base").getBrush().Name);
-			this.m.TemporaryModel.getSprite("body").setBrush(this.World.State.getPlayer().getSprite("body").getBrush().Name);
+			::World.Flags.remove("AvatarSprite");
+			::World.Flags.remove("AvatarSocket");
+			::World.Flags.remove("AvatarIsFlippedHorizontally");
+			::World.Assets.updateLook();
+			this.m.TemporaryModel.getSprite("base").setBrush(::World.State.getPlayer().getSprite("base").getBrush().Name);
+			this.m.TemporaryModel.getSprite("body").setBrush(::World.State.getPlayer().getSprite("body").getBrush().Name);
 			this.m.TemporaryModel.setFlipped(false);
 		}
 
@@ -358,21 +363,21 @@ this.world_editor_screen <- {
 	function onChangePlayerBanner( _banner )
 	{
 		this.m.BannerIsChanged = true;
-		this.World.Assets.m.Banner = _banner;
-		this.World.Assets.m.BannerID = _banner.slice(_banner.find("_") + 1).tointeger();
+		::World.Assets.m.Banner = _banner;
+		::World.Assets.m.BannerID = _banner.slice(_banner.find("_") + 1).tointeger();
 	}
 
 	function onChangeCompanyName( _name )
 	{
-		this.World.Assets.m.Name = _name;
+		::World.Assets.m.Name = _name;
 	}
 
 	function onChangeFactionBanner( _data )
 	{
 		// find banner
-		if (_data[0] > this.Const.NobleBanners.len() - 1 && _data[0] > this.Const.OtherBanner.len() - 1) return;
+		if (_data[0] > ::Const.NobleBanners.len() - 1 && _data[0] > ::Const.OtherBanner.len() - 1) return;
 
-		local faction = this.World.FactionManager.getFaction(_data[1]);
+		local faction = ::World.FactionManager.getFaction(_data[1]);
 		faction.setBanner(_data[0]);
 		local bannerSmall = faction.getBannerSmall();
 
@@ -395,17 +400,17 @@ this.world_editor_screen <- {
 
 	function onChangeFactionName( _data )
 	{
-		this.World.FactionManager.getFaction(_data[0]).setName(_data[1]);
+		::World.FactionManager.getFaction(_data[0]).setName(_data[1]);
 	}
 
 	function onChangeFactionMotto( _data )
 	{
-		this.World.FactionManager.getFaction(_data[0]).setMotto(_data[1]);
+		::World.FactionManager.getFaction(_data[0]).setMotto(_data[1]);
 	}
 
 	function onDespawnFactionTroops( _id )
 	{
-		local faction = this.World.FactionManager.getFaction(_id);
+		local faction = ::World.FactionManager.getFaction(_id);
 		local new = [];
 
 		foreach( u in faction.getUnits() )
@@ -420,7 +425,7 @@ this.world_editor_screen <- {
 
 	function onRefreshFactionLeader( _id )
 	{
-		local faction = this.World.FactionManager.getFaction(_id);
+		local faction = ::World.FactionManager.getFaction(_id);
 		faction.getRoster().clear();
 		faction.onUpdateRoster();
 
@@ -434,7 +439,7 @@ this.world_editor_screen <- {
 
 	function onRefreshFactionActions( _id )
 	{
-		local faction = this.World.FactionManager.getFaction(_id);
+		local faction = ::World.FactionManager.getFaction(_id);
 		faction.m.LastActionTime = 0;
 		faction.m.LastActionHour = 0;
 
@@ -446,7 +451,7 @@ this.world_editor_screen <- {
 
 	function onRefreshFactionContracts( _id )
 	{
-		local faction = this.World.FactionManager.getFaction(_id);
+		local faction = ::World.FactionManager.getFaction(_id);
 		faction.setLastContractTime(0);
 
 		foreach ( action in faction.m.Deck )
@@ -459,97 +464,97 @@ this.world_editor_screen <- {
 			if (contract.isActive()) continue;
 
 			contract.onClear();
-			local i = this.World.Contracts.getOpenContracts().find(contract);
+			local i = ::World.Contracts.getOpenContracts().find(contract);
 
 			if (i != null)
 			{
-				this.World.Contracts.getOpenContracts().remove(i);
+				::World.Contracts.getOpenContracts().remove(i);
 			}
 
-			if (this.World.Contracts.m.LastShown == contract)
+			if (::World.Contracts.m.LastShown == contract)
 			{
-				this.World.Contracts.m.LastShown = null;
+				::World.Contracts.m.LastShown = null;
 			}
 		}
 
 		this.m.JSHandle.asyncCall("addContractsData", ::Woditor.Helper.convertContractsToUIData());
-		this.log("Refreshed contracts of faction " + this.Const.UI.getColorized(faction.getName(), "#1e468f") + "!");
+		this.log("Refreshed contracts of faction " + ::Const.UI.getColorized(faction.getName(), "#1e468f") + "!");
 	}
 
 	function onChangeWorldEntityName( _data )
 	{
-		this.World.getEntityByID(_data[0]).setName(_data[1]);
+		::World.getEntityByID(_data[0]).setName(_data[1]);
 	}
 
 	function onChangeLocationSprite( _data )
 	{
-		this.World.getEntityByID(_data[0]).getSprite("body").setBrush(_data[1]);
+		::World.getEntityByID(_data[0]).getSprite("body").setBrush(_data[1]);
 	}
 
 	function onChangeScenario( _id )
 	{
-		this.World.Assets.m.Origin = this.Const.ScenarioManager.getScenario(_id);
+		::World.Assets.m.Origin = ::Const.ScenarioManager.getScenario(_id);
 	}
 
 	function onChangeActiveStatusOfSettlement( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		world_entity.setActive(_data[1], false);
-		this.log(this.Const.UI.getColorized(world_entity.getName(), "#1e468f") + " has become " + (_data[1] ? "active." : "inactive."));
+		this.log(::Const.UI.getColorized(world_entity.getName(), "#1e468f") + " has become " + (_data[1] ? "active." : "inactive."));
 	}
 
 	function onRefreshSettlementShop( _id )
 	{
-		local world_entity = this.World.getEntityByID(_id)
+		local world_entity = ::World.getEntityByID(_id)
 		world_entity.resetShop();
-		this.log(this.Const.UI.getColorized(world_entity.getName(), "#1e468f") + "\'s shops have refreshed their stocks.");
+		this.log(::Const.UI.getColorized(world_entity.getName(), "#1e468f") + "\'s shops have refreshed their stocks.");
 	}
 
 	function onRefreshSettlementRoster( _id )
 	{
-		local world_entity = this.World.getEntityByID(_id);
+		local world_entity = ::World.getEntityByID(_id);
 		world_entity.resetRoster(true);
-		this.log(this.Const.UI.getColorized(world_entity.getName(), "#1e468f") + " has refreshed its recruit roster.");
+		this.log(::Const.UI.getColorized(world_entity.getName(), "#1e468f") + " has refreshed its recruit roster.");
 	}
 
 	function onAddHouse( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		local isAddHouse = _data[1];
 
 		if (isAddHouse)
 		{
 			if (!world_entity.buildHouse())
 			{
-				this.log(this.Const.UI.getColorized("Failed to build house. Reason: can\'t find suitable tile to build", "#8f1e1e"));
+				this.log(::Const.UI.getColorized("Failed to build house. Reason: can\'t find suitable tile to build", "#8f1e1e"));
 			}
 		}
 		else
 		{
 			if (!world_entity.destroyHouse())
 			{
-				this.log(this.Const.UI.getColorized("Failed to destroy house. Reason: there is no house", "#8f1e1e"));
+				this.log(::Const.UI.getColorized("Failed to destroy house. Reason: there is no house", "#8f1e1e"));
 			}
 		}
 	}
 
 	function onAddBuildingToSlot( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		local slot = _data[1];
 		local logText = "Added ";
 
 		if (world_entity.m.Buildings[slot] != null)
 		{
-			logText = "Replaced " + this.Const.UI.getColorized(world_entity.m.Buildings[slot].getName(), "#1e468f") + " with ";
+			logText = "Replaced " + ::Const.UI.getColorized(world_entity.m.Buildings[slot].getName(), "#1e468f") + " with ";
 			world_entity.m.Buildings[slot].m.Settlement = null;
 			world_entity.m.Buildings[slot] = null;
 		}
 
-		local building = this.new(_data[2]);
+		local building = ::new(_data[2]);
 		building.setSettlement(world_entity);
 		world_entity.m.Buildings[slot] = building;
-		logText += this.Const.UI.getColorized(building.getName(), "#1e468f");
+		logText += ::Const.UI.getColorized(building.getName(), "#1e468f");
 
 		if ("getStash" in building)
 		{
@@ -569,7 +574,7 @@ this.world_editor_screen <- {
 
 	function onRemoveBuilding( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		local slot = _data[1];
 		local id = _data[2];
 		local name = "";
@@ -577,7 +582,7 @@ this.world_editor_screen <- {
 		if (world_entity.m.Buildings[slot] == null || world_entity.m.Buildings[slot].getID() != id) return;
 
 		world_entity.m.Buildings[slot].m.Settlement = null;
-		name = this.Const.UI.getColorized(world_entity.m.Buildings[slot].getName(), "#1e468f");
+		name = ::Const.UI.getColorized(world_entity.m.Buildings[slot].getName(), "#1e468f");
 		world_entity.m.Buildings[slot] = null;
 
 		this.m.JSHandle.asyncCall("updateSettlementBuildingSlot", {
@@ -590,9 +595,9 @@ this.world_editor_screen <- {
 	function onAddAttachedLocationToSlot( _data )
 	{
 		local result = [];
-		local world_entity = this.World.getEntityByID(_data[0]);
-		local nearRoad = this.Const.NearRoadAttachedLocations.find(_data[1]) != null;
-		local additionalTile = this.Math.rand(0, 1);
+		local world_entity = ::World.getEntityByID(_data[0]);
+		local nearRoad = ::Const.NearRoadAttachedLocations.find(_data[1]) != null;
+		local additionalTile = ::Math.rand(0, 1);
 		local attachment = this.buildAttachedLocation(world_entity, _data[1], additionalTile, nearRoad);
 		local tries = 0
 
@@ -604,7 +609,7 @@ this.world_editor_screen <- {
 
 		if (attachment == null) 
 		{
-			this.log(this.Const.UI.getColorized("Failed to add new attached location. Reason: can\'t find suitable tile to spawn", "#8f1e1e"));
+			this.log(::Const.UI.getColorized("Failed to add new attached location. Reason: can\'t find suitable tile to spawn", "#8f1e1e"));
 			return;
 		} 
 
@@ -627,12 +632,12 @@ this.world_editor_screen <- {
 			Attachments = result,
 			IsUpdating = true
 		});
-		this.log("Added " + this.Const.UI.getColorized(attachment.getName(), "#1e468f") + " attached location");
+		this.log("Added " + ::Const.UI.getColorized(attachment.getName(), "#1e468f") + " attached location");
 	}
 
 	function onRemoveAttachedLocation( _data )
 	{
-		local entity = this.World.getEntityByID(_data[0]);
+		local entity = ::World.getEntityByID(_data[0]);
 		local id = _data[1];
 		local find;
 
@@ -647,7 +652,7 @@ this.world_editor_screen <- {
 
 		if (find == null) 
 		{
-			this.log(this.Const.UI.getColorized("Failed to remove attached location. Reason: selected attached location don\'t exist", "#8f1e1e"));
+			this.log(::Const.UI.getColorized("Failed to remove attached location. Reason: selected attached location don\'t exist", "#8f1e1e"));
 			return;
 		}
 
@@ -673,19 +678,19 @@ this.world_editor_screen <- {
 			Attachments = result,
 			IsUpdating = true
 		});
-		this.log("Removed " + this.Const.UI.getColorized(name, "#1e468f") + " attached location");
+		this.log("Removed " + ::Const.UI.getColorized(name, "#1e468f") + " attached location");
 	}
 
 	function onAddSituationToSlot( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		local result = [];
 		local added = _data[1].len();
 		local before = world_entity.getSituations().len();
 
 		foreach (script in _data[1])
 		{
-			local situation = this.new(script);
+			local situation = ::new(script);
 			world_entity.addSituation(situation, 7); // i set up the default duration of the situaton to be 7 days
 		}
 
@@ -705,17 +710,17 @@ this.world_editor_screen <- {
 		if (before + added > 10)
 		{
 			local overflow = before + added - 10;
-			this.log("Added " + this.Const.UI.getColorized(added, "#135213") + " situation" + (added > 1 ? "s" : "") + " and removed " + this.Const.UI.getColorized(overflow, "#8f1e1e") + " situation" + (overflow > 1 ? "s" : "") + " due to overflow");
+			this.log("Added " + ::Const.UI.getColorized(added, "#135213") + " situation" + (added > 1 ? "s" : "") + " and removed " + ::Const.UI.getColorized(overflow, "#8f1e1e") + " situation" + (overflow > 1 ? "s" : "") + " due to overflow");
 		}
 		else
 		{
-			this.log("Added " + this.Const.UI.getColorized(added, "#135213") + " situation" + (added > 1 ? "s" : ""));
+			this.log("Added " + ::Const.UI.getColorized(added, "#135213") + " situation" + (added > 1 ? "s" : ""));
 		}
 	}
 
 	function onRemoveSituation( _data )
 	{
-		local entity = this.World.getEntityByID(_data[0]);
+		local entity = ::World.getEntityByID(_data[0]);
 		local result = [];
 		entity.removeSituationByID(_data[1]);
 
@@ -736,13 +741,13 @@ this.world_editor_screen <- {
 
 	function onRemoveLoot( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		local remove = world_entity.getLoot().getItemByInstanceID(_data[1]);
 		local result = [];
 
 		if (remove == null) 
 		{
-			return this.log(this.Const.UI.getColorized("Failed to remove the item from loot pool. Reason: can\'t find item", "#8f1e1e"));
+			return this.log(::Const.UI.getColorized("Failed to remove the item from loot pool. Reason: can\'t find item", "#8f1e1e"));
 		}
 		else
 		{
@@ -762,12 +767,12 @@ this.world_editor_screen <- {
 			Loots = result,
 			IsUpdating = true
 		});
-		this.log("Removed " + this.Const.UI.getColorized(remove.item.getName(), "#135213") + " from loot pool");
+		this.log("Removed " + ::Const.UI.getColorized(remove.item.getName(), "#135213") + " from loot pool");
 	}
 
 	function onRerollLoots( _id )
 	{
-		local world_entity = this.World.getEntityByID(_id);
+		local world_entity = ::World.getEntityByID(_id);
 		local result = [];
 		world_entity.getLoot().clear();
 		world_entity.location.onSpawned();
@@ -789,8 +794,8 @@ this.world_editor_screen <- {
 
 	function onAddItemToLoot( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
-		local newItem = this.new(_data[1]);
+		local world_entity = ::World.getEntityByID(_data[0]);
+		local newItem = ::new(_data[1]);
 		local result = [];
 		world_entity.getLoot().add(newItem);
 
@@ -806,48 +811,48 @@ this.world_editor_screen <- {
 			Loots = result,
 			IsUpdating = true
 		});
-		this.log("Added " + this.Const.UI.getColorized(newItem.getName(), "#135213") + " to loot pool");
+		this.log("Added " + ::Const.UI.getColorized(newItem.getName(), "#135213") + " to loot pool");
 	}
 
 	function onAddRandomNamedItem( _id )
 	{
-		local world_entity = this.World.getEntityByID(_id);
+		local world_entity = ::World.getEntityByID(_id);
 		local result = [];
 		local items = [];
 		local pick;
 
-		switch (this.Math.rand(1, 4))
+		switch (::Math.rand(1, 4))
 		{
 		case 1:
-			items.extend(this.Const.Items.NamedHelmets);
+			items.extend(::Const.Items.NamedHelmets);
 			if (world_entity.m.NamedHelmetsList != null && world_entity.m.NamedHelmetsList.len() != 0)
 			{
 				items.extend(world_entity.m.NamedHelmetsList);
 				items.extend(world_entity.m.NamedHelmetsList);
 			}
-			if (this.LegendsMod.Configs().LegendArmorsEnabled())
+			if (::LegendsMod.Configs().LegendArmorsEnabled())
 			{
-				local weightName = this.Const.World.Common.convNameToList(items);
-				pick = this.Const.World.Common.pickHelmet(weightName);
+				local weightName = ::Const.World.Common.convNameToList(items);
+				pick = ::Const.World.Common.pickHelmet(weightName);
 			}
 			break;
 
 		case 2:
-			items.extend(this.Const.Items.NamedArmors);
+			items.extend(::Const.Items.NamedArmors);
 			if (world_entity.m.NamedArmorsList != null && world_entity.m.NamedArmorsList.len() != 0)
 			{
 				items.extend(world_entity.m.NamedArmorsList);
 				items.extend(world_entity.m.NamedArmorsList);
 			}
-			if (this.LegendsMod.Configs().LegendArmorsEnabled())
+			if (::LegendsMod.Configs().LegendArmorsEnabled())
 			{
-				local weightName = this.Const.World.Common.convNameToList(items);
-				pick = this.Const.World.Common.pickArmor(weightName);
+				local weightName = ::Const.World.Common.convNameToList(items);
+				pick = ::Const.World.Common.pickArmor(weightName);
 			}
 			break;
 
 		case 3:
-			items.extend(this.Const.Items.NamedShields);
+			items.extend(::Const.Items.NamedShields);
 			if (world_entity.m.NamedShieldsList != null && world_entity.m.NamedShieldsList.len() != 0)
 			{
 				items.extend(world_entity.m.NamedShieldsList);
@@ -856,7 +861,7 @@ this.world_editor_screen <- {
 			break;
 
 		default:
-			items.extend(this.Const.Items.NamedWeapons);
+			items.extend(::Const.Items.NamedWeapons);
 			if (world_entity.m.NamedWeaponsList != null && world_entity.m.NamedWeaponsList.len() != 0)
 			{
 				items.extend(world_entity.m.NamedWeaponsList);
@@ -868,11 +873,11 @@ this.world_editor_screen <- {
 		{
 			if (items.len() > 0)
 			{
-				pick = this.new("scripts/items/" + this.MSU.Array.getRandom(items));
+				pick = ::new("scripts/items/" + ::MSU.Array.getRandom(items));
 			}
 			else
 			{
-				return this.log(this.Const.UI.getColorized("Failed to add a random named item. Reason: the named item table is empty", "#8f1e1e"));
+				return this.log(::Const.UI.getColorized("Failed to add a random named item. Reason: the named item table is empty", "#8f1e1e"));
 			}
 		}
 			
@@ -890,13 +895,13 @@ this.world_editor_screen <- {
 			Loots = result,
 			IsUpdating = true
 		});
-		this.log("Randomly picked and added " + this.Const.UI.getColorized(pick.getName(), "#135213") + " to loot pool");
+		this.log("Randomly picked and added " + ::Const.UI.getColorized(pick.getName(), "#135213") + " to loot pool");
 	}
 
 	function onAddRandomLootItem( _id )
 	{
-		local world_entity = this.World.getEntityByID(_id);
-		local pick = this.new("scripts/items/" + this.MSU.Array.getRandom(::Const.RandomTreasure));
+		local world_entity = ::World.getEntityByID(_id);
+		local pick = ::new("scripts/items/" + ::MSU.Array.getRandom(::Const.RandomTreasure));
 		local result = [];
 		world_entity.getLoot().add(pick);
 
@@ -912,12 +917,12 @@ this.world_editor_screen <- {
 			Loots = result,
 			IsUpdating = true
 		});
-		this.log("Randomly picked and added " + this.Const.UI.getColorized(pick.getName(), "#135213") + " to loot pool");
+		this.log("Randomly picked and added " + ::Const.UI.getColorized(pick.getName(), "#135213") + " to loot pool");
 	}
 
 	function onRerollTroop( _id )
 	{
-		local world_entity = this.World.getEntityByID(_id);
+		local world_entity = ::World.getEntityByID(_id);
 		world_entity.m.LastSpawnTime = 0.0;
 		world_entity.createDefenders();
 		this.m.JSHandle.asyncCall("updateLocationTroops", {
@@ -929,7 +934,7 @@ this.world_editor_screen <- {
 
 	function onRemoveTroop( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		local troop = _data[1];
 		local new = [];
 
@@ -949,13 +954,13 @@ this.world_editor_screen <- {
 			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
 			IsUpdating = true
 		});
-		this.log("Removed " + this.Const.UI.getColorized(troop.Name, "#135213") + " from troop list, " + this.Const.UI.getColorized(troop.Num, "#135213") + " in total");
+		this.log("Removed " + ::Const.UI.getColorized(troop.Name, "#135213") + " from troop list, " + ::Const.UI.getColorized(troop.Num, "#135213") + " in total");
 	}
 
 	function onAddRandomTroop( _data )
 	{
 		local list = clone ::Woditor.ValidTroops[::Woditor.TroopTypeFilter.All];
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		local result = [];
 
 		foreach( key in _data[1] )
@@ -968,8 +973,8 @@ this.world_editor_screen <- {
 			}
 		}
 
-		local t = clone this.Const.World.Spawn.Troops[::MSU.Array.getRandom(list)];
-		t.Party <- this.WeakTableRef(world_entity);
+		local t = clone ::Const.World.Spawn.Troops[::MSU.Array.getRandom(list)];
+		t.Party <- ::WeakTableRef(world_entity);
 		t.Faction <- world_entity.getFaction();
 		t.Name <- "";
 		t.Variant = 0;
@@ -979,22 +984,22 @@ this.world_editor_screen <- {
 			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
 			IsUpdating = true
 		});
-		this.log("Randomly picked and added " + this.Const.UI.getColorized(::Woditor.getTroopName(t), "#135213") + " to troop list");
+		this.log("Randomly picked and added " + ::Const.UI.getColorized(::Woditor.getTroopName(t), "#135213") + " to troop list");
 	}
 
 	function onAddNewTroop( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 
 		foreach( key in _data[1] )
 		{
-			local t = clone this.Const.World.Spawn.Troops[key];
-			t.Party <- this.WeakTableRef(world_entity);
+			local t = clone ::Const.World.Spawn.Troops[key];
+			t.Party <- ::WeakTableRef(world_entity);
 			t.Faction <- world_entity.getFaction();
 			t.Name <- "";
 			t.Variant = 0;
 			world_entity.getTroops().push(t);
-			this.log("Added " + this.Const.UI.getColorized(::Woditor.getTroopName(t), "#135213") + " to troop list");
+			this.log("Added " + ::Const.UI.getColorized(::Woditor.getTroopName(t), "#135213") + " to troop list");
 		}
 
 		world_entity.updateStrength();
@@ -1006,7 +1011,7 @@ this.world_editor_screen <- {
 
 	function onChangeTroopNum( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		local troops = world_entity.getTroops();
 		local troop = _data[1];
 		local different = _data[2];
@@ -1014,7 +1019,7 @@ this.world_editor_screen <- {
 		
 		if (different > 0)
 		{
-			text = "Removed " + different + " " + this.Const.UI.getColorized(troop.Name, "#135213") + " from troop list";
+			text = "Removed " + different + " " + ::Const.UI.getColorized(troop.Name, "#135213") + " from troop list";
 			for (local i = troops.len() - 1; i >= 0; --i) 
 			{
 		        local t = troops[i];
@@ -1032,28 +1037,28 @@ this.world_editor_screen <- {
 		}
 		else
 		{
-			text = "Added " + this.Math.abs(different) + " more " + this.Const.UI.getColorized(troop.Name, "#135213") + " to troop list";
+			text = "Added " + ::Math.abs(different) + " more " + ::Const.UI.getColorized(troop.Name, "#135213") + " to troop list";
 			while (different < 0)
 			{
-				local t = clone this.Const.World.Spawn.Troops[troop.Key];
-				t.Party <- this.WeakTableRef(world_entity);
+				local t = clone ::Const.World.Spawn.Troops[troop.Key];
+				t.Party <- ::WeakTableRef(world_entity);
 				t.Faction <- world_entity.getFaction();
 				t.Name <- "";
 				t.Variant = 0;
 
 				if (troop.IsChampion)
 				{
-					if ("NameList" in this.Const.World.Spawn.Troops[troop.Key])
+					if ("NameList" in ::Const.World.Spawn.Troops[troop.Key])
 					{
-						t.Name = this.Const.World.Common.generateName(this.Const.World.Spawn.Troops[troop.Key].NameList) + ((this.Const.World.Spawn.Troops[troop.Key].TitleList != null) ? " " + this.Const.World.Spawn.Troops[troop.Key].TitleList[this.Math.rand(0, this.Const.World.Spawn.Troops[troop.Key].TitleList.len() - 1)] : "");
+						t.Name = ::Const.World.Common.generateName(::Const.World.Spawn.Troops[troop.Key].NameList) + ((::Const.World.Spawn.Troops[troop.Key].TitleList != null) ? " " + ::MSU.Array.getRandom(::Const.World.Spawn.Troops[troop.Key].TitleList) : "");
 					}
 					else
 					{
-						t.Name = "Champion " + this.Const.Strings.EntityName[t.ID];
+						t.Name = "Champion " + ::Const.Strings.EntityName[t.ID];
 					}
 
-					t.Variant = this.Math.rand(1, 255);
-					t.Strength = this.Math.round(t.Strength * 1.35);
+					t.Variant = ::Math.rand(1, 255);
+					t.Strength = ::Math.round(t.Strength * 1.35);
 				}
 
 				world_entity.getTroops().push(t);
@@ -1067,37 +1072,37 @@ this.world_editor_screen <- {
 
 	function onConvertTroopToChampion( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		local troop = _data[1];
 		local text = "";
 
 		if (!troop.IsChampion)
 		{
-			text = "Convert a " + this.Const.UI.getColorized(troop.Name, "#135213") + " into a champion";
+			text = "Convert a " + ::Const.UI.getColorized(troop.Name, "#135213") + " into a champion";
 			foreach ( t in world_entity.getTroops() )
 			{
 				local key = ::Woditor.getTroopKey(t);
 
 				if (t.Variant == 0 && troop.Key == key)
 				{
-					if ("NameList" in this.Const.World.Spawn.Troops[key])
+					if ("NameList" in ::Const.World.Spawn.Troops[key])
 					{
-						t.Name = this.Const.World.Common.generateName(this.Const.World.Spawn.Troops[key].NameList) + ((this.Const.World.Spawn.Troops[key].TitleList != null) ? " " + this.Const.World.Spawn.Troops[key].TitleList[this.Math.rand(0, this.Const.World.Spawn.Troops[key].TitleList.len() - 1)] : "");
+						t.Name = ::Const.World.Common.generateName(::Const.World.Spawn.Troops[key].NameList) + ((this.Const.World.Spawn.Troops[key].TitleList != null) ? " " + ::MSU.Array.getRandom(::Const.World.Spawn.Troops[troop.Key].TitleList) : "");
 					}
 					else
 					{
-						t.Name = "Champion " + this.Const.Strings.EntityName[t.ID];
+						t.Name = "Champion " + ::Const.Strings.EntityName[t.ID];
 					}
 
-					t.Variant = this.Math.rand(1, 255);
-					t.Strength = this.Math.round(t.Strength * 1.35);
+					t.Variant = ::Math.rand(1, 255);
+					t.Strength = ::Math.round(t.Strength * 1.35);
 					break;
 				}
 			}
 		}
 		else
 		{
-			text = "Revert a champion " + this.Const.UI.getColorized(troop.Name, "#135213") + " back to a normal one";
+			text = "Revert a champion " + ::Const.UI.getColorized(troop.Name, "#135213") + " back to a normal one";
 			foreach ( t in world_entity.getTroops() )
 			{
 				local key = ::Woditor.getTroopKey(t);
@@ -1106,7 +1111,7 @@ this.world_editor_screen <- {
 				{
 					t.Name = "";
 					t.Variant = 0;
-					t.Strength = this.Const.World.Spawn.Troops[key].Strength;
+					t.Strength = ::Const.World.Spawn.Troops[key].Strength;
 					break;
 				}
 			}
@@ -1122,10 +1127,10 @@ this.world_editor_screen <- {
 
 	function onUpdateResourseValue( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		world_entity.setResources(_data[1]);
 
-		if (world_entity.isLocationType(this.Const.World.LocationType.Settlement))
+		if (world_entity.isLocationType(::Const.World.LocationType.Settlement))
 		{
 			this.m.JSHandle.asyncCall("updateSettlementWealth", {
 				Wealth = world_entity.getWealth(),
@@ -1143,11 +1148,11 @@ this.world_editor_screen <- {
 
 	function onUpdateWealthValue( _data )
 	{
-		local world_entity = this.World.getEntityByID(_data[0]);
+		local world_entity = ::World.getEntityByID(_data[0]);
 		local baseLevel = 0.0;
 
 		if (world_entity.isMilitary()) baseLevel = baseLevel + 50.0;
-		if (this.isKindOf(world_entity, "city_state")) baseLevel = baseLevel + 100;
+		if (::isKindOf(world_entity, "city_state")) baseLevel = baseLevel + 100;
 
 		switch(world_entity.getSize())
 		{
@@ -1164,7 +1169,7 @@ this.world_editor_screen <- {
 			break;
 		}
 
-		local resources = this.Math.round(_data[1] * baseLevel / 100);
+		local resources = ::Math.round(_data[1] * baseLevel / 100);
 		world_entity.setResources(resources);
 		this.m.JSHandle.asyncCall("updateSettlementResources", {
 			Resources = resources,
@@ -1182,11 +1187,11 @@ this.world_editor_screen <- {
 				this.m.StashIsChanged = true;
 			}
 
-			this.World.Flags.set("StashModifier", _data[1] - before);
+			::World.Flags.set("StashModifier", _data[1] - before);
 		}
 		else
 		{
-			this.World.Assets.m[_data[0]] = _data[1];
+			::World.Assets.m[_data[0]] = _data[1];
 		}
 	}
 
@@ -1194,73 +1199,73 @@ this.world_editor_screen <- {
 	{
 		local key = _data[0];
 		local value = _data[1];
-		local baseValue = this.World.Assets.getBaseProperties()[key];
+		local baseValue = ::World.Assets.getBaseProperties()[key];
 		local isMult = ::Woditor.AssetsProperties.Mult.find(key) != null;
 		local isAdditive = ::Woditor.AssetsProperties.Additive.find(key) != null;
 
-		if (isMult) this.World.Flags.set(key, value / baseValue * 100);
-		else if (isAdditive) this.World.Flags.set(key, value - baseValue);
-		else this.World.Flags.set(key, value);
+		if (isMult) ::World.Flags.set(key, value / baseValue * 100);
+		else if (isAdditive) ::World.Flags.set(key, value - baseValue);
+		else ::World.Flags.set(key, value);
 	}
 
 	function onUpdateRosterTier( _tier )
 	{
-		this.World.Flags.set("RosterTier", _tier);
+		::World.Flags.set("RosterTier", _tier);
 	}
 
 	function onUpdateDifficultyMult( _value )
 	{
-		this.World.Flags.set("DifficultyMult", _value / 100);
+		::World.Flags.set("DifficultyMult", _value / 100);
 	}
 
 	function onUpdateCombatDifficulty( _value )
 	{
-		this.World.Assets.m.CombatDifficulty = _value;
+		::World.Assets.m.CombatDifficulty = _value;
 	}
 
 	function onUpdateEconomicDifficulty( _value )
 	{
-		this.World.Assets.m.EconomicDifficulty = _value;
+		::World.Assets.m.EconomicDifficulty = _value;
 	}
 
 	function onUpdateGenderLevel( _value )
 	{
-		this.LegendsMod.Configs().m.IsGender = _value;
+		::LegendsMod.Configs().m.IsGender = _value;
 	}
 
 	function onUpdataAssetsCheckBox( _data )
 	{
-		if (_data[0] in this.World.Assets.m) this.World.Assets.m[_data[0]] = _data[1];
-		else this.LegendsMod.Configs().m[_data[0]] = _data[1];
+		if (_data[0] in ::World.Assets.m) ::World.Assets.m[_data[0]] = _data[1];
+		else ::LegendsMod.Configs().m[_data[0]] = _data[1];
 	}
 
 	function updateFactionRelation( _data )
 	{
-		local faction = this.World.FactionManager.getFaction(_data[0]);
+		local faction = ::World.FactionManager.getFaction(_data[0]);
 		faction.setPlayerRelation(_data[1]);
 		return {
 			Relation = faction.getPlayerRelationAsText(),
-			RelationNum = this.Math.round(faction.getPlayerRelation())
+			RelationNum = ::Math.round(faction.getPlayerRelation())
 		};
 	}
 
 	function onUpdataFactionRelationDeterioration( _data )
 	{
-		this.World.FactionManager.getFaction(_data[0]).getFlags().set("RelationDeterioration",_data[1]);
+		::World.FactionManager.getFaction(_data[0]).getFlags().set("RelationDeterioration",_data[1]);
 	}
 
 	function onSendCaravanTo( _data )
 	{
 		local resources = _data[2];
-		local start = this.World.getEntityByID(_data[0]);
-		local destination = this.World.getEntityByID(_data[1]);
-		local faction =  this.World.FactionManager.getFaction(this.MSU.Array.getRandom(start.getFactions()));
+		local start = ::World.getEntityByID(_data[0]);
+		local destination = ::World.getEntityByID(_data[1]);
+		local faction =  ::World.FactionManager.getFaction(::MSU.Array.getRandom(start.getFactions()));
 
-		if (_data[3].find("Noble") != null && faction.getType() != this.Const.FactionType.NobleHouse)
+		if (_data[3].find("Noble") != null && faction.getType() != ::Const.FactionType.NobleHouse)
 		{
 			local owner = start.getOwner();
 
-			if (owner != null && !owner.isNull() && owner.getType() == this.Const.FactionType.NobleHouse)
+			if (owner != null && !owner.isNull() && owner.getType() == ::Const.FactionType.NobleHouse)
 			{
 				faction = owner.get();
 			}
@@ -1270,11 +1275,11 @@ this.world_editor_screen <- {
 			}
 		}
 
-		local party = faction.spawnEntity(start.getTile(), "Trading Caravan", false, this.Const.World.Spawn[_data[3]], resources);
+		local party = faction.spawnEntity(start.getTile(), "Trading Caravan", false, ::Const.World.Spawn[_data[3]], resources);
 		party.getSprite("banner").Visible = false;
 		party.getSprite("base").Visible = false;
 		party.setDescription("A trading caravan from " + start.getName() + " that is transporting all manner of goods between settlements.");
-		party.setFootprintType(this.Const.World.FootprintsType.Caravan);
+		party.setFootprintType(::Const.World.FootprintsType.Caravan);
 		party.setMirrored(true);
 		party.setAttackableByAI(_data[4]);
 		party.setSlowerAtNight(_data[5]);
@@ -1282,7 +1287,7 @@ this.world_editor_screen <- {
 		party.getFlags().set("IsCaravan", true);
 		party.getFlags().set("IsRandomlySpawned", true);
 
-		if (this.World.Assets.m.IsBrigand)
+		if (::World.Assets.m.IsBrigand)
 		{
 			party.setVisibleInFogOfWar(true);
 			party.setImportant(true);
@@ -1292,28 +1297,28 @@ this.world_editor_screen <- {
 		if (start.getProduce().len() == 0) start.updateProduce();
 	
 		local produce = 3
-		if(this.LegendsMod.Configs().LegendWorldEconomyEnabled())
+		if(::LegendsMod.Configs().LegendWorldEconomyEnabled())
 		{
-			produce = this.Math.max(3, 3 + this.Math.round(0.025 * resources));
+			produce = ::Math.max(3, 3 + ::Math.round(0.025 * resources));
 		}
 
 		for( local j = 0; j < produce; j = ++j )
 		{
-			party.addToInventory(this.MSU.Array.getRandom(start.getProduce()));
+			party.addToInventory(::MSU.Array.getRandom(start.getProduce()));
 		}
 
-		party.getLoot().Money = this.Math.rand(0, 100);
-		party.getLoot().ArmorParts = this.Math.rand(0, 10);
-		party.getLoot().Medicine = this.Math.rand(0, 10);
-		party.getLoot().Ammo = this.Math.rand(0, 25);
+		party.getLoot().Money = ::Math.rand(0, 100);
+		party.getLoot().ArmorParts = ::Math.rand(0, 10);
+		party.getLoot().Medicine = ::Math.rand(0, 10);
+		party.getLoot().Ammo = ::Math.rand(0, 25);
 
-		if(this.LegendsMod.Configs().LegendWorldEconomyEnabled())
+		if(::LegendsMod.Configs().LegendWorldEconomyEnabled())
 		{
-			local investment = this.Math.max(1, this.Math.round(0.033 * resources));
-			start.setResources(this.Math.max(10, start.getResources() - investment));
+			local investment = ::Math.max(1, ::Math.round(0.033 * resources));
+			start.setResources(::Math.max(10, start.getResources() - investment));
 			party.setResources(investment);
 
-			local r = this.Math.rand(1,3);
+			local r = ::Math.rand(1,3);
 			for( local j = 0; j < r; j = ++j )
 			{
 				local items = [
@@ -1337,41 +1342,41 @@ this.world_editor_screen <- {
 					[0, "supplies/wine_item"]
 				]
 
-				local item = this.Const.World.Common.pickItem(items)
+				local item = ::Const.World.Common.pickItem(items)
 				party.addToInventory(item);
 			}
 		}
 		else
 		{
 			local supplies = ["bread_item", "roots_and_berries_item", "dried_fruits_item", "ground_grains_item"];
-			party.addToInventory("supplies/" + this.MSU.Array.getRandom(supplies));
+			party.addToInventory("supplies/" + ::MSU.Array.getRandom(supplies));
 		}
 
 		local c = party.getController();
-		c.getBehavior(this.Const.World.AI.Behavior.ID.Attack).setEnabled(false);
-		c.getBehavior(this.Const.World.AI.Behavior.ID.Flee).setEnabled(false);
-		local move = this.new("scripts/ai/world/orders/move_order");
+		c.getBehavior(::Const.World.AI.Behavior.ID.Attack).setEnabled(false);
+		c.getBehavior(::Const.World.AI.Behavior.ID.Flee).setEnabled(false);
+		local move = ::new("scripts/ai/world/orders/move_order");
 		move.setDestination(destination.getTile());
 		move.setRoadsOnly(true);
-		local unload = this.new("scripts/ai/world/orders/unload_order");
-		local despawn = this.new("scripts/ai/world/orders/despawn_order");
+		local unload = ::new("scripts/ai/world/orders/unload_order");
+		local despawn = ::new("scripts/ai/world/orders/despawn_order");
 		c.addOrder(move);
 		c.addOrder(unload);
 		c.addOrder(despawn);
 
-		this.log("Successfully sent a caravan from " + this.Const.UI.getColorized(start.getName(), "#1e468f") + " to " + this.Const.UI.getColorized(destination.getName(), "#1e468f"));
+		this.log("Successfully sent a caravan from " + ::Const.UI.getColorized(start.getName(), "#1e468f") + " to " + ::Const.UI.getColorized(destination.getName(), "#1e468f"));
 	}
 
 	function onSendMercenaryTo( _data )
 	{
 		local resources = _data[2];
-		local start = this.World.getEntityByID(_data[0]);
-		local destination = this.World.getEntityByID(_data[1]);
-		local faction =  this.World.FactionManager.getFaction(this.MSU.Array.getRandom(start.getFactions()));
-		local party = this.World.spawnEntity("scripts/entity/world/party", start.getTile().Coords);
-		party.setPos(this.createVec(party.getPos().X - 50, party.getPos().Y - 50));
+		local start = ::World.getEntityByID(_data[0]);
+		local destination = ::World.getEntityByID(_data[1]);
+		local faction =  ::World.FactionManager.getFaction(::MSU.Array.getRandom(start.getFactions()));
+		local party = ::World.spawnEntity("scripts/entity/world/party", start.getTile().Coords);
+		party.setPos(::createVec(party.getPos().X - 50, party.getPos().Y - 50));
 		party.setDescription("A free mercenary company travelling the lands and lending their swords to the highest bidder.");
-		party.setFootprintType(this.Const.World.FootprintsType.Mercenaries);
+		party.setFootprintType(::Const.World.FootprintsType.Mercenaries);
 		party.setAttackableByAI(_data[4]);
 		party.setSlowerAtNight(_data[5]);
 		party.setLootScale(_data[6] ? 2.0 : 1.0);
@@ -1384,18 +1389,18 @@ this.world_editor_screen <- {
 		}
 		else
 		{
-			party.setFaction(start.getFactionOfType(this.Const.FactionType.Settlement).getID());
+			party.setFaction(start.getFactionOfType(::Const.FactionType.Settlement).getID());
 		}
 
-		this.Const.World.Common.assignTroops(party, this.Const.World.Spawn[_data[3]], resources);
-		party.getLoot().Money = this.Math.rand(300, 600);
-		party.getLoot().ArmorParts = this.Math.rand(0, 25);
-		party.getLoot().Medicine = this.Math.rand(0, 10);
-		party.getLoot().Ammo = this.Math.rand(0, 50);
+		::Const.World.Common.assignTroops(party, ::Const.World.Spawn[_data[3]], resources);
+		party.getLoot().Money = ::Math.rand(300, 600);
+		party.getLoot().ArmorParts = ::Math.rand(0, 25);
+		party.getLoot().Medicine = ::Math.rand(0, 10);
+		party.getLoot().Ammo = ::Math.rand(0, 50);
 
 		if (_data[3] == "Assassins")
 		{
-			party.getSprite("body").setBrush("figure_mercenary_0" + this.Math.rand(1, 2));
+			party.getSprite("body").setBrush("figure_mercenary_0" + ::Math.rand(1, 2));
 		}
 
 		local supplies = ["bread_item", "roots_and_berries_item", "dried_fruits_item", "ground_grains_item"];
@@ -1403,18 +1408,18 @@ this.world_editor_screen <- {
 			"silver_bowl_item", "jeweled_crown_item", "ancient_amber_item", "webbed_valuables_item", "looted_valuables_item",
 			"white_pearls_item", "rainbow_scale_item", "lindwurm_hoard_item", "silverware_item",
 		];
-		party.addToInventory("supplies/" + this.MSU.Array.getRandom(supplies));
-		party.addToInventory("loot/" + this.MSU.Array.getRandom(loots));
+		party.addToInventory("supplies/" + ::MSU.Array.getRandom(supplies));
+		party.addToInventory("loot/" + ::MSU.Array.getRandom(loots));
 
 		local c = party.getController();
-		local wait1 = this.new("scripts/ai/world/orders/wait_order");
-		wait1.setTime(this.Math.rand(5, 7) * 1.0);
-		local move = this.new("scripts/ai/world/orders/move_order");
+		local wait1 = ::new("scripts/ai/world/orders/wait_order");
+		wait1.setTime(::Math.rand(5, 7) * 1.0);
+		local move = ::new("scripts/ai/world/orders/move_order");
 		move.setDestination(destination.getTile());
 		move.setRoadsOnly(false);
-		local wait2 = this.new("scripts/ai/world/orders/wait_order");
-		wait2.setTime(this.Math.rand(10, 60) * 1.0);
-		local mercenary = this.new("scripts/ai/world/orders/mercenary_order");
+		local wait2 = ::new("scripts/ai/world/orders/wait_order");
+		wait2.setTime(::Math.rand(10, 60) * 1.0);
+		local mercenary = ::new("scripts/ai/world/orders/mercenary_order");
 		mercenary.setSettlement(destination);
 		c.addOrder(wait1);
 		c.addOrder(move);
@@ -1423,16 +1428,16 @@ this.world_editor_screen <- {
 
 		while (true)
 		{
-			local name = this.Const.Strings.MercenaryCompanyNames[this.Math.rand(0, this.Const.Strings.MercenaryCompanyNames.len() - 1)];
+			local name = ::MSU.Array.getRandom(::Const.Strings.MercenaryCompanyNames);
 
-			if (name == this.World.Assets.getName())
+			if (name == ::World.Assets.getName())
 			{
 				continue;
 			}
 
 			local abort = false;
 
-			foreach( p in this.World.EntityManager.m.Mercenaries )
+			foreach( p in ::World.EntityManager.m.Mercenaries )
 			{
 				if (p.getName() == name)
 				{
@@ -1452,16 +1457,16 @@ this.world_editor_screen <- {
 
 		while (true)
 		{
-			local banner = this.Const.PlayerBanners[this.Math.rand(0, this.Const.PlayerBanners.len() - 1)];
+			local banner = ::MSU.Array.getRandom(::Const.PlayerBanners);
 
-			if (banner == this.World.Assets.getBanner())
+			if (banner == ::World.Assets.getBanner())
 			{
 				continue;
 			}
 
 			local abort = false;
 
-			foreach( p in this.World.EntityManager.m.Mercenaries )
+			foreach( p in ::World.EntityManager.m.Mercenaries )
 			{
 				if (p.getBanner() == banner)
 				{
@@ -1479,8 +1484,8 @@ this.world_editor_screen <- {
 			break;
 		}
 
-		this.World.EntityManager.m.Mercenaries.push(this.WeakTableRef(party));
-		this.log("Successfully sent a mercenary company from " + this.Const.UI.getColorized(start.getName(), "#1e468f") + " to " + this.Const.UI.getColorized(destination.getName(), "#1e468f"));
+		::World.EntityManager.m.Mercenaries.push(::WeakTableRef(party));
+		this.log("Successfully sent a mercenary company from " + ::Const.UI.getColorized(start.getName(), "#1e468f") + " to " + ::Const.UI.getColorized(destination.getName(), "#1e468f"));
 	}
 
 	function convertToUIData()
@@ -1500,15 +1505,15 @@ this.world_editor_screen <- {
 
 	function updatePlayerBannerOnAllThings()
 	{
-		local banner = this.World.Assets.getBanner();
-		local bannerID = this.World.Assets.getBannerID();
-		this.World.State.getPlayer().getSprite("banner").setBrush(banner);
-		this.World.State.getPlayer().getSprite("zoom_banner").setBrush(banner);
+		local banner = ::World.Assets.getBanner();
+		local bannerID = ::World.Assets.getBannerID();
+		::World.State.getPlayer().getSprite("banner").setBrush(banner);
+		::World.State.getPlayer().getSprite("zoom_banner").setBrush(banner);
 		this.changeBannerItem(bannerID);
 
 		if (::mods_getRegisteredMod("mod_stronghold") != null)
 		{
-			local faction = this.Stronghold.getPlayerFaction();
+			local faction = ::Stronghold.getPlayerFaction();
 			if (faction == null) return;
 			faction.setBanner(bannerID);
 			local bannerSmall = faction.getBannerSmall();
@@ -1532,7 +1537,7 @@ this.world_editor_screen <- {
 
 	function changeBannerItem( _bannerID )
 	{
-		local banner = this.World.Assets.getStash().getItemByID("weapon.player_banner");
+		local banner = ::World.Assets.getStash().getItemByID("weapon.player_banner");
 
 		if (banner != null)
 		{
@@ -1541,7 +1546,7 @@ this.world_editor_screen <- {
 			return;
 		}
 
-		foreach ( bro in this.World.getPlayerRoster().getAll() )
+		foreach ( bro in ::World.getPlayerRoster().getAll() )
 		{
 			local items = bro.getItems();
 			local allItems = items.getAllItems();
@@ -1568,20 +1573,20 @@ this.world_editor_screen <- {
 	function buildAttachedLocation(_settlement, _script, _additionalDistance = 0, _mustBeNearRoad = false, _clearTile = true)
 	{
 		local terrain = [
-			this.Const.World.TerrainType.Plains,
-			this.Const.World.TerrainType.Swamp,
-			this.Const.World.TerrainType.Hills,
-			this.Const.World.TerrainType.Forest,
-			this.Const.World.TerrainType.SnowyForest,
-			this.Const.World.TerrainType.LeaveForest,
-			this.Const.World.TerrainType.AutumnForest,
-			this.Const.World.TerrainType.Mountains,
-			this.Const.World.TerrainType.Snow,
-			this.Const.World.TerrainType.Badlands,
-			this.Const.World.TerrainType.Tundra,
-			this.Const.World.TerrainType.Steppe,
-			this.Const.World.TerrainType.Desert,
-			this.Const.World.TerrainType.Oasis,
+			::Const.World.TerrainType.Plains,
+			::Const.World.TerrainType.Swamp,
+			::Const.World.TerrainType.Hills,
+			::Const.World.TerrainType.Forest,
+			::Const.World.TerrainType.SnowyForest,
+			::Const.World.TerrainType.LeaveForest,
+			::Const.World.TerrainType.AutumnForest,
+			::Const.World.TerrainType.Mountains,
+			::Const.World.TerrainType.Snow,
+			::Const.World.TerrainType.Badlands,
+			::Const.World.TerrainType.Tundra,
+			::Const.World.TerrainType.Steppe,
+			::Const.World.TerrainType.Desert,
+			::Const.World.TerrainType.Oasis,
 		];
 		local tries = 0;
 		local myTile = _settlement.getTile();
@@ -1589,15 +1594,15 @@ this.world_editor_screen <- {
 
 		while (tries++ < 1000)
 		{
-			local x = this.Math.rand(myTile.SquareCoords.X - 2 - _additionalDistance, myTile.SquareCoords.X + 2 + _additionalDistance);
-			local y = this.Math.rand(myTile.SquareCoords.Y - 2 - _additionalDistance, myTile.SquareCoords.Y + 2 + _additionalDistance);
+			local x = ::Math.rand(myTile.SquareCoords.X - 2 - _additionalDistance, myTile.SquareCoords.X + 2 + _additionalDistance);
+			local y = ::Math.rand(myTile.SquareCoords.Y - 2 - _additionalDistance, myTile.SquareCoords.Y + 2 + _additionalDistance);
 
-			if (!this.World.isValidTileSquare(x, y))
+			if (!::World.isValidTileSquare(x, y))
 			{
 				continue;
 			}
 
-			local tile = this.World.getTileSquare(x, y);
+			local tile = ::World.getTileSquare(x, y);
 
 			if (tile.IsOccupied)
 			{
@@ -1665,9 +1670,9 @@ this.world_editor_screen <- {
 
 			if (tile.getDistanceTo(myTile) > 2)
 			{
-				local navSettings = this.World.getNavigator().createSettings();
-				navSettings.ActionPointCosts = this.Const.World.TerrainTypeNavCost_Flat;
-				local path = this.World.getNavigator().findPath(myTile, tile, navSettings, 0);
+				local navSettings = ::World.getNavigator().createSettings();
+				navSettings.ActionPointCosts = ::Const.World.TerrainTypeNavCost_Flat;
+				local path = ::World.getNavigator().findPath(myTile, tile, navSettings, 0);
 
 				if (path.isEmpty())
 				{
@@ -1677,14 +1682,14 @@ this.world_editor_screen <- {
 
 			if (_clearTile)
 			{
-				tile.clearAllBut(this.Const.World.DetailType.Shore);
+				tile.clearAllBut(::Const.World.DetailType.Shore);
 			}
 			else
 			{
-				tile.clear(this.Const.World.DetailType.NotCompatibleWithRoad);
+				tile.clear(::Const.World.DetailType.NotCompatibleWithRoad);
 			}
 
-			entity = this.World.spawnLocation(_script, tile.Coords);
+			entity = ::World.spawnLocation(_script, tile.Coords);
 			entity.setSettlement(_settlement);
 
 			if (entity.onBuild())

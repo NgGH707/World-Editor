@@ -1,10 +1,6 @@
 
 WorldEditorScreen.prototype.getWorldLocation = function (_id)
 {
-    if (_id === null) {
-        console.error('ERROR: Failed to search for WorldLocation. id is null.');
-        return null;
-    }
     var result = this.getSettlement(_id);
     if (result !== null) {
         return result;
@@ -118,15 +114,13 @@ WorldEditorScreen.prototype.updateContractDetailsPanel = function(_element)
     if(_element !== null && _element.length > 0)
     {
         var data = _element.data('entry');
-        var faction = this.getFaction(data.Faction);
-        var origin = this.getWorldLocation(data.Origin);
-        var home = this.getWorldLocation(data.Home);
         this.mContract.Name.html(data.Name);
         this.mContract.Employer.attr('src', Path.PROCEDURAL + data.Employer);
         this.mContract.DifficultyMult.setInputText('' + data.DifficultyMult + '');
         this.mContract.PaymentMult.setInputText('' + data.PaymentMult + '');
         this.mContract.Expiration.setInputText('' + data.Expire + '');
 
+        var faction = this.getFaction(data.Faction);
         if (faction === null) {
             this.mContract.FactionBanner.attr('src', Path.GFX + 'ui/banners/missing_banner.png');
             this.mContract.FactionBanner.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.nofaction' });
@@ -136,14 +130,8 @@ WorldEditorScreen.prototype.updateContractDetailsPanel = function(_element)
             this.mContract.FactionBanner.bindTooltip({ contentType: 'ui-element', elementId: faction.ID, elementOwner: 'woditor.factionbanner' });
         }
         
-        if (origin === null)
-            this.mContract.Origin.attr('src', Path.GFX + 'ui/images/undiscovered_opponent.png');
-        else
-            this.mContract.Origin.attr('src', Path.GFX + origin.ImagePath);
         
-        if (home === null)
-            this.mContract.Home.attr('src', Path.GFX + 'ui/images/undiscovered_opponent.png');
-        else
-            this.mContract.Home.attr('src', Path.GFX + home.ImagePath);
+        this.notifyBackendGetWolrdEntityImagePath(data.Origin, this.mContract.Origin);
+        this.notifyBackendGetWolrdEntityImagePath(data.Home, this.mContract.Home);
     }
 };

@@ -1,8 +1,13 @@
 this.world_editor_data_helper <- {
 	m = {},
+	function getWolrdEntityImagePath( _id )
+	{
+		return ::World.getEntityByID(_id).getUIImagePath();
+	}
+
 	function convertFactionAllianceToUIData( _data )
 	{
-		local faction = this.World.FactionManager.getFaction(_data[0]);
+		local faction = ::World.FactionManager.getFaction(_data[0]);
 		local allies = faction.getAllies();
 		local result = {Allies = [], Hostile = []};
 		local index = _data[1];
@@ -27,7 +32,7 @@ this.world_editor_data_helper <- {
 
 	function convertFactionLeadersToUIData( _id )
 	{
-		local faction = this.World.FactionManager.getFaction(_id);
+		local faction = ::World.FactionManager.getFaction(_id);
 		local result = [];
 
 		foreach( character in faction.getRoster().getAll() )
@@ -43,7 +48,7 @@ this.world_editor_data_helper <- {
 
 	function convertBuildingEntriesToUIData( _id )
 	{
-		local settlement = this.World.getEntityByID(_id);
+		local settlement = ::World.getEntityByID(_id);
 		local result = [];
 
 		foreach( script in ::Woditor.Buildings.Valid)
@@ -72,7 +77,7 @@ this.world_editor_data_helper <- {
 			result.push({
 				Script = script,
 				ID = attached_location.getTypeID(),
-				ImagePath = attached_location.getUIImage()
+				ImagePath = attached_location.getUIImagePath()
 			});
 		}
 
@@ -81,7 +86,7 @@ this.world_editor_data_helper <- {
 
 	function convertSituationEntriesToUIData( _id )
 	{
-		local settlement = this.World.getEntityByID(_id);
+		local settlement = ::World.getEntityByID(_id);
 		local result = [];
 
 		foreach( script in ::Woditor.Situations.Valid )
@@ -101,7 +106,7 @@ this.world_editor_data_helper <- {
 
 	function convertLocationSpriteEntriesToUIData( _id )
 	{
-		local world_entity = this.World.getEntityByID(_id);
+		local world_entity = ::World.getEntityByID(_id);
 		local body = world_entity.getSprite("body");
 		local result = [];
 		local valid = [];
@@ -147,7 +152,7 @@ this.world_editor_data_helper <- {
 
 		foreach( key in list )
 		{
-			local troop = this.Const.World.Spawn.Troops[key];
+			local troop = ::Const.World.Spawn.Troops[key];
 
 			result.push({
 				Name = ::Woditor.getTroopName(troop),
@@ -168,7 +173,7 @@ this.world_editor_data_helper <- {
 		switch (_type)
 		{
 		case "caravan":
-			foreach(key, value in this.Const.World.Spawn)
+			foreach(key, value in ::Const.World.Spawn)
 			{
 				if (typeof value != "table") continue;
 				if (key.find("Caravan") == null) continue;
@@ -177,7 +182,7 @@ this.world_editor_data_helper <- {
 			break;
 
 		case "mercenary":
-			foreach(key, value in this.Const.World.Spawn)
+			foreach(key, value in ::Const.World.Spawn)
 			{
 				if (typeof value != "table") continue;
 				if (key.find("Company") == null) continue;
@@ -191,7 +196,7 @@ this.world_editor_data_helper <- {
 			break;
 
 		case "bandit":
-			foreach(key, value in this.Const.World.Spawn)
+			foreach(key, value in ::Const.World.Spawn)
 			{
 				if (typeof value != "table") continue;
 				if (key.find("Bandit") == null) continue;
@@ -200,7 +205,7 @@ this.world_editor_data_helper <- {
 			break;
 
 		case "barbarian":
-			foreach(key, value in this.Const.World.Spawn)
+			foreach(key, value in ::Const.World.Spawn)
 			{
 				if (typeof value != "table") continue;
 				if (key.find("Barbarian") == null) continue;
@@ -209,7 +214,7 @@ this.world_editor_data_helper <- {
 			break;
 
 		case "goblin":
-			foreach(key, value in this.Const.World.Spawn)
+			foreach(key, value in ::Const.World.Spawn)
 			{
 				if (typeof value != "table") continue;
 				if (key.find("Goblin") == null) continue;
@@ -218,7 +223,7 @@ this.world_editor_data_helper <- {
 			break;
 
 		case "orc":
-			foreach(key, value in this.Const.World.Spawn)
+			foreach(key, value in ::Const.World.Spawn)
 			{
 				if (typeof value != "table") continue;
 				if (key.find("Orc") == null) continue;
@@ -227,7 +232,7 @@ this.world_editor_data_helper <- {
 			break;
 	
 		default: // all
-			foreach(key, value in this.Const.World.Spawn)
+			foreach(key, value in ::Const.World.Spawn)
 			{
 				if (typeof value != "table") continue;
 				result.push(key);
@@ -239,10 +244,10 @@ this.world_editor_data_helper <- {
 
 	function convertAvatarToUIData( _screen )
 	{
-		this.World.Assets.updateLook();
+		::World.Assets.updateLook();
 		local result = {};
-		local roster = this.World.getTemporaryRoster();
-		local player = this.World.State.getPlayer();
+		local roster = ::World.getTemporaryRoster();
+		local player = ::World.State.getPlayer();
 		local socket = player.getSprite("base").getBrush().Name;
 		local body = player.getSprite("body").getBrush().Name;
 		local flip = player.getSprite("body").isFlippedHorizontally();
@@ -260,14 +265,14 @@ this.world_editor_data_helper <- {
 		result.IsFlipping <- flip;
 		result.Sprites <- [];
 		result.SpriteNames <- [];
-		result.Sockets <- this.Const.WorldSockets;
+		result.Sockets <- ::Const.WorldSockets;
 		result.SocketIndex <- 0;
 		result.Selected <- {
 			Row = 0,
 			Index = 0,
 		};
 
-		foreach (i, row in this.Const.WorldSprites) 
+		foreach (i, row in ::Const.WorldSprites) 
 		{
 			local index = row.find(body);
 
@@ -277,11 +282,11 @@ this.world_editor_data_helper <- {
 				result.Selected.Index = index;
 			}
 
-			result.SpriteNames.push(this.Const.WorldSpritesNames[i]);
+			result.SpriteNames.push(::Const.WorldSpritesNames[i]);
 			result.Sprites.push(row);
 		}
 		
-		local index = this.Const.WorldSockets.find(socket);
+		local index = ::Const.WorldSockets.find(socket);
 		if (index != null) result.SocketIndex = index;
 		return result;
 	}
@@ -289,8 +294,8 @@ this.world_editor_data_helper <- {
 	function convertScenariosToUIData()
 	{
 		local result = {};
-		local currentID = this.World.Assets.getOrigin().getID();
-		result.Data <- this.Const.ScenarioManager.getDataScenariosForUI()
+		local currentID = ::World.Assets.getOrigin().getID();
+		result.Data <- ::Const.ScenarioManager.getDataScenariosForUI()
 		result.Selected <- null;
 
 		foreach (i, s in result.Data)
@@ -314,50 +319,49 @@ this.world_editor_data_helper <- {
 			Data = [],
 			Selected = null
 		};
-		result.Banners.Data.push(this.Const.PlayerBanners);
-		result.Banners.Data.push(this.Const.NobleBanners);
-		result.Banners.Data.push(this.Const.OtherBanner);
-		result.Banners.Selected = this.Const.PlayerBanners.find(this.World.Assets.getBanner());
+		result.Banners.Data.push(::Const.PlayerBanners);
+		result.Banners.Data.push(::Const.NobleBanners);
+		result.Banners.Data.push(::Const.OtherBanner);
+		result.Banners.Selected = ::Const.PlayerBanners.find(::World.Assets.getBanner());
 
 		// roster and difficulty sliders
-		result.DifficultyMult <- this.Math.floor(100 * (this.World.Flags.has("DifficultyMult") ? this.World.Flags.getAsFloat("DifficultyMult") : 1.0));
+		result.DifficultyMult <- ::Math.floor(100 * (::World.Flags.has("DifficultyMult") ? ::World.Flags.getAsFloat("DifficultyMult") : 1.0));
 		result.RosterTier <- {
-			Max = this.Const.Roster.Tier[this.Const.Roster.Tier.len() - 1],
-			//Value = this.World.Flags.has("RosterTier") ? this.World.Flags.getAsInt("RosterTier") : this.World.Assets.getOrigin().getRosterTier(),
-			Value = this.World.Assets.getOrigin().getStartingRosterTier()
+			Max = ::Const.Roster.Tier[::Const.Roster.Tier.len() - 1],
+			Value = ::World.Assets.getOrigin().getStartingRosterTier()
 		};
 
 		// check box configurations
 		result.CheckBox <- {
-			IsIronman = this.World.Assets.isIronman(),
-			IsBleedKiller = this.LegendsMod.Configs().LegendBleedKillerEnabled(),
-			IsLocationScaling = this.LegendsMod.Configs().LegendLocationScalingEnabled(),
-			IsRecruitScaling = this.LegendsMod.Configs().LegendRecruitScalingEnabled(),
-			IsWorldEconomy = this.LegendsMod.Configs().LegendWorldEconomyEnabled(),
-			IsBlueprintsVisible = this.LegendsMod.Configs().LegendAllBlueprintsEnabled(),
-			IsGender = this.LegendsMod.Configs().LegendGenderLevel(),
-			CombatDifficulty = this.World.Assets.getCombatDifficulty(),
-			EconomicDifficulty = this.World.Assets.getEconomicDifficulty(),
+			IsIronman = ::World.Assets.isIronman(),
+			IsBleedKiller = ::LegendsMod.Configs().LegendBleedKillerEnabled(),
+			IsLocationScaling = ::LegendsMod.Configs().LegendLocationScalingEnabled(),
+			IsRecruitScaling = ::LegendsMod.Configs().LegendRecruitScalingEnabled(),
+			IsWorldEconomy = ::LegendsMod.Configs().LegendWorldEconomyEnabled(),
+			IsBlueprintsVisible = ::LegendsMod.Configs().LegendAllBlueprintsEnabled(),
+			IsGender = ::LegendsMod.Configs().LegendGenderLevel(),
+			CombatDifficulty = ::World.Assets.getCombatDifficulty(),
+			EconomicDifficulty = ::World.Assets.getEconomicDifficulty(),
 		};
 
 		// assets stuffs
-		result.Name <- this.World.Assets.getName();
-		result.BusinessReputation <- this.World.Assets.getBusinessReputation();
-		result.MoralReputation <- this.World.Assets.getMoralReputation();
-		result.Money <- this.World.Assets.getMoney();
-		result.Stash <- this.World.Assets.getStash().getCapacity();
-		result.Ammo <- this.World.Assets.getAmmo();
-		result.ArmorParts <- this.World.Assets.getArmorParts();
-		result.Medicine <- this.World.Assets.getMedicine();
+		result.Name <- ::World.Assets.getName();
+		result.BusinessReputation <- ::World.Assets.getBusinessReputation();
+		result.MoralReputation <- ::World.Assets.getMoralReputation();
+		result.Money <- ::World.Assets.getMoney();
+		result.Stash <- ::World.Assets.getStash().getCapacity();
+		result.Ammo <- ::World.Assets.getAmmo();
+		result.ArmorParts <- ::World.Assets.getArmorParts();
+		result.Medicine <- ::World.Assets.getMedicine();
 		
 		foreach (key in ::Woditor.AssetsProperties.Mult)
 		{
-			result[key] <- this.Math.floor(this.World.Assets.m[key] * 100);
+			result[key] <- ::Math.floor(::World.Assets.m[key] * 100);
 		}
 
 		foreach (key in ::Woditor.AssetsProperties.Additive)
 		{
-			result[key] <- this.World.Assets.m[key];
+			result[key] <- ::World.Assets.m[key];
 		}
 
 		return result;
@@ -366,11 +370,11 @@ this.world_editor_data_helper <- {
 	function convertLocationsToUIData()
 	{
 		local result = [];
-		local playerTile = this.World.State.getPlayer().getTile();
+		local playerTile = ::World.State.getPlayer().getTile();
 
-		foreach (i, location in this.World.EntityManager.getLocations())
+		foreach (i, location in ::World.EntityManager.getLocations())
 		{
-			if (location.isLocationType(this.Const.World.LocationType.AttachedLocation) || location.m.IsBattlesite)
+			if (location.isLocationType(::Const.World.LocationType.AttachedLocation) || location.m.IsBattlesite)
 			{
 				continue;
 			}
@@ -379,9 +383,9 @@ this.world_editor_data_helper <- {
 				location.onVisibleToPlayer();
 			}
 
-			local isUnique = location.isLocationType(this.Const.World.LocationType.Unique);
-			local isLair = location.isLocationType(this.Const.World.LocationType.Lair);
-			local isPassive = location.isLocationType(this.Const.World.LocationType.Passive);
+			local isUnique = location.isLocationType(::Const.World.LocationType.Unique);
+			local isLair = location.isLocationType(::Const.World.LocationType.Lair);
+			local isPassive = location.isLocationType(::Const.World.LocationType.Passive);
 			local loots = [];
 
 			foreach ( item in location.getLoot().m.Items )
@@ -400,9 +404,9 @@ this.world_editor_data_helper <- {
 				Faction = location.getFaction(),
 				TooltipId = location.getTooltipId(),
 				Banner = location.getUIBanner(),
-				ImagePath = location.getUIImage(),
 				Resources = location.getResources(),
 				Terrain = location.getTerrainImage(),
+				ImagePath = location.getUIImagePath(),
 				Troops = this.convertTroopsToUIData(location),
 				NamedItemChance = location.getNameItemChance(),
 				Distance = playerTile.getDistanceTo(location.getTile()),
@@ -421,11 +425,11 @@ this.world_editor_data_helper <- {
 	function convertSettlementsToUIData()
 	{
 		local result = [];
-		local playerTile = this.World.State.getPlayer().getTile();
+		local playerTile = ::World.State.getPlayer().getTile();
 
-		foreach(i, settlement in this.World.EntityManager.getSettlements())
+		foreach(i, settlement in ::World.EntityManager.getSettlements())
 		{
-			if (settlement.getFactionOfType(this.Const.FactionType.Settlement) != null)
+			if (settlement.getFactionOfType(::Const.FactionType.Player) != null)
 			{
 				continue;
 			}
@@ -436,7 +440,7 @@ this.world_editor_data_helper <- {
 			local attached_locations = [];
 			local situations = [];
 			local draftlist = [];
-			local find = settlement.getFactionOfType(this.Const.FactionType.Settlement);
+			local find = settlement.getFactionOfType(::Const.FactionType.Settlement);
 
 			if (find != null)
 			{
@@ -481,7 +485,7 @@ this.world_editor_data_helper <- {
 
 				attached_locations.push({
 					ID = a.getTypeID(),
-					ImagePath = a.getUIImage(),
+					ImagePath = a.getUIImagePath(),
 				});
 			}
 
@@ -507,17 +511,11 @@ this.world_editor_data_helper <- {
 				ID = settlement.getID(),
 				Name = settlement.getName(),
 				Size = settlement.getSize(),
-				Owner = owner,
-				Faction = faction,
-				Buildings = buildings,
-				Attachments = attached_locations,
-				Situations = situations,
-				DraftList = draftlist,
 				House = settlement.m.HousesTiles.len(),
 				HouseMax = settlement.getHouseMax(),
 				HouseImage = settlement.getHouseUIImage(),
 				Terrain = settlement.getTerrainImage(),
-				ImagePath = settlement.getImagePath(),
+				ImagePath = settlement.getUIImagePath(),
 				Wealth = settlement.getWealth(),
 				Resources = settlement.getResources(),
 				IsActive = settlement.isActive(),
@@ -526,6 +524,12 @@ this.world_editor_data_helper <- {
 				IsSouthern = settlement.isSouthern(),
 				IsIsolated = settlement.isIsolatedFromRoads(),
 				Distance = playerTile.getDistanceTo(settlement.getTile()),
+				Attachments = attached_locations,
+				Situations = situations,
+				Buildings = buildings,
+				DraftList = draftlist,
+				Faction = faction,
+				Owner = owner,
 			});
 		}
 
@@ -566,23 +570,23 @@ this.world_editor_data_helper <- {
 	{
 		local result = [];
 		local valid = [
-			this.Const.FactionType.OrientalCityState,
-			this.Const.FactionType.NobleHouse,
-			this.Const.FactionType.Settlement,
+			::Const.FactionType.OrientalCityState,
+			::Const.FactionType.NobleHouse,
+			::Const.FactionType.Settlement,
 		];
-		local factions = clone this.World.FactionManager.getFactions(false);
+		local factions = clone ::World.FactionManager.getFactions(false);
 		local factions_southern = [];
 		local factions_with_settlement = [];
 		local factions_misc = [];
 
 		foreach( f in factions )
 		{
-			if (f == null || f.getType() == this.Const.FactionType.Player)
+			if (f == null || f.getType() == ::Const.FactionType.Player)
 			{
 				continue;
 			}
 
-			if (f.getType() == this.Const.FactionType.OrientalCityState)
+			if (f.getType() == ::Const.FactionType.OrientalCityState)
 			{
 				factions_southern.push(f);
 			}
@@ -611,10 +615,10 @@ this.world_editor_data_helper <- {
 				Name = ("getNameOnly" in f) ? f.getNameOnly() : f.getName(),
 				Motto = f.getMotto(),
 				Relation = f.getPlayerRelationAsText(),
-				RelationNum = this.Math.round(f.getPlayerRelation())
-				RelationNumSimplified = this.Math.min(this.Const.Strings.Relations.len() - 1, f.getPlayerRelation() / 10),
+				RelationNum = ::Math.round(f.getPlayerRelation())
+				RelationNumSimplified = ::Math.min(::Const.Strings.Relations.len() - 1, f.getPlayerRelation() / 10),
 				FactionFixedRelation = f.isPlayerRelationPermanent(),
-				IsNoble = f.getType() == this.Const.FactionType.NobleHouse,
+				IsNoble = f.getType() == ::Const.FactionType.NobleHouse,
 				SettlementNum = f.getSettlements().len(),
 			};
 
@@ -639,17 +643,17 @@ this.world_editor_data_helper <- {
 	{
 		local result = [];
 
-		foreach( contract in this.World.Contracts.getOpenContracts() )
+		foreach( contract in ::World.Contracts.getOpenContracts() )
 		{
-			if (contract.getFaction() == this.Const.FactionType.Player)
+			if (contract.getFaction() == ::Const.FactionType.Player)
 			{
 				continue;
 			}
 
-			local daysLeft = this.Math.max(1, this.Math.abs(this.Time.getVirtualTimeF() - contract.m.TimeOut) / this.World.getTime().SecondsPerDay);
+			local daysLeft = ::Math.max(1, ::Math.abs(::Time.getVirtualTimeF() - contract.m.TimeOut) / ::World.getTime().SecondsPerDay);
 			local originID = (contract.getOrigin() != null && !contract.getOrigin().isNull()) ? contract.getOrigin().getID() : null;
 			local homeID = (contract.getHome() != null && !contract.getHome().isNull()) ? contract.getHome().getID() : null;
-			local employeImagePath = contract.getCharacter().getImagePath();
+			local employeImagePath = contract.getEmployer().getImagePath();
 
 			result.push({
 				ID = contract.getID(),
@@ -659,8 +663,8 @@ this.world_editor_data_helper <- {
 				Faction = contract.getFaction(),
 				IsNegotiated = contract.isNegotiated(),
 				DifficultyIcon = contract.getUIDifficultySmall() + ".png",
-				DifficultyMult = this.Math.floor(contract.getDifficultyMult() * 100),
-				PaymentMult = this.Math.floor(contract.getPaymentMult() * 100),
+				DifficultyMult = ::Math.floor(contract.getDifficultyMult() * 100),
+				PaymentMult = ::Math.floor(contract.getPaymentMult() * 100),
 				Employer = employeImagePath,
 				Expire = daysLeft,
 				Origin = originID,
