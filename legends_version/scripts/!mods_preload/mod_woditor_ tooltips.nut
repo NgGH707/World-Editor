@@ -1174,6 +1174,34 @@
 					},
 				];
 
+			case "woditor.basemovementspeed":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Base Movement Speed"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Determine the speed of this unit party on world map. May change due to the penalty of nighttime"
+					},
+				];
+
+			case "woditor.visibilitymult":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Visibility"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Determine how far or close player party needs to be so you can see this world entity within your field of vision. Bring the value down to 0 will effectively make the entity invisible to player eyes"
+					},
+				];
+
 			case "woditor.lootscale":
 		       	return [
 					{

@@ -263,6 +263,21 @@ WorldEditorScreen.prototype.updateUnitCheckboxes = function(_data)
     });
 }
 
+WorldEditorScreen.prototype.updateUnitSliders = function(_data)
+{
+    var self = this;
+    var controls = [
+        'BaseMovementSpeed',
+        'VisibilityMult',
+        'LootScale',
+    ];
+    controls.forEach(function (_key) {
+        var definition = self.mUnit[_key];
+        definition.Control.val(_data[_key]);
+        definition.Label.text('' + _data[_key] + definition.Postfix);
+    });
+}
+
 WorldEditorScreen.prototype.updateUnitDetailsPanel = function(_element)
 {
     if(_element !== null && _element.length > 0)
@@ -278,6 +293,7 @@ WorldEditorScreen.prototype.updateUnitDetailsPanel = function(_element)
         this.mUnit.Terrain.css('background-image', 'url("' + Path.GFX + data.Terrain + '")');
         this.updateUnitTroops(data.Troops);
         this.updateUnitCheckboxes(data);
+        this.updateUnitSliders(data);
 
         if (data.Banner === undefined || data.Banner === null) {
             this.mUnit.Banner.attr('src', Path.GFX + 'ui/banners/missing_banner.png');

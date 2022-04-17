@@ -201,9 +201,9 @@ var WorldEditorScreen = function(_parent)
         IsSlowerAtNight        : {Checkbox: null, Label: null, Name: 'Is Slower At Night'         , TooltipId: 'woditor.issloweratnight' },
 
         // slider
-        LootScale        : {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.lootscale', Postfix: '%'},
-        BaseMovementSpeed: {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.lootscale', Postfix: '%'},
-        VisibilityMult   : {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.lootscale', Postfix: '%'},
+        BaseMovementSpeed: {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.basemovementspeed', Postfix: ''},
+        VisibilityMult   : {Control: null, Title: null, Min: 0, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.visibilitymult', Postfix: '%'},
+        LootScale        : {Control: null, Title: null, Min: 0, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.lootscale', Postfix: '%'},
     };
 
     this.mAssets =
@@ -635,6 +635,8 @@ WorldEditorScreen.prototype.createUnitsScreenDIV = function(_parentDiv)
             var leftHalf = this.addColumn(50);
             row60.append(leftHalf);
             {
+                this.createSliderControlDIV(this.mUnit.BaseMovementSpeed, 'Base Movement Speed', leftHalf, true);
+                this.createSliderControlDIV(this.mUnit.VisibilityMult, 'Visibility', leftHalf);
                 this.createSliderControlDIV(this.mUnit.LootScale, 'Loot Scale', leftHalf);
             }
 
@@ -2425,10 +2427,15 @@ WorldEditorScreen.prototype.createCheckBoxControlDIV = function(_definition, _pa
     _definition.Label.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
 };
 
-WorldEditorScreen.prototype.createSliderControlDIV = function(_definition, _title, _parentDiv) 
+WorldEditorScreen.prototype.createSliderControlDIV = function(_definition, _title, _parentDiv, _firstRow) 
 {
     var self = this;
     var row = $('<div class="row"></div>');
+
+    if (_firstRow === true) {
+        row.css('margin-top', '1.0rem');
+    }
+
     _parentDiv.append(row);
     _definition.Title = $('<div class="title title-font-big font-bold font-color-title">' + _title + '</div>');
     _definition.Title.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
@@ -2455,6 +2462,22 @@ WorldEditorScreen.prototype.createSliderControlDIV = function(_definition, _titl
             _definition.Value = parseInt(_definition.Control.val());
             _definition.Label.text('' + _definition.Value + _definition.Postfix);
             self.notifyBackendUpdateWorldEntityLootScale(_definition.Value);
+        });
+        break;
+
+    case 'woditor.visibilitymult':
+        _definition.Control.on("change", function () {
+            _definition.Value = parseInt(_definition.Control.val());
+            _definition.Label.text('' + _definition.Value + _definition.Postfix);
+            self.notifyBackendUpdateWorldEntityVisibilityMult(_definition.Value);
+        });
+        break;
+
+    case 'woditor.basemovementspeed':
+        _definition.Control.on("change", function () {
+            _definition.Value = parseInt(_definition.Control.val());
+            _definition.Label.text('' + _definition.Value + _definition.Postfix);
+            self.notifyBackendUpdateWorldEntityBaseMovementSpeed(_definition.Value);
         });
         break;
 
@@ -3369,6 +3392,18 @@ WorldEditorScreen.prototype.notifyBackendUpdateDifficultyMult = function(_value)
 {
     this.mAssetsData.DifficultyMult = _value;
     SQ.call(this.mSQHandle, 'onUpdateDifficultyMult', _value);
+};
+
+WorldEditorScreen.prototype.notifyBackendUpdateWorldEntityBaseMovementSpeed = function(_value) 
+{
+    var result = this.updateUnitData({BaseMovementSpeed: _value});
+    SQ.call(this.mSQHandle, 'onUpdateWorldEntityBaseMovementSpeed', [ result.Data.ID, _value ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendUpdateWorldEntityVisibilityMult = function(_value) 
+{
+    var result = this.updateUnitData({VisibilityMult: _value});
+    SQ.call(this.mSQHandle, 'onUpdateWorldEntityVisibilityMult', [ result.Data.ID, _value ]);
 };
 
 WorldEditorScreen.prototype.notifyBackendUpdateWorldEntityLootScale = function(_value) 

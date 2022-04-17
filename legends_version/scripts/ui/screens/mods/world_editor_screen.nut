@@ -740,6 +740,16 @@ this.world_editor_screen <- {
 		::World.getEntityByID(_data[0]).getSprite("body").setBrush(_data[1]);
 	}
 
+	function onUpdateWorldEntityBaseMovementSpeed( _data )
+	{
+		::World.getEntityByID(_data[0]).setMovementSpeed(_data[1]);
+	}
+
+	function onUpdateWorldEntityVisibilityMult( _data )
+	{
+		::World.getEntityByID(_data[0]).setVisibilityMult(_data[1] / 100);
+	}
+
 	function onUpdateWorldEntityLootScale( _data )
 	{
 		::World.getEntityByID(_data[0]).setLootScale(_data[1] / 100);
