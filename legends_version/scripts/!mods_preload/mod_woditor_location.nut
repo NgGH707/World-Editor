@@ -41,14 +41,12 @@
 		};
 		obj.getUIBanner <- function()
 		{
-			if (this.m.IsShowingBanner)
+			if (this.m.IsShowingBanner || this.getFlags().get("IsShowingBanner"))
 			{
 				return "ui/banners/" + this.getBanner() + ".png";
 			}
-			else
-			{
-				return null;
-			}
+			
+			return null;
 		};
 		obj.getTooltipId <- function()
 		{

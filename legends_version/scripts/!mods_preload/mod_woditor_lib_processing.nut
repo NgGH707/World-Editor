@@ -1,7 +1,55 @@
 ::Woditor.processWoditorLib <- function ()
 {
 	// UI Processing Helper for Woditor
-	::Woditor.Helper <- this.new("scripts/mods/world_editor_data_helper");
+	::Woditor.Helper <- ::new("scripts/mods/world_editor_data_helper");
+
+	// non-player banners
+	::Woditor.ValidBannerSprites <- [];
+	::Woditor.ValidBannerSprites.extend(::Const.BanditBanners);
+	::Woditor.ValidBannerSprites.extend(::Const.BarbarianBanners);
+	::Woditor.ValidBannerSprites.extend(::Const.GoblinBanners);
+	::Woditor.ValidBannerSprites.extend(::Const.OrcBanners);
+	::Woditor.ValidBannerSprites.extend(::Const.ZombieBanners);
+	::Woditor.ValidBannerSprites.extend(::Const.UndeadBanners);
+	::Woditor.ValidBannerSprites.extend(::Const.NomadBanners);
+
+	// location sprites
+	::Woditor.ValidLocationSprites <- [];
+	local locations_directory = "gfx/ui/locations/";
+	foreach (i, directory in ::IO.enumerateFiles(locations_directory) )
+	{
+		::Woditor.ValidLocationSprites.push(directory.slice(locations_directory.len()));
+	}
+
+	// party sprites
+	::Woditor.ValidPartySprites <- [];
+	local parties_directory = "gfx/ui/parties/";
+	foreach (i, directory in ::IO.enumerateFiles(parties_directory) )
+	{
+		::Woditor.ValidPartySprites.push(directory.slice(parties_directory.len()));
+	}
+
+	// contracts
+	::Woditor.InvalidContracts <- [];
+	::Woditor.Contracts <- {};
+	::Woditor.PrepareContractOnCampaignStart <- function()
+	{
+		if (::Woditor.Contracts.len() > 0) return;
+		
+		local contracts = ::IO.enumerateFiles("scripts/contracts/contracts/");
+		foreach ( script in contracts )
+		{
+			if (::Const.Invalid.Contracts.find(script) != null) continue;
+
+			local contract = ::new(script);
+			::Woditor.Contracts[contract.getType()] <- {
+				ChangeObjective = "setDestination" in contract || "setLocation" in contract,
+				Name = contract.getName(),
+				Script = script,
+			};
+		}
+	};
+	
 
 	// processing item data, and creating a search function
 	::Woditor.ItemFilter <- {
@@ -41,7 +89,7 @@
 		"Accessory",
 	];
 	::Woditor.ItemFilterMax <- 10;
-	::Woditor.Stash <- this.new("scripts/items/stash_container");
+	::Woditor.Stash <- ::new("scripts/items/stash_container");
 	::Woditor.Stash.setResizable(true);
 	::Woditor.Items <- [];
 	for (local i = 0; i < ::Woditor.ItemFilterMax; ++i)
@@ -49,26 +97,26 @@
 		::Woditor.Items.push([]);
 	}
 	local prefix = "scripts/items/";
-	local items = this.IO.enumerateFiles(prefix);
+	local items = ::IO.enumerateFiles(prefix);
 	local getLayerImage = function( _item )
 	{
 		if (::mods_isClass(_item, "legend_armor_upgrade") != null)
 		{
 			switch (_item.m.Type)
 			{
-			case this.Const.Items.ArmorUpgrades.Chain:
+			case ::Const.Items.ArmorUpgrades.Chain:
 				return "layers/layer_1.png";
 		
-			case this.Const.Items.ArmorUpgrades.Plate:
+			case ::Const.Items.ArmorUpgrades.Plate:
 				return "layers/layer_2.png";
 
-			case this.Const.Items.ArmorUpgrades.Tabbard:
+			case ::Const.Items.ArmorUpgrades.Tabbard:
 				return "layers/layer_3.png";
 
-			case this.Const.Items.ArmorUpgrades.Cloak:
+			case ::Const.Items.ArmorUpgrades.Cloak:
 				return "layers/layer_4.png";
 
-			case this.Const.Items.ArmorUpgrades.Attachment:
+			case ::Const.Items.ArmorUpgrades.Attachment:
 				return "layers/layer_5.png";
 			}
 		}
@@ -77,13 +125,13 @@
 		{
 			switch (_item.m.Type)
 			{
-			case this.Const.Items.HelmetUpgrades.Helm:
+			case ::Const.Items.HelmetUpgrades.Helm:
 				return "layers/layer_1.png";
 
-			case this.Const.Items.HelmetUpgrades.Top:
+			case ::Const.Items.HelmetUpgrades.Top:
 				return "layers/layer_2.png";
 
-			case this.Const.Items.HelmetUpgrades.Vanity:
+			case ::Const.Items.HelmetUpgrades.Vanity:
 				return "layers/layer_3.png";
 			}
 		}
@@ -94,7 +142,7 @@
 	{
 		if (::Const.Invalid.Items.find(script) != null) continue;
 
-		local _item = this.new(script);
+		local _item = ::new(script);
 
 		if (_item.m.ID.len() == 0) continue;
 
@@ -127,7 +175,7 @@
 			Description = _item.m.Description,
 			ImagePath = "ui/items/" + _item.m.Icon,
 			LayerImagePath = getLayerImage(_item),
-			Script = this.IO.scriptFilenameByHash(_item.ClassNameHash),
+			Script = ::IO.scriptFilenameByHash(_item.ClassNameHash),
 		};
 
 		foreach (key in ::Woditor.ItemFilterKey)
@@ -228,27 +276,18 @@
 	};
 
 
-	// get all location sprites
-	::Woditor.ValidLocationSprites <- [];
-	local locations_directory = "gfx/ui/locations/";
-	foreach (i, directory in this.IO.enumerateFiles("gfx/ui/locations/") )
-	{
-		::Woditor.ValidLocationSprites.push(directory.slice(locations_directory.len()));
-	}
-
-
 	// filter valid backgrounds for woditor
 	::Woditor.Backgrounds <- {
 		Stuff = {},
 		Key = [],
 	};
 	local prefix = "scripts/skills/backgrounds/";
-	local background = this.IO.enumerateFiles(prefix);
+	local background = ::IO.enumerateFiles(prefix);
 	foreach ( script in background )
 	{
 		if (::Const.Invalid.Backgrounds.find(script) != null) continue;
 
-		local background = this.new(script);
+		local background = ::new(script);
 		local string = script.slice(prefix.len());
 		::Woditor.Backgrounds.Key.push(string);
 		::Woditor.Backgrounds.Stuff[string] <- {
@@ -265,10 +304,10 @@
 		Valid = [],
 		All = [],
 	};
-	local buildings = this.IO.enumerateFiles("scripts/entity/world/settlements/buildings/");
+	local buildings = ::IO.enumerateFiles("scripts/entity/world/settlements/buildings/");
 	foreach ( script in buildings )
 	{
-		local building = this.new(script);
+		local building = ::new(script);
 
 		if (::Const.Invalid.Buildings.find(script) == null)
 		{
@@ -292,10 +331,10 @@
 		Valid = [],
 		All = [],
 	};
-	local attached_locations = this.IO.enumerateFiles("scripts/entity/world/attached_location/");
+	local attached_locations = ::IO.enumerateFiles("scripts/entity/world/attached_location/");
 	foreach ( script in attached_locations )
 	{
-		local attached_location = this.new(script);
+		local attached_location = ::new(script);
 
 		if (::Const.Invalid.AttachedLocations.find(script) == null)
 		{
@@ -319,12 +358,12 @@
 		Valid = [],
 		All = [],
 	};
-	local situations = this.IO.enumerateFiles("scripts/entity/world/settlements/situations/");
+	local situations = ::IO.enumerateFiles("scripts/entity/world/settlements/situations/");
 	foreach ( script in situations )
 	{
 		if (::Const.Invalid.Situations.find(script) == null)
 		{
-			local situation = this.new(script);
+			local situation = ::new(script);
 			::Woditor.Situations.Valid.push(script);
 			::Woditor.Situations.Stuff[script] <- situation;
 
@@ -365,7 +404,7 @@
 	::Woditor.TroopKeys <- {};
 	::Woditor.TroopNames <- {};
 	local cultist = [];
-	foreach (key, entry in this.Const.World.Spawn.Troops)
+	foreach (key, entry in ::Const.World.Spawn.Troops)
 	{
 		if (::Const.Invalid.Troops.find(key) != null)
 		{
@@ -377,7 +416,7 @@
 			::Woditor.TroopKeys[entry.Script] <- key;
 			
 			// attempting to filter out all entries by enemy type group
-			local entity = this.new(entry.Script);
+			local entity = ::new(entry.Script);
 			if (entity.getFlags().has("human"))
 			{
 				if (key.find("Cultist") != null) // separate Taro Cultist to be a subtype of human
@@ -393,7 +432,7 @@
 			{
 				::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Undead].push(key);
 			}
-			else if (entity.getFlags().has("goblin") || this.Const.IsOrcs.find(entity.getType()) != null)
+			else if (entity.getFlags().has("goblin") || ::Const.IsOrcs.find(entity.getType()) != null)
 			{
 				::Woditor.ValidTroops[::Woditor.TroopTypeFilter.Greenskin].push(key);
 			}
@@ -488,7 +527,7 @@
 	};
 	::Woditor.getTroopIcon <- function(_entry)
 	{
-		return "ui/orientation/" + this.Const.EntityIcon[_entry.ID] + ".png";
+		return "ui/orientation/" + ::Const.EntityIcon[_entry.ID] + ".png";
 	};
 
 

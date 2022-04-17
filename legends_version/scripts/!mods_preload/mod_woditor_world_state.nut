@@ -77,6 +77,20 @@
 				}
 			}
 		}
+
+		local ws_onSerialize = obj.onSerialize;
+		obj.onSerialize <- function( _out )
+		{
+			this.m.WorldEditorScreen.onSerialize();
+			ws_onSerialize(_out);
+		}
+
+		local ws_onDeserialize = obj.onDeserialize;
+		obj.onDeserialize = function( _in )
+		{
+			ws_onDeserialize(_in);
+			this.m.WorldEditorScreen.onDeserialize();
+		}
 	});
 
 	delete ::Woditor.hookWorldState;

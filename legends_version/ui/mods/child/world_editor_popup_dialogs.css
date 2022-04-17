@@ -390,9 +390,40 @@
 }
 .world-editor-screen .ui-control.popup-dialog.choose-building-popup .is-building-slot.is-selected
 {
-    background-image: url("coui://gfx/ui/skin/metal_edge_selection.png");  /*custom_panel_180x120 popup_background_180x120*/
-    background-size: 18.0rem 12.0rem;               /* 100% 100%; */
+    background-image: url("coui://gfx/ui/skin/metal_edge_selection_180x120.png");
+    background-size: 18.0rem 12.0rem;              
     background-repeat: no-repeat; 
+}
+.world-editor-screen .ui-control.popup-dialog.choose-building-popup .is-banner-slot
+{
+    width: 12.0rem;
+    height: 18.0rem;
+    margin-left: 0.7rem;
+    margin-right: 0.7rem;
+    position: relative;
+    float: left;
+}
+.world-editor-screen .ui-control.popup-dialog.choose-building-popup .is-banner-slot.is-selected
+{
+    background-image: url("coui://gfx/ui/skin/metal_edge_selection_120x180.png");
+    background-size: 12.0rem 18.0rem;              
+    background-repeat: no-repeat; 
+}
+.world-editor-screen .ui-control.popup-dialog.choose-building-popup .is-party-slot
+{
+    width: 9.0rem;
+    height: 9.0rem;
+    margin-left: 0.1rem;
+    margin-right: 0.1rem;
+    position: relative;
+    float: left;
+}
+.world-editor-screen .ui-control.popup-dialog.choose-building-popup .is-party-slot.is-selected
+{
+    background-image: url("coui://gfx/ui/skin/metal_edge_selection_90x90.png");
+    background-size: 9.0rem 9.0rem;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 
@@ -735,15 +766,11 @@
 {
     width: 26.0rem;
     height: 17.5rem;
-    position: relative;
     margin-bottom: 0.4rem;
-    margin-left: 0.1rem;
 
     overflow: hidden;
-}
-.world-editor-screen .ui-control.popup-dialog .l-settlement-row:first-child
-{
-    margin-top: 1.0;
+    position: relative;
+    float: left;
 }
 .world-editor-screen .ui-control.popup-dialog .l-settlement-row:last-child
 {

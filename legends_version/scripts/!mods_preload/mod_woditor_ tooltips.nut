@@ -39,7 +39,7 @@
 	 		{
 	 			if (_elementOwner == "woditor.faction_contracts")
 	 			{
-		 			local contract = this.World.Contracts.getContractsByID(_elementId);
+		 			local contract = this.World.Contracts.getContractByID(_elementId);
 
 					if (contract == null)
 					{
@@ -225,6 +225,64 @@
 		 				]
 		 			}
 
+		 			if (_elementOwner == "woditor.world_entity_clickable")
+					{
+						local world_entity = this.World.getEntityByID(_elementId);
+
+						if (world_entity != null)
+						{
+							return [
+								{
+									id = 1,
+									type = "title",
+									text = world_entity.getName()
+								},
+								{
+									id = 2,
+									type = "description",
+									text = world_entity.getDescription()
+								},
+								{
+									id = 11,
+									type = "hint",
+									icon = "ui/icons/mouse_left_button.png",
+									text = "Change sprite"
+								}
+							];
+						}
+
+						return null;
+					}
+
+		 			if (_elementOwner == "woditor.world_entity")
+					{
+						local world_entity = this.World.getEntityByID(_elementId);
+
+						if (world_entity != null)
+						{
+							return [
+								{
+									id = 1,
+									type = "title",
+									text = world_entity.getName()
+								},
+								{
+									id = 2,
+									type = "description",
+									text = world_entity.getDescription()
+								},
+								{
+									id = 11,
+									type = "hint",
+									icon = "ui/icons/mouse_left_button_ctrl.png",
+									text = "Show on map"
+								}
+							];
+						}
+
+						return null;
+					}
+
 					if (_elementOwner == "woditor.attached_location")
 		 			{
 		 				local tooltip = ::Woditor.AttachedLocations.Tooltip[_elementId].world_entity.getTooltip();
@@ -265,6 +323,68 @@
 
 			switch (_elementId) 
 			{
+			case "woditor.worldentitybanner":
+				return [
+					{
+						id = 1,
+						type = "title",
+						text = "Banner"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "The banner of the current world entity"
+					},
+					{
+						id = 11,
+						type = "hint",
+						icon = "ui/icons/mouse_left_button.png",
+						text = "Change banner"
+					}
+				];
+
+			case "woditor.removecontract":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Discard Contract"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Discard the currently selected contract"
+					},
+				];
+
+			case "woditor.refreshcontract":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Refresh Contracts"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Discard all current contracts and then attempting to generate new contracts"
+					},
+				];
+
+			case "woditor.addnewcontract":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Add Contract"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Choose a contract then the game will assign a random faction to it, you can change that contract at will after that"
+					},
+				];
+
 			case "woditor.contractexpiration":
 		       	return [
 					{
@@ -1051,6 +1171,62 @@
 						id = 2,
 						type = "description",
 						text = "This is not an input, please stop clicking on it XD."
+					},
+				];
+
+			case "woditor.lootscale":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Loot Scale"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Decide the amount of supply (foods, medicine, tool parts, ammo) and crowns after defeating a world map unit. This value may be depending on Resouces value"
+					},
+				]; 
+
+			case "woditor.isleavingfootprints":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Is Leaving Footprints"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Decide whether the unit party will leave footprints when moving or not."
+					},
+				];
+
+			case "woditor.islooting":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Is Looting"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Decide whether the AI should prioritize raiding caravans, peasants or even settlements."
+					},
+				];
+
+			case "woditor.isalwaysattackingplayer":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Is Always Attacking Player"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Decide whether the AI should prioritize attacking player at any cost, even its strength is far weaker than the player."
 					},
 				];
 

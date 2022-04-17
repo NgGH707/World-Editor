@@ -81,6 +81,19 @@ var WorldEditorScreen = function(_parent)
         Objective          : null,
         ListContainer      : null,
         ListScrollContainer: null,
+        DetailsPanel       : null,
+
+        // fancy stuff
+        IsExpanded          : false,
+        ExpandLabel         : null,
+        ExpandButton        : null,
+        ExpandableList      : null,
+        ExpandableListScroll: null,
+        DefaultFilter       : null,
+
+        // banned contracts
+        BannedList      : null,
+        BannedListScroll: null,
     };
 
     // settlements
@@ -107,13 +120,6 @@ var WorldEditorScreen = function(_parent)
         DetailsPanel       : null,
         DraftList          : null,
 
-        // coordinate to place new location
-        Coordinate:
-        {
-            X: {Input: null, Value: 0, ValueMin: 0, ValueMax: 999, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            Y: {Input: null, Value: 0, ValueMin: 0, ValueMax: 999, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.MoralReputation},
-        },
-
         // fancy stuff
         IsExpanded          : false,
         ExpandLabel         : null,
@@ -129,13 +135,14 @@ var WorldEditorScreen = function(_parent)
         Data               : null,
         Name               : null,
         Image              : null,
+        Banner             : null,
         Loots              : null,
         Troops             : null,
+        TroopsLabel        : null,
         Terrain            : null,
         Selected           : null,
         Strength           : null,
         Resources          : null,
-        TroopsLabel        : null,
         Fortification      : null,
         NamedItemChance    : null,
         FactionBanner      : null,
@@ -149,13 +156,6 @@ var WorldEditorScreen = function(_parent)
         SearchItem         : null,
         SearchItemOverlay  : null,
         SearchItemContainer: null,
-
-        // coordinate to place new location
-        Coordinate:
-        {
-            X: {Input: null, Value: 0, ValueMin: 0, ValueMax: 999, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            Y: {Input: null, Value: 0, ValueMin: 0, ValueMax: 999, Min: 0, Max: 3, TooltipId: TooltipIdentifier.Assets.MoralReputation},
-        },
 
         // fancy stuff
         IsExpanded          : false,
@@ -172,7 +172,38 @@ var WorldEditorScreen = function(_parent)
         Data               : null,
         Name               : null,
         Image              : null,
+        Banner             : null,
         Selected           : null,
+        Strength           : null,
+        Resources          : null,
+        Description        : null,
+        Terrain            : null,
+        Troops             : null,
+        TroopsLabel        : null,
+        FactionBanner      : null,
+        ListContainer      : null,
+        ListScrollContainer: null,
+        DetailsPanel       : null,
+
+        // fancy stuff
+        IsExpanded          : false,
+        ExpandLabel         : null,
+        ExpandButton        : null,
+        ExpandableList      : null,
+        ExpandableListScroll: null,
+        DefaultFilter       : null,
+
+        // check box
+        IsAttackableByAI       : {Checkbox: null, Label: null, Name: 'Is Attackable By AI'        , TooltipId: 'woditor.isattackablebyai'},
+        IsLooting              : {Checkbox: null, Label: null, Name: 'Is Looting'                 , TooltipId: 'woditor.islooting'},
+        IsAlwaysAttackingPlayer: {Checkbox: null, Label: null, Name: 'Is Always Attacking Player' , TooltipId: 'woditor.isalwaysattackingplayer'},
+        IsLeavingFootprints    : {Checkbox: null, Label: null, Name: 'Is Leaving Footprints'      , TooltipId: 'woditor.isleavingfootprints' },
+        IsSlowerAtNight        : {Checkbox: null, Label: null, Name: 'Is Slower At Night'         , TooltipId: 'woditor.issloweratnight' },
+
+        // slider
+        LootScale        : {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.lootscale', Postfix: '%'},
+        BaseMovementSpeed: {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.lootscale', Postfix: '%'},
+        VisibilityMult   : {Control: null, Title: null, Min: 5, Max: 300, Value: 100, Step: 5, TooltipId: 'woditor.lootscale', Postfix: '%'},
     };
 
     this.mAssets =
@@ -315,7 +346,8 @@ var WorldEditorScreen = function(_parent)
     };
 
     // banner
-    this.mBanner = {
+    this.mBanner = 
+    {
         Data    : null,
         Image   : null,
         Player  : 0,
@@ -427,6 +459,253 @@ WorldEditorScreen.prototype.createDIV = function(_parentDiv)
 WorldEditorScreen.prototype.createUnitsScreenDIV = function(_parentDiv) 
 {
     var self = this;
+    // divide into 2 column - 23% and 77%
+    var column = this.addColumn(23);
+    _parentDiv.append(column);
+    {
+        var row90 = this.addRow(90, 'with-dialog-background');
+        column.append(row90);
+        {
+            var slotContainer = $('<div class="below-container"/>');
+            row90.append(slotContainer);
+            var listContainerLayout = $('<div class="l-list-container"/>');
+            slotContainer.append(listContainerLayout);
+            this.mUnit.ListContainer = listContainerLayout.createList(2);
+            this.mUnit.ListScrollContainer = this.mUnit.ListContainer.findListScrollContainer();
+           
+            var scrollHeader = $('<div class="upper-container with-small-dialog-background"/>')
+            row90.append(scrollHeader);
+            {
+                var logLayout = $('<div class="expandable-container"/>'); 
+                scrollHeader.append(logLayout);
+                this.mUnit.ExpandableList = logLayout.createList(2);
+                this.mUnit.ExpandableListScroll = this.mUnit.ExpandableList.findListScrollContainer();
+
+                this.mUnit.ExpandLabel = $('<div class="expandable-label-container"/>');
+                scrollHeader.append(this.mUnit.ExpandLabel);
+                var label = $('<div class="label text-font-normal font-bold font-color-ink">-Select Filter-</div>');
+                this.mUnit.ExpandLabel.append(label);
+
+                var buttonLayout = $('<div class="expand-button"/>');
+                scrollHeader.append(buttonLayout);
+                this.mUnit.ExpandButton = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_OPEN_EVENTLOG, function() {
+                    self.expandExpandableList(!self.mUnit.IsExpanded, self.mUnit);
+                }, '', 6);
+            }
+        }
+
+        var row10 = this.addRow(10, 'with-small-dialog-background');
+        column.append(row10);
+        {
+            
+        }
+    }
+
+    this.mUnit.DetailsPanel = this.addColumn(77);
+    _parentDiv.append(this.mUnit.DetailsPanel);
+    {
+        var row40 = this.addRow(40);
+        this.mUnit.DetailsPanel.append(row40);
+        {
+            var leftColumn = this.addColumn(37.5);
+            row40.append(leftColumn);
+            {
+                var upperHalf = this.addRow(44);
+                leftColumn.append(upperHalf);
+                {
+                    // terrain background
+                    this.mUnit.Terrain = $('<div class="terrain-background"/>');
+                    upperHalf.append(this.mUnit.Terrain);
+
+                    // name input
+                    var row = $('<div class="row"/>');
+                    upperHalf.append(row);
+                    var title = $('<div class="title-black title-font-big font-color-ink">Unit Name</div>');
+                    row.append(title);
+                    var inputLayout = $('<div class="l-input-big"/>');
+                    row.append(inputLayout);
+                    this.mUnit.Name = inputLayout.createInput('', 0, 40, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                        if (_input.getInputTextLength() === 0)
+                            _input.val(self.mUnit.Selected.data('entry').Name);
+                        else
+                            self.notifyBackendChangeName(_input.getInputText(), 'unit');
+                    });
+                }
+                
+                var lowerHalf = this.addRow(56, 'with-small-dialog-background');
+                leftColumn.append(lowerHalf);
+                {
+                    // unit image
+                    var column50 = this.addColumn(50);
+                    lowerHalf.append(column50);
+                    var imageContainer = this.addLayout(16.0, 12.0, 'is-center');
+                    column50.append(imageContainer);
+                    this.mUnit.Image = imageContainer.createImage(null, function(_image) {
+                        _image.centerImageWithinParent(0, 0, 1.0);
+                    }, null, '');
+                    this.mUnit.Image.click(function(_event) {
+                        self.createChangeUnitSpritePopupDialog();
+                    });
+
+                    // unit banner
+                    var column50 = this.addColumn(50);
+                    lowerHalf.append(column50);
+                    var imageContainer = this.addLayout(16.0, 12.0, 'is-center');
+                    column50.append(imageContainer);
+                    this.mUnit.Banner = imageContainer.createImage(null, function(_image) {
+                        //_image.fitImageToParent(0, 0);
+                        _image.centerImageWithinParent(0, 0, 1.0);
+                    }, null, '');
+                    this.mUnit.Banner.click(function(_event) {
+                        self.createChangeWorldEntityBannerPopupDialog(self.mUnit.Selected);
+                    });
+                    this.mUnit.Banner.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.worldentitybanner' });
+                }
+            }
+
+            var midColumn = this.addColumn(37.5, 'with-medium-dialog-background');
+            row40.append(midColumn);
+            {
+                var resourcesColumn = this.addColumn(50);
+                midColumn.append(resourcesColumn);
+                {
+                    // name input
+                    var row = $('<div class="row"/>');
+                    resourcesColumn.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Resources</div>');
+                    row.append(title);
+                    this.mUnit.Resources = this.addInput(row, 'half-big', 0, 4, null, null, function(_input) {
+                        var index = self.mUnit.Selected.data('index');
+                        self.confirmResourcesChanges(_input, index, self.mUnit);
+                    });
+
+                    // name input
+                    var row = $('<div class="row"/>');
+                    resourcesColumn.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Strength</div>');
+                    row.append(title);
+                    var row = $('<div class="row"/>');
+                    resourcesColumn.append(row);
+                    var inputLayout = $('<div class="strength-label-container with-input-box"/>');
+                    row.append(inputLayout);
+                    this.mUnit.Strength = $('<div class="strength-title is-vertical-center title-font-big font-bold font-color-brother-name"></div>');
+                    inputLayout.append(this.mUnit.Strength);
+                    this.mUnit.Strength.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.notaninput' });
+                }
+
+                var factionColumn = this.addColumn(50);
+                midColumn.append(factionColumn);
+                {
+                    var row = $('<div class="row"/>');
+                    factionColumn.append(row);
+                    var title = $('<div class="title title-font-big font-color-title">Faction</div>');
+                    row.append(title);
+                    // faction image banner
+                    var imageContainer = $('<div class="faction-landlord-container"/>');
+                    imageContainer.css('top', '5.0rem');
+                    factionColumn.append(imageContainer);
+                    this.mUnit.FactionBanner = imageContainer.createImage(null, function(_image) {
+                        _image.fitImageToParent(0, 0);
+                    }, null, '');
+                    this.mUnit.FactionBanner.click(function(_event) {
+                        var element = self.mUnit.Selected;
+                        if (element !== null && element.length > 0) {
+                            var data = element.data('entry');
+                            self.createChooseFactionPopupDialog(data, false, true);
+                        }
+                    });
+                    this.mUnit.FactionBanner.addHighlighter();
+                }
+            }
+
+            var rightColumn = this.addColumn(25, 'with-dirty-scroll-background');
+            row40.append(rightColumn);
+            {
+                this.createCheckBoxControlDIV(this.mUnit.IsAttackableByAI, rightColumn, 'IsAttackableByAI', 'font-color-ink', true);
+                this.createCheckBoxControlDIV(this.mUnit.IsAlwaysAttackingPlayer, rightColumn, 'IsAlwaysAttackingPlayer', 'font-color-ink', true);
+                this.createCheckBoxControlDIV(this.mUnit.IsLooting, rightColumn, 'IsLooting', 'font-color-ink', true);
+                this.createCheckBoxControlDIV(this.mUnit.IsSlowerAtNight, rightColumn, 'IsSlowerAtNight', 'font-color-ink', true);
+                this.createCheckBoxControlDIV(this.mUnit.IsLeavingFootprints, rightColumn, 'IsLeavingFootprints', 'font-color-ink', true);
+            }
+        }
+
+        var row60 = this.addRow(60);
+        this.mUnit.DetailsPanel.append(row60);
+        {
+            var leftHalf = this.addColumn(50);
+            row60.append(leftHalf);
+            {
+                this.createSliderControlDIV(this.mUnit.LootScale, 'Loot Scale', leftHalf);
+            }
+
+            var rightHalf = this.addColumn(50, 'with-scroll-tooltip-background');
+            row60.append(rightHalf);
+            {
+                var scrollHeader = this.addContainer(null, 4.3);
+                rightHalf.append(scrollHeader);
+                var flexboxContainer = $('<div class="flexbox-row-container"/>');
+                scrollHeader.append(flexboxContainer);
+                {
+                    // button
+                    var buttonLayout = this.addFlexboxItem(3.9, 3.9);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/info.png', null, '', 10);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.troopsinfo' });
+
+                    // not button
+                    var flexItem = this.addFlexboxItem(23.0, 4.3);
+                    flexboxContainer.append(flexItem);
+                    var imageLayout = $('<div class="defenders-label-container"/>');
+                    flexItem.append(imageLayout);
+                    this.mUnit.TroopsLabel = $('<div class="defenders-label is-center text-font-normal">Troops</div>');
+                    imageLayout.append(this.mUnit.TroopsLabel);
+
+                    // button button
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/sort-button.png', function() {
+                        //self.();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.picktrooptemplate' });
+
+                    // button button button
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
+                        if(self.mUnit.Selected !== null && self.mUnit.Selected.length > 0)
+                            self.notifyBackendRerollTroop(self.mUnit.Selected);
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.refreshtroops' });
+
+                    // button button button button
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/icon_dice.png', function() {
+                        if(self.mUnit.Selected !== null && self.mUnit.Selected.length > 0)
+                            self.notifyBackendAddRandomTroop(self.mUnit.Selected);
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addrandomtroop' });
+
+                    // button button button button button
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
+                        if(self.mUnit.Selected !== null && self.mUnit.Selected.length > 0)
+                            self.createAddTroopPopupDialog(self.mUnit.Selected);
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
+                }
+
+                // troop list
+                var slotContainer = this.addContainer(null, 30.0);
+                rightHalf.append(slotContainer);
+                var listContainerLayout = $('<div class="l-list-container"/>');
+                slotContainer.append(listContainerLayout);
+                var listContainer = listContainerLayout.createList(2);
+                this.mUnit.Troops = listContainer.findListScrollContainer();
+            }
+        }
+    }
 };
 
 WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv) 
@@ -470,22 +749,7 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
         var row10 = this.addRow(10, 'with-small-dialog-background');
         column.append(row10);
         {
-            var column20 = this.addColumn(20);
-            row10.append(column20);
-            var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
-            column20.append(buttonLayout);
-            var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/center.png', function() {
-                //self.onPreviousBannerClicked();
-            }, '', 6);
-            button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.choosecoords' });
-
-            var column40 = this.addColumn(40);
-            row10.append(column40);
-            //this.createSmallInputDIV('X:', this.mLocation.Coordinate.X ,column40);
-
-            var column40 = this.addColumn(40);
-            row10.append(column40);
-            //this.createSmallInputDIV('Y:', this.mLocation.Coordinate.Y ,column40);
+            
         }
     }
 
@@ -524,15 +788,33 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                 leftColumn.append(lowerHalf);
                 {
                     // location image
-                    var column75 = this.addColumn(70);
-                    lowerHalf.append(column75);
+                    var column50 = this.addColumn(43);
+                    lowerHalf.append(column50);
                     var imageContainer = this.addLayout(16.0, 12.0, 'is-center');
-                    column75.append(imageContainer);
+                    column50.append(imageContainer);
                     this.mLocation.Image = imageContainer.createImage(null, function(_image) {
                         _image.fitImageToParent(0, 0);
                     }, null, '');
+                    this.mLocation.Image.click(function(_event) {
+                        self.createChangeLocationSpritePopupDialog();
+                    });
 
-                    var column25 = this.addColumn(30);
+                    // location banner
+                    var column50 = this.addColumn(43);
+                    lowerHalf.append(column50);
+                    var imageContainer = this.addLayout(16.0, 12.0, 'is-center');
+                    column50.append(imageContainer);
+                    this.mLocation.Banner = imageContainer.createImage(null, function(_image) {
+                        //_image.fitImageToParent(0, 0);
+                        _image.centerImageWithinParent(0, 0, 1.0);
+                    }, null, '');
+                    this.mLocation.Banner.click(function(_event) {
+                        self.createChangeWorldEntityBannerPopupDialog(self.mLocation.Selected);
+                    });
+                    this.mLocation.Banner.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.worldentitybanner' });
+
+
+                    var column25 = this.addColumn(7);
                     lowerHalf.append(column25);
                     var flexboxContainer = $('<div class="flexbox-column-container"/>');
                     column25.append(flexboxContainer);
@@ -542,12 +824,6 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     this.mLocation.Fortification = imageLayout.createImage(Path.GFX + 'ui/icons/fortification_false.png', function(_image) {
                         _image.centerImageWithinParent(0, 0, 1.0);
                     }, null, '');
-
-                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
-                    flexboxContainer.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
-                        self.createChangeLocationSpritePopupDialog();
-                    }, '', 6);
                 }
             }
 
@@ -562,20 +838,10 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     resourcesColumn.append(row);
                     var title = $('<div class="title title-font-big font-color-title">Resources</div>');
                     row.append(title);
-                    var inputLayout = $('<div class="l-input-half-big"/>');
-                    row.append(inputLayout);
-                    this.mLocation.Resources = inputLayout.createInput('', 0, 4, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                    this.mLocation.Resources = this.addInput(row, 'half-big', 0, 4, null, null, function(_input) {
                         var index = self.mLocation.Selected.data('index');
                         self.confirmResourcesChanges(_input, index, self.mLocation);
                     });
-                    this.mLocation.Resources.assignInputEventListener('focusout', function(_input, _event) {
-                        var index = self.mLocation.Selected.data('index');
-                        self.confirmResourcesChanges(_input, index, self.mLocation);
-                    });
-                    this.mLocation.Resources.assignInputEventListener('click', function(_input, _event) {
-                        _input.data('IsUpdated', false);
-                    });
-                    this.mLocation.Resources.css('background-size', '100% 4.0rem');
 
                     // name input
                     var row = $('<div class="row"/>');
@@ -612,12 +878,7 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                             self.createChooseFactionPopupDialog(data, false, true);
                         }
                     });
-                    this.mLocation.FactionBanner.mouseover(function() {
-                        this.classList.add('is-highlighted');
-                    });
-                    this.mLocation.FactionBanner.mouseout(function() {
-                        this.classList.remove('is-highlighted');
-                    });
+                    this.mLocation.FactionBanner.addHighlighter();
                 }
             }
 
@@ -680,73 +941,6 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
         var row60 = this.addRow(60);
         this.mLocation.DetailsPanel.append(row60);
         {
-            var rightHalf = this.addColumn(50, 'with-scroll-tooltip-background');
-            row60.append(rightHalf);
-            {
-                var scrollHeader = this.addContainer(null, 4.3);
-                rightHalf.append(scrollHeader);
-                var flexboxContainer = $('<div class="flexbox-row-container"/>');
-                scrollHeader.append(flexboxContainer);
-                {
-                    // button
-                    var buttonLayout = this.addFlexboxItem(3.9, 3.9);
-                    flexboxContainer.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/info.png', null, '', 10);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.troopsinfo' });
-
-                    // not button
-                    var flexItem = this.addFlexboxItem(23.0, 4.3);
-                    flexboxContainer.append(flexItem);
-                    var imageLayout = $('<div class="defenders-label-container"/>');
-                    flexItem.append(imageLayout);
-                    this.mLocation.TroopsLabel = $('<div class="defenders-label is-center text-font-normal">Defenders</div>');
-                    imageLayout.append(this.mLocation.TroopsLabel);
-
-                    // button button
-                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
-                    flexboxContainer.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/sort-button.png', function() {
-                        //self.();
-                    }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.picktrooptemplate' });
-
-                    // button button button
-                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
-                    flexboxContainer.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
-                        if(self.mLocation.Selected !== null && self.mLocation.Selected.length > 0)
-                            self.notifyBackendRerollTroop();
-                    }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.refreshtroops' });
-
-                    // button button button button
-                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
-                    flexboxContainer.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/icon_dice.png', function() {
-                        if(self.mLocation.Selected !== null && self.mLocation.Selected.length > 0)
-                            self.notifyBackendAddRandomTroop();
-                    }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addrandomtroop' });
-
-                    // button button button button button
-                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
-                    flexboxContainer.append(buttonLayout);
-                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
-                        if(self.mLocation.Selected !== null && self.mLocation.Selected.length > 0)
-                            self.createAddTroopPopupDialog();
-                    }, '', 6);
-                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
-                }
-
-                // troop list
-                var slotContainer = this.addContainer(null, 30.0);
-                rightHalf.append(slotContainer);
-                var listContainerLayout = $('<div class="l-list-container"/>');
-                slotContainer.append(listContainerLayout);
-                var listContainer = listContainerLayout.createList(2);
-                this.mLocation.Troops = listContainer.findListScrollContainer();
-            }
-
             var leftHalf = this.addColumn(50, 'with-dialog-background');
             row60.append(leftHalf);
             {
@@ -858,6 +1052,73 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     this.mLocation.SearchResult = listContainer.findListScrollContainer();
                 }
             }
+
+            var rightHalf = this.addColumn(50, 'with-scroll-tooltip-background');
+            row60.append(rightHalf);
+            {
+                var scrollHeader = this.addContainer(null, 4.3);
+                rightHalf.append(scrollHeader);
+                var flexboxContainer = $('<div class="flexbox-row-container"/>');
+                scrollHeader.append(flexboxContainer);
+                {
+                    // button
+                    var buttonLayout = this.addFlexboxItem(3.9, 3.9);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/info.png', null, '', 10);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.troopsinfo' });
+
+                    // not button
+                    var flexItem = this.addFlexboxItem(23.0, 4.3);
+                    flexboxContainer.append(flexItem);
+                    var imageLayout = $('<div class="defenders-label-container"/>');
+                    flexItem.append(imageLayout);
+                    this.mLocation.TroopsLabel = $('<div class="defenders-label is-center text-font-normal">Defenders</div>');
+                    imageLayout.append(this.mLocation.TroopsLabel);
+
+                    // button button
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/sort-button.png', function() {
+                        //self.();
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.picktrooptemplate' });
+
+                    // button button button
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
+                        if(self.mLocation.Selected !== null && self.mLocation.Selected.length > 0)
+                            self.notifyBackendRerollTroop(self.mLocation.Selected);
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.refreshtroops' });
+
+                    // button button button button
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/icon_dice.png', function() {
+                        if(self.mLocation.Selected !== null && self.mLocation.Selected.length > 0)
+                            self.notifyBackendAddRandomTroop(self.mLocation.Selected);
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addrandomtroop' });
+
+                    // button button button button button
+                    var buttonLayout = this.addFlexboxItem(4.5, 4.1);
+                    flexboxContainer.append(buttonLayout);
+                    var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
+                        if(self.mLocation.Selected !== null && self.mLocation.Selected.length > 0)
+                            self.createAddTroopPopupDialog(self.mLocation.Selected);
+                    }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewentry' });
+                }
+
+                // troop list
+                var slotContainer = this.addContainer(null, 30.0);
+                rightHalf.append(slotContainer);
+                var listContainerLayout = $('<div class="l-list-container"/>');
+                slotContainer.append(listContainerLayout);
+                var listContainer = listContainerLayout.createList(2);
+                this.mLocation.Troops = listContainer.findListScrollContainer();
+            }
         }
     }
 };
@@ -904,22 +1165,6 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
         var row10 = this.addRow(10, 'with-small-dialog-background');
         column.append(row10);
         {
-            var column20 = this.addColumn(20);
-            row10.append(column20);
-            var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
-            column20.append(buttonLayout);
-            var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/center.png', function() {
-                //self.onPreviousBannerClicked();
-            }, '', 6);
-            button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.choosecoords' });
-
-            var column40 = this.addColumn(40);
-            row10.append(column40);
-            //this.createSmallInputDIV('X:', this.mSettlement.Coordinate.X ,column40);
-
-            var column40 = this.addColumn(40);
-            row10.append(column40);
-            //this.createSmallInputDIV('Y:', this.mSettlement.Coordinate.Y ,column40);
         }
     }
 
@@ -968,6 +1213,11 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                         this.mSettlement.Image = imageContainer.createImage(null, function(_image) {
                             _image.fitImageToParent(0, 0);
                         }, null, '');
+                        this.mSettlement.Image.click(function(_event) {
+                            var data = self.mSettlement.Selected.data('entry');
+                            if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+                               self.notifyBackendShowWorldEntityOnMap({ID: data.ID, Type: 'settlement'});
+                        });
 
                         var column35 = this.addColumn(35);
                         row33.append(column35);
@@ -1027,12 +1277,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                                 self.createChooseFactionPopupDialog(data, false);
                             }
                         });
-                        this.mSettlement.FactionBanner.mouseover(function() {
-                            this.classList.add('is-highlighted');
-                        });
-                        this.mSettlement.FactionBanner.mouseout(function() {
-                            this.classList.remove('is-highlighted');
-                        });
+                        this.mSettlement.FactionBanner.addHighlighter();
 
                         // title
                         var column50 = this.addColumn(50);
@@ -1054,12 +1299,7 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                                 self.createChooseFactionPopupDialog(data, true);
                             }
                         });
-                        this.mSettlement.OwnerBanner.mouseover(function() {
-                            this.classList.add('is-highlighted');
-                        });
-                        this.mSettlement.OwnerBanner.mouseout(function() {
-                            this.classList.remove('is-highlighted');
-                        });
+                        this.mSettlement.OwnerBanner.addHighlighter();
                     }
 
                     var row10 = this.addRow(10);
@@ -1089,20 +1329,10 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             resourcesColumn.append(row);
                             var title = $('<div class="title title-font-big font-color-title">Resources</div>');
                             row.append(title);
-                            var inputLayout = $('<div class="l-input-half-big"/>');
-                            row.append(inputLayout);
-                            this.mSettlement.Resources = inputLayout.createInput('', 0, 5, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                            this.mSettlement.Resources = this.addInput(row, 'half-big', 0, 5, null, null, function(_input) {
                                 var index = self.mSettlement.Selected.data('index');
                                 self.confirmResourcesChanges(_input, index, self.mSettlement);
                             });
-                            this.mSettlement.Resources.assignInputEventListener('focusout', function(_input, _event) {
-                                var index = self.mSettlement.Selected.data('index');
-                                self.confirmResourcesChanges(_input, index, self.mSettlement);
-                            });
-                            this.mSettlement.Resources.assignInputEventListener('click', function(_input, _event) {
-                                _input.data('IsUpdated', false);
-                            });
-                            this.mSettlement.Resources.css('background-size', '100% 4.0rem'); // simple solution to get a smaller input without much work :evilgrins
                         }
 
                         var wealthColumn = this.addColumn(50);
@@ -1113,21 +1343,10 @@ WorldEditorScreen.prototype.createSettlementsScreenDIV = function(_parentDiv)
                             wealthColumn.append(row);
                             var title = $('<div class="title title-font-big font-color-title">Wealth</div>');
                             row.append(title);
-                            var inputLayout = $('<div class="l-input-half-big"/>');
-                            row.append(inputLayout);
-                            this.mSettlement.Wealth = inputLayout.createInput('', 0, 4, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                            this.mSettlement.Wealth = this.addInput(row, 'half-big', 0, 4, null, null, function(_input) {
                                 self.confirmWealthChanges(_input);
                                 _input.addPercentageToInput();
-                            });
-                            this.mSettlement.Wealth.assignInputEventListener('focusout', function(_input, _event) {
-                                self.confirmWealthChanges(_input);
-                                _input.addPercentageToInput();
-                            });
-                            this.mSettlement.Wealth.assignInputEventListener('click', function(_input, _event) {
-                                _input.removePercentageFromInput();
-                                _input.data('IsUpdated', false);
-                            });
-                            this.mSettlement.Wealth.css('background-size', '100% 4.0rem');
+                            }, true);
                         }
                     }
 
@@ -1319,186 +1538,247 @@ WorldEditorScreen.prototype.createContractsScreenDIV = function(_parentDiv)
 {
     var self = this;
 
-    var column25 = this.addColumn(25, 'with-dialog-background');
-    column25.css('padding-top', '0.9rem');
-    _parentDiv.append(column25);
+    var leftMainColumn = this.addColumn(30, 'with-dialog-background');
+    _parentDiv.append(leftMainColumn);
     {
-        var listContainerLayout = $('<div class="l-list-container"/>');
-        column25.append(listContainerLayout);
-        this.mContract.ListContainer = listContainerLayout.createList(2);
-        this.mContract.ListScrollContainer = this.mContract.ListContainer.findListScrollContainer();
+        var row90 = this.addRow(90, 'with-dialog-background');
+        leftMainColumn.append(row90);
+        {
+            var slotContainer = $('<div class="below-container"/>');
+            row90.append(slotContainer);
+            var listContainerLayout = $('<div class="l-list-container"/>');
+            slotContainer.append(listContainerLayout);
+            this.mContract.ListContainer = listContainerLayout.createList(2);
+            this.mContract.ListScrollContainer = this.mContract.ListContainer.findListScrollContainer();
+         
+            var scrollHeader = $('<div class="upper-container with-small-dialog-background"/>')
+            row90.append(scrollHeader);
+            {
+                var logLayout = $('<div class="expandable-container"/>'); 
+                scrollHeader.append(logLayout);
+                this.mContract.ExpandableList = logLayout.createList(2);
+                this.mContract.ExpandableListScroll = this.mContract.ExpandableList.findListScrollContainer();
+
+                this.mContract.ExpandLabel = $('<div class="expandable-label-container"/>');
+                scrollHeader.append(this.mContract.ExpandLabel);
+                var label = $('<div class="label text-font-normal font-bold font-color-ink">-Select Filter-</div>');
+                this.mContract.ExpandLabel.append(label);
+
+                var buttonLayout = $('<div class="expand-button"/>');
+                scrollHeader.append(buttonLayout);
+                this.mContract.ExpandButton = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_OPEN_EVENTLOG, function() {
+                    self.expandExpandableList(!self.mContract.IsExpanded, self.mContract);
+                }, '', 6);
+
+                var buttonLayout = $('<div class="expand-button"/>');
+                buttonLayout.css('left', '28.5rem');
+                scrollHeader.append(buttonLayout);
+                var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function() {
+                    self.createAddContractPopupDialog();
+                }, '', 6);
+                button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.addnewcontract' });
+
+
+                var buttonLayout = $('<div class="expand-button"/>'); 
+                buttonLayout.css('left', '33.0rem');
+                scrollHeader.append(buttonLayout);
+                var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/cancel.png', function() {
+                    self.notifyBackendRemoveContract();
+                }, '', 6);
+                button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.removecontract' });
+            }
+        }
+
+        var row10 = this.addRow(10, 'with-small-dialog-background');
+        leftMainColumn.append(row10);
+        {
+            var buttonLayout = $('<div class="expand-button"/>');
+            buttonLayout.css('left', '33.0rem');
+            row10.append(buttonLayout);
+            var button = buttonLayout.createImageButton(Path.GFX + 'ui/skin/icon_wait.png', function() {
+                self.notifyBackendRefreshAllContracts();
+            }, '', 6);
+            button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.refreshcontract' });
+        }
     }
 
-    var column75 = this.addColumn(75);
-    _parentDiv.append(column75);
+    this.mContract.DetailsPanel = this.addColumn(50);
+    _parentDiv.append(this.mContract.DetailsPanel);
     {
-        var column40 = this.addColumn(40);
-        column75.append(column40);
+        var columnLeft = this.addColumn(60); 
+        this.mContract.DetailsPanel.append(columnLeft);
         {
             var nameContainer = this.addRow(10, 'with-scroll-header-background');
-            column40.append(nameContainer);
+            columnLeft.append(nameContainer);
             var row = $('<div class="row"/>');
             row.css('padding-top', '1.0rem');
             nameContainer.append(row);
             this.mContract.Name = $('<div class="title-black title-font-big font-align-center font-color-ink">Contract Name</div>');
             row.append(this.mContract.Name);
 
-            var below = this.addRow(90);
-            column40.append(below);
-            {
-                var insideScroll = this.addLayout('98%', '100%','is-horizontal-center with-scroll-background');
-                below.append(insideScroll);
-
-                // difficulty mult input
-                var row = $('<div class="row"/>');
-                row.css('padding-top', '2.0rem');
-                insideScroll.append(row);
-                var title = $('<div class="title-black title-font-big font-color-ink">Difficulty Mult</div>');
-                row.append(title);
-                var inputLayout = $('<div class="l-input-big"/>');
-                row.append(inputLayout);
-                this.mContract.DifficultyMult = inputLayout.createInput('', 0, 10, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
-                    //var index = self.mSettlement.Selected.data('index');
-                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
-                });
-                this.mContract.DifficultyMult.assignInputEventListener('focusout', function(_input, _event) {
-                    //var index = self.mSettlement.Selected.data('index');
-                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
-                });
-                this.mContract.DifficultyMult.assignInputEventListener('click', function(_input, _event) {
-                    _input.data('IsUpdated', false);
-                });
-
-                // payment input
-                var row = $('<div class="row"/>');
-                insideScroll.append(row);
-                var title = $('<div class="title-black title-font-big font-color-ink">Payment Mult</div>');
-                row.append(title);
-                var inputLayout = $('<div class="l-input-big"/>');
-                row.append(inputLayout);
-                this.mContract.PaymentMult = inputLayout.createInput('', 0, 10, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
-                    //var index = self.mSettlement.Selected.data('index');
-                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
-                });
-                this.mContract.PaymentMult.assignInputEventListener('focusout', function(_input, _event) {
-                    //var index = self.mSettlement.Selected.data('index');
-                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
-                });
-                this.mContract.PaymentMult.assignInputEventListener('click', function(_input, _event) {
-                    _input.data('IsUpdated', false);
-                });
-
-                // expiration
-                var row = $('<div class="row"/>');
-                insideScroll.append(row);
-                var title = $('<div class="title-black title-font-big font-color-ink">Expiration</div>');
-                row.append(title);
-                var inputLayout = $('<div class="l-input-big"/>');
-                row.append(inputLayout);
-                this.mContract.Expiration = inputLayout.createInput('', 0, 10, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
-                    //var index = self.mSettlement.Selected.data('index');
-                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
-                });
-                this.mContract.Expiration.assignInputEventListener('focusout', function(_input, _event) {
-                    //var index = self.mSettlement.Selected.data('index');
-                    //self.confirmResourcesChanges(_input, index, self.mSettlement);
-                });
-                this.mContract.Expiration.assignInputEventListener('click', function(_input, _event) {
-                    _input.data('IsUpdated', false);
-                });
-            }
-        }
-
-        var column60 = this.addColumn(60);
-        column75.append(column60);
-        {
-            var leftPart = this.addColumn(52);
-            column60.append(leftPart);
-            {
-                var upperRow = this.addRow(30, 'with-medium-dialog-background');
-                leftPart.append(upperRow);
+            var scrollSection = this.addRow(90);
+            columnLeft.append(scrollSection);
+            var insideScroll = this.addLayout('97%', '100%','is-horizontal-center with-scroll-background');
+            scrollSection.append(insideScroll);
+            {   
+                // upper part
+                var upperPartScroll = this.addRow(40);
+                insideScroll.append(upperPartScroll);
+                var scrollContent = this.addLayout('100%', '92%');
+                scrollContent.css('top', '1.5rem');
+                upperPartScroll.append(scrollContent);
                 {
-                    var column57 = this.addColumn(43);
-                    upperRow.append(column57);
+                    var column = this.addColumn(50);
+                    scrollContent.append(column);
                     var row = $('<div class="row"/>');
-                    column57.append(row);
-                    var title = $('<div class="title title-font-big font-color-title">Faction</div>');
+                    column.append(row);
+                    var title = $('<div class="title-black title-font-big font-color-ink">Faction</div>');
                     row.append(title);
                     // faction image banner
                     var imageContainer = $('<div class="faction-landlord-container"/>');
-                    imageContainer.css('top', '5.0rem');
-                    upperRow.append(imageContainer);
+                    imageContainer.css('top', '5.3rem');
+                    scrollContent.append(imageContainer);
                     this.mContract.FactionBanner = imageContainer.createImage(null, function(_image) {
                         _image.fitImageToParent(0, 0);
                     }, null, '');
-                    /*this.mContract.FactionBanner.click(function(_event) {
-                        var element = self.mLocation.Selected;
-                        if (element !== null && element.length > 0) {
-                            var data = element.data('entry');
-                            self.createChooseFactionPopupDialog(data, false, true);
-                        }
-                    });*/
-                    this.mContract.FactionBanner.mouseover(function() {
-                        this.classList.add('is-highlighted');
+                    this.mContract.FactionBanner.click(function(_event) {
+                        self.createChooseFactionForContractPopupDialog();
                     });
-                    this.mContract.FactionBanner.mouseout(function() {
-                        this.classList.remove('is-highlighted');
-                    });
+                    this.mContract.FactionBanner.addHighlighter();
 
-
-                    var column43 = this.addColumn(57);
-                    upperRow.append(column43);
+                    var column = this.addColumn(50);
+                    scrollContent.append(column);
                     var row = $('<div class="row"/>');
-                    column43.append(row);
-                    var title = $('<div class="title title-font-big font-color-title">Employer</div>');
+                    column.append(row);
+                    var title = $('<div class="title-black title-font-big font-color-ink">Employer</div>');
                     row.append(title);
                     var employerContainer = $('<div class="employer-image-container is-horizontal-center"/>');
-                    column43.append(employerContainer);
+                    column.append(employerContainer);
                     this.mContract.Employer = employerContainer.createImage(null, function(_image) {
                         _image.centerImageWithinParent(0, 0, 1.0);
                     }, null, '');
                 }
+
+                // lower part
+                var lowerPartScroll = this.addRow(53);
+                insideScroll.append(lowerPartScroll);
+                {
+                    var column = this.addColumn(50);
+                    lowerPartScroll.append(column);
+                    // difficulty mult input
+                    var row = $('<div class="row"/>');
+                    column.append(row);
+                    var title = $('<div class="title-black title-font-big font-color-ink">Difficulty</div>');
+                    row.append(title);
+                    this.mContract.DifficultyMult = this.addInput(row, 'half-big', 0, 4, null, null, function(_input) {
+                        self.confirmContractInputChanges(_input, 'DifficultyMult', 5, 9999);
+                        _input.addPercentageToInput();
+                    }, true);
+                    // expiration
+                    var row = $('<div class="row"/>');
+                    column.append(row);
+                    var title = $('<div class="title-black title-font-big font-color-ink">Expiration</div>');
+                    row.append(title);
+                    this.mContract.Expiration = this.addInput(row, 'half-big', 0, 3, null, null, function(_input) {
+                        self.confirmContractInputChanges(_input, 'Expiration', 1, 999);
+                    });
+
+                    var column = this.addColumn(50);
+                    lowerPartScroll.append(column);
+                    // payment mult input
+                    var row = $('<div class="row"/>');
+                    column.append(row);
+                    var title = $('<div class="title-black title-font-big font-color-ink">Payment</div>');
+                    row.append(title);
+                    this.mContract.PaymentMult = this.addInput(row, 'half-big', 0, 4, null, null, function(_input) {
+                        self.confirmContractInputChanges(_input, 'PaymentMult', 5, 9999);
+                        _input.addPercentageToInput();
+                    }, true);
+                }
             }
+        }
 
-            var rightPart = this.addColumn(48);
-            column60.append(rightPart);
-            {
-                var originContainer = this.addRow(30, 'with-scroll-tooltip-background');
-                rightPart.append(originContainer);
-                var row = $('<div class="row"/>');
-                originContainer.append(row);
-                var title = $('<div class="title-black title-font-big font-color-ink">Origin</div>');
-                row.append(title);
-                var originImageLayout = $('<div class="contract-origin-image-container is-horizontal-center"/>');
-                originContainer.append(originImageLayout);
-                this.mContract.Origin = originImageLayout.createImage(Path.GFX + 'ui/images/undiscovered_opponent.png', function(_image) {
-                    _image.centerImageWithinParent(0, 0, 1.0);
-                }, null, '');
+        var columnRight = this.addColumn(40);
+        this.mContract.DetailsPanel.append(columnRight);
+        {
+            var originContainer = this.addRow(30, 'with-medium-dialog-background');
+            columnRight.append(originContainer);
+            var row = $('<div class="row"/>');
+            originContainer.append(row);
+            var title = $('<div class="title title-font-big font-color-title">Origin</div>');
+            row.append(title);
+            var originImageLayout = $('<div class="contract-origin-image-container is-horizontal-center"/>');
+            originContainer.append(originImageLayout);
+            this.mContract.Origin = originImageLayout.createImage(null, function(_image) {
+                _image.centerImageWithinParent(0, 0, 1.0);
+            }, null, '');
+            this.mContract.Origin.click(function(_event) {
+                var data = self.mContract.Selected.data('entry');
+                if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+                    self.notifyBackendShowWorldEntityOnMap({ID: data.Origin, Type: 'contract', Find: data.ID});
+                else
+                    self.createChooseLocationForContractPopupDialog('Origin');
+            });
+            this.mContract.Origin.addHighlighter();
 
-                var originContainer = this.addRow(30, 'with-scroll-tooltip-background');
-                rightPart.append(originContainer);
-                var row = $('<div class="row"/>');
-                originContainer.append(row);
-                var title = $('<div class="title-black title-font-big font-color-ink">Home</div>');
-                row.append(title);
-                var originImageLayout = $('<div class="contract-origin-image-container is-horizontal-center"/>');
-                originContainer.append(originImageLayout);
-                this.mContract.Home = originImageLayout.createImage(Path.GFX + 'ui/images/undiscovered_opponent.png', function(_image) {
-                    _image.centerImageWithinParent(0, 0, 1.0);
-                }, null, '');
+            var originContainer = this.addRow(30, 'with-medium-dialog-background');
+            columnRight.append(originContainer);
+            var row = $('<div class="row"/>');
+            originContainer.append(row);
+            var title = $('<div class="title title-font-big font-color-title">Home</div>');
+            row.append(title);
+            var originImageLayout = $('<div class="contract-origin-image-container is-horizontal-center"/>');
+            originContainer.append(originImageLayout);
+            this.mContract.Home = originImageLayout.createImage(null, function(_image) {
+                _image.centerImageWithinParent(0, 0, 1.0);
+            }, null, '');
+            this.mContract.Home.click(function(_event) {
+                var data = self.mContract.Selected.data('entry');
+                if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+                    self.notifyBackendShowWorldEntityOnMap({ID: data.Home, Type: 'contract', Find: data.ID});
+                else
+                    self.createChooseLocationForContractPopupDialog('Home');
+            });
+            this.mContract.Home.addHighlighter();
 
-                var originContainer = this.addRow(30, 'with-scroll-tooltip-background');
-                rightPart.append(originContainer);
-                var row = $('<div class="row"/>');
-                originContainer.append(row);
-                var title = $('<div class="title-black title-font-big font-color-ink">Objective</div>');
-                row.append(title);
-                var originImageLayout = $('<div class="contract-origin-image-container is-horizontal-center"/>');
-                originContainer.append(originImageLayout);
-                this.mContract.Objective = originImageLayout.createImage(Path.GFX + 'ui/images/undiscovered_opponent.png', function(_image) {
-                    _image.centerImageWithinParent(0, 0, 1.0);
-                }, null, '');
-            }
+            this.mContract.Objective = this.addRow(30, 'with-medium-dialog-background');
+            columnRight.append(this.mContract.Objective);
+            var row = $('<div class="row"/>');
+            this.mContract.Objective.append(row);
+            var title = $('<div class="title title-font-big font-color-title">Objective</div>');
+            row.append(title);
+            var originImageLayout = $('<div class="contract-origin-image-container is-horizontal-center"/>');
+            this.mContract.Objective.append(originImageLayout);
+            var image = originImageLayout.createImage(null, function(_image) {
+                _image.centerImageWithinParent(0, 0, 1.0);
+            }, null, '');
+            this.mContract.Objective.click(function(_event) {
+                var data = self.mContract.Selected.data('entry');
+                if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+                    self.notifyBackendShowWorldEntityOnMap({ID: data.Objective, Type: 'contract', Find: data.ID});
+            });
+            this.mContract.Objective.addHighlighter();
+        }
+    }
+
+    var rightMainColumn = this.addColumn(20, 'with-dialog-background');
+    _parentDiv.append(rightMainColumn);
+    {
+        var slotContainer = $('<div class="below-container-extra"/>');
+        rightMainColumn.append(slotContainer);
+        var listContainerLayout = $('<div class="l-list-container"/>');
+        slotContainer.append(listContainerLayout);
+        this.mContract.BannedList = listContainerLayout.createList(2);
+        this.mContract.BannedListScroll = this.mContract.BannedList.findListScrollContainer();
+     
+        var scrollHeader = $('<div class="upper-container with-small-dialog-background"/>')
+        rightMainColumn.append(scrollHeader);
+        {
+            var labelContainer = $('<div class="expandable-label-container is-horizontal-center with-scroll-tooltip-no-resize-background"/>');
+            labelContainer.css('left', '0');
+            scrollHeader.append(labelContainer);
+            var label = $('<div class="label text-font-normal font-bold font-color-ink">Invalid Contracts</div>');
+            labelContainer.append(label);
         }
     }
 };
@@ -1557,24 +1837,17 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     // relation stuffs
                     this.createSliderControlDIV(this.mFactionRelation, 'Relation', row90);
                     this.createCheckBoxControlDIV(this.mFactionFixedRelation, row90, 'relation');
-
-                    /*var mottoContainer = this.addContainer(30, 13.5, '', 'green');
-                    row.append(mottoContainer);
-                    var mottoListContainer = mottoContainer.createList(10, 'description-font-medium font-bottom-shadow font-color-description', true);
-                    this.mFaction.Motto = mottoListContainer.findListScrollContainer();*/
                 }
 
                 var row10 = this.addRow(10);
                 column.append(row10);
-                {
-                    // another title that you shouldn't ask why
-                    var row = $('<div class="row"/>');
-                    row10.append(row);
-                    var title = $('<div class="title title-font-big font-color-title">Available Contracts</div>');
-                    title.css('margin-top', '1.0rem');
-                    title.css('margin-bottom', '0');
-                    row.append(title);
-                }
+                // another title that you shouldn't ask why
+                var row = $('<div class="row"/>');
+                row10.append(row);
+                var title = $('<div class="title title-font-big font-color-title">Available Contracts</div>');
+                title.css('margin-top', '1.0rem');
+                title.css('margin-bottom', '0');
+                row.append(title);
             }
 
             var column = this.addColumn(50);
@@ -1610,7 +1883,7 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     // banner image
                     this.mFaction.Banner = bannerContainer.createImage(null, function(_image) {
                         _image.centerImageWithinParent(0, 0, 1.0);
-                        _image.removeClass('display-none').addClass('display-block');
+                        _image.showThisDiv(true);
                     }, null, 'display-none');
 
                     var rightColumn = this.addColumn(30);
@@ -1645,18 +1918,20 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     var button = buttonLayout.createTextButton('View Settlements', function() {
                         var element = self.mFaction.Selected;
                         var data = element.data('entry');
-                        var index = element.data('index');
                         var isSettlement = data.NoChangeName === false;
+                        var filter = {Search: null, Filter: ["Faction", data.ID]};
 
                         if (isSettlement) {
                             self.switchScreen('Settlements');
-                            self.filterSettlementsByFaction({ID: data.ID});
+                            self.filterSettlementWithData(filter);
                             self.mSettlement.ExpandableList.deselectListEntries();
+                            self.mSettlement.ExpandLabel.find('.label:first').html('Custom');
                         }
                         else {
                             self.switchScreen('Locations');
-                            self.filterLocationsByFaction({ID: data.ID});
+                            self.filterLocationWithData(filter);
                             self.mLocation.ExpandableList.deselectListEntries();
+                            self.mLocation.ExpandLabel.find('.label:first').html('Custom');
                         }
                     }, '', 4);
 
@@ -1675,7 +1950,6 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
                     var buttonLayout = this.addLayout(23.0, 4.3, 'is-center', 3.0);
                     row.append(buttonLayout);
                     var button = buttonLayout.createTextButton('View Leaderships', function() {
-                        //self.notifyBackendRefreshFactionOwningCharacter();
                         self.createFactionLeadersPopupDialog();
                     }, '', 4);
 
@@ -1712,10 +1986,8 @@ WorldEditorScreen.prototype.createFactionsScreenDIV = function(_parentDiv)
         // contract panel
         var row20 = this.addRow(20, 'with-small-dialog-background');
         column60.append(row20);
-        {
-            this.mFaction.Contracts = $('<div class="a-container is-center"/>');
-            row20.append(this.mFaction.Contracts);
-        }
+        this.mFaction.Contracts = $('<div class="a-container is-center"/>');
+        row20.append(this.mFaction.Contracts);
     }
 };
 
@@ -1969,7 +2241,7 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                     mid.append(avatarImage);
                     this.mAvatar.Image = avatarImage.createImage(Path.GFX + 'ui/icons/legends_necro.png', function(_image) {
                         _image.centerImageWithinParent(0, 0, 1.0);
-                        _image.removeClass('display-none').addClass('display-block');
+                        _image.showThisDiv(true);
                     }, null, 'display-none');
 
                     // button button
@@ -2078,7 +2350,7 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
 
             var bannerImage = table.find('.banner-image-container:first');
             this.mBanner.Image = bannerImage.createImage(Path.GFX + 'ui/banners/banner_beasts_01.png', function(_image) {
-                _image.removeClass('display-none').addClass('display-block');
+                _image.showThisDiv(true);
             }, null, 'display-none banner-image');
         }
 
@@ -2087,14 +2359,17 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
     }
 };
 
-WorldEditorScreen.prototype.createRadioControlDIV = function(_definition, _parentDiv, _index, _name) 
+WorldEditorScreen.prototype.createRadioControlDIV = function(_definition, _parentDiv, _index, _name, _fontColor) 
 {
+    if (_fontColor === null || _fontColor === undefined)
+        _fontColor = 'font-color-subtitle';
+
     var self = this;
     var control = $('<div class="control"></div>');
     _parentDiv.append(control);
     _definition.Checkbox = $('<input type="radio" id="' + _definition.TooltipId + '" name="' + _name + '" />');
     control.append(_definition.Checkbox);
-    _definition.Label = $('<label class="text-font-normal font-color-subtitle" for="' + _definition.TooltipId + '">' + _definition.Name + '</label>');
+    _definition.Label = $('<label class="text-font-normal ' + _fontColor + '" for="' + _definition.TooltipId + '">' + _definition.Name + '</label>');
     control.append(_definition.Label);
 
     _definition.Checkbox.iCheck({
@@ -2111,15 +2386,23 @@ WorldEditorScreen.prototype.createRadioControlDIV = function(_definition, _paren
     _definition.Label.bindTooltip({ contentType: 'ui-element', elementId: _definition.TooltipId });
 };
 
-WorldEditorScreen.prototype.createCheckBoxControlDIV = function(_definition, _parentDiv, _key) 
+WorldEditorScreen.prototype.createCheckBoxControlDIV = function(_definition, _parentDiv, _key, _fontColor, _isOffset) 
 {
+    if (_fontColor === null || _fontColor === undefined)
+        _fontColor = 'font-color-subtitle';
+
     var row = $('<div class="row"></div>');
+
+    if (_isOffset === true) {
+        row.css('padding-left', '0.5rem');
+    }
+
     _parentDiv.append(row);
     var control = $('<div class="control"/>');
     row.append(control);
     _definition.Checkbox = $('<input type="checkbox" id="' + _definition.TooltipId + '"/>');
     control.append(_definition.Checkbox);
-    _definition.Label = $('<label class="text-font-normal font-color-subtitle" for="' + _definition.TooltipId + '">' + _definition.Name + '</label>');
+    _definition.Label = $('<label class="text-font-normal ' + _fontColor + '" for="' + _definition.TooltipId + '">' + _definition.Name + '</label>');
     control.append(_definition.Label);
 
     _definition.Checkbox.iCheck({
@@ -2167,6 +2450,14 @@ WorldEditorScreen.prototype.createSliderControlDIV = function(_definition, _titl
     
     switch(_definition.TooltipId)
     {
+    case 'woditor.lootscale':
+        _definition.Control.on("change", function () {
+            _definition.Value = parseInt(_definition.Control.val());
+            _definition.Label.text('' + _definition.Value + _definition.Postfix);
+            self.notifyBackendUpdateWorldEntityLootScale(_definition.Value);
+        });
+        break;
+
     case 'woditor.rostertier':
         _definition.Control.on("change", function () {
             _definition.Value = parseInt(_definition.Control.val());
@@ -2445,14 +2736,9 @@ WorldEditorScreen.prototype.switchScreen = function(_screen)
     var self = this;
 
     $.each(this.mScreens, function (_key, _definition) {
-        if (_key === _screen) {
-            _definition.removeClass('display-none').addClass('display-block');
-            self.mSwitchToButton[_key].enableButton(false);
-        }
-        else {
-            _definition.removeClass('display-block').addClass('display-none');
-            self.mSwitchToButton[_key].enableButton(true);
-        }
+        var isShow = _key === _screen;
+        _definition.showThisDiv(isShow);
+        self.mSwitchToButton[_key].enableButton(!isShow);
     });
 
     this.mLastScreen = _screen;
@@ -2464,6 +2750,34 @@ WorldEditorScreen.prototype.isVisible = function()
 };
 
 // simple functions so i don't have to prepare so many css elements
+WorldEditorScreen.prototype.addInput = function(_parentDiv, _type, _min, _max, _inputUpdatedCallback, _class, _acceptCallback, _addPercentage)
+{
+    if (_class === undefined || _class === null)
+        _class = 'title-font-big font-bold font-color-brother-name';
+
+    var inputLayout = $('<div class="l-input-' + _type + '"/>');
+    _parentDiv.append(inputLayout);
+    var input = inputLayout.createInput('', _min, _max, 1, _inputUpdatedCallback, _class, _acceptCallback);
+    input.assignInputEventListener('focusout', _acceptCallback);
+
+    if (_addPercentage === true) {
+        input.assignInputEventListener('click', function(_input, _event) {
+            _input.data('IsUpdated', false);
+        });
+    }
+    else { 
+        input.assignInputEventListener('click', function(_input, _event) {
+            _input.removePercentageFromInput();
+            _input.data('IsUpdated', false);
+        });
+    }
+
+    if (_type != 'big')
+        input.css('background-size', '100% 4.0rem');
+    
+    return input;
+};
+
 WorldEditorScreen.prototype.addFlexboxItem = function(_width, _height, _allowShrink, _color)
 {
     var result = $('<div class="custom-flexbox-item"/>');
@@ -2767,13 +3081,15 @@ WorldEditorScreen.prototype.loadFromData = function(_data)
     var hasContracts = 'Contracts' in _data && _data.Contracts !== undefined && _data.Contracts !== null && jQuery.isArray(_data.Contracts);
     var hasSettlements = 'Settlements' in _data && _data.Settlements !== undefined && _data.Settlements !== null && jQuery.isArray(_data.Settlements);
     var hasLocations = 'Locations' in _data && _data.Locations !== undefined && _data.Locations !== null && jQuery.isArray(_data.Locations);
-    var validToPreload = hasFactions && hasContracts && hasSettlements && hasLocations;
+    var hasUnits = 'Units' in _data && _data.Units !== undefined && _data.Units !== null && jQuery.isArray(_data.Units);
+    var validToPreload = hasFactions && hasContracts && hasSettlements && hasLocations && hasUnits;
 
     if (validToPreload) {
         this.mFaction.Data = _data.Factions;
         this.mContract.Data = _data.Contracts;
         this.mSettlement.Data = _data.Settlements;
         this.mLocation.Data = _data.Locations;
+        this.mUnit.Data = _data.Units;
     }
 
     if ('Assets' in _data && _data.Assets !== undefined && _data.Assets !== null && typeof _data.Assets === 'object')
@@ -2802,13 +3118,19 @@ WorldEditorScreen.prototype.loadFromData = function(_data)
 
     if (hasLocations)
         this.addLocationsData(_data.Locations, validToPreload);
+
+    if (hasUnits)
+        this.addUnitsData(_data.Units, validToPreload);
 };
 
 WorldEditorScreen.prototype.addFilterData = function (_data)
 {
     this.mFilterData = _data;
+    this.addContractFilter(_data.Contracts);
     this.addSettlementFilter(_data.Settlements);
     this.addLocationFilter(_data.Locations);
+    this.addUnitFilter(_data.Units);
+    this.addInvalidContractsData(_data.InvalidContracts);
 };
 WorldEditorScreen.prototype.addExpandableContent = function (_data, _parent)
 {
@@ -2838,8 +3160,9 @@ WorldEditorScreen.prototype.addExpandableContent = function (_data, _parent)
     _parent.IsExpanded = false;
     this.expandExpandableList(false, _parent);
 }
-WorldEditorScreen.prototype.addExpandableEntry = function (_data, _label, _parent)
+WorldEditorScreen.prototype.addExpandableEntry = function (_data, _label, _parent, _onClickFilterCallback)
 {
+    var self = this;
     var result = $('<div class="expandable-row"/>');
     _parent.ExpandableListScroll.append(result);
 
@@ -2850,6 +3173,22 @@ WorldEditorScreen.prototype.addExpandableEntry = function (_data, _label, _paren
 
     var label = $('<span class="label text-font-normal font-bold font-color-ink">' + _label + '</span>');
     entry.append(label);
+
+    if (_onClickFilterCallback !== undefined && _onClickFilterCallback !== null && jQuery.isFunction(_onClickFilterCallback))
+    {
+        entry.click(this, function(_event) {
+            var div = $(this);
+            if (div.hasClass('is-selected') !== true) {
+                var data = div.data('key');
+                _parent.ExpandableList.deselectListEntries();
+                div.addClass('is-selected');
+                _onClickFilterCallback.call(self, data);
+                self.expandExpandableList(false, _parent);
+                _parent.ExpandLabel.find('.label:first').html(data.Name);
+            }
+        });
+    }
+
     return entry;
 };
 WorldEditorScreen.prototype.expandExpandableList = function (_value, _parent, _maxHeight)
@@ -2992,10 +3331,15 @@ WorldEditorScreen.prototype.notifyBackendReloadButtonPressed = function()
     SQ.call(this.mSQHandle, 'onReloadButtonPressed');
 };
 
-WorldEditorScreen.prototype.notifyBackendShowWorldEntityOnMap = function(_id, _type) 
+WorldEditorScreen.prototype.notifyBackendShowWorldEntityOnMap = function(_data) 
 {
-    this.mShowEntityOnMap = {ID: _id, Type: _type};
-    SQ.call(this.mSQHandle, 'onShowWorldEntityOnMap', _id);
+    this.mShowEntityOnMap = _data;
+    SQ.call(this.mSQHandle, 'onShowWorldEntityOnMap', _data.ID);
+};
+
+WorldEditorScreen.prototype.notifyBackendInvalidContract = function(_type, _isInvalid)
+{
+     SQ.call(this.mSQHandle, 'onInvalidContract', [_type, _isInvalid]);
 };
 
 WorldEditorScreen.prototype.notifyBackendUpdateAvatarModel = function(_keyName, _value) 
@@ -3027,15 +3371,35 @@ WorldEditorScreen.prototype.notifyBackendUpdateDifficultyMult = function(_value)
     SQ.call(this.mSQHandle, 'onUpdateDifficultyMult', _value);
 };
 
+WorldEditorScreen.prototype.notifyBackendUpdateWorldEntityLootScale = function(_value) 
+{
+    var result = this.updateUnitData({LootScale: _value});
+    SQ.call(this.mSQHandle, 'onUpdateWorldEntityLootScale', [ result.Data.ID, _value ]);
+};
+
 WorldEditorScreen.prototype.notifyBackendUpdateCheckBox = function(_key, _isChecked) 
 {
-    if (_key !== 'relation') {
+    switch(_key)
+    {
+    case 'IsLooting':
+    case 'IsSlowerAtNight':
+    case 'IsAttackableByAI':
+    case 'IsLeavingFootprints':
+    case 'IsAlwaysAttackingPlayer':
+        var data = {};
+        data[_key] = _isChecked;
+        var result = this.updateUnitData(data);
+        SQ.call(this.mSQHandle, 'onUpdateUnitCheckBox', [ result.Data.ID, _key, _isChecked ]);
+        break;
+
+    case 'relation':
         this.mAssetsData.CheckBox[_key] = _isChecked;
-        SQ.call(this.mSQHandle, 'onUpdataAssetsCheckBox', [_key, _isChecked]);
-    }
-    else {
+        SQ.call(this.mSQHandle, 'onUpdateAssetsCheckBox', [ _key, _isChecked ]);
+        break;
+
+    default:
         var id = this.updateFactionRelationDeterioration(_isChecked);
-        SQ.call(this.mSQHandle, 'onUpdataFactionRelationDeterioration', [id, _isChecked]);
+        SQ.call(this.mSQHandle, 'onUpdateFactionRelationDeterioration', [ id, _isChecked ]);
     }
 };
 
@@ -3082,6 +3446,11 @@ WorldEditorScreen.prototype.notifyBackendChangeName = function(_name, _key)
 
     switch(_key)
     {
+    case 'unit':
+        id = this.updateUnitName(_name);
+        SQ.call(this.mSQHandle, 'onChangeWorldEntityName', [id, _name]);
+        break;
+
     case 'location':
         id = this.updateLocationName(_name);
         SQ.call(this.mSQHandle, 'onChangeWorldEntityName', [id, _name]);
@@ -3224,11 +3593,26 @@ WorldEditorScreen.prototype.notifyBackendToRefreshSettlementRoster = function(_i
     SQ.call(this.mSQHandle, 'onRefreshSettlementRoster', _id);
 };
 
+WorldEditorScreen.prototype.notifyBackendChangeUnitSprite = function(_sprite)
+{
+    var imagePath = 'ui/parties/' + _sprite + '.png';
+    var data = this.updateUnitImage({ImagePath: imagePath});
+    SQ.call(this.mSQHandle, 'onChangeWorldEntitySprite', [ data.ID, _sprite ]);
+};
+
 WorldEditorScreen.prototype.notifyBackendChangeLocationSprite = function(_sprite)
 {
     var imagePath = 'ui/locations/' + _sprite + '.png';
     var data = this.updateLocationImage({ImagePath: imagePath});
-    SQ.call(this.mSQHandle, 'onChangeLocationSprite', [ data.ID, _sprite ]);
+    SQ.call(this.mSQHandle, 'onChangeWorldEntitySprite', [ data.ID, _sprite ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendChangeWorldEntityBanner = function(_element, _banner)
+{
+    var data = _element.data('entry');
+    var bannerImagePath = 'ui/banners/' + _banner + '.png';
+    var result = data.IsParty === true ? this.updateUnitBanner({Banner: bannerImagePath}) : this.updateLocationBanner({Banner: bannerImagePath});
+    SQ.call(this.mSQHandle, 'onChangeWorldEntityBanner', [ result.ID, _banner ]);
 };
 
 WorldEditorScreen.prototype.notifyBackendUpdateWealthValue = function(_value, _index)
@@ -3332,15 +3716,16 @@ WorldEditorScreen.prototype.notifyBackendAddItemToLoot = function(_script)
     SQ.call(this.mSQHandle, 'onAddItemToLoot', [ id, _script ]);
 };
 
-WorldEditorScreen.prototype.notifyBackendConvertTroopToChampion = function(_data)
+WorldEditorScreen.prototype.notifyBackendConvertTroopToChampion = function(_data, _type)
 {
-    var id = this.mLocation.Selected.data('entry').ID;
+    var parent = _type === 'unit' ? this.mUnit : this.mLocation;
+    var id = parent.Selected.data('entry').ID;
     SQ.call(this.mSQHandle, 'onConvertTroopToChampion', [ id, _data ]);
 };
 
-WorldEditorScreen.prototype.notifyBackendRerollTroop = function()
+WorldEditorScreen.prototype.notifyBackendRerollTroop = function(_element)
 {
-    var data = this.mLocation.Selected.data('entry');
+    var data = _element.data('entry');
     var id = data.ID;
 
     if (data.IsSpawningTroop === false)
@@ -3349,23 +3734,23 @@ WorldEditorScreen.prototype.notifyBackendRerollTroop = function()
         SQ.call(this.mSQHandle, 'onRerollTroop', id);
 };
 
-WorldEditorScreen.prototype.notifyBackendRemoveTroop = function(_data)
+WorldEditorScreen.prototype.notifyBackendRemoveTroop = function(_data, _type)
 {
-    var id = this.mLocation.Selected.data('entry').ID;
+    var parent = _type === 'unit' ? this.mUnit : this.mLocation;
+    var id = parent.Selected.data('entry').ID;
     SQ.call(this.mSQHandle, 'onRemoveTroop', [ id, _data ]);
 };
 
-WorldEditorScreen.prototype.notifyBackendAddNewTroop = function()
+WorldEditorScreen.prototype.notifyBackendAddNewTroop = function(_element)
 {
     var keys = this.mTroop.Selected;
-    var id = this.mLocation.Selected.data('entry').ID;
+    var id = _element.data('entry').ID;
     SQ.call(this.mSQHandle, 'onAddNewTroop', [ id, keys ]);
 }
 
-WorldEditorScreen.prototype.notifyBackendAddRandomTroop = function()
+WorldEditorScreen.prototype.notifyBackendAddRandomTroop = function(_element)
 {
-    var self = this;
-    var data = this.mLocation.Selected.data('entry');
+    var data = _element.data('entry');
     var id = data.ID;
     var keys = [];
 
@@ -3376,12 +3761,13 @@ WorldEditorScreen.prototype.notifyBackendAddRandomTroop = function()
     SQ.call(this.mSQHandle, 'onAddRandomTroop', [ id, keys ]);
 };
 
-WorldEditorScreen.prototype.notifyBackendChangeTroopNum = function(_data, _index, _different)
+WorldEditorScreen.prototype.notifyBackendChangeTroopNum = function(_data, _index, _different, _type)
 {
+    var parent = _type === 'unit' ? this.mUnit : this.mLocation;
     var num = 0;
     var strength = 0;
-    var id = this.mLocation.Selected.data('entry').ID;
-    var entries = this.mLocation.Troops.find('.troop-row');
+    var id = parent.Selected.data('entry').ID;
+    var entries = parent.Troops.find('.troop-row');
     if (entries.length > 0 && _index >= 0 && _index < entries.length) {
         var element = $(entries[_index]);
         var label = element.find('.strength-label');
@@ -3393,7 +3779,12 @@ WorldEditorScreen.prototype.notifyBackendChangeTroopNum = function(_data, _index
        strength += _data[i].Strength * _data[i].Num;
        num += _data[i].Num;
     }
-    this.updateLocationTroopsLabel(strength, num);
+
+    if (_type === 'unit')
+        this.updateUnitTroopsLabel(strength, num);
+    else
+        this.updateLocationTroopsLabel(strength, num);
+
     SQ.call(this.mSQHandle, 'onChangeTroopNum', [ id, _data[_index], _different ]);
 }
 
@@ -3523,6 +3914,34 @@ WorldEditorScreen.prototype.notifyBackendSendMercenaryTo = function( _result )
     SQ.call(this.mSQHandle, 'onSendMercenaryTo', [ id, des, resources, key, no0, no1, no2 ]);
 };
 
+WorldEditorScreen.prototype.notifyBackendGetBannerSpriteEntries = function(_element, _listScrollContainer)
+{
+    var self = this;
+    var id = _element.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onGetBannerSpriteEntries', id , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to get Banner Sprite Entries. Invalid data result.');
+            return;
+        }
+
+        self.addBannerSpriteEntriesToPopupDialog(_data, _listScrollContainer);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendGetUnitSpriteEntries = function(_listScrollContainer)
+{
+    var self = this;
+    var id = this.mUnit.Selected.data('entry').ID;
+    SQ.call(this.mSQHandle, 'onGetUnitSpriteEntries', id , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to get Unit Sprite Entries. Invalid data result.');
+            return;
+        }
+
+        self.addUnitSpriteEntriesToPopupDialog(_data, _listScrollContainer);
+    });
+};
+
 WorldEditorScreen.prototype.notifyBackendGetLocationSpriteEntries = function(_listScrollContainer)
 {
     var self = this;
@@ -3550,11 +3969,11 @@ WorldEditorScreen.prototype.notifyBackendGetTroopTemplate = function( _parent , 
     });
 };
 
-WorldEditorScreen.prototype.notifyBackendGetTroopEntries = function( _result )
+WorldEditorScreen.prototype.notifyBackendGetTroopEntries = function(_element, _result)
 {
     var self = this;
     var filter = this.mTroop.Filter;
-    var troop_data = this.mLocation.Selected.data('entry').Troops;
+    var troop_data = _element.data('entry').Troops;
     var keys = [];
 
     troop_data.forEach(function (_definition) {
@@ -3618,10 +4037,12 @@ WorldEditorScreen.prototype.notifyBackendShowAllItems = function()
 WorldEditorScreen.prototype.notifyBackendGetWolrdEntityImagePath = function(_id, _image)
 {
     if (_id === null) {
-        _image.attr('src', Path.GFX + 'ui/images/undiscovered_opponent.png');
+        _image.addClass('opacity-none');
         return;
     }
 
+    _image.removeClass('opacity-none');
+    _image.bindTooltip({ contentType: 'ui-element', elementId: _id, elementOwner: 'woditor.world_entity' });
     var find = this.getWorldLocation(_id);
     if (find != null) {
         _image.attr('src', Path.GFX + find.ImagePath);
@@ -3635,11 +4056,109 @@ WorldEditorScreen.prototype.notifyBackendGetWolrdEntityImagePath = function(_id,
         }
 
         if (_data.length === 0)
-            _image.attr('src', Path.GFX + 'ui/images/undiscovered_opponent.png');
+            _image.addClass('opacity-none');
         else
             _image.attr('src', Path.GFX + _data);
     });
 };
+
+WorldEditorScreen.prototype.notifyBackendContractInputChanges = function(_value, _key)
+{
+    var data = {};
+    data[_key] = _value;
+    var result = this.updateContractData(data);
+    SQ.call(this.mSQHandle, 'onContractInputChanges', [ result.Data.ID, _key, _value ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendChangeContractFaction = function(_factionId)
+{
+    var id = this.mContract.Selected.data('entry').ID; 
+    SQ.call(this.mSQHandle, 'onChangeContractFaction', [ id, _factionId ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendChangeLocationForContract = function(_type, _locationId)
+{
+    var id = this.mContract.Selected.data('entry').ID; 
+    SQ.call(this.mSQHandle, 'onChangeLocationForContract', [ id, _type, _locationId ]);
+};
+
+WorldEditorScreen.prototype.notifyBackendGetAvailableContracts = function(_listScrollContainer, _button)
+{
+    var self = this;
+    _button.enableButton(false);
+    SQ.call(this.mSQHandle, 'onGetAvailableContracts', [] , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to Get Available Contracts. Invalid data result.');
+            return;
+        }
+
+        self.addContractEntriesToPopupDialog(_data, _listScrollContainer, _button); 
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendAddNewContract = function(_script)
+{
+    if (_script === null || _script === undefined) {
+        console.error('ERROR: Failed to Add New Contract. Invalid data result.');
+        this.printLog('[color=#8f1e1e]Failed to Add New Contract. Reason: Invalid data result[/color]');
+        return;
+    }
+
+    var self = this;
+    SQ.call(this.mSQHandle, 'onAddNewContract', _script , function(_data) {
+        if (_data === undefined || _data === null || typeof _data !== 'object') {
+            console.error('ERROR: Failed to Add New Contract. Invalid data result.');
+            return;
+        }
+
+        var database = self.mContract.Data;
+        var index = database.length;
+        database.push(_data);
+        var element = self.addContractListEntry(_data, index); 
+        self.mContract.ListContainer.scrollListToBottom();
+        self.selectContractListEntry(element);
+    });
+};
+
+WorldEditorScreen.prototype.notifyBackendRemoveContract = function()
+{
+    var self = this;
+    var index = this.mContract.Selected.data('index');
+    var id = this.mContract.Selected.data('entry').ID;
+    var data = this.mContract.Data;
+    data.splice(index, 1);
+    this.mContract.Selected.parent().remove();
+    this.mContract.Selected = null;
+    this.mContract.ListScrollContainer.find('.list-entry').each(function(_i, _e) {
+        var element = $(_e);
+        var elementData = element.data('entry');
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].ID == elementData.ID) {
+                element.data('index', i);
+            }
+        }
+
+        if (_i == 0) {
+            self.selectContractListEntry(element);
+        }
+    });
+    SQ.call(this.mSQHandle, 'onRemoveContract', id);
+};
+
+WorldEditorScreen.prototype.notifyBackendRefreshAllContracts = function()
+{
+    var self = this;
+    SQ.call(this.mSQHandle, 'onRefreshAllContracts', [] , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to retrieve newly generated contracts. Invalid data result.');
+            return;
+        }
+
+        self.addContractsData(_data);
+    });
+};
+
+
 
 
 

@@ -63,6 +63,40 @@ this.world_editor_screen <- {
 		this.m.JSHandle = this.UI.connect("WorldEditorScreen", this);
 	}
 
+	function onDeserialize()
+	{
+		if (::World.Flags.has("InvalidContracts"))
+		{
+			::Woditor.InvalidContracts = split(::World.Flags.get("InvalidContracts"), "/");
+		}
+
+		::Woditor.PrepareContractOnCampaignStart();
+	}
+
+	function onSerialize()
+	{
+		if (::Woditor.InvalidContracts.len() == 0)
+		{
+			::World.Flags.remove("InvalidContracts");
+			return;
+		}
+
+		local string = "";
+		local max = ::Woditor.InvalidContracts.len() - 1;
+		foreach (i, id in ::Woditor.InvalidContracts)
+		{
+			string += id;
+
+			if (i != max)
+			{
+				string += "/";
+			} 
+		}
+
+		if (string.len() == 0) return;
+		::World.Flags.set("InvalidContracts", string);
+	}
+
 	function destroy()
 	{
 		this.clearEventListener();
@@ -206,6 +240,16 @@ this.world_editor_screen <- {
 		return ::Woditor.Helper.convertSituationEntriesToUIData(_id);
 	}
 
+	function onGetBannerSpriteEntries( _id )
+	{
+		return ::Woditor.Helper.convertBannerSpriteEntriesToUIData(_id);
+	}
+
+	function onGetUnitSpriteEntries( _id )
+	{
+		return ::Woditor.Helper.convertUnitSpriteEntriesToUIData(_id);
+	}
+
 	function onGetLocationSpriteEntries( _id )
 	{
 		return ::Woditor.Helper.convertLocationSpriteEntriesToUIData(_id);
@@ -226,9 +270,210 @@ this.world_editor_screen <- {
 		return ::Woditor.Helper.convertFactionLeadersToUIData(_id);
 	}
 
+	function onGetAvailableContracts( _emptyArray )
+	{
+		return ::Woditor.Helper.convertAvailableContractToUIData(_emptyArray);
+	}
+
 	function onCollectAllianceData( _data )
 	{
 		return ::Woditor.Helper.convertFactionAllianceToUIData(_data);
+	}
+
+	function onRefreshAllContracts( _emptyArray )
+	{
+		::World.Contracts.clearAllContracts();
+
+		local factions = [];
+		factions.extend(::World.FactionManager.getFactionsOfType(::Const.FactionType.Settlement));
+		factions.extend(::World.FactionManager.getFactionsOfType(::Const.FactionType.NobleHouse));
+		factions.extend(::World.FactionManager.getFactionsOfType(::Const.FactionType.OrientalCityState));
+		
+		foreach (f in factions)
+		{
+			f.setLastContractTime(0);
+
+			foreach ( action in f.m.Deck )
+			{
+				action.resetCooldown();
+			}
+
+			for (local i = 0; i < 10; ++i)
+			{
+				f.update(true);
+			}
+		}
+		
+		this.log("Refreshed contract!");
+		return ::Woditor.Helper.convertContractsToUIData();
+	}
+
+	function onRemoveContract( _id )
+	{
+		local contract = ::World.Contracts.removeContractByID(_id);
+
+		if (contract == null)
+		{
+			return this.log("Failed to remove " + contract.getType() + " contract. Reason: can\'t find contract", true);
+		}
+
+		this.log("Successfully removed " + ::Const.UI.getColorized(contract.getType(), "#1e468f"));
+	}
+
+	function onAddNewContract( _script )
+	{
+		local contract = this.new(_script);
+		local factions = [];
+		factions.extend(::World.FactionManager.getFactionsOfType(::Const.FactionType.Settlement));
+		factions.extend(::World.FactionManager.getFactionsOfType(::Const.FactionType.NobleHouse));
+		factions.extend(::World.FactionManager.getFactionsOfType(::Const.FactionType.OrientalCityState));
+		local faction; 
+		do
+		{
+			faction = ::MSU.Array.getRandom(factions);
+		}
+		while(faction.getSettlements().len() == 0)
+		local settlement = faction.getSettlements()[0];
+		local employer = faction.getRandomCharacter();
+		contract.setFaction(faction.getID());
+		contract.setEmployerID(employer.getID());
+		contract.setOrigin(settlement);
+		contract.setHome(settlement);
+		::World.Contracts.addContractByForce(contract);
+		this.log("Added " + ::Const.UI.getColorized(contract.getType(), "#1e468f"));
+		return {
+			ID = contract.getID(),
+			Name = contract.getName(),
+			Type = contract.getType(),
+			Icon = contract.getBanner() + ".png",
+			Faction = faction.getID(),
+			IsNegotiated = contract.isNegotiated(),
+			DifficultyIcon = contract.getUIDifficultySmall() + ".png",
+			DifficultyMult = ::Math.floor(contract.getDifficultyMult() * 100),
+			PaymentMult = ::Math.floor(contract.getPaymentMult() * 100),
+			Expire = ::Math.max(1, ::Math.abs(::Time.getVirtualTimeF() - contract.m.TimeOut) / ::World.getTime().SecondsPerDay),
+			Origin = settlement.getID(),
+			Home = settlement.getID()
+			Employer = employer.getImagePath(),
+			Objective = null,
+		};
+	}
+
+	function onChangeContractFaction( _data )
+	{
+		local faction = ::World.FactionManager.getFaction(_data[1]);
+
+		if (faction.getSettlements().len() == 0)
+		{
+			return this.log("Failed to change " + contract.getType() + " faction. Reason: selected faction has no settlement", true);
+		}
+
+		local contract = ::World.Contracts.getContractByID(_data[0]);
+
+		if (contract == null)
+		{
+			return this.log("Failed to change faction of contract. Reason: can\'t find contract", true);
+		}
+
+		local result = {};
+		local settlement = faction.getSettlements()[0];
+		local employer = faction.getRandomCharacter();
+		contract.setFaction(_data[1]);
+		contract.setEmployerID(employer.getID());
+		result.Faction <- _data[1];
+		result.Employer <- employer.getImagePath();
+
+		if (contract.getHome() != null && !contract.getHome().isNull())
+		{
+			contract.setHome(settlement);
+			result.Home <- settlement.getID();
+		}
+
+		if (contract.getOrigin() != null && !contract.getOrigin().isNull())
+		{
+			contract.setOrigin(settlement);
+			result.Origin <- settlement.getID();
+		}
+		
+		this.log("Successfully changed " + ::Const.UI.getColorized(contract.getType(), "#1e468f") + " faction");
+		this.m.JSHandle.asyncCall("refreshContractDetailPanel", result);
+	}
+
+	function onChangeLocationForContract( _data )
+	{
+		local contract = ::World.Contracts.getContractByID(_data[0]);
+		local result = {};
+
+		if (contract == null)
+		{
+			return this.log("Failed to change " + contract.getType() + " faction. Reason: can\'t find contract", true);
+		}
+
+		local world_entity = ::World.getEntityByID(_data[2]);
+
+		switch (_data[1])
+		{
+		case "Home":
+			contract.setHome(world_entity);
+			result.Home <- world_entity.getID();
+			this.log("Changed " + ::Const.UI.getColorized(contract.getType(), "#1e468f") + " Home to " + ::Const.UI.getColorized(world_entity.getName(), "#1e468f"));
+			break;
+	
+		case "Origin":
+			contract.setOrigin(world_entity);
+			result.Origin <- world_entity.getID();
+			this.log("Changed " + ::Const.UI.getColorized(contract.getType(), "#1e468f") + " Origin to " + ::Const.UI.getColorized(world_entity.getName(), "#1e468f"));
+			break;
+		}
+
+		this.m.JSHandle.asyncCall("refreshContractDetailPanel", result);
+	}
+
+	function onContractInputChanges( _data )
+	{
+		local contract = this.World.Contracts.getContractByID(_data[0]);
+
+		if (contract == null)
+		{
+			return this.log("Failed to change " + _data[1] + " of contract. Reason: can\'t find contract", true);
+		}
+
+		if (_data[1] == "Expiration")
+		{
+			contract.m.TimeOut = this.Time.getVirtualTimeF() + this.World.getTime().SecondsPerDay * _data[2];
+			this.m.JSHandle.asyncCall("updateContractExpiration", null);
+		}
+		else
+		{
+			contract.m[_data[1]] = _data[2] * 0.01;
+
+			if (_data[1] == "DifficultyMult")
+			{
+				this.m.JSHandle.asyncCall("updateContractDifficultyIcon", {DifficultyIcon = contract.getUIDifficultySmall() + ".png"});
+			}
+		}
+	}
+
+	function onInvalidContract( _data )
+	{
+		if (_data[1] == true)
+		{
+			local find = ::Woditor.InvalidContracts.find(_data[0]);
+
+			if (find == null)
+			{
+				::Woditor.InvalidContracts.push(_data[0]);
+			}
+
+			return;
+		}
+
+		local find = ::Woditor.InvalidContracts.find(_data[0]);
+
+		if (find != null)
+		{
+			::Woditor.InvalidContracts.remove(find);
+		}
 	}
 
 	function onGetAllNonHostileFactionsOfThisFaction( _factionID )
@@ -283,7 +528,7 @@ this.world_editor_screen <- {
 	{
 		local world_entity = ::World.getEntityByID(_data[0]);
 
-		if (world_entity.isLocationType(::Const.World.LocationType.Settlement))
+		if (world_entity.isLocation() && world_entity.isLocationType(::Const.World.LocationType.Settlement))
 		{
 			if (world_entity.getOwner() != null && world_entity.getOwner().getID() != _data[2])
 			{
@@ -292,18 +537,17 @@ this.world_editor_screen <- {
 
 			world_entity.addFaction(_data[1]);
 			this.m.JSHandle.asyncCall("updateSettlementNewFaction", {Faction = _data[1]});
+			return;
 		}
-		else
+		
+		world_entity.setFaction(_data[1]);
+
+		foreach ( troop in world_entity.getTroops() )
 		{
-			world_entity.setFaction(_data[1]);
-
-			foreach ( troop in world_entity.getTroops() )
-			{
-				troop.Faction = world_entity.getFaction();
-			}
-
-			this.m.JSHandle.asyncCall("updateLocationNewFaction", {Faction = _data[1]});
+			troop.Faction = world_entity.getFaction();
 		}
+
+		this.m.JSHandle.asyncCall((world_entity.isParty() ? "updateUnitNewFaction" : "updateLocationNewFaction"), {Faction = _data[1]});
 	}
 
 	function onUpdateFactionAlliance( _data )
@@ -324,7 +568,7 @@ this.world_editor_screen <- {
 			faction.removeAlly(id);
 		}
 
-
+		this.log("Updated the alliance between " + ::Const.UI.getColorized(faction.getName(), "#1e468f") + " and other factions");
 	}
 
 	function onUpdateAvatarModel( _data )
@@ -486,9 +730,19 @@ this.world_editor_screen <- {
 		::World.getEntityByID(_data[0]).setName(_data[1]);
 	}
 
-	function onChangeLocationSprite( _data )
+	function onChangeWorldEntityBanner( _data )
+	{
+		::World.getEntityByID(_data[0]).setBanner(_data[1]);
+	}
+
+	function onChangeWorldEntitySprite( _data )
 	{
 		::World.getEntityByID(_data[0]).getSprite("body").setBrush(_data[1]);
+	}
+
+	function onUpdateWorldEntityLootScale( _data )
+	{
+		::World.getEntityByID(_data[0]).setLootScale(_data[1] / 100);
 	}
 
 	function onChangeScenario( _id )
@@ -526,14 +780,14 @@ this.world_editor_screen <- {
 		{
 			if (!world_entity.buildHouse())
 			{
-				this.log(::Const.UI.getColorized("Failed to build house. Reason: can\'t find suitable tile to build", "#8f1e1e"));
+				this.log("Failed to build house. Reason: can\'t find suitable tile to build", true);
 			}
 		}
 		else
 		{
 			if (!world_entity.destroyHouse())
 			{
-				this.log(::Const.UI.getColorized("Failed to destroy house. Reason: there is no house", "#8f1e1e"));
+				this.log("Failed to destroy house. Reason: there is no house", true);
 			}
 		}
 	}
@@ -609,7 +863,7 @@ this.world_editor_screen <- {
 
 		if (attachment == null) 
 		{
-			this.log(::Const.UI.getColorized("Failed to add new attached location. Reason: can\'t find suitable tile to spawn", "#8f1e1e"));
+			this.log("Failed to add new attached location. Reason: can\'t find suitable tile to spawn", true);
 			return;
 		} 
 
@@ -652,7 +906,7 @@ this.world_editor_screen <- {
 
 		if (find == null) 
 		{
-			this.log(::Const.UI.getColorized("Failed to remove attached location. Reason: selected attached location don\'t exist", "#8f1e1e"));
+			this.log("Failed to remove attached location. Reason: selected attached location don\'t exist", true);
 			return;
 		}
 
@@ -747,7 +1001,7 @@ this.world_editor_screen <- {
 
 		if (remove == null) 
 		{
-			return this.log(::Const.UI.getColorized("Failed to remove the item from loot pool. Reason: can\'t find item", "#8f1e1e"));
+			return this.log("Failed to remove the item from loot pool. Reason: can\'t find item", true);
 		}
 		else
 		{
@@ -877,7 +1131,7 @@ this.world_editor_screen <- {
 			}
 			else
 			{
-				return this.log(::Const.UI.getColorized("Failed to add a random named item. Reason: the named item table is empty", "#8f1e1e"));
+				return this.log("Failed to add a random named item. Reason: the named item table is empty", true);
 			}
 		}
 			
@@ -923,12 +1177,21 @@ this.world_editor_screen <- {
 	function onRerollTroop( _id )
 	{
 		local world_entity = ::World.getEntityByID(_id);
-		world_entity.m.LastSpawnTime = 0.0;
-		world_entity.createDefenders();
-		this.m.JSHandle.asyncCall("updateLocationTroops", {
-			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
-			IsUpdating = true
-		});
+
+		if (world_entity.isLocation())
+		{
+			world_entity.m.LastSpawnTime = 0.0;
+			world_entity.createDefenders();
+			this.m.JSHandle.asyncCall("updateLocationTroops", {
+				Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
+				IsUpdating = true
+			});
+		}
+		else
+		{
+			
+		}
+
 		this.log("Troop list has been refreshed!");
 	}
 
@@ -950,7 +1213,7 @@ this.world_editor_screen <- {
 
 		world_entity.m.Troops = new;
 		world_entity.updateStrength();
-		this.m.JSHandle.asyncCall("updateLocationTroops", {
+		this.m.JSHandle.asyncCall((world_entity.isParty() ? "updateUnitTroops" : "updateLocationTroops"), {
 			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
 			IsUpdating = true
 		});
@@ -980,7 +1243,7 @@ this.world_editor_screen <- {
 		t.Variant = 0;
 		world_entity.getTroops().push(t);
 		world_entity.updateStrength();
-		this.m.JSHandle.asyncCall("updateLocationTroops", {
+		this.m.JSHandle.asyncCall((world_entity.isParty() ? "updateUnitTroops" : "updateLocationTroops"), {
 			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
 			IsUpdating = true
 		});
@@ -1003,7 +1266,7 @@ this.world_editor_screen <- {
 		}
 
 		world_entity.updateStrength();
-		this.m.JSHandle.asyncCall("updateLocationTroops", {
+		this.m.JSHandle.asyncCall((world_entity.isParty() ? "updateUnitTroops" : "updateLocationTroops"), {
 			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
 			IsUpdating = true
 		});
@@ -1118,7 +1381,7 @@ this.world_editor_screen <- {
 		}
 
 		world_entity.updateStrength();
-		this.m.JSHandle.asyncCall("updateLocationTroops", {
+		this.m.JSHandle.asyncCall((world_entity.isParty() ? "updateUnitTroops" : "updateLocationTroops"), {
 			Troops = ::Woditor.Helper.convertTroopsToUIData(world_entity),
 			IsUpdating = true
 		});
@@ -1130,6 +1393,11 @@ this.world_editor_screen <- {
 		local world_entity = ::World.getEntityByID(_data[0]);
 		world_entity.setResources(_data[1]);
 
+		if (world_entity.isParty())
+		{
+			return;
+		}
+		
 		if (world_entity.isLocationType(::Const.World.LocationType.Settlement))
 		{
 			this.m.JSHandle.asyncCall("updateSettlementWealth", {
@@ -1233,10 +1501,15 @@ this.world_editor_screen <- {
 		::LegendsMod.Configs().m.IsGender = _value;
 	}
 
-	function onUpdataAssetsCheckBox( _data )
+	function onUpdateAssetsCheckBox( _data )
 	{
 		if (_data[0] in ::World.Assets.m) ::World.Assets.m[_data[0]] = _data[1];
 		else ::LegendsMod.Configs().m[_data[0]] = _data[1];
+	}
+
+	function onUpdateUnitCheckBox( _data )
+	{
+		::World.getEntityByID(_data[0]).m[_data[1]] = _data[2];
 	}
 
 	function updateFactionRelation( _data )
@@ -1249,7 +1522,7 @@ this.world_editor_screen <- {
 		};
 	}
 
-	function onUpdataFactionRelationDeterioration( _data )
+	function onUpdateFactionRelationDeterioration( _data )
 	{
 		::World.FactionManager.getFaction(_data[0]).getFlags().set("RelationDeterioration",_data[1]);
 	}
@@ -1497,6 +1770,7 @@ this.world_editor_screen <- {
 		result.Contracts <- ::Woditor.Helper.convertContractsToUIData();
 		result.Settlements <- ::Woditor.Helper.convertSettlementsToUIData();
 		result.Locations <- ::Woditor.Helper.convertLocationsToUIData();
+		result.Units <- ::Woditor.Helper.convertUnitsToUIData();
 		result.Filter <- ::Woditor.Helper.convertToUIFilterData(result.Factions);
 		result.Scenario <- ::Woditor.Helper.convertScenariosToUIData();
 		this.m.StashCapacityBefore = result.Assets.Stash;
@@ -1708,8 +1982,14 @@ this.world_editor_screen <- {
 		return entity;
 	}
 
-	function log(_text)
+	function log( _text, _isError = false)
 	{
+		if (_isError)
+		{
+			this.logError(_text);
+			_text = ::Const.UI.getColorized(_text, "#8f1e1e");
+		}
+
 		this.m.JSHandle.asyncCall("printLog", _text);
 	}
 

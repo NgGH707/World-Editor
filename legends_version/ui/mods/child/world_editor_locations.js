@@ -33,111 +33,48 @@ WorldEditorScreen.prototype.addLocationFilter = function(_data)
     var self = this;
     this.mLocation.ExpandableListScroll.empty();
 
-    // add the place holder
-    var placeholderName = this.mLocation.ExpandLabel.find('.label:first');
+    // add the show all
+    this.addExpandableEntry({Name: 'All', Filter: null}, 'All', this.mLocation, self.filterLocationWithData);
 
-    // add the filter-all option, not recommend cuz the map has lots of location
-    var specialEntry = this.addExpandableEntry({NoFilter: true}, 'All', this.mLocation);
-    specialEntry.click(this, function(_event) {
-        var div = $(this);
-        if (div.hasClass('is-selected') !== true) {
-            self.mLocation.ExpandableList.deselectListEntries();
-            div.addClass('is-selected');
-            self.filterLocationsByType();
-            var label = div.data('label');
-            placeholderName.html(label);
-        }
-    });
+    // the default filter is not all but is 'Camps'
+    this.mLocation.DefaultFilter = this.addExpandableEntry(_data[0], _data[0].Name, this.mLocation, self.filterLocationWithData);
+    this.mLocation.DefaultFilter.addClass('is-selected');
 
-    // add the filter for enemy camp option
-    this.mLocation.DefaultFilter = this.addExpandableEntry({NoFilter: true}, 'Camps', this.mLocation);
-    this.mLocation.DefaultFilter.click(this, function(_event) {
-        var div = $(this);
-        if (div.hasClass('is-selected') !== true) {
-            self.mLocation.ExpandableList.deselectListEntries();
-            div.addClass('is-selected');
-            self.filterLocationsByType('IsCamp', true);
-            var label = div.data('label');
-            placeholderName.html(label);
-        }
-    });
-
-    // add the filter stronghold option
-    var specialEntry = this.addExpandableEntry({NoFilter: true}, 'Legendary', this.mLocation);
-    specialEntry.click(this, function(_event) {
-        var div = $(this);
-        if (div.hasClass('is-selected') !== true) {
-            self.mLocation.ExpandableList.deselectListEntries();
-            div.addClass('is-selected');
-            self.filterLocationsByType('IsLegendary', true);
-            var label = div.data('label');
-            placeholderName.html(label);
-        }
-    });
-
-    // add the filter passive location option
-    var specialEntry = this.addExpandableEntry({NoFilter: true}, 'Misc', this.mLocation);
-    specialEntry.click(this, function(_event) {
-        var div = $(this);
-        if (div.hasClass('is-selected') !== true) {
-            self.mLocation.ExpandableList.deselectListEntries();
-            div.addClass('is-selected');
-            self.filterLocationsByType('IsPassive', true);
-            var label = div.data('label');
-            placeholderName.html(label);
-        }
-    });
-
-    for (var i = 0; i < _data.length; i++) {
-        var entryData = _data[i];
-        var faction = this.getFaction(entryData.ID);
-        var entry = this.addExpandableEntry(entryData, faction.Name, this.mLocation);
-        entry.click(this, function(_event) {
-            var div = $(this);
-            if (div.hasClass('is-selected') !== true) {
-                var data = div.data('key');
-                self.mLocation.ExpandableList.deselectListEntries();
-                div.addClass('is-selected');
-                self.filterLocationsByFaction(data);
-                var label = div.data('label');
-                placeholderName.html(label);
-            }
-        });
+    for (var i = 1; i < _data.length; i++) {
+        this.addExpandableEntry(_data[i], _data[i].Name, this.mLocation, self.filterLocationWithData);
     }
 
     this.mLocation.IsExpanded = false;
     this.expandExpandableList(false, this.mLocation);
+    this.mLocation.ExpandLabel.find('.label:first').html(_data[0].Name);
 };
 
-WorldEditorScreen.prototype.filterLocationsByType = function (_filter1, _value1, _filter2, _value2)
+WorldEditorScreen.prototype.filterLocationWithData = function (_filterData)
 {
-    var _data = this.mLocation.Data;
-    var noFilter = _filter1 === undefined || _filter1 === null;
-    var extraFilter = _filter2 === undefined || _filter2 === null;
-    this.mLocation.ListScrollContainer.empty();
+    if (_filterData.Filter === null) {
+        this.addLocationsData(null, true);
+        return;
+    }
 
-    for(var i = 0; i < _data.length; ++i) {
-        if (noFilter || _data[i][_filter1] === _value1 && (extraFilter || _data[i][_filter2] === _value2)) 
-            this.addLocationListEntry(_data[i], i);
+    this.mLocation.ListScrollContainer.empty();
+    var key = _filterData.Search;
+    var filterKey = _filterData.Filter[0];
+    var filterValue = _filterData.Filter[1];
+
+    for(var i = 0; i < this.mLocation.Data.length; ++i) {
+        var data = this.mLocation.Data[i];
+        if (key !== null) {
+            var getData = this.getData(key[0], data[key[1]]);
+            if (getData !== null && getData[filterKey] === filterValue)
+                this.addLocationListEntry(data, i);
+        }
+        else {
+            if (data[filterKey] === filterValue)
+                this.addLocationListEntry(data, i);
+        }
     }
 
     this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
-    this.expandExpandableList(false, this.mLocation);
-};
-
-WorldEditorScreen.prototype.filterLocationsByFaction = function (_filter)
-{
-    var _data = this.mLocation.Data;
-    var NoFilter = _filter === undefined || _filter === null;
-    this.mLocation.ListScrollContainer.empty();
-
-    for(var i = 0; i < _data.length; ++i) {
-        if (NoFilter || _filter.ID == _data[i].Faction) 
-            this.addLocationListEntry(_data[i], i);
-    }
-
-    this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
-    this.expandExpandableList(false, this.mLocation);
 };
 
 WorldEditorScreen.prototype.addLocationsData = function(_data, _isLoaded)
@@ -151,9 +88,10 @@ WorldEditorScreen.prototype.addLocationsData = function(_data, _isLoaded)
         this.mLocation.Data = _data;
 
     // load back and scroll to the position where you have left to see a location
-    if (this.mShowEntityOnMap !== null && this.mShowEntityOnMap.Type === 'location')
-    {
-        this.filterLocationsByType();
+    if (this.mShowEntityOnMap !== null && this.mShowEntityOnMap.Type === 'location') {   
+        for(var i = 0; i < this.mLocation.Data.length; ++i) {
+            this.addLocationListEntry(this.mLocation.Data[i], i);
+        }
 
         var find = null;
         this.mLocation.ListScrollContainer.find('.list-entry-fat').each(function(index, element) {
@@ -163,15 +101,21 @@ WorldEditorScreen.prototype.addLocationsData = function(_data, _isLoaded)
             }
         });
 
-        if (find !== null && find.length > 0) {
+        if (find !== null && find.length > 0)
             this.selectLocationListEntry(find, true);
-        }
+        else
+            this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
 
         this.mShowEntityOnMap = null;
     }
-    else
-    {
-        this.filterLocationsByType('IsCamp', true);
+    else {
+        for(var i = 0; i < this.mLocation.Data.length; ++i) {
+            if (this.mLocation.Data[i].IsCamp === true)
+                this.addLocationListEntry(this.mLocation.Data[i], i);
+        }
+
+        this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+        this.mLocation.ExpandLabel.find('.label:first').html('Camps');
     }
 };
 
@@ -214,7 +158,7 @@ WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
     var buttonLayout = $('<div class="distance-button"/>');
     entry.append(buttonLayout);
     var button = buttonLayout.createTextButton('' + _data.Distance + '', function() {
-        self.notifyBackendShowWorldEntityOnMap(_data.ID, 'location');
+        self.notifyBackendShowWorldEntityOnMap({ID: _data.ID, Type: 'location'});
     }, 'display-block', 6);
     button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.distance' });
 };
@@ -231,17 +175,17 @@ WorldEditorScreen.prototype.selectLocationListEntry = function(_element, _scroll
         _element.addClass('is-selected');
         this.mLocation.Selected = _element;
         this.updateLocationDetailsPanel(this.mLocation.Selected);
-        this.mLocation.DetailsPanel.addClass('display-block').removeClass('display-none');
+        this.mLocation.DetailsPanel.showThisDiv(true);
     }
     else
     {
         this.mLocation.Selected = null;
         this.updateLocationDetailsPanel(this.mLocation.Selected);
-        this.mLocation.DetailsPanel.addClass('display-none').removeClass('display-block');
+        this.mLocation.DetailsPanel.showThisDiv(false);
     }
 };
 
-WorldEditorScreen.prototype.addTroopListEntry = function (_data, _index, _listScrollContainer)
+WorldEditorScreen.prototype.addTroopListEntry = function (_data, _index, _listScrollContainer, _type)
 {
     var self = this;
     var result = $('<div class="troop-row"/>');
@@ -292,7 +236,7 @@ WorldEditorScreen.prototype.addTroopListEntry = function (_data, _index, _listSc
             Max: 3,
             Color: color,
             Font: 'title-font-normal'
-        }, column, _index);
+        }, column, _index, _type);
 
         // to display the strength this troop entry contributes
         var column = this.addColumn(30);
@@ -313,7 +257,7 @@ WorldEditorScreen.prototype.addTroopListEntry = function (_data, _index, _listSc
         var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
         column.append(buttonLayout);
         var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/' + minibossIcon + '.png', function() {
-            self.notifyBackendConvertTroopToChampion(_data);
+            self.notifyBackendConvertTroopToChampion(_data, _type);
         }, '', 6);
         button.bindTooltip({ contentType: 'ui-element', elementId: (_data.IsChampion === true ? 'woditor.dechampionization' : 'woditor.championization') });
 
@@ -323,7 +267,7 @@ WorldEditorScreen.prototype.addTroopListEntry = function (_data, _index, _listSc
         var buttonLayout = this.addLayout(4.5, 4.1, 'is-center');
         column.append(buttonLayout);
         var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/cancel.png', function() {
-            self.notifyBackendRemoveTroop(_data);
+            self.notifyBackendRemoveTroop(_data, _type);
         }, '', 6);
         button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.removeentry' });
 
@@ -419,7 +363,7 @@ WorldEditorScreen.prototype.updateLocationTroops = function(_data)
     var num = 0;
     this.mLocation.Troops.empty();
     for (var i = 0; i < _data.length; i++) {
-        strength += this.addTroopListEntry(_data[i], i, this.mLocation.Troops);
+        strength += this.addTroopListEntry(_data[i], i, this.mLocation.Troops, 'location');
         num += _data[i].Num;
     }
 
@@ -452,6 +396,20 @@ WorldEditorScreen.prototype.updateLocationNamedItemChance = function(_data)
     this.mLocation.NamedItemChance.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.refreshloot', elementOwner: _data });
 }
 
+WorldEditorScreen.prototype.updateLocationBanner = function(_data)
+{
+    var result = this.updateLocationData(_data);
+    var container = result.Element.find('.l-settlement-banner-container:first');
+    if (container.length > 0) {
+        var image = container.find('img:first');
+        if (image.length > 0) {
+            image.attr('src', Path.GFX + _data.Banner);
+        }
+    }
+    this.mLocation.Banner.attr('src', Path.GFX + _data.Banner);
+    return result.Data;
+}
+
 WorldEditorScreen.prototype.updateLocationImage = function(_data)
 {
     var result = this.updateLocationData(_data);
@@ -476,11 +434,19 @@ WorldEditorScreen.prototype.updateLocationDetailsPanel = function(_element)
         this.mLocation.Name.setInputText(data.Name);
         this.mLocation.Resources.setInputText('' + data.Resources + '');
         this.mLocation.Image.attr('src', Path.GFX + data.ImagePath);
+        this.mLocation.Image.bindTooltip({ contentType: 'ui-element', elementId: data.ID, elementOwner: 'woditor.world_entity_clickable' });
         this.mLocation.Fortification.attr('src', Path.GFX + 'ui/icons/fortification_' + data.Fortification + '.png');
         this.mLocation.Terrain.css('background-image', 'url("' + Path.GFX + data.Terrain + '")');
         this.updateLocationNamedItemChance(data.NamedItemChance);
         this.updateLocationTroops(data.Troops);
         this.updateLocationLoots(data.Loots);
+
+        if (data.Banner === undefined || data.Banner === null) {
+            this.mLocation.Banner.attr('src', Path.GFX + 'ui/banners/missing_banner.png');
+        }
+        else {
+            this.mLocation.Banner.attr('src', Path.GFX + data.Banner);
+        }
         
         if (faction === null) {
             this.mLocation.FactionBanner.attr('src', Path.GFX + 'ui/banners/missing_banner.png');
@@ -549,7 +515,7 @@ WorldEditorScreen.prototype.fillLocationSearchItemResult = function(_data)
     }
 }
 
-WorldEditorScreen.prototype.createTroopNumInputDIV = function(_key, _definition, _parentDiv, _index)
+WorldEditorScreen.prototype.createTroopNumInputDIV = function(_key, _definition, _parentDiv, _index, _type)
 {
     var self = this;
     var font = 'Font' in _definition ? _definition.Font  : 'title-font-big';
@@ -565,10 +531,10 @@ WorldEditorScreen.prototype.createTroopNumInputDIV = function(_key, _definition,
     var inputLayout = $('<div class="l-input-small is-center"/>');
     column70.append(inputLayout);
     _definition.Input = inputLayout.createInput('', _definition.Min, _definition.Max, null, null, 'title-font-medium font-bold font-color-brother-name', function (_input) {
-        self.confirmTroopNumChanges(_input, _index);
+        self.confirmTroopNumChanges(_input, _index, _type);
     });
     _definition.Input.assignInputEventListener('focusout', function(_input, _event) {
-        self.confirmTroopNumChanges(_input, _index);
+        self.confirmTroopNumChanges(_input, _index, _type);
     });
     _definition.Input.assignInputEventListener('click', function(_input, _event) {
         _input.data('IsUpdated', false);
@@ -587,14 +553,15 @@ WorldEditorScreen.prototype.createTroopNumInputDIV = function(_key, _definition,
         _definition.Input.val(_definition.Value);
 };
 
-WorldEditorScreen.prototype.confirmTroopNumChanges = function(_input, _index)
+WorldEditorScreen.prototype.confirmTroopNumChanges = function(_input, _index, _type)
 {
     if (_input.data('IsUpdated') === true)
         return;
 
-    var element = this.mLocation.Selected;
+    var parent = _type === 'unit' ? this.mUnit : this.mLocation;
+    var element = parent.Selected;
     var i = element.data('index');
-    var data = this.mLocation.Data[i];
+    var data = parent.Data[i];
     var text = _input.getInputText();
     var value = 0;
     var isValid = true;
@@ -614,7 +581,7 @@ WorldEditorScreen.prototype.confirmTroopNumChanges = function(_input, _index)
         var different = data.Troops[_index].Num - value;
         data.Troops[_index].Num = value;
         element.data('entry', data);
-        this.notifyBackendChangeTroopNum(data.Troops, _index, different);
+        this.notifyBackendChangeTroopNum(data.Troops, _index, different, _type);
     }
     else {
         _input.val('' + data.Troops[_index].Num + '');

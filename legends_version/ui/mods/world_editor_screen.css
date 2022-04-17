@@ -425,6 +425,12 @@
     background-size: 100% 5.9rem;
     background-repeat: no-repeat;
 }
+.world-editor-screen > .l-world-editor-dialog-container .content .with-scroll-tooltip-no-resize-background
+{
+    background-image: url("coui://gfx/ui/skin/tooltip_255_bottom.png");
+    background-size: 100% 55.3rem;
+    background-repeat: no-repeat;
+}
 .world-editor-screen > .l-world-editor-dialog-container .content .with-scroll-tooltip2-background
 {
     background-image: url("coui://gfx/ui/skin/tooltip_315_bottom.png");
@@ -550,6 +556,16 @@
     top: 5.3rem;
     width: 100%;
     height: 46.5rem;
+
+    position: absolute;
+    z-index: 98;
+}
+
+.world-editor-screen > .l-world-editor-dialog-container .content .below-container-extra
+{
+    top: 5.3rem;
+    width: 100%;
+    height: 51.8rem;
 
     position: absolute;
     z-index: 98;

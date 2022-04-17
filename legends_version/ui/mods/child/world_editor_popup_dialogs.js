@@ -381,11 +381,9 @@ WorldEditorScreen.prototype.createFactionAllianceEntry = function(_data, _listSc
     entry.append(leftColumn);
     var iconLayout = $('<div class="banner-icon"/>');  
     leftColumn.append(iconLayout);
-    var icon = iconLayout.createImage(Path.GFX + _data.ImagePath, function(_image)
-    {
+    var icon = iconLayout.createImage(Path.GFX + _data.ImagePath, function(_image) {
         _image.fitImageToParent(0, 0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
 
     var rightColumn = $('<div class="column-is-75"/>');
     entry.append(rightColumn);
@@ -403,8 +401,7 @@ WorldEditorScreen.prototype.createFactionAllianceEntry = function(_data, _listSc
     var image = imageContainer.createImage(Path.GFX + 'ui/skin/hud_button_01_default.png', function(_image)
     {
         _image.centerImageWithinParent(0, 0, 1.0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
 
     // set up event listener
     entry.click(this, function(_event) {
@@ -421,8 +418,130 @@ WorldEditorScreen.prototype.createFactionAllianceEntry = function(_data, _listSc
 };
 
 
+/*
+    Choose Home/Origin For Contract
+*/
+WorldEditorScreen.prototype.createChooseLocationForContractPopupDialog = function(_type) 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Pick a Place', '', null, 'troops-popup');
+
+    // create: content
+    var result = this.createChooseFactionDialogContent(this.mCurrentPopupDialog);
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // create: list
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var listScrollContainer = result.ListContainer.findListScrollContainer();
+
+    // add the ok button
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        var selectedEntry = listScrollContainer.find('.is-selected:first');
+        if (selectedEntry.length > 0) {
+            self.notifyBackendChangeLocationForContract(_type, selectedEntry.data('ID'));
+        }
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    
+    // add the cancel button
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.findPopupDialogCancelButton().addClass('move-to-left');
+    this.mCurrentPopupDialog.findPopupDialogOkButton().addClass('move-to-right');
+
+    switch(_type)
+    {
+    case 'Home':
+    case 'Origin':
+        this.addSettlementsOfThisFactionToPopupDialog(listScrollContainer, _type);
+        break;
+
+    case 'Objective':
+        //this.addSettlementsOfThisFactionToPopupDialog(listScrollContainer, button);
+        break;
+    }
+};
+WorldEditorScreen.prototype.addSettlementsOfThisFactionToPopupDialog = function(_listScrollContainer, _type) 
+{
+    var entry = this.mContract.Selected.data('entry');
+    var factionID = entry.Faction;
+    var enitytID = entry[_type];
+    _listScrollContainer.empty();
+
+    for (var i = 0; i < this.mSettlement.Data.length; i++) {
+        var data = this.mSettlement.Data[i];
+        if (data.Faction === factionID || data.Owner === factionID) {
+            this.addSettlementEntriesToPopUpDialog(data, _listScrollContainer, enitytID === data.ID); 
+        }
+    }
+};
 
 
+
+
+/*
+    Choose Faction For Contract
+*/
+WorldEditorScreen.prototype.createChooseFactionForContractPopupDialog = function() 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Choose Faction', '', null, 'troops-popup');
+
+    // create: content
+    var result = this.createChooseFactionDialogContent(this.mCurrentPopupDialog);
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // create: list
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var listScrollContainer = result.ListContainer.findListScrollContainer();
+
+    // add the ok button
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        var selectedEntry = listScrollContainer.find('.is-selected:first');
+        if (selectedEntry.length > 0) {
+            self.notifyBackendChangeContractFaction(selectedEntry.data('ID'));
+        }
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    
+    // add the cancel button
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.findPopupDialogCancelButton().addClass('move-to-left');
+
+    var button = this.mCurrentPopupDialog.findPopupDialogOkButton();
+    button.addClass('move-to-right');
+    button.enableButton(false);
+
+    this.addSettlementFactionToPopupDialog(listScrollContainer, button);
+};
+WorldEditorScreen.prototype.addSettlementFactionToPopupDialog = function(_listScrollContainer, _button) 
+{
+    var selectedID = this.mContract.Selected.data('entry').Faction;
+    _listScrollContainer.empty();
+
+    for (var i = 0; i < this.mFaction.Data.length; ++i)
+    {
+        var data = this.mFaction.Data[i];
+
+        if (data.Type === 2 || data.Type === 3 || data.Type === 13)
+        {
+            this.createChooseFactionEntry(data, _listScrollContainer, _button, data.ID === selectedID);
+        }
+    }
+};
 
 
 /*
@@ -527,8 +646,7 @@ WorldEditorScreen.prototype.createChooseFactionEntry = function(_data, _listScro
     leftColumn.append(iconLayout);
     var icon = iconLayout.createImage(Path.GFX + _data.ImagePath, function(_image) {
         _image.fitImageToParent(0, 0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
 
     var rightColumn = $('<div class="column-is-75"/>');
     entry.append(rightColumn);
@@ -551,6 +669,146 @@ WorldEditorScreen.prototype.createChooseFactionEntry = function(_data, _listScro
         }
     });
 };
+
+
+
+
+/*
+    Change World Entity Banner
+*/
+WorldEditorScreen.prototype.createChangeWorldEntityBannerPopupDialog = function(_element) 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Change Banner', null, null, 'choose-building-popup');
+    var title = this.mCurrentPopupDialog.findPopupDialogTitle();
+    title.removeClass('font-bottom-shadow');
+    title.removeClass('font-color-title');
+    title.addClass('font-color-ink');
+
+    var result = this.createBuildingPopupDialogContent(this.mCurrentPopupDialog); 
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // add scroll bar, due to how the ui works, it has to be created rather in the content function
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var listScrollContainer = result.ListContainer.findListScrollContainer();
+    
+    // add footer buttons
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        var selectedEntry = listScrollContainer.find('.is-selected:first');
+        if (selectedEntry.length > 0) {
+            self.notifyBackendChangeWorldEntityBanner(_element, selectedEntry.data('sprite'));
+        }
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    
+    // add building entries so you can pick one
+    this.notifyBackendGetBannerSpriteEntries(_element, listScrollContainer);
+};
+WorldEditorScreen.prototype.addBannerSpriteEntriesToPopupDialog = function(_data, _listScrollContainer) 
+{
+    for (var i = 0; i < _data.length; i++) {
+        var entry = $('<div class="is-banner-slot"/>');
+        entry.data('sprite', _data[i].Sprite);
+        _listScrollContainer.append(entry);
+
+        if (i == 0)
+            entry.addClass('is-selected');
+
+        var image = entry.createImage(Path.GFX + _data[i].ImagePath, function(_image) {
+            _image.centerImageWithinParent(0, 0, 1.0);
+        }, null, '');
+
+        // set up event listeners
+        entry.click(this, function(_event) {
+            var div = $(this);
+            if (div.hasClass('is-selected') === false) {
+                _listScrollContainer.find('.is-selected').each(function (_index, _element) {
+                    $(_element).removeClass('is-selected');
+                });
+                div.addClass('is-selected');
+            }
+        });
+    }
+};
+
+
+
+
+/*
+    Change Unit Sprite
+*/
+WorldEditorScreen.prototype.createChangeUnitSpritePopupDialog = function() 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Change Sprite', null, null, 'choose-building-popup');
+    var title = this.mCurrentPopupDialog.findPopupDialogTitle();
+    title.removeClass('font-bottom-shadow');
+    title.removeClass('font-color-title');
+    title.addClass('font-color-ink');
+
+    var result = this.createBuildingPopupDialogContent(this.mCurrentPopupDialog); 
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // add scroll bar, due to how the ui works, it has to be created rather in the content function
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var listScrollContainer = result.ListContainer.findListScrollContainer();
+    
+    // add footer buttons
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        var selectedEntry = listScrollContainer.find('.is-selected:first');
+        if (selectedEntry.length > 0) {
+            self.notifyBackendChangeUnitSprite(selectedEntry.data('sprite'));
+        }
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    
+    // add building entries so you can pick one
+    this.notifyBackendGetUnitSpriteEntries(listScrollContainer);
+};
+WorldEditorScreen.prototype.addUnitSpriteEntriesToPopupDialog = function(_data, _listScrollContainer) 
+{
+    for (var i = 0; i < _data.length; i++) {
+        var entry = $('<div class="is-party-slot"/>');
+        entry.data('sprite', _data[i].Sprite);
+        _listScrollContainer.append(entry);
+
+        if (i == 0)
+            entry.addClass('is-selected');
+
+        var image = entry.createImage(Path.GFX + _data[i].ImagePath, function(_image) {
+            _image.centerImageWithinParent(0, 0, 1.0);
+        }, null, '');
+
+        // set up event listeners
+        entry.click(this, function(_event) {
+            var div = $(this);
+            if (div.hasClass('is-selected') === false) {
+                _listScrollContainer.find('.is-selected').each(function (_index, _element) {
+                    $(_element).removeClass('is-selected');
+                });
+                div.addClass('is-selected');
+            }
+        });
+    }
+};
+
+
 
 
 /*
@@ -604,8 +862,7 @@ WorldEditorScreen.prototype.addLocationSpriteEntriesToPopupDialog = function(_da
 
         var image = entry.createImage(Path.GFX + _data[i].ImagePath, function(_image) {
             _image.centerImageWithinParent(0, 0, 1.0);
-            _image.removeClass('opacity-none');
-        }, null, 'opacity-none');
+        }, null, '');
 
         // set up event listeners
         entry.click(this, function(_event) {
@@ -624,9 +881,84 @@ WorldEditorScreen.prototype.addLocationSpriteEntriesToPopupDialog = function(_da
 
 
 /*
+    Add new contract
+*/
+WorldEditorScreen.prototype.createAddContractPopupDialog = function() 
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-editor-screen').createPopupDialog('Add Contract', null, null, 'choose-building-popup');
+    var title = this.mCurrentPopupDialog.findPopupDialogTitle();
+    title.removeClass('font-bottom-shadow');
+    title.removeClass('font-color-title');
+    title.addClass('font-color-ink');
+
+    var result = this.createBuildingPopupDialogContent(this.mCurrentPopupDialog);
+    this.mCurrentPopupDialog.addPopupDialogContent(result.Content);
+
+    // add scroll bar, due to how the ui works, it has to be created rather in the content function
+    result.ListContainer.aciScrollBar({delta: 1, lineDelay: 0, lineTimer: 0, pageDelay: 0, pageTimer: 0, bindKeyboard: false, resizable: false, smoothScroll: false});
+    var listScrollContainer = result.ListContainer.findListScrollContainer();
+    
+    // add footer buttons
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        var script;
+        listScrollContainer.find('input').each(function(index, element) {
+            var checkbox = $(element);
+            if (checkbox.is(':checked') === true) {
+                script = checkbox.data('script');
+            }
+        });
+        self.notifyBackendAddNewContract(script);
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    
+    // add contract entries so you can pick one
+    this.notifyBackendGetAvailableContracts(listScrollContainer, this.mCurrentPopupDialog.findPopupDialogOkButton());
+};
+WorldEditorScreen.prototype.addContractEntriesToPopupDialog = function(_data, _listScrollContainer, _button) 
+{
+    for (var i = 0; i < _data.length; i++) {
+        this.createContractEntryToPopupDialog(_data[i], _listScrollContainer, _button);
+    }
+};
+WorldEditorScreen.prototype.createContractEntryToPopupDialog = function(_data, _listScrollContainer, _button) 
+{
+    var row = $('<div class="row"></div>');
+    _listScrollContainer.append(row);
+    var control = $('<div class="control"/>');
+    row.append(control);
+    var checkbox = $('<input type="radio" id="' + _data.Type + '" name="contract" />');
+    control.append(checkbox);
+    var label = $('<label class="text-font-normal font-color-ink" for="' + _data.Type + '">' + _data.Name + '</label>');
+    control.append(label);
+    checkbox.iCheck({
+        checkboxClass: 'icheckbox_flat-orange',
+        radioClass: 'iradio_flat-orange',
+        increaseArea: '30%'
+    });
+    checkbox.on('ifChecked', null, this, function(_event) {
+        var self = _event.data;
+        _button.enableButton(true);
+    });
+    checkbox.data('script', _data.Script);
+};
+
+
+
+
+
+/*
     Add Troop Dialog
 */
-WorldEditorScreen.prototype.createAddTroopPopupDialog = function() 
+WorldEditorScreen.prototype.createAddTroopPopupDialog = function(_element) 
 {
     var self = this;
     this.mTroop.Selected = [];
@@ -646,8 +978,7 @@ WorldEditorScreen.prototype.createAddTroopPopupDialog = function()
     var buttonLayout = $('<div class="l-tab-button is-deselect-all"/>');
     result.Tab.append(buttonLayout);
     var button = buttonLayout.createTextButton("Deselect All", function() {
-        listScrollContainer.find('.is-selected').each(function (_index, _element)
-        {
+        listScrollContainer.find('.is-selected').each(function(_index, _element) {
             var div = $(_element)
             div.removeClass('is-selected');
             var result = div.find('.check-image:first').find('img:first');
@@ -715,7 +1046,7 @@ WorldEditorScreen.prototype.createAddTroopPopupDialog = function()
 
     // add the ok button
     this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
-        self.notifyBackendAddNewTroop();
+        self.notifyBackendAddNewTroop(_element);
         self.mTroop.Selected = [];
         self.mCurrentPopupDialog = null;
         _dialog.destroyPopupDialog();
@@ -733,7 +1064,7 @@ WorldEditorScreen.prototype.createAddTroopPopupDialog = function()
     this.mCurrentPopupDialog.findPopupDialogCancelButton().addClass('move-to-left');
 
     // add data to the list
-    this.notifyBackendGetTroopEntries({
+    this.notifyBackendGetTroopEntries(_element, {
         ListScrollContainer: listScrollContainer,
         SubTitle: subTitle
     });
@@ -789,8 +1120,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     leftColumn.append(iconLayout);
     var icon = iconLayout.createImage(Path.GFX + _data.Icon, function(_image) {
         _image.fitImageToParent(0, 0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
 
     var rightColumn = $('<div class="column-is-75"/>');
     entry.append(rightColumn);
@@ -805,8 +1135,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     column.append(iconLayout);
     var image = iconLayout.createImage(Path.GFX + 'ui/icons/money2.png', function(_image) {
         _image.fitImageToParent(0, 0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
     //image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.partystrength' });
     var name = $('<div class="strength-label title-font-normal font-bold font-color-white">' + _data.Cost + '</div>');
     column.append(name);
@@ -818,8 +1147,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     column.append(iconLayout);
     var image = iconLayout.createImage(Path.GFX + 'ui/icons/fist.png', function(_image) {
         _image.fitImageToParent(0, 0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
     image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.partystrength' });
     var name = $('<div class="strength-label title-font-normal font-bold font-color-white">' + _data.Strength + '</div>');
     column.append(name);
@@ -835,8 +1163,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
     column.append(iconLayout);
     var check = iconLayout.createImage(Path.GFX + (isSelected === true ? 'ui/skin/hud_button_01_checked.png' : 'ui/skin/hud_button_01_default.png'), function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
 
     // for name
     var row = $('<div class="row-half"/>');
@@ -867,7 +1194,7 @@ WorldEditorScreen.prototype.createTroopEntry = function(_data, _listScrollContai
 
 
 /*
-    Choose Building
+    Choose Attached Location
 */
 WorldEditorScreen.prototype.createAttachedLocationPopupDialog = function(_isAttach) 
 {
@@ -981,8 +1308,7 @@ WorldEditorScreen.prototype.addAttachedLocationEntriesToPopupDialog = function(_
 
         var image = slot.createImage(Path.GFX + entry.ImagePath, function(_image) {
             _image.centerImageWithinParent(0, 0, 1.0);
-            _image.removeClass('opacity-none');
-        }, null, 'opacity-none');
+        }, null, '');
 
         // set up event listeners
         slot.click(this, function(_event) {
@@ -1007,8 +1333,7 @@ WorldEditorScreen.prototype.addSituationEntriesToPopupDialog = function(_data, _
 
         var image = slot.createImage(Path.GFX + entry.ImagePath, function(_image) {
             _image.centerImageWithinParent(0, 0, 1.0);
-            _image.removeClass('opacity-none');
-        }, null, 'opacity-none');
+        }, null, '');
 
         // set up event listeners
         slot.click(this, function(_event) {
@@ -1034,8 +1359,7 @@ WorldEditorScreen.prototype.addBuildingEntriesToPopupDialog = function(_data, _l
 
         var image = slot.createImage(Path.GFX + entry.ImagePath, function(_image) {
             _image.centerImageWithinParent(0, 0, 1.0);
-            _image.removeClass('opacity-none');
-        }, null, 'opacity-none');
+        }, null, '');
 
         // set up event listeners
         slot.click(this, function(_event) {
@@ -1266,8 +1590,7 @@ WorldEditorScreen.prototype.addSettlementEntriesToPopUpDialog = function(_data, 
 
     imageContainer.createImage(Path.GFX + _data.ImagePath, function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
 
     // banner image
     var imageContainer = $('<div class="l-settlement-banner-container"/>');
@@ -1277,8 +1600,7 @@ WorldEditorScreen.prototype.addSettlementEntriesToPopUpDialog = function(_data, 
     var faction = this.getFaction(factionID);
     imageContainer.createImage(Path.GFX + faction.ImagePath, function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
 
     var name = $('<div class="name title-font-normal font-bold font-color-white">' + _data.Name + '</div>');
     entry.append(name);

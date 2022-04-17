@@ -2,10 +2,42 @@
 {
 	::mods_hookExactClass("entity/world/party", function ( obj )
 	{
+		obj.setBanner <- function( _banner )
+		{
+			if (this.hasSprite("banner"))
+			{
+				this.getSprite("banner").setBrush(_banner);
+			}
+		};
 		obj.getUIImagePath <- function()
 		{
+			local sprite = this.getSprite("body");
+
+			if (sprite.HasBrush)
+			{
+				return "ui/parties/" + sprite.getBrush().Name + ".png";
+			}
+			
 			return "ui/images/undiscovered_opponent.png";
-			//return "ui/attached_locations/" + this.m.Sprite + ".png";
+		};
+		obj.getTerrainImage <- function()
+		{
+			return "ui/" + this.Const.World.TerrainTacticalImage[this.getTile().TacticalType] + (!this.World.getTime().IsDaytime ? "_night.png" : ".png");
+		};
+		obj.getTooltipId <- function()
+		{
+			return this.getID();
+		};
+		obj.getUIBanner <- function()
+		{
+			local sprite = this.getSprite("banner");
+
+			if (sprite.HasBrush)
+			{
+				return "ui/banners/" + sprite.getBrush().Name + ".png";
+			}
+			
+			return null;
 		};
 	});
 

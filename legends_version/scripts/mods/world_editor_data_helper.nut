@@ -104,6 +104,64 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
+	function convertBannerSpriteEntriesToUIData( _id )
+	{
+		local world_entity = ::World.getEntityByID(_id);
+		local banner = world_entity.isParty() ? world_entity.getSprite("banner") : world_entity.getSprite("location_banner");
+		local result = [];
+		local valid = [];
+		valid.extend(::Woditor.ValidBannerSprites);
+
+		if (banner.HasBrush)
+		{
+			local find = valid.find(banner.getBrush().Name);
+
+			if (find != null)
+			{
+				valid.remove(find);
+			}
+		}
+
+		foreach (banner in valid )
+		{
+			result.push({
+				ImagePath = "ui/banners/" + banner + ".png",
+				Sprite = banner
+			});
+		}
+
+		return result;
+	}
+
+	function convertUnitSpriteEntriesToUIData( _id )
+	{
+		local world_entity = ::World.getEntityByID(_id);
+		local body = world_entity.getSprite("body");
+		local result = [];
+		local valid = [];
+		valid.extend(::Woditor.ValidPartySprites);
+
+		if (body.HasBrush)
+		{
+			local find = valid.find(body.getBrush().Name);
+
+			if (find != null)
+			{
+				valid.remove(find);
+			}
+		}
+
+		foreach (sprite in valid )
+		{
+			result.push({
+				ImagePath = "ui/parties/" + sprite + ".png",
+				Sprite = sprite
+			});
+		}
+
+		return result;
+	}
+
 	function convertLocationSpriteEntriesToUIData( _id )
 	{
 		local world_entity = ::World.getEntityByID(_id);
@@ -367,6 +425,50 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
+	function convertUnitsToUIData()
+	{
+		local result = [];
+		local playerTile = ::World.State.getPlayer().getTile();
+		local factions = clone ::World.FactionManager.getFactions(false);
+
+		foreach( f in factions )
+		{
+			if (f == null)
+			{
+				continue;
+			}
+
+			foreach( party in f.getUnits() )
+			{
+				result.push({
+					ID = party.getID(),
+					Name = party.getName(),
+					Faction = f.getID(),
+					TooltipId = party.getID(),
+					Banner = party.getUIBanner(),
+					Resources = party.getResources(),
+					Terrain = party.getTerrainImage(),
+					ImagePath = party.getUIImagePath(),
+					LootScale = party.m.LootScale,
+					Troops = this.convertTroopsToUIData(party),
+					Distance = playerTile.getDistanceTo(party.getTile()),
+					IsAlwaysAttackingPlayer = party.isAlwaysAttackingPlayer(),
+					IsLeavingFootprints = party.m.IsLeavingFootprints,
+					IsAttackableByAI = party.isAttackableByAI(),
+					IsSlowerAtNight = party.isSlowerAtNight(),
+					IsLooting = party.isLooting(),
+					IsCaravan = party.getFlags().get("IsCaravan"),
+					IsQuest = party.getSprite("selection").Visible,
+					IsParty = party.isParty(),
+					IsSpawningTroop = false,
+				});
+			}
+		}
+
+		result.sort(this.onSortByFactionAndDistance);
+		return result;
+	}
+
 	function convertLocationsToUIData()
 	{
 		local result = [];
@@ -412,13 +514,14 @@ this.world_editor_data_helper <- {
 				Distance = playerTile.getDistanceTo(location.getTile()),
 				IsSpawningTroop = location.getDefenderSpawnList() != null,
 				Fortification = location.getCombatLocation().Fortification != 0,
+				IsParty = location.isParty(),
 				IsPassive = isPassive && !isLair,
 				IsCamp =  isLair && !isUnique,
 				IsLegendary = isUnique,
 			});
 		}
 
-		result.sort(this.onSortLocations);
+		result.sort(this.onSortByFactionAndDistance);
 		return result;
 	}
 
@@ -522,6 +625,7 @@ this.world_editor_data_helper <- {
 				IsCoastal = settlement.isCoastal(),
 				IsMilitary = settlement.isMilitary(),
 				IsSouthern = settlement.isSouthern(),
+				IsTown = !settlement.isMilitary() && !settlement.isSouthern(),
 				IsIsolated = settlement.isIsolatedFromRoads(),
 				Distance = playerTile.getDistanceTo(settlement.getTile()),
 				Attachments = attached_locations,
@@ -534,35 +638,6 @@ this.world_editor_data_helper <- {
 		}
 
 		result.sort(this.onSortSettlements);
-		return result;
-	}
-
-	function convertToUIFilterData( _factions )
-	{
-		local result = {Settlements = [], Locations = []};
-
-		foreach( f in _factions )
-		{
-			if (!f.NoChangeName)
-			{
-				if (f.SettlementNum <= 1) continue;
-
-				result.Settlements.push({
-					ID = f.ID,
-					Num = f.SettlementNum
-				});
-			}
-			else if (f.SettlementNum > 0)
-			{
-				result.Locations.push({
-					ID = f.ID,
-					Num = f.SettlementNum
-				});
-			}
-		}
-
-		result.Settlements.sort(this.onSortNum);
-		result.Locations.sort(this.onSortNum);
 		return result;
 	}
 
@@ -612,6 +687,7 @@ this.world_editor_data_helper <- {
 		{
 			local faction = {
 				ID = f.getID(),
+				Type = f.getType(),
 				Name = ("getNameOnly" in f) ? f.getNameOnly() : f.getName(),
 				Motto = f.getMotto(),
 				Relation = f.getPlayerRelationAsText(),
@@ -620,6 +696,7 @@ this.world_editor_data_helper <- {
 				FactionFixedRelation = f.isPlayerRelationPermanent(),
 				IsNoble = f.getType() == ::Const.FactionType.NobleHouse,
 				SettlementNum = f.getSettlements().len(),
+				UnitNum = f.getUnits().len()
 			};
 
 			if (valid.find(f.getType()) != null)
@@ -654,6 +731,17 @@ this.world_editor_data_helper <- {
 			local originID = (contract.getOrigin() != null && !contract.getOrigin().isNull()) ? contract.getOrigin().getID() : null;
 			local homeID = (contract.getHome() != null && !contract.getHome().isNull()) ? contract.getHome().getID() : null;
 			local employeImagePath = contract.getEmployer().getImagePath();
+			local objective;
+
+			if ("Destination" in contract.m)
+			{
+				objective = (contract.m.Destination != null && !contract.m.Destination) ? contract.m.Destination.getID() : null;
+			}
+
+			if (objective == null && "Location" in contract.m)
+			{
+				objective = (contract.m.Location != null && !contract.m.Location) ? contract.m.Location.getID() : null;
+			}
 
 			result.push({
 				ID = contract.getID(),
@@ -666,14 +754,48 @@ this.world_editor_data_helper <- {
 				DifficultyMult = ::Math.floor(contract.getDifficultyMult() * 100),
 				PaymentMult = ::Math.floor(contract.getPaymentMult() * 100),
 				Employer = employeImagePath,
+				Objective = objective,
 				Expire = daysLeft,
 				Origin = originID,
 				Home = homeID
 			});
 		}
 
-		result.sort(this.onSortWithFaction);
+		result.sort(this.onSortByFaction);
 		return result;
+	}
+
+	function convertAvailableContractToUIData( _result )
+	{
+		foreach (id, v in ::Woditor.Contracts)
+		{
+			if (::Woditor.InvalidContracts.find(id) != null) continue;
+			if (v.ChangeObjective) continue;
+
+			_result.push({
+				Type = id,
+				Name = v.Name,
+				Script = v.Script,
+			});
+		}
+
+		_result.sort(this.onSortByName);
+		return _result;
+	}
+
+	function convertInvalidContractsToUIData( _result )
+	{
+		foreach (id, v in ::Woditor.Contracts)
+		{
+			_result.InvalidContracts.push({
+				Type = id,
+				Name = v.Name,
+				Script = v.Script,
+				IsValid = ::Woditor.InvalidContracts.find(id) == null,
+			});
+		}
+
+		_result.InvalidContracts.sort(this.onSortByName);
 	}
 
 	function convertItemToUIData( _item, _owner )
@@ -720,6 +842,88 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
+	function convertToUIFilterData( _factions )
+	{
+		local result = {Contracts = [], InvalidContracts = [], Settlements = [], Locations = [], Units = []};
+
+		foreach( f in _factions )
+		{
+			if (!f.NoChangeName)
+			{
+				if (f.SettlementNum > 1)
+				{
+					result.Settlements.push({
+						Name = f.Name,
+						Search = null,
+						Filter = ["Faction", f.ID],
+						Num = f.SettlementNum
+					});
+				}
+			}
+			else if (f.SettlementNum > 0)
+			{
+				result.Locations.push({
+					Name = f.Name,
+					Search = null,
+					Filter = ["Faction", f.ID],
+					Num = f.SettlementNum
+				});
+			}
+
+			if (f.UnitNum > 0)
+			{
+				result.Units.push({
+					Name = f.Name,
+					Search = null,
+					Filter = ["Faction", f.ID],
+					Num = f.UnitNum
+				});
+			}
+		}
+
+		result.Settlements.sort(this.onSortNum);
+		result.Locations.sort(this.onSortNum);
+		result.Units.sort(this.onSortNum);
+		this.addDefaultContractFilters(result);
+		this.addDefaultSettlementFilters(result);
+		this.addDefaultLocationFilters(result);
+		this.addDefaultUnitsFilters(result);
+		this.convertInvalidContractsToUIData(result);
+		return result;
+	}
+
+	function addDefaultSettlementFilters( _result )
+	{
+		_result.Settlements.insert(0, {Name = "City States", Search = null, Filter = ["IsSouthern", true]});
+		_result.Settlements.insert(0, {Name = "Strongholds", Search = null, Filter = ["IsMilitary", true]});
+		_result.Settlements.insert(0, {Name = "Towns"      , Search = null, Filter = ["IsTown"    , true]});
+	}
+
+	function addDefaultLocationFilters( _result )
+	{
+		_result.Locations.insert(0, {Name = "Legendary", Search = null, Filter = ["IsLegendary", true]});
+		_result.Locations.insert(0, {Name = "Camps"    , Search = null, Filter = ["IsCamp"     , true]});
+		_result.Locations.push(     {Name = "Misc"     , Search = null, Filter = ["IsPassive"  , true]}); // at the bottom of the list
+	}
+
+	function addDefaultUnitsFilters( _result )
+	{
+		_result.Units.insert(0, {Name = "Quest Target", Search = null, Filter = ["IsQuest", true]});
+		_result.Units.insert(0, {Name = "Caravan"     , Search = null, Filter = ["IsCaravan", true]});
+	}
+
+	function addDefaultContractFilters( _result )
+	{
+		_result.Contracts.push({Name = "Settlement"          , Search = ["Faction", "Faction"] , Filter = ["Type", ::Const.FactionType.Settlement]});
+		_result.Contracts.push({Name = "Noble"               , Search = ["Faction", "Faction"] , Filter = ["Type", ::Const.FactionType.NobleHouse]});
+		_result.Contracts.push({Name = "Southern"            , Search = ["Faction", "Faction"] , Filter = ["Type", ::Const.FactionType.OrientalCityState]});
+		_result.Contracts.push({Name = "Legendary Contract"  , Search = null      , Filter = ["Icon", "ui/banners/factions/banner_legend_s.png"]});
+		_result.Contracts.push({Name = "Difficulty Easy"     , Search = null      , Filter = ["DifficultyIcon", "ui/icons/difficulty_easy.png"]});
+		_result.Contracts.push({Name = "Difficulty Medium"   , Search = null      , Filter = ["DifficultyIcon", "ui/icons/difficulty_medium.png"]});
+		_result.Contracts.push({Name = "Difficulty Hard"     , Search = null      , Filter = ["DifficultyIcon", "ui/icons/difficulty_hard.png"]});
+		_result.Contracts.push({Name = "Difficulty Legendary", Search = null      , Filter = ["DifficultyIcon", "ui/icons/difficulty_legend.png"]});
+	}
+
 	function lookForTroop( _key, _troops, _isMiniboss )
 	{
 		foreach (i, troop in _troops )
@@ -758,7 +962,23 @@ this.world_editor_data_helper <- {
 		}
 	}
 
-	function onSortWithFaction( _f1, _f2 )
+	function onSortByName( _f1, _f2 )
+	{
+		if (_f1.Name < _f2.Name)
+		{
+			return -1;
+		}
+		else if (_f1.Name > _f2.Name)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	function onSortByFaction( _f1, _f2 )
 	{
 		if (_f1.Faction < _f2.Faction)
 		{
@@ -790,7 +1010,7 @@ this.world_editor_data_helper <- {
 		}
 	}
 
-	function onSortLocations( _l1, _l2 )
+	function onSortByFactionAndDistance( _l1, _l2 )
 	{
 		if (_l1.Faction < _l2.Faction)
 		{

@@ -1,7 +1,7 @@
 
 .world-editor-screen > .l-world-editor-dialog-container .content .scroll-container .contract-row
 {
-    width: 29.0rem;
+    width: 35.0rem; /*29.0*/
     height: 10.7rem;
     position: relative;
     margin-bottom: -0.1rem;
@@ -39,7 +39,7 @@
 .world-editor-screen > .l-world-editor-dialog-container .content .contract-row .contract-column-right
 {
     left : 8.0rem;
-    width: 20.0rem;
+    width: 26.0rem; /*20*/
     height: 100%;
     position: absolute;
 }
@@ -54,7 +54,7 @@
 .world-editor-screen > .l-world-editor-dialog-container .content .contract-row .contract-column-right .expiration-container
 {
     top: 0.8rem;
-    left: 15.3rem;
+    left: 21.3rem; /*15.3*/
     width: 6.0rem;
     height: 3.0rem;
     position: absolute;
@@ -91,7 +91,7 @@
 {
     top: 3.0rem;
     width: 12.0rem;
-    height: 14.0rem;
+    height: 16.0rem;
     position: absolute;
 }
 .world-editor-screen > .l-world-editor-dialog-container .content .employer-image-container > img,

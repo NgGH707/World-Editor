@@ -2,7 +2,7 @@
 {
 	::mods_hookNewObject("contracts/contract_manager", function( obj ) 
 	{
-		obj.getContractsByID <- function( _id )
+		obj.getContractByID <- function( _id )
 		{
 			foreach( contract in this.m.Open )
 			{
@@ -13,6 +13,62 @@
 			}
 
 			return null;
+		}
+
+		obj.removeContractByID <- function( _id )
+		{
+			local find;
+
+			foreach (i, c in this.m.Open)
+			{
+				if (c.getID() == _id)
+				{
+					find = i;
+					break;
+				}
+			}
+
+			if (find == null) return null;
+
+			local remove = this.m.Open.remove(find);
+			this.World.FactionManager.getFaction(remove.getFaction()).removeContract(remove);
+			remove.onClear();
+			
+			if (this.m.LastShown == remove)
+			{
+				this.m.LastShown = null;
+			}
+
+			if (this.World.State.getCurrentTown() != null)
+			{
+				this.World.State.getTownScreen().updateContracts();
+			}
+
+			return remove;
+		}
+
+		obj.addContractByForce <- function( _contract )
+		{
+			_contract.m.ID = this.generateContractID();
+			_contract.m.TimeOut += this.World.getTime().SecondsPerDay * (this.Math.rand(0, 200) - 100) * 0.01;
+
+			if (_contract.getFaction() != 0)
+			{
+				this.World.FactionManager.getFaction(_contract.getFaction()).addContract(_contract);
+			}
+
+			this.m.Open.push(_contract);
+		}
+
+		local ws_addContract = obj.addContract;
+		obj.addContract = function( _contract, _isNewContract = true )
+		{
+			if (::Woditor.InvalidContracts.find(_contract.getType()) != null)
+			{
+				return;
+			}
+
+			ws_addContract(_contract, _isNewContract);
 		}
 	});
 

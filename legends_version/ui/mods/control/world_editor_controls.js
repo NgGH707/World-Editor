@@ -1,3 +1,14 @@
+$.fn.addHighlighter = function()
+{
+    this.mouseover(function() {
+        this.classList.add('is-highlighted');
+    });
+    this.mouseout(function() {
+        this.classList.remove('is-highlighted');
+    });
+    return this;
+}
+
 $.fn.showThisDiv = function(_value)
 {
     if (_value === true)

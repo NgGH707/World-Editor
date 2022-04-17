@@ -19,6 +19,7 @@ local version = 3.0;
 ::mods_registerJS("child/world_editor_contracts.js");
 ::mods_registerJS("child/world_editor_settlements.js");
 ::mods_registerJS("child/world_editor_locations.js");
+::mods_registerJS("child/world_editor_units.js");
 ::mods_registerJS("child/world_editor_popup_dialogs.js");
 
 // register hooks

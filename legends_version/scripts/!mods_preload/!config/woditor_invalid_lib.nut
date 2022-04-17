@@ -153,4 +153,27 @@ else
 }
 
 
+local contracts = [
+	"scripts/contracts/contracts/arena_contract",
+	"scripts/contracts/contracts/arena_tournament_contract",
+	"scripts/contracts/contracts/tutorial_contract",
+	"scripts/contracts/contracts/raid_caravan_contract",
+	"scripts/contracts/contracts/stronghold_defeat_assailant_contract",
+	"scripts/contracts/contracts/stronghold_find_waterskin_recipe_contract",
+	"scripts/contracts/contracts/stronghold_free_mercenaries_contract",
+	"scripts/contracts/contracts/stronghold_free_trainer_contract",
+	"scripts/contracts/contracts/stronghold_management_contract",
+	"scripts/contracts/contracts/travel_together_contract",
+];
+// contracts
+if (!("Contracts" in ::Const.Invalid))
+{
+	::Const.Invalid.Contracts <- contracts;
+}
+else
+{
+	::Const.Invalid.Contracts.extend(contracts);
+}
+
+
 
