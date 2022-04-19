@@ -732,7 +732,7 @@ this.world_editor_data_helper <- {
 			local daysLeft = ::Math.max(1, ::Math.abs(::Time.getVirtualTimeF() - contract.m.TimeOut) / ::World.getTime().SecondsPerDay);
 			local originID = (contract.getOrigin() != null && !contract.getOrigin().isNull()) ? contract.getOrigin().getID() : null;
 			local homeID = (contract.getHome() != null && !contract.getHome().isNull()) ? contract.getHome().getID() : null;
-			local employeImagePath = contract.getEmployer().getImagePath();
+			local employeImagePath = contract.getEmployer() != null ? contract.getEmployer().getImagePath() : "ui/images/undiscovered_opponent.png";
 			local objective;
 
 			if ("Destination" in contract.m)

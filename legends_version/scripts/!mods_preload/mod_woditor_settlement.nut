@@ -17,8 +17,6 @@
 				this.Const.World.TerrainType.Impassable,
 				this.Const.World.TerrainType.Ocean,
 				this.Const.World.TerrainType.Shore,
-				this.Const.World.TerrainType.Mountains,
-				this.Const.World.TerrainType.Steppe
 			];
 
 			for( local i = 0; i < 6; i = ++i )
@@ -38,7 +36,6 @@
 							Y = nextTile.SquareCoords.Y,
 							V = v
 						});
-						nextTile.clear();
 						nextTile.IsOccupied = true;
 						local d = nextTile.spawnDetail("world_houses_0" + this.m.HousesType + "_0" + v, this.Const.World.ZLevel.Object - 3, this.Const.World.DetailType.Houses);
 						d.Scale = 0.85;

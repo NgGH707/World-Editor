@@ -1,0 +1,123 @@
+
+.world-screen > .world-map-editor-container
+{
+    top: 10.0rem;
+    left: 0;
+    width: 30.0rem;
+    position: absolute;
+    z-index: 2;
+
+    pointer-events: none;
+}
+
+.world-screen .world-map-editor-module
+{
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    pointer-events: auto;
+    background-image: url("coui://gfx/ui/skin/dialog_panel_02.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.world-screen .world-map-editor-module .l-tab-column
+{
+    width: 4.5rem;
+    height: 100%;
+    position: relative;
+    float: left;
+
+    background-image: url("coui://gfx/ui/skin/horizontal_panel_118x729.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.world-screen .world-map-editor-module .l-content-column
+{
+    left: 4.6rem;
+    width: 25.4rem;
+    height: 100%;
+    position: absolute;
+    float: left;
+}
+
+.world-screen .world-map-editor-module .l-header-container
+{
+    width: 100%;
+    height: 5.3rem;
+
+    position: relative;
+    float: left;
+}
+.world-screen .world-map-editor-module > .l-content-column .l-header-container .l-button-45-41.is-expand
+{  
+    top: 1.0rem;
+    left: 20.5rem;
+    position: absolute;
+}
+.world-screen .world-map-editor-module > .l-content-column .l-header-container .l-button-174-43.is-label
+{  
+    top: 0.9rem;
+    left: 2.0rem;
+    position: absolute;
+}
+
+.world-screen .world-map-editor-module > .l-content-column .l-content-container
+{
+    width: 100%;
+    position: relative;
+    float: left;
+}
+
+.world-screen .world-map-editor-module > .l-content-column .l-content-container .selection-container
+{
+    width: 24.0rem;
+    height: 27.0rem;
+    position: absolute;
+
+    background-image: url("coui://gfx/ui/borders/border_01.png");
+    background-size: 24.0rem 27.0rem;
+    background-repeat: no-repeat;
+    border: 1px solid red;
+}
+
+.world-screen .world-map-editor-module .l-button-45-41
+{
+    width: 4.5rem;
+    height: 4.1rem;
+
+    position: absolute;
+}
+
+.world-screen .world-map-editor-module .l-button-174-43
+{
+    width: 17.4rem;
+    height: 4.3rem;
+
+    position: absolute;
+}
+
+.world-screen .world-map-editor-module .is-center
+{
+    position: absolute;
+    margin: auto;
+}
+
+.world-screen .world-map-editor-module .is-horizontal-center
+{
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+}
+
+.world-screen .world-map-editor-module .is-vertical-center
+{
+    margin-top: auto;
+    margin-bottom: auto;
+    position: absolute;
+}
+
+
+

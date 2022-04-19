@@ -15,8 +15,8 @@
 		obj.onDestroyUI = function()
 		{
 			destroy_ui();
-			this.m.Woditor.destroy();
-			this.m.Woditor = null;
+			this.m.WorldEditorScreen.destroy();
+			this.m.WorldEditorScreen = null;
 		}
 
 		obj.showWorldEditorScreen <- function()
@@ -68,14 +68,21 @@
 		{
 			if(!keyHandler(_key) && _key.getState() == 0)
 			{
-				if (_key.getModifier() == 2 && _key.getKey() == 38) //CTRL + Tab
+				if (_key.getModifier() == 2) // CTRL
 				{
-					if (!this.m.CharacterScreen.isVisible() && !this.m.WorldTownScreen.isVisible() && !this.m.EventScreen.isVisible() && !this.m.EventScreen.isAnimating())
+					if (_key.getKey() == 23 && this.m.WorldScreen.isVisible()) // M
+					{
+						return this.m.WorldScreen.toggleWorldMapEditorModule();
+					}
+
+					if (_key.getKey() == 38 && !this.m.CharacterScreen.isVisible() && !this.m.WorldTownScreen.isVisible() && !this.m.EventScreen.isVisible() && !this.m.EventScreen.isAnimating())
 					{
 						return this.toggleWorldEditorScreen();
 					}
 				}
 			}
+
+			return true;
 		}
 
 		local ws_onSerialize = obj.onSerialize;

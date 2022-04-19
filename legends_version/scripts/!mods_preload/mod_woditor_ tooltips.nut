@@ -517,7 +517,7 @@
 					{
 						id = 2,
 						type = "description",
-						text = "Bonus chance to the existing chance to loot enemy equipment (armors, weapon, quiver, etc). The chance to loot an equipment of an enemy is based on the durability of said item. With this chance value reaches 100, you are guaranteed to loot enemy equipment. The default value is 0 which means 0%."
+						text = "Bonus chance to the existing chance to loot enemy equipment (armors, weapon, quiver, etc). The chance to loot an equipment of an enemy is based on the durability of said item. With this chance value reaches 100, you are guaranteed to loot enemy equipment as long as the equipment\'s durability above 25%. The default value is 0 which means 0%."
 					},
 				];
 

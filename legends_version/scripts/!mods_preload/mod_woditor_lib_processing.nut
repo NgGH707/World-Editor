@@ -32,7 +32,7 @@
 	// contracts
 	::Woditor.InvalidContracts <- [];
 	::Woditor.Contracts <- {};
-	::Woditor.PrepareContractOnCampaignStart <- function()
+	::Woditor.PrepareContractsOnCampaignStart <- function()
 	{
 		if (::Woditor.Contracts.len() > 0) return;
 		
@@ -92,107 +92,113 @@
 	::Woditor.Stash <- ::new("scripts/items/stash_container");
 	::Woditor.Stash.setResizable(true);
 	::Woditor.Items <- [];
-	for (local i = 0; i < ::Woditor.ItemFilterMax; ++i)
+	::Woditor.PrepareItemsOnCampaignStart <- function()
 	{
-		::Woditor.Items.push([]);
-	}
-	local prefix = "scripts/items/";
-	local items = ::IO.enumerateFiles(prefix);
-	local getLayerImage = function( _item )
-	{
-		if (::mods_isClass(_item, "legend_armor_upgrade") != null)
+		if (::Woditor.Items.len() > 0) return;
+
+		for (local i = 0; i < ::Woditor.ItemFilterMax; ++i)
 		{
-			switch (_item.m.Type)
-			{
-			case ::Const.Items.ArmorUpgrades.Chain:
-				return "layers/layer_1.png";
-		
-			case ::Const.Items.ArmorUpgrades.Plate:
-				return "layers/layer_2.png";
-
-			case ::Const.Items.ArmorUpgrades.Tabbard:
-				return "layers/layer_3.png";
-
-			case ::Const.Items.ArmorUpgrades.Cloak:
-				return "layers/layer_4.png";
-
-			case ::Const.Items.ArmorUpgrades.Attachment:
-				return "layers/layer_5.png";
-			}
+			::Woditor.Items.push([]);
 		}
 
-		if (::mods_isClass(_item, "legend_helmet_upgrade") != null)
+		local prefix = "scripts/items/";
+		local items = ::IO.enumerateFiles(prefix);
+		local getLayerImage = function( _item )
 		{
-			switch (_item.m.Type)
+			if (::mods_isClass(_item, "legend_armor_upgrade") != null)
 			{
-			case ::Const.Items.HelmetUpgrades.Helm:
-				return "layers/layer_1.png";
+				switch (_item.m.Type)
+				{
+				case ::Const.Items.ArmorUpgrades.Chain:
+					return "layers/layer_1.png";
+			
+				case ::Const.Items.ArmorUpgrades.Plate:
+					return "layers/layer_2.png";
 
-			case ::Const.Items.HelmetUpgrades.Top:
-				return "layers/layer_2.png";
+				case ::Const.Items.ArmorUpgrades.Tabbard:
+					return "layers/layer_3.png";
 
-			case ::Const.Items.HelmetUpgrades.Vanity:
-				return "layers/layer_3.png";
+				case ::Const.Items.ArmorUpgrades.Cloak:
+					return "layers/layer_4.png";
+
+				case ::Const.Items.ArmorUpgrades.Attachment:
+					return "layers/layer_5.png";
+				}
 			}
-		}
 
-		return "";
-	};
-	foreach ( script in items )
-	{
-		if (::Const.Invalid.Items.find(script) != null) continue;
-
-		local _item = ::new(script);
-
-		if (_item.m.ID.len() == 0) continue;
-
-		if (_item.m.Icon == null || _item.m.Icon == "") continue;
-
-		// fuck it, legends fault for not adding the image of these but still leave the directory
-		if (_item.m.Icon == "helmets/icon_southern_veil_07.png" || _item.m.Icon == "helmets/icon_southern_veil_01.png") continue;
-
-		if (_item.m.Name.len() == 0)
-		{
-			if (_item.isNamed())
+			if (::mods_isClass(_item, "legend_helmet_upgrade") != null)
 			{
-				_item.setName(_item.createRandomName());
-			}
-			else
-			{
-				continue;
-			}
-		}
+				switch (_item.m.Type)
+				{
+				case ::Const.Items.HelmetUpgrades.Helm:
+					return "layers/layer_1.png";
 
-		::Woditor.Stash.add(_item);
-	}
-	::Woditor.Stash.sort();
-	foreach (_item in ::Woditor.Stash.m.Items)
-	{
-		local exclude = [];
-		local data = {
-			ID = _item.m.ID,
-			Name = _item.m.Name,
-			Description = _item.m.Description,
-			ImagePath = "ui/items/" + _item.m.Icon,
-			LayerImagePath = getLayerImage(_item),
-			Script = ::IO.scriptFilenameByHash(_item.ClassNameHash),
+				case ::Const.Items.HelmetUpgrades.Top:
+					return "layers/layer_2.png";
+
+				case ::Const.Items.HelmetUpgrades.Vanity:
+					return "layers/layer_3.png";
+				}
+			}
+
+			return "";
 		};
-
-		foreach (key in ::Woditor.ItemFilterKey)
+		foreach ( script in items )
 		{
-			local filter = ::Woditor.ItemFilter[key];
+			if (::Const.Invalid.Items.find(script) != null) continue;
 
-			if (key == "All")
+			local _item = ::new(script);
+
+			if (_item.m.ID.len() == 0) continue;
+
+			if (_item.m.Icon == null || _item.m.Icon == "") continue;
+
+			// fuck it, legends fault for not adding the image of these but still leave the directory
+			if (_item.m.Icon == "helmets/icon_southern_veil_07.png" || _item.m.Icon == "helmets/icon_southern_veil_01.png") continue;
+
+			if (_item.m.Name.len() == 0)
 			{
-				::Woditor.Items[filter].push(data);
+				if (_item.isNamed())
+				{
+					_item.setName(_item.createRandomName());
+				}
+				else
+				{
+					continue;
+				}
 			}
-			else if (_item.isItemType(::Const.Items.ItemType[key]) && exclude.find(filter) == null)
+
+			::Woditor.Stash.add(_item);
+		}
+		::Woditor.Stash.sort();
+		foreach (_item in ::Woditor.Stash.m.Items)
+		{
+			local exclude = [];
+			local data = {
+				ID = _item.m.ID,
+				Name = _item.m.Name,
+				Description = _item.m.Description,
+				ImagePath = "ui/items/" + _item.m.Icon,
+				LayerImagePath = getLayerImage(_item),
+				Script = ::IO.scriptFilenameByHash(_item.ClassNameHash),
+			};
+
+			foreach (key in ::Woditor.ItemFilterKey)
 			{
-				::Woditor.Items[filter].push(data);
-				exclude.push(filter);
+				local filter = ::Woditor.ItemFilter[key];
+
+				if (key == "All")
+				{
+					::Woditor.Items[filter].push(data);
+				}
+				else if (_item.isItemType(::Const.Items.ItemType[key]) && exclude.find(filter) == null)
+				{
+					::Woditor.Items[filter].push(data);
+					exclude.push(filter);
+				}
 			}
 		}
-	}
+	};
 	::Woditor.sortItemSearch <- function( _i1, _i2 )
 	{
 		if (_i1.SearchByName && !_i2.SearchByName)
@@ -275,25 +281,29 @@
 		return result;
 	};
 
-
 	// filter valid backgrounds for woditor
 	::Woditor.Backgrounds <- {
 		Stuff = {},
 		Key = [],
 	};
-	local prefix = "scripts/skills/backgrounds/";
-	local background = ::IO.enumerateFiles(prefix);
-	foreach ( script in background )
+	::Woditor.PrepareBackgroundsOnCampaignStart <- function()
 	{
-		if (::Const.Invalid.Backgrounds.find(script) != null) continue;
+		if (::Woditor.Backgrounds.Key.len() > 0) return;
 
-		local background = ::new(script);
-		local string = script.slice(prefix.len());
-		::Woditor.Backgrounds.Key.push(string);
-		::Woditor.Backgrounds.Stuff[string] <- {
-			Name = background.getName(),
-			Icon = background.getIcon()
-		};
+		local prefix = "scripts/skills/backgrounds/";
+		local background = ::IO.enumerateFiles(prefix);
+		foreach ( script in background )
+		{
+			if (::Const.Invalid.Backgrounds.find(script) != null) continue;
+
+			local background = ::new(script);
+			local string = script.slice(prefix.len());
+			::Woditor.Backgrounds.Key.push(string);
+			::Woditor.Backgrounds.Stuff[string] <- {
+				Name = background.getName(),
+				Icon = background.getIcon()
+			};
+		}
 	}
 
 
@@ -304,24 +314,29 @@
 		Valid = [],
 		All = [],
 	};
-	local buildings = ::IO.enumerateFiles("scripts/entity/world/settlements/buildings/");
-	foreach ( script in buildings )
+	::Woditor.PrepareBuildingsOnCampaignStart <- function()
 	{
-		local building = ::new(script);
+		if (::Woditor.Buildings.All.len() > 0) return;
 
-		if (::Const.Invalid.Buildings.find(script) == null)
+		local buildings = ::IO.enumerateFiles("scripts/entity/world/settlements/buildings/");
+		foreach ( script in buildings )
 		{
-			::Woditor.Buildings.Valid.push(script);
-		}
+			local building = ::new(script);
 
-		::Woditor.Buildings.All.push(script);
-		::Woditor.Buildings.Stuff[script] <- building;
+			if (::Const.Invalid.Buildings.find(script) == null)
+			{
+				::Woditor.Buildings.Valid.push(script);
+			}
 
-		if (building.m.Tooltip != null && !(building.m.Tooltip in ::Woditor.Buildings.Tooltip))
-		{
-			::Woditor.Buildings.Tooltip[building.m.Tooltip] <- building;
+			::Woditor.Buildings.All.push(script);
+			::Woditor.Buildings.Stuff[script] <- building;
+
+			if (building.m.Tooltip != null && !(building.m.Tooltip in ::Woditor.Buildings.Tooltip))
+			{
+				::Woditor.Buildings.Tooltip[building.m.Tooltip] <- building;
+			}
 		}
-	}
+	};
 
 
 	// filter valid attached locations for woditor
@@ -331,22 +346,27 @@
 		Valid = [],
 		All = [],
 	};
-	local attached_locations = ::IO.enumerateFiles("scripts/entity/world/attached_location/");
-	foreach ( script in attached_locations )
+	::Woditor.PrepareAttachedLocationsOnCampaignStart <- function()
 	{
-		local attached_location = ::new(script);
+		if (::Woditor.AttachedLocations.All.len() > 0) return;
 
-		if (::Const.Invalid.AttachedLocations.find(script) == null)
+		local attached_locations = ::IO.enumerateFiles("scripts/entity/world/attached_location/");
+		foreach ( script in attached_locations )
 		{
-			::Woditor.AttachedLocations.Valid.push(script);
-		}
+			local attached_location = ::new(script);
 
-		::Woditor.AttachedLocations.All.push(script);
-		::Woditor.AttachedLocations.Stuff[script] <- attached_location;
+			if (::Const.Invalid.AttachedLocations.find(script) == null)
+			{
+				::Woditor.AttachedLocations.Valid.push(script);
+			}
 
-		if (!(attached_location.getTypeID() in ::Woditor.AttachedLocations.Tooltip))
-		{
-			::Woditor.AttachedLocations.Tooltip[attached_location.getTypeID()] <- attached_location;
+			::Woditor.AttachedLocations.All.push(script);
+			::Woditor.AttachedLocations.Stuff[script] <- attached_location;
+
+			if (!(attached_location.getTypeID() in ::Woditor.AttachedLocations.Tooltip))
+			{
+				::Woditor.AttachedLocations.Tooltip[attached_location.getTypeID()] <- attached_location;
+			}
 		}
 	}
 
@@ -358,22 +378,27 @@
 		Valid = [],
 		All = [],
 	};
-	local situations = ::IO.enumerateFiles("scripts/entity/world/settlements/situations/");
-	foreach ( script in situations )
+	::Woditor.PrepareSituationsOnCampaignStart <- function()
 	{
-		if (::Const.Invalid.Situations.find(script) == null)
+		if (::Woditor.Situations.All.len() > 0) return;
+
+		local situations = ::IO.enumerateFiles("scripts/entity/world/settlements/situations/");
+		foreach ( script in situations )
 		{
-			local situation = ::new(script);
-			::Woditor.Situations.Valid.push(script);
-			::Woditor.Situations.Stuff[script] <- situation;
-
-			if (!(situation.getID() in ::Woditor.Situations.Tooltip))
+			if (::Const.Invalid.Situations.find(script) == null)
 			{
-				::Woditor.Situations.Tooltip[situation.getID()] <- situation;
-			}
-		}
+				local situation = ::new(script);
+				::Woditor.Situations.Valid.push(script);
+				::Woditor.Situations.Stuff[script] <- situation;
 
-		::Woditor.Situations.All.push(script);
+				if (!(situation.getID() in ::Woditor.Situations.Tooltip))
+				{
+					::Woditor.Situations.Tooltip[situation.getID()] <- situation;
+				}
+			}
+
+			::Woditor.Situations.All.push(script);
+		}
 	}
 
 

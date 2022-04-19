@@ -60,7 +60,7 @@ this.world_editor_screen <- {
 		this.m.Visible = false;
 		this.m.Animating = false;
 		this.m.PopupDialogVisible = false;
-		this.m.JSHandle = this.UI.connect("WorldEditorScreen", this);
+		this.m.JSHandle = ::UI.connect("WorldEditorScreen", this);
 	}
 
 	function onDeserialize()
@@ -70,7 +70,12 @@ this.world_editor_screen <- {
 			::Woditor.InvalidContracts = split(::World.Flags.get("InvalidContracts"), "/");
 		}
 
-		::Woditor.PrepareContractOnCampaignStart();
+		::Woditor.PrepareItemsOnCampaignStart();
+		::Woditor.PrepareContractsOnCampaignStart();
+		::Woditor.PrepareBackgroundsOnCampaignStart();
+		::Woditor.PrepareBuildingsOnCampaignStart();
+		::Woditor.PrepareAttachedLocationsOnCampaignStart();
+		::Woditor.PrepareSituationsOnCampaignStart();
 	}
 
 	function onSerialize()
@@ -100,7 +105,7 @@ this.world_editor_screen <- {
 	function destroy()
 	{
 		this.clearEventListener();
-		this.m.JSHandle = this.UI.disconnect(this.m.JSHandle);
+		this.m.JSHandle = ::UI.disconnect(this.m.JSHandle);
 	}
 
 	function show( _withSlideAnimation = false )
@@ -112,7 +117,7 @@ this.world_editor_screen <- {
 
 		if (this.m.JSHandle != null)
 		{
-			this.Tooltip.hide();
+			::Tooltip.hide();
 			this.m.JSHandle.asyncCall("show", this.convertToUIData());
 		}
 	}
@@ -121,12 +126,12 @@ this.world_editor_screen <- {
 	{
 		if (this.m.JSHandle != null)
 		{
-			this.Tooltip.hide();
+			::Tooltip.hide();
 			this.m.JSHandle.asyncCall("hide", _withSlideAnimation);
 		}
 
 		this.m.TemporaryModel = null;
-		this.World.getTemporaryRoster().clear();
+		::World.getTemporaryRoster().clear();
 	}
 
 	function onScreenConnected()
@@ -171,18 +176,18 @@ this.world_editor_screen <- {
 
 	function updateSomeShit()
 	{
-		if (this.m.StashIsChanged) this.World.State.getPlayer().forceRecalculateStashModifier();
+		if (this.m.StashIsChanged) ::World.State.getPlayer().forceRecalculateStashModifier();
 		if (this.m.BannerIsChanged) this.updatePlayerBannerOnAllThings();
 		if (this.m.IDToShowOnMap == null) return;
 
-		local entity = this.World.getEntityByID(this.m.IDToShowOnMap);
+		local entity = ::World.getEntityByID(this.m.IDToShowOnMap);
 
 		if (entity == null) return;
 		local entityTile = entity.getTile();
 		entity.setDiscovered(true);
-		this.World.uncoverFogOfWar(entityTile.Pos, 500.0);
-		this.World.getCamera().Zoom = 1.0;
-		this.World.getCamera().setPos(entityTile.Pos);
+		::World.uncoverFogOfWar(entityTile.Pos, 500.0);
+		::World.getCamera().Zoom = 1.0;
+		::World.getCamera().setPos(entityTile.Pos);
 		this.m.IDToShowOnMap = null;
 	}
 
@@ -202,10 +207,10 @@ this.world_editor_screen <- {
 
 	function onReloadButtonPressed()
 	{
-		this.World.Retinue.update();
-		this.World.Assets.updateLook();
-		this.World.State.updateTopbarAssets();
-		if (this.m.StashIsChanged) this.World.State.getPlayer().forceRecalculateStashModifier();
+		::World.Retinue.update();
+		::World.Assets.updateLook();
+		::World.State.updateTopbarAssets();
+		if (this.m.StashIsChanged) ::World.State.getPlayer().forceRecalculateStashModifier();
 		if (this.m.BannerIsChanged) this.updatePlayerBannerOnAllThings();
 		this.m.JSHandle.asyncCall("loadFromData", this.convertToUIData());
 	}
@@ -322,7 +327,7 @@ this.world_editor_screen <- {
 
 	function onAddNewContract( _script )
 	{
-		local contract = this.new(_script);
+		local contract = ::new(_script);
 		local factions = [];
 		factions.extend(::World.FactionManager.getFactionsOfType(::Const.FactionType.Settlement));
 		factions.extend(::World.FactionManager.getFactionsOfType(::Const.FactionType.NobleHouse));
@@ -431,7 +436,7 @@ this.world_editor_screen <- {
 
 	function onContractInputChanges( _data )
 	{
-		local contract = this.World.Contracts.getContractByID(_data[0]);
+		local contract = ::World.Contracts.getContractByID(_data[0]);
 
 		if (contract == null)
 		{
@@ -440,7 +445,7 @@ this.world_editor_screen <- {
 
 		if (_data[1] == "Expiration")
 		{
-			contract.m.TimeOut = this.Time.getVirtualTimeF() + this.World.getTime().SecondsPerDay * _data[2];
+			contract.m.TimeOut = ::Time.getVirtualTimeF() + ::World.getTime().SecondsPerDay * _data[2];
 			this.m.JSHandle.asyncCall("updateContractExpiration", null);
 		}
 		else
@@ -1481,7 +1486,7 @@ this.world_editor_screen <- {
 		local isMult = ::Woditor.AssetsProperties.Mult.find(key) != null;
 		local isAdditive = ::Woditor.AssetsProperties.Additive.find(key) != null;
 
-		if (isMult) ::World.Flags.set(key, value / baseValue * 100);
+		if (isMult) ::World.Flags.set(key, value / (baseValue * 100));
 		else if (isAdditive) ::World.Flags.set(key, value - baseValue);
 		else ::World.Flags.set(key, value);
 	}
