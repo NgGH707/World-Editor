@@ -70,6 +70,21 @@ $.fn.removePercentageFromInput = function()
         this.val(currentText.slice(0, index));
     }
 }
+$.fn.addDashToInput = function()
+{
+    var currentText = this.getInputText();
+    var length = this.getInputTextLength();
+    if (length === 0) {
+        this.val('-');
+    }
+}
+$.fn.removeDashFromInput = function()
+{
+    var currentText = this.getInputText();
+    if (currentText === '-') {
+        this.val('');
+    }
+}
 
 
 

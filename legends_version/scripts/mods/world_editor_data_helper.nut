@@ -927,19 +927,82 @@ this.world_editor_data_helper <- {
 		result.CanChangeName <- "setName" in _item;
 		result.CanChangeAmount <- "setAmount" in _item;
 		result.CanChangeStats <- _item.isItemType(this.Const.Items.ItemType.Named);
+		result.ClassName <- _item.ClassNameHash;
 		result.Attribute <- null;
 		return result;
 	}
 
-	function convertPlayerStashToUIData()
+	function getAdditionInfoFromItem( _item )
 	{
 		local result = {};
-		result.Slots <- ::World.Assets.getStash().getCapacity();
-		result.Stash <- this.convertStashItemToUIData(::World.Assets.getStash());
+
+		if (_item.isItemType(this.Const.Items.ItemType.Named))
+		{
+			local isShield = _item.isItemType(::Const.Items.ItemType.Shield);
+			local isMelee = _item.isItemType(::Const.Items.ItemType.MeleeWeapon);
+			local isRanged = _item.isItemType(::Const.Items.ItemType.RangedWeapon);
+			local isThrowing = _item.isItemType(::Const.Items.ItemType.Ammo);
+
+			switch (true)
+			{
+			case isShield:
+				result = {
+					MeleeDefense = _item.getMeleeDefense(),
+					RangedDefense = _item.getRangedDefense(),
+					FatigueOnSkillUse = _item.m.FatigueOnSkillUse,
+				};
+				break;
+
+			case isMelee:
+				result = {
+					RegularDamage = _item.getDamageMin(),
+					RegularDamageMax = _item.getDamageMax(),
+					ArmorDamageMult = this.Math.floor(_item.getArmorDamageMult() * 100),
+					DirectDamageAdd = this.Math.floor(_item.m.DirectDamageAdd * 100),
+					ShieldDamage = _item.m.ShieldDamage,
+					ChanceToHitHead = _item.m.ChanceToHitHead,
+					FatigueOnSkillUse = _item.m.FatigueOnSkillUse,
+				};
+				break;
+
+			case isRanged:
+				result = {
+					RegularDamage = _item.getDamageMin(),
+					RegularDamageMax = _item.getDamageMax(),
+					ArmorDamageMult = this.Math.floor(_item.getArmorDamageMult() * 100),
+					DirectDamageAdd = this.Math.floor(_item.m.DirectDamageAdd * 100),
+					ChanceToHitHead = _item.m.ChanceToHitHead,
+					FatigueOnSkillUse = _item.m.FatigueOnSkillUse,
+					AdditionalAccuracy = _item.getAdditionalAccuracy(),
+				};
+				break;
+		
+			default:
+				result = {};
+			}
+
+			if (isThrowing) result.AmmoMax <- _item.getAmmoMax();
+			result.ConditionMax <- _item.getConditionMax();
+			result.StaminaModifier <- _item.m.StaminaModifier;
+		}
+
 		return result;
 	}
 
-	function convertStashItemToUIData( _stash )
+	function convertPlayerStashToUIData( _sort = false )
+	{
+		if (_sort)
+		{
+			::World.Assets.getStash().sort();
+		}
+
+		local result = {};
+		result.Slots <- ::World.Assets.getStash().getCapacity();
+		result.Stash <- this.convertStashItemsToUIData(::World.Assets.getStash());
+		return result;
+	}
+
+	function convertStashItemsToUIData( _stash )
 	{
 		local result = [];
 		local id = _stash.getID();
@@ -949,27 +1012,8 @@ this.world_editor_data_helper <- {
 			if (_item == null) continue;
 
 			local entry = this.convertItemToUIData(_item, id);
+			entry.Attribute = this.getAdditionInfoFromItem(_item);
 			entry.Index <- i;
-
-			if (_item.isItemType(this.Const.Items.ItemType.Named))
-			{
-				entry.Attribute = {
-					ConditionMax = _item.getConditionMax(),
-					StaminaModifier = "StaminaModifier" in _item.m ? _item.m.StaminaModifier : null,
-					MeleeDefense = "getMeleeDefense" in _item ? _item.getMeleeDefense() : null,
-					RangedDefense = "getRangedDefense" in _item ? _item.getRangedDefense() : null,
-					RegularDamage = "getDamageMin" in _item ? _item.getDamageMin() : null,
-					RegularDamageMax = "getDamageMax" in _item ? _item.getDamageMax() : null,
-					ArmorDamageMult = "getArmorDamageMult" in _item ? this.Math.floor(_item.getArmorDamageMult() * 100) : null,
-					DirectDamageAdd = "DirectDamageAdd" in _item.m ? this.Math.floor(_item.m.DirectDamageAdd * 100) : null,
-					ShieldDamage = "getShieldDamage" in _item ? _item.m.ShieldDamage : null,
-					ChanceToHitHead = "ChanceToHitHead" in _item.m ? _item.m.ChanceToHitHead : null,
-					FatigueOnSkillUse = "FatigueOnSkillUse" in _item.m ? _item.m.FatigueOnSkillUse : null,
-					AdditionalAccuracy = "getAdditionalAccuracy" in _item ? _item.getAdditionalAccuracy() : null,
-					AmmoMax = "getAmmoMax" in _item ? _item.getAmmoMax() : null,
-				};
-			}
-
 			result.push(entry);
 		}
 

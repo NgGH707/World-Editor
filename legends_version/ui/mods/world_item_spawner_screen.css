@@ -299,6 +299,24 @@
     margin-right: auto;
 }
 
+.world-items-spawner-screen > .l-items-spanwer-dialog-container .content .search-found
+{
+    width: 19.5%;
+    height: 29%;
+    position: absolute;
+}
+.world-items-spawner-screen > .l-items-spanwer-dialog-container .content .search-found-label
+{
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 95%;
+    height: 60%;
+    position: absolute;
+    margin: auto;
+    line-height: 2.0rem;
+}
 .world-items-spawner-screen > .l-items-spanwer-dialog-container .content .search-bar-row
 {
     left: 19.5%;
@@ -346,17 +364,6 @@
     height: 100%;
     position: relative;
     float: left;
-}
-.world-items-spawner-screen > .l-items-spanwer-dialog-container .content .search-result
-{
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 98%;
-    height: 99%;
-    position: absolute;
-    margin: auto;
 }
 .world-items-spawner-screen > .l-items-spanwer-dialog-container .content .find-no-result-container
 {

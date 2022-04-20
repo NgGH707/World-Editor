@@ -53,6 +53,7 @@ var WorldItemsSpawnerScreen = function(_parent)
     this.mSearch = {
         Filter             : 0,
         Input              : null,
+        Found              : null,
         ListContainer      : null,
         ListScrollContainer: null,
     };
@@ -96,7 +97,9 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
         {
             var buttonLayout = $('<div class="l-flex-button-45-41"/>');
             stashHeader.append(buttonLayout);
-            var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/delete.png', null, '', 6);
+            var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/delete.png', function(_button) {
+                self.notifyBackendDeleteAllStashItem();
+            }, '', 6);
 
             var buttonLayout = $('<div class="l-flex-button-174-43"/>');
             stashHeader.append(buttonLayout);
@@ -106,15 +109,21 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
 
             var buttonLayout = $('<div class="l-flex-button-45-41"/>');
             stashHeader.append(buttonLayout);
-            var button = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_SORT, null, '', 6);
+            var button = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_SORT, function(_button) {
+                self.notifyBackendSortStashItem();
+            }, '', 6);
 
             var buttonLayout = $('<div class="l-flex-button-45-41"/>');
             stashHeader.append(buttonLayout);
-            var button = buttonLayout.createImageButton(Path.GFX + Asset.ICON_REPAIR_ITEM, null, '', 6);
+            var button = buttonLayout.createImageButton(Path.GFX + Asset.ICON_REPAIR_ITEM, function(_button) {
+                self.notifyBackendRepairAllStashItem();
+            }, '', 6);
 
             var buttonLayout = $('<div class="l-flex-button-45-41"/>');
             stashHeader.append(buttonLayout);
-            var button = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_DELAY_TURN, null, '', 6);
+            var button = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_DELAY_TURN, function(_button) {
+                self.notifyBackendRestockAllStashItem();
+            }, '', 6);
         }
 
         var stashContent = $('<div class="stash-content-container"/>');
@@ -151,7 +160,10 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
             upperRow.append(column);
             var buttonLayout = $('<div class="l-add-button"/>');
             column.append(buttonLayout);
-            this.mAddButton = buttonLayout.createTextButton('Add', null, '', 2);
+            this.mAddButton = buttonLayout.createTextButton('Add', function(_button) {
+                var imageEntry = self.mSelected.Layout.find('img:first');
+                self.notifyBackendAddItemToStash(imageEntry);
+            }, '', 2);
             this.mAddButton.findButtonText().css('top', '0.2rem');
             var amountContainer = $('<div class="input-amount-container"/>');
             column.append(amountContainer);
@@ -179,6 +191,11 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
             var lowerRow = $('<div class="row-lower with-dialog-background"/>');
             rightColumn.append(lowerRow);
             {
+                var foundContainer = $('<div class="search-found"/>');
+                lowerRow.append(foundContainer);
+                this.mSearch.Found = $('<div class="search-found-label text-font-medium font-color-title font-align-center"/>');
+                foundContainer.append(this.mSearch.Found);
+
                 var searchBarRow = $('<div class="search-bar-row"/>');
                 lowerRow.append(searchBarRow);
                 var row = $('<div class="row"/>');
@@ -211,7 +228,7 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
                     var buttonLayout = $('<div class="l-flex-button-45-41"/>');
                     filterColumn.append(buttonLayout);
                     var imageButton = buttonLayout.createImageButton(Path.GFX + 'ui/icons/add_entry.png', function(_button) {
-                        self.changeSearchItemFilter(_button, i);
+                        self.changeSearchItemFilter(_button);
                         if (self.mSearch.Input.getInputTextLength() >= 3) {
                             self.notifyBackendSeachItemBy(self.mSearch.Input.getInputText());
                         }
@@ -241,10 +258,8 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
 
                 var searchResultContainer = $('<div class="search-result-container with-scroll-tooltip-background"/>');
                 searchResultRow.append(searchResultContainer);
-                var searchResult = $('<div class="search-result"/>');
-                searchResultContainer.append(searchResult);
                 var listContainerLayout = $('<div class="l-list-container"/>');
-                searchResult.append(listContainerLayout);
+                searchResultContainer.append(listContainerLayout);
                 this.mSearch.ListContainer = listContainerLayout.createList(1);
                 this.mSearch.ListScrollContainer = this.mSearch.ListContainer.findListScrollContainer();
             }
@@ -323,7 +338,7 @@ WorldItemsSpawnerScreen.prototype.changeSearchItemFilter = function(_button, _i)
 WorldItemsSpawnerScreen.prototype.createAmountInputDIV = function(_layout)
 {
     var self = this;
-    this.mSelected.Amount = _layout.createInput('', 0, 99, null, null, 'title-font-medium font-bold font-color-brother-name font-align-center', function(_input) {
+    this.mSelected.Amount = _layout.createInput('', 0, 3, null, null, 'title-font-medium font-bold font-color-brother-name font-align-center', function(_input) {
         self.confirmAmountChanges(_input);
     });
     this.mSelected.Amount.assignInputEventListener('focusout', function(_input, _event) {
@@ -361,6 +376,8 @@ WorldItemsSpawnerScreen.prototype.createInputDIV = function(_key, _definition, _
         self.confirmAttributeChanges(_input, _key);
         if (isPercentage === true)
             _input.addPercentageToInput();
+
+        _input.addDashToInput();
     });
     _definition.Input.assignInputEventListener('focusout', function(_input, _event) {
         self.confirmAttributeChanges(_input, _key);
@@ -371,6 +388,7 @@ WorldItemsSpawnerScreen.prototype.createInputDIV = function(_key, _definition, _
         if (isPercentage === true)
             _input.removePercentageFromInput();
 
+        _input.removeDashFromInput();
         _input.data('IsUpdated', false);
         _input.data('Default', _input.val());
     });
@@ -393,7 +411,7 @@ WorldItemsSpawnerScreen.prototype.confirmAmountChanges = function(_input)
     var value = 0;
     var isValid = true;
 
-    if (_input.getInputTextLength() <= 0 || definition === null) {
+    if (_input.getInputTextLength() <= 0) {
         isValid = false;
     }
     else {
@@ -406,7 +424,6 @@ WorldItemsSpawnerScreen.prototype.confirmAmountChanges = function(_input)
         _input.val('' + value + '');
         _input.data('IsUpdated', true);
         _input.data('Default', value);
-        //this.notifyBackendUpdateAssetsPropertyValue(_keyName, value);
     }
     else {
         _input.val('' + _input.data('Default') + '');
@@ -595,14 +612,15 @@ WorldItemsSpawnerScreen.prototype.addStashData = function(_data)
 {
     this.mStash.Data = _data;
     for (var i = 0; i < _data.length; i++) {
-        this.createItemEntry(_data[i]);
+        this.createItemEntry(_data[i], this.mStash.Slot[_data[i].Index]);
     }
 };
 
-WorldItemsSpawnerScreen.prototype.createItemEntry = function(_data)
+WorldItemsSpawnerScreen.prototype.createItemEntry = function(_data, _slot)
 {
     var self = this;
-    var itemContainer = this.mStash.Slot[_data.Index];
+    var itemContainer = _slot;
+    itemContainer.empty();
     var imageLayout = $('<div class="item-layout"/>');
     itemContainer.append(imageLayout);
     var image = imageLayout.createImage(Path.GFX + _data.ImagePath, null, null, '');
@@ -628,10 +646,7 @@ WorldItemsSpawnerScreen.prototype.createItemEntry = function(_data)
     // set up event listeners
     image.click(this, function(_event) {
         var element = $(this);
-        //if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
-        //    self.notifyBackendRemoveItem(id);
-        //else
-            self.selectItem(element);
+        self.selectItem(element);
     });
     image.bindTooltip({ contentType: 'ui-item', entityId: _data.Owner, itemId: _data.ID, itemOwner: 'woditor.itemspawner'});
 };
@@ -645,8 +660,11 @@ WorldItemsSpawnerScreen.prototype.fillSearchItemResult = function(_data)
         var foundNothingLabel = $('<div class="find-no-result-container text-font-normal font-bold font-color-negative-value font-align-center"/>');
         foundNothingLabel.html('No Item Matches');
         this.mSearch.ListScrollContainer.append(foundNothingLabel);
+        this.mSearch.Found.html('');
         return;
     }
+
+    this.mSearch.Found.html('Found ' + _data.length + ' item' + (_data.length > 1 ? 's' : ''));
 
     for (var i = 0; i < _data.length; i++) {
         var itemContainer = $('<div class="item-container"/>');
@@ -665,7 +683,10 @@ WorldItemsSpawnerScreen.prototype.fillSearchItemResult = function(_data)
         // set up event listeners
         image.click(this, function(_event) {
             var element = $(this);
-            self.selectItem(element);
+            if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
+                self.notifyBackendAddItemToStash(element, true);
+            else
+                self.selectItem(element);
         });
 
         image.bindTooltip({ contentType: 'ui-element', elementId: _data[i].ID, elementOwner: 'woditor.searchresult' });
@@ -714,16 +735,17 @@ WorldItemsSpawnerScreen.prototype.updateSelectedItemDetailPanel = function(_elem
         this.mSelected.Name.addClass('no-pointer-events');
 
     if (data.CanChangeStats === true) {
+        var attribute = data.Attribute;
         this.mSelected.AttributeContainer.removeClass('is-grayscale');
         $.each(this.mSelected.Attribute, function(_key, _definition) {
             var attr = self.mSelected.Attribute[_key];
-            if (data.Attribute[_key] === null || data.Attribute[_key] === undefined) {
-                attr.Input.val('-x-');
-                attr.Input.addClass('no-pointer-events');
+            if (_key in attribute) {
+                attr.Input.val('' + attribute[_key] + attr.Postfix);
+                attr.Input.removeClass('no-pointer-events');
             }
             else {
-                attr.Input.val('' + data.Attribute[_key] + attr.Postfix);
-                attr.Input.removeClass('no-pointer-events');
+                attr.Input.val('-x-');
+                attr.Input.addClass('no-pointer-events');
             }
         }); 
     }
@@ -732,7 +754,7 @@ WorldItemsSpawnerScreen.prototype.updateSelectedItemDetailPanel = function(_elem
         $.each(this.mSelected.Attribute, function(_key, _definition) {
             _definition.Input.val('-x-');
             _definition.Input.addClass('no-pointer-events');
-        }); 
+        });
     }
 };
 
@@ -741,13 +763,12 @@ WorldItemsSpawnerScreen.prototype.updateDisplayItem = function(_data)
     var self = this;
     this.mSelected.Layout.empty();
     var image = this.mSelected.Layout.createImage(Path.GFX + _data.ImagePath, null, null, '');
-    image.data('item', null);
+    image.data('item', _data);
 
     var overlays = _data.ImageOverlayPath;
     if (overlays !== undefined && overlays !== '' && overlays.length > 0) {
         overlays.forEach(function (_imagePath) {
             if (_imagePath === '') return;
-
             var overlayImage = self.mSelected.Layout.createImage(Path.ITEMS + _imagePath, null, null, '');
             overlayImage.css('pointer-events', 'none');
         });
@@ -774,6 +795,40 @@ WorldItemsSpawnerScreen.prototype.revertToDefault = function()
         else 
             image.remove();
     });
+};
+
+WorldItemsSpawnerScreen.prototype.gatherAttributes = function()
+{
+    var result = {};
+    $.each(this.mSelected.Attribute, function(_key, _definition) {
+        var v = parseInt(_definition.Input.getInputText());
+        if (isNaN(v) === false) {
+            result[_key] = v;
+        } 
+    });
+    return result;
+};
+
+WorldItemsSpawnerScreen.prototype.getStashItem = function(_id)
+{
+    for (var i = 0; i < this.mStash.Data.length; i++) {
+        if (this.mStash.Data[i].ID === _id) {
+            return {
+                Index = i;
+                Item = this.mStash.Data[i];
+            };
+        }
+    }
+    return null;
+};
+
+WorldItemsSpawnerScreen.prototype.getSelectedItem = function()
+{
+    var element = this.mSelected.Layout.find('img:first');
+    if (element.length > 0) {
+        return element;
+    }
+    return null;
 };
 
 WorldItemsSpawnerScreen.prototype.notifyBackendOnConnected = function()
@@ -813,6 +868,7 @@ WorldItemsSpawnerScreen.prototype.notifyBackendSeachItemBy = function( _text )
 
     if (_text.length <= 1) {
         this.mSearch.ListScrollContainer.empty();
+        this.mSearch.Found.html('');
         return;
     }
 
@@ -823,6 +879,7 @@ WorldItemsSpawnerScreen.prototype.notifyBackendSeachItemBy = function( _text )
             var foundNothingLabel = $('<div class="find-no-result-container text-font-normal font-bold font-color-negative-value font-align-center"/>');
             foundNothingLabel.html('Error!!! Can not process input');
             self.mSearch.ListScrollContainer.append(foundNothingLabel);
+            self.mSearch.Found.html('');
             return;
         }
 
@@ -841,11 +898,100 @@ WorldItemsSpawnerScreen.prototype.notifyBackendShowAllItems = function()
             var foundNothingLabel = $('<div class="find-no-result-container text-font-normal font-bold font-color-negative-value font-align-center"/>');
             foundNothingLabel.html('Error!!! Can not process input');
             self.mSearch.ListScrollContainer.append(foundNothingLabel);
+            self.mSearch.Found.html('');
             return;
         }
 
         self.fillSearchItemResult(_data);
     });
+};
+
+WorldItemsSpawnerScreen.prototype.notifyBackendDeleteAllStashItem = function()
+{
+    this.mStash.Data = [];
+    this.createItemContainer(this.mStash.Slot.length);
+    SQ.call(this.mSQHandle, 'onDeleteAllStashItem');
+}
+
+WorldItemsSpawnerScreen.prototype.notifyBackendSortStashItem = function()
+{
+    var self = this;
+    SQ.call(this.mSQHandle, 'onSortStashItem', [] , function(_data) {
+        if (_data === undefined || _data === null || jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to retrieve sorted stash data. Invalid data result.');
+            return;
+        }
+
+        self.addStashData(_data);
+    });
+}
+
+WorldItemsSpawnerScreen.prototype.notifyBackendRepairAllStashItem = function()
+{
+    var self = this;
+    SQ.call(this.mSQHandle, 'onRepairAllStashItem', [] , function(_data) {
+        if (_data === undefined || _data === null || jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to retrieve repaired stash data. Invalid data result.');
+            return;
+        }
+
+        self.addStashData(_data);
+    });
+}
+
+WorldItemsSpawnerScreen.prototype.notifyBackendRestockAllStashItem = function()
+{
+    var self = this;
+    SQ.call(this.mSQHandle, 'onRestockAllStashItem', [] , function(_data) {
+        if (_data === undefined || _data === null || jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to retrieve restocked stash data. Invalid data result.');
+            return;
+        }
+
+        self.addStashData(_data);
+    });
+}
+
+WorldItemsSpawnerScreen.prototype.notifyBackendAddItemToStash = function( _element, isQuickAdd )
+{
+    var self = this;
+    var data = _element.data('item');
+
+    if (data === null || data === undefined) {
+        console.error('ERROR: Failed to add item to stash. Undefined selected data.');
+        return;
+    }
+
+    var num = isQuickAdd === true ? 1 : parseInt(this.mSelected.Amount.getInputText());
+    var name = isQuickAdd === true ? '' : this.mSelected.Name.getInputText();
+    var attr = isQuickAdd === true ? {} : this.gatherAttributes();
+    SQ.call(this.mSQHandle, 'onAddItemToStash', [ data, num, name, attr, isQuickAdd ] , function(_data) {
+        if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
+            console.error('ERROR: Failed to add item to stash. Invalid data result.');
+            return;
+        }
+
+        for (var i = 0; i < _data.length; i++) {
+            self.mStash.Data.push(_data[i]);
+            self.createItemEntry(_data[i], self.mStash.Slot[_data[i].Index]);
+        }
+    });
+};
+
+WorldItemsSpawnerScreen.prototype.notifyBackendRemoveItemFromStash = function( _element )
+{
+    var data = _element.data('item');
+    var result = this.getStashItem(data.ID);
+    var selected = this.getSelectedItem();
+    this.mStash.Slot[data.Index].empty();
+    if (result !== null) {
+        this.mStash.Data.splice(result.Index, 1);
+    }
+    if (selected !== null && selected.data('item') === result.Item.ID) {
+        this.revertToDefault();
+    }
+
+    SQ.call(this.mSQHandle, 'onRemoveItemFromStash', result.Item.Index);
 };
 
 

@@ -190,26 +190,60 @@
 				CanChangeName = "setName" in _item,
 				CanChangeAmount = "setAmount" in _item,
 				CanChangeStats = isNamed,
+				ClassName = _item.ClassNameHash,
 				Script = ::IO.scriptFilenameByHash(_item.ClassNameHash),
 			};
 
 			if (isNamed)
 			{
-				data.Attribute <- {
-					ConditionMax = "-",
-					StaminaModifier = "StaminaModifier" in _item.m ? "-" : null,
-					MeleeDefense = "getMeleeDefense" in _item ? "-" : null,
-					RangedDefense = "getRangedDefense" in _item ? "-" : null,
-					RegularDamage = "getDamageMin" in _item ? "-" : null,
-					RegularDamageMax = "getDamageMax" in _item ? "-" : null,
-					ArmorDamageMult = "getArmorDamageMult" in _item ? "-" : null,
-					DirectDamageAdd = "DirectDamageAdd" in _item.m ? "-" : null,
-					ShieldDamage = "getShieldDamage" in _item ? "-" : null,
-					ChanceToHitHead = "ChanceToHitHead" in _item.m ? "-" : null,
-					FatigueOnSkillUse = "FatigueOnSkillUse" in _item.m ? "-" : null,
-					AdditionalAccuracy = "getAdditionalAccuracy" in _item ? "-" : null,
-					AmmoMax = "getAmmoMax" in _item ? "-" : null,
-				};
+				local isShield = _item.isItemType(::Const.Items.ItemType.Shield);
+				local isMelee = _item.isItemType(::Const.Items.ItemType.MeleeWeapon);
+				local isRanged = _item.isItemType(::Const.Items.ItemType.RangedWeapon);
+
+				switch (true)
+				{
+				case isShield:
+					data.Attribute <- {
+						MeleeDefense = "-",
+						RangedDefense = "-",
+						FatigueOnSkillUse = "-",
+					};
+					break;
+
+				case isMelee:
+					data.Attribute <- {
+						RegularDamage = "-",
+						RegularDamageMax = "-",
+						ArmorDamageMult = "-",
+						DirectDamageAdd = "-",
+						ShieldDamage = "-",
+						ChanceToHitHead = "-",
+						FatigueOnSkillUse = "-",
+					};
+					break;
+
+				case isRanged:
+					data.Attribute <- {
+						RegularDamage = "-",
+						RegularDamageMax = "-",
+						ArmorDamageMult = "-",
+						DirectDamageAdd = "-",
+						ChanceToHitHead = "-",
+						FatigueOnSkillUse = "-",
+						AdditionalAccuracy = "-",
+					};
+					if (_item.isItemType(this.Const.Items.ItemType.Ammo))
+					{
+						data.Attribute.AmmoMax <- "-";
+					}
+					break;
+			
+				default:
+					data.Attribute <- {};
+				}
+
+				data.Attribute.ConditionMax <- "-";
+				data.Attribute.StaminaModifier <- "-";
 			}
 			else
 			{
