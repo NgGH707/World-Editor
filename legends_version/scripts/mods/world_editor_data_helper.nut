@@ -732,7 +732,7 @@ this.world_editor_data_helper <- {
 			local daysLeft = ::Math.max(1, ::Math.abs(::Time.getVirtualTimeF() - contract.m.TimeOut) / ::World.getTime().SecondsPerDay);
 			local originID = (contract.getOrigin() != null && !contract.getOrigin().isNull()) ? contract.getOrigin().getID() : null;
 			local homeID = (contract.getHome() != null && !contract.getHome().isNull()) ? contract.getHome().getID() : null;
-			local employeImagePath = contract.getEmployer() != null ? contract.getEmployer().getImagePath() : "ui/images/undiscovered_opponent.png";
+			local employeImagePath = contract.getEmployer() != null ? contract.getEmployer().getImagePath() : null;
 			local objective;
 
 			if ("Destination" in contract.m)
@@ -924,6 +924,34 @@ this.world_editor_data_helper <- {
 		_result.Contracts.push({Name = "Difficulty Medium"   , Search = null      , Filter = ["DifficultyIcon", "ui/icons/difficulty_medium.png"]});
 		_result.Contracts.push({Name = "Difficulty Hard"     , Search = null      , Filter = ["DifficultyIcon", "ui/icons/difficulty_hard.png"]});
 		_result.Contracts.push({Name = "Difficulty Legendary", Search = null      , Filter = ["DifficultyIcon", "ui/icons/difficulty_legend.png"]});
+	}
+
+	function convertPlayerStashToUIData()
+	{
+		local result = {};
+		result.Slots <- ::World.Assets.getStash().getCapacity();
+		result.Stash <- this.convertStashItemToUIData(::World.Assets.getStash());
+		return result;
+	}
+
+	function convertStashItemToUIData( _stash )
+	{
+		local result = [];
+		local id = _stash.getID();
+
+		foreach (i, _item in _stash.m.Items)
+		{
+			if (_item == null) continue;
+
+			local entry = this.convertItemToUIData(_item, id);
+			entry.Index <- i;
+			entry.CanChangeName <- "setName" in _item;
+			entry.CanChangeAmount <- "setAmount" in _item;
+			entry.CanChangeStats <- _item.isItemType(this.Const.Items.ItemType.Named);
+			result.push(entry);
+		}
+
+		return result;
 	}
 
 	function lookForTroop( _key, _troops, _isMiniboss )

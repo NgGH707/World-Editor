@@ -449,7 +449,7 @@ WorldEditorScreen.prototype.createDIV = function(_parentDiv)
     // create: buttons
     var layout = $('<div class="l-leave-button"/>');
     footerButtonBar.append(layout);
-    this.mCloseButton = layout.createTextButton("Close", function() {
+    this.mCloseButton = layout.createTextButton('Close', function() {
         self.notifyBackendCloseButtonPressed();
     }, '', 1);
 
@@ -949,7 +949,7 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                 var upperRow = this.addRow(28);
                 leftHalf.append(upperRow);
                 {
-                    var column21 = this.addColumn(21, 'inventory_bag_slot');
+                    var column21 = this.addColumn(21, 'with-inventory_bag_slot');
                     upperRow.append(column21);
                     this.mLocation.SearchItemContainer = $('<div class="item-layout is-center"/>');
                     column21.append(this.mLocation.SearchItemContainer);

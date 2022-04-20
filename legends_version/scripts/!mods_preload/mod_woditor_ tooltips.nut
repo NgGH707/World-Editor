@@ -5,6 +5,33 @@
 		local queryUIItemTooltipData = obj.onQueryUIItemTooltipData;
 		obj.onQueryUIItemTooltipData = function( _entityId, _itemId, _itemOwner )
 		{
+			if (_itemOwner == "woditor.itemspawner")
+			{
+				local result = this.World.Assets.getStash().getItemByInstanceID(_itemId);
+
+				if (result != null)
+				{
+					local tooltip = result.item.getTooltip();
+					tooltip.extend([
+						{
+							id = 11,
+							type = "hint",
+							icon = "ui/icons/mouse_left_button.png",
+							text = "Select item"
+						},
+						{
+							id = 11,
+							type = "hint",
+							icon = "ui/icons/mouse_left_button_ctrl.png",
+							text = "Discard item"
+						}
+					]);
+					return tooltip;
+				}
+
+				return null;
+			}
+
 			if (_itemOwner == "woditor.loot")
 			{
 				local world_entity = this.World.getEntityByID(_entityId);

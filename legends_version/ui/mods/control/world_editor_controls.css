@@ -1,5 +1,96 @@
 
 /*
+    Tons of background
+ */ 
+.with-bottom-border
+{
+    border-image: url("coui://gfx/ui/skin/line_metal.png") 0% 0% 100% 0%;
+    border-image-outset: 0 0 0.5rem 0;
+}
+.with-bottom-border-gold
+{
+    border-image: url("coui://gfx/ui/skin/line_gold.png") 0% 0% 100% 0%;
+    border-image-outset: 0 0 0.5rem 0;
+}
+
+.with-input-box
+{
+    background-image: url("coui://gfx/ui/skin/text_input_300x40_inactive.png");
+    background-size: 100% 4.0rem;
+    background-repeat: no-repeat;
+}
+
+.with-medium-dialog-background
+{
+    background-image: url("coui://gfx/ui/skin/popup_background_449x250.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.with-small-dialog-background
+{
+    background-image: url("coui://gfx/ui/skin/tactical_character_background.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.with-scroll-header-background
+{
+    background-image: url("coui://gfx/ui/skin/panel_quest_header2.png");
+    background-size: 100% 5.9rem;
+    background-repeat: no-repeat;
+}
+.with-scroll-tooltip-no-resize-background
+{
+    background-image: url("coui://gfx/ui/skin/tooltip_255_bottom.png");
+    background-size: 100% 55.3rem;
+    background-repeat: no-repeat;
+}
+.with-scroll-tooltip2-background
+{
+    background-image: url("coui://gfx/ui/skin/tooltip_315_bottom.png");
+    background-size: 100% 55.3rem;
+    background-repeat: no-repeat;
+}
+.with-scroll-tooltip-background
+{
+    background-image: url("coui://gfx/ui/skin/tooltip_315_bottom.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.with-dirty-scroll-background
+{
+    background-image: url("coui://gfx/ui/skin/combat_log_bottom.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.with-scroll-background
+{
+    background-image: url("coui://gfx/ui/skin/tooltip_background.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.with-dialog-background
+{
+    background-image: url("coui://gfx/ui/skin/dialog_panel_502x549.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.with-dialog-2-background
+{
+    background-image: url("coui://gfx/ui/skin/dialog_panel_02.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.with-inventory_bag_slot
+{
+    background-image: url("coui://gfx/ui/skin/inventory_bag_slot.png");
+    background-size: 7.4rem 7.4rem;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+
+/*
 	Dialog Specific
 */
 .ui-control.dialog-1280-768

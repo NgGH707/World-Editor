@@ -8,6 +8,8 @@
 			init_ui();
 			this.m.WorldEditorScreen <- this.new("scripts/ui/screens/mods/world_editor_screen");
 			this.m.WorldEditorScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
+			this.m.WorldItemsSpawnerScreen <- this.new("scripts/ui/screens/mods/world_item_spawner_screen");
+			this.m.WorldItemsSpawnerScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
 			this.initLoadingScreenHandler();
 		}
 
@@ -17,6 +19,8 @@
 			destroy_ui();
 			this.m.WorldEditorScreen.destroy();
 			this.m.WorldEditorScreen = null;
+			this.m.WorldItemsSpawnerScreen.destroy();
+			this.m.WorldItemsSpawnerScreen = null;
 		}
 
 		obj.showWorldEditorScreen <- function()
@@ -49,6 +53,29 @@
 			}
 		}
 
+		obj.showWorldItemsSpawnerScreen <- function()
+		{
+			if (!this.m.WorldItemsSpawnerScreen.isVisible() && !this.m.WorldItemsSpawnerScreen.isAnimating())
+			{
+				this.m.CustomZoom = this.World.getCamera().Zoom;
+				this.World.getCamera().zoomTo(1.0, 4.0);
+				this.setAutoPause(true);
+				this.m.WorldItemsSpawnerScreen.show();
+				this.m.WorldScreen.hide();
+				this.Cursor.setCursor(this.Const.UI.Cursor.Hand);
+				this.m.MenuStack.push(function()
+				{
+					this.World.getCamera().zoomTo(this.m.CustomZoom, 4.0);
+					this.m.WorldItemsSpawnerScreen.hide();
+					this.m.WorldScreen.show();
+					this.setAutoPause(false);
+				}, function()
+				{
+					return !this.m.WorldItemsSpawnerScreen.isAnimating();
+				});
+			}
+		}
+
 		obj.toggleWorldEditorScreen <- function()
 		{
 			if (this.m.WorldEditorScreen.isVisible())
@@ -59,6 +86,20 @@
 			else
 			{
 				this.showWorldEditorScreen();
+				return true;
+			}
+		}
+
+		obj.toggleWorldItemsSpawnerScreen <- function()
+		{
+			if (this.m.WorldItemsSpawnerScreen.isVisible())
+			{
+				this.m.MenuStack.pop();
+				return false;
+			}
+			else
+			{
+				this.showWorldItemsSpawnerScreen();
 				return true;
 			}
 		}
@@ -75,9 +116,17 @@
 						return this.m.WorldScreen.toggleWorldMapEditorModule();
 					}
 
-					if (_key.getKey() == 38 && !this.m.CharacterScreen.isVisible() && !this.m.WorldTownScreen.isVisible() && !this.m.EventScreen.isVisible() && !this.m.EventScreen.isAnimating())
+					if (!this.m.CharacterScreen.isVisible() && !this.m.WorldTownScreen.isVisible() && !this.m.EventScreen.isVisible() && !this.m.EventScreen.isAnimating())
 					{
-						return this.toggleWorldEditorScreen();
+						if (_key.getKey() == 38)
+						{
+							return this.toggleWorldEditorScreen();
+						}
+
+						if (_key.getKey() == 24)
+						{
+							return this.toggleWorldItemsSpawnerScreen();
+						}
 					}
 				}
 			}

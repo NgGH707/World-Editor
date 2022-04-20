@@ -245,10 +245,14 @@ WorldEditorScreen.prototype.updateContractDetailsPanel = function(_element)
     {
         var data = _element.data('entry');
         this.mContract.Name.html(data.Name);
-        this.mContract.Employer.attr('src', Path.PROCEDURAL + data.Employer);
         this.mContract.DifficultyMult.val('' + data.DifficultyMult + '%');
         this.mContract.PaymentMult.val('' + data.PaymentMult + '%');
         this.mContract.Expiration.val('' + data.Expire + '');
+
+        if (data.Employer === null || data.Employer === undefined)
+            this.mContract.Employer.attr('src', Path.GFX + 'ui/images/undiscovered_opponent.png');
+        else
+            this.mContract.Employer.attr('src', Path.PROCEDURAL + data.Employer);
 
         var faction = this.getFaction(data.Faction);
         if (faction === null) {

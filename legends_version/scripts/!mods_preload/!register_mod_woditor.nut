@@ -5,6 +5,7 @@ local version = 3.0;
 
 // register CSS
 ::mods_registerCSS("world_editor_screen.css");
+::mods_registerCSS("world_item_spawner_screen.css");
 ::mods_registerCSS("world_map_editor_module.css");
 ::mods_registerCSS("control/world_editor_controls.css");
 ::mods_registerCSS("child/world_editor_factions.css");
@@ -15,6 +16,7 @@ local version = 3.0;
 
 // register JS
 ::mods_registerJS("world_editor_screen.js");
+::mods_registerJS("world_item_spawner_screen.js");
 ::mods_registerJS("world_map_editor_module.js");
 ::mods_registerJS("control/world_editor_controls.js");
 ::mods_registerJS("child/world_editor_factions.js");
