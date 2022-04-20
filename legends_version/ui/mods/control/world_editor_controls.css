@@ -20,6 +20,13 @@
     background-repeat: no-repeat;
 }
 
+.with-large-dialog-background
+{
+    background-image: url("coui://gfx/ui/skin/popup_background_600x300.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
 .with-medium-dialog-background
 {
     background-image: url("coui://gfx/ui/skin/popup_background_449x250.png");

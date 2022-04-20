@@ -174,14 +174,47 @@
 		foreach (_item in ::Woditor.Stash.m.Items)
 		{
 			local exclude = [];
+			local layer = getLayerImage(_item);
+			local isNamed = _item.isItemType(::Const.Items.ItemType.Named);
 			local data = {
+				Index = null,
 				ID = _item.m.ID,
 				Name = _item.m.Name,
 				Description = _item.m.Description,
+				ShowAmount = _item.isAmountShown(),
+				Amount = _item.getAmountString(),
+				AmountColor = _item.getAmountColor(),
 				ImagePath = "ui/items/" + _item.m.Icon,
-				LayerImagePath = getLayerImage(_item),
+				LayerImagePath = layer,
+				ImageOverlayPath = [layer],
+				CanChangeName = "setName" in _item,
+				CanChangeAmount = "setAmount" in _item,
+				CanChangeStats = isNamed,
 				Script = ::IO.scriptFilenameByHash(_item.ClassNameHash),
 			};
+
+			if (isNamed)
+			{
+				data.Attribute <- {
+					ConditionMax = "-",
+					StaminaModifier = "StaminaModifier" in _item.m ? "-" : null,
+					MeleeDefense = "getMeleeDefense" in _item ? "-" : null,
+					RangedDefense = "getRangedDefense" in _item ? "-" : null,
+					RegularDamage = "getDamageMin" in _item ? "-" : null,
+					RegularDamageMax = "getDamageMax" in _item ? "-" : null,
+					ArmorDamageMult = "getArmorDamageMult" in _item ? "-" : null,
+					DirectDamageAdd = "DirectDamageAdd" in _item.m ? "-" : null,
+					ShieldDamage = "getShieldDamage" in _item ? "-" : null,
+					ChanceToHitHead = "ChanceToHitHead" in _item.m ? "-" : null,
+					FatigueOnSkillUse = "FatigueOnSkillUse" in _item.m ? "-" : null,
+					AdditionalAccuracy = "getAdditionalAccuracy" in _item ? "-" : null,
+					AmmoMax = "getAmmoMax" in _item ? "-" : null,
+				};
+			}
+			else
+			{
+				data.Attribute <- null;
+			}
 
 			foreach (key in ::Woditor.ItemFilterKey)
 			{

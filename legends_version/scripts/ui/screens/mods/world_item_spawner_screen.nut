@@ -132,5 +132,15 @@ this.world_item_spawner_screen <- {
 		return ::Woditor.Helper.convertPlayerStashToUIData();
 	}
 
+	function onSeachItemBy( _data )
+	{
+		return ::Woditor.SearchItems(_data[0], _data[1]);
+	}
+
+	function onShowAllItems( _filter )
+	{
+		return ::Woditor.Items[_filter];
+	}
+
 };
 

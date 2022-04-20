@@ -22,6 +22,22 @@ $.fn.showThisDiv = function(_value)
     return this;
 }
 
+$.fn.isValidInputNumber = function(_min, _max)
+{
+    var convertedText = parseInt(this.getInputText());
+
+    if(isNaN(convertedText)) 
+        return null;
+
+    if (convertedText < _min) 
+        return _min;
+
+    if (convertedText > _max) 
+        return _max;
+
+    return convertedText;
+};
+
 // simple function to help bind event listener to a input
 $.fn.assignInputEventListener = function(_type, _callback)
 {

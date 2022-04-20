@@ -800,19 +800,6 @@ this.world_editor_data_helper <- {
 		_result.InvalidContracts.sort(this.onSortByName);
 	}
 
-	function convertItemToUIData( _item, _owner )
-	{
-		local result = {};
-		result.ID <- _item.getInstanceID();
-		result.ShowAmount <- _item.isAmountShown();
-		result.Amount <- _item.getAmountString();
-		result.AmountColor <- _item.getAmountColor();
-		result.ImagePath <- "ui/items/" + _item.m.Icon;
-		result.ImageOverlayPath <- _item.getIconOverlay();
-		result.Owner <- _owner;
-		return result;
-	}
-
 	function convertTroopsToUIData( _worldEntity )
 	{
 		local result = [];
@@ -926,6 +913,24 @@ this.world_editor_data_helper <- {
 		_result.Contracts.push({Name = "Difficulty Legendary", Search = null      , Filter = ["DifficultyIcon", "ui/icons/difficulty_legend.png"]});
 	}
 
+	function convertItemToUIData( _item, _owner )
+	{
+		local result = {};
+		result.Owner <- _owner;
+		result.Name <- _item.m.Name;
+		result.ID <- _item.getInstanceID();
+		result.ShowAmount <- _item.isAmountShown();
+		result.Amount <- _item.getAmountString();
+		result.AmountColor <- _item.getAmountColor();
+		result.ImagePath <- "ui/items/" + _item.m.Icon;
+		result.ImageOverlayPath <- _item.getIconOverlay();
+		result.CanChangeName <- "setName" in _item;
+		result.CanChangeAmount <- "setAmount" in _item;
+		result.CanChangeStats <- _item.isItemType(this.Const.Items.ItemType.Named);
+		result.Attribute <- null;
+		return result;
+	}
+
 	function convertPlayerStashToUIData()
 	{
 		local result = {};
@@ -945,9 +950,26 @@ this.world_editor_data_helper <- {
 
 			local entry = this.convertItemToUIData(_item, id);
 			entry.Index <- i;
-			entry.CanChangeName <- "setName" in _item;
-			entry.CanChangeAmount <- "setAmount" in _item;
-			entry.CanChangeStats <- _item.isItemType(this.Const.Items.ItemType.Named);
+
+			if (_item.isItemType(this.Const.Items.ItemType.Named))
+			{
+				entry.Attribute = {
+					ConditionMax = _item.getConditionMax(),
+					StaminaModifier = "StaminaModifier" in _item.m ? _item.m.StaminaModifier : null,
+					MeleeDefense = "getMeleeDefense" in _item ? _item.getMeleeDefense() : null,
+					RangedDefense = "getRangedDefense" in _item ? _item.getRangedDefense() : null,
+					RegularDamage = "getDamageMin" in _item ? _item.getDamageMin() : null,
+					RegularDamageMax = "getDamageMax" in _item ? _item.getDamageMax() : null,
+					ArmorDamageMult = "getArmorDamageMult" in _item ? this.Math.floor(_item.getArmorDamageMult() * 100) : null,
+					DirectDamageAdd = "DirectDamageAdd" in _item.m ? this.Math.floor(_item.m.DirectDamageAdd * 100) : null,
+					ShieldDamage = "getShieldDamage" in _item ? _item.m.ShieldDamage : null,
+					ChanceToHitHead = "ChanceToHitHead" in _item.m ? _item.m.ChanceToHitHead : null,
+					FatigueOnSkillUse = "FatigueOnSkillUse" in _item.m ? _item.m.FatigueOnSkillUse : null,
+					AdditionalAccuracy = "getAdditionalAccuracy" in _item ? _item.getAdditionalAccuracy() : null,
+					AmmoMax = "getAmmoMax" in _item ? _item.getAmmoMax() : null,
+				};
+			}
+
 			result.push(entry);
 		}
 

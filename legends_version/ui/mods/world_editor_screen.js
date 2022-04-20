@@ -1000,7 +1000,6 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     {
                         var buttonLayout = this.addLayout(9.8, 4.3, 'is-horizontal-center');
                         column21.append(buttonLayout);
-                        //var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/plus.png', function(_button) {
                         var button = buttonLayout.createTextButton('Add', function(_button) {
                             var script = self.mLocation.SearchItem.data('script');
                             self.notifyBackendAddItemToLoot(script);
