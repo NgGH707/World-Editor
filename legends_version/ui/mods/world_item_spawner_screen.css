@@ -435,8 +435,71 @@
     width: 17.5rem;
     position: absolute;
     line-height: 3.0rem;
-
 }
 
+
+
+/* 
+    Popup Dialog 
+*/
+.world-items-spawner-screen .add-item-via-script-dialog
+{
+    width: 44.9rem;
+    height: 20.3rem;
+
+    background-image: url("coui://gfx/ui/skin/save_game_name_background.png");
+    background-size: 44.9rem 20.3rem;
+    background-repeat: no-repeat;
+}
+.world-items-spawner-screen .ui-control.popup-dialog .delete-all-items-warning-container
+{
+    width: 44.9rem;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    position: relative;
+    float: left;
+}
+.world-items-spawner-screen .ui-control.popup-dialog .delete-all-items-warning-container .row
+{
+    width: 100%;
+    height: 7.0rem;
+    position: relative;
+    margin: auto;
+    float: left;
+}
+.world-items-spawner-screen .ui-control.popup-dialog .add-item-via-script-container
+{
+    width: 44.9rem;
+    padding: 0.6rem;
+    position: relative;
+    float: left;
+}
+.world-items-spawner-screen .ui-control.popup-dialog .add-item-via-script-container .row
+{
+    width: 100%;
+    height: 6.0rem;
+    position: relative;
+    float: left;
+}
+.world-items-spawner-screen .ui-control.popup-dialog .add-item-via-script-container .row .label
+{
+    width: 9.0rem;
+    height: 6.0rem;
+    margin-right: 1.0rem;
+    position: relative;
+    float: left;
+
+    line-height: 5.9rem;
+    text-align: right;
+}
+.world-items-spawner-screen .ui-control.popup-dialog .add-item-via-script-container .row .l-input
+{
+    width: 30.0rem;
+    height: 4.0rem;
+    margin-top: 1.0rem;
+    margin-bottom: 1.0rem;
+    position: relative;
+    float: left;
+}
 
 

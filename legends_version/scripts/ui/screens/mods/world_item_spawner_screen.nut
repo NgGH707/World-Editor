@@ -249,6 +249,25 @@ this.world_item_spawner_screen <- {
 		return result;
 	}
 
+	function onCheckScriptInputThenAddItem( _script )
+	{
+		local isValidShorten = ::Woditor.ItemsScriptShorten.find(_script) != null;
+		local isValid = isValidShorten || ::Woditor.ItemsScript.find(_script) != null;
+
+		if (!isValid) return false;
+		
+		local prefix = isValidShorten ? "scripts/items/" : "";
+		local item = ::new(prefix + _script);
+		local add = ::World.Assets.getStash().add(item);
+
+		if (add == null) return true;
+
+		local result = ::Woditor.Helper.convertItemToUIData(item, ::World.Assets.getStash().getID());
+		result.Attribute = ::Woditor.Helper.getAdditionInfoFromItem(item);
+		result.Index <- add;
+		return result;
+	}
+
 	function onRerollStats( _index )
 	{
 		local item = ::World.Assets.getStash().removeByIndex(_index);

@@ -483,6 +483,20 @@
 					},
 				];
 
+			case "woditor.itemspawneraddbyscript":
+				return [
+					{
+						id = 1,
+						type = "title",
+						text = "Add Item Via Script"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Open a popup where you can enter an item script that you want to add. The script may not need \'script/items/\'"
+					},
+				];
+
 			case "woditor.itemspawneramount":
 				return [
 					{

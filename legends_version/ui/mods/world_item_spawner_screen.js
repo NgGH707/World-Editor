@@ -17,6 +17,9 @@ var WorldItemsSpawnerScreen = function(_parent)
 	this.mContainer = null;
     this.mDialogContainer = null;
 
+    // popup dialog
+    this.mCurrentPopupDialog = null;
+
     // 
     this.mStash = {
         Data               : null,
@@ -98,7 +101,7 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
             var buttonLayout = $('<div class="l-flex-button-45-41"/>');
             stashHeader.append(buttonLayout);
             var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/delete.png', function(_button) {
-                self.notifyBackendDeleteAllStashItem();
+                self.createDeleteAllItemsWarningPopupDialog();
             }, '', 6);
             button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.deletestashitems' });
 
@@ -128,6 +131,13 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
                 self.notifyBackendRestockAllStashItem();
             }, '', 6);
             button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.restockallitems' });
+
+            var buttonLayout = $('<div class="l-flex-button-45-41"/>');
+            stashHeader.append(buttonLayout);
+            var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/plus.png', function(_button) {
+                self.createAddItemViaScriptPopupDialog();
+            }, '', 6);
+            button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.itemspawneraddbyscript' });
         }
 
         var stashContent = $('<div class="stash-content-container"/>');
@@ -423,7 +433,87 @@ WorldItemsSpawnerScreen.prototype.createInputDIV = function(_key, _definition, _
     });
     _definition.Input.css('background-image', 'url("coui://gfx/ui/skin/button_03_default.png")');
     _definition.Input.css('background-size', '5.2rem 4.1rem');
-}
+};
+
+WorldItemsSpawnerScreen.prototype.createDeleteAllItemsWarningPopupDialog = function()
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-items-spawner-screen').createPopupDialog('Discard All', null, null, 'add-item-via-script-dialog');
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog) {
+        self.notifyBackendDeleteAllStashItem();
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.addPopupDialogContent(this.createDeleteAllItemsWarningPopupDialogContent(this.mCurrentPopupDialog));
+};
+
+WorldItemsSpawnerScreen.prototype.createDeleteAllItemsWarningPopupDialogContent = function (_dialog)
+{
+    var result = $('<div class="delete-all-items-warning-container"/>');
+    var row = $('<div class="row"/>');
+    result.append(row);
+    var label = $('<div class="text-font-normal font-color-label">Permanently discard all items in your stash?</div>');
+    row.append(label);
+    return result;
+};
+
+WorldItemsSpawnerScreen.prototype.createAddItemViaScriptPopupDialog = function()
+{
+    var self = this;
+    this.notifyBackendPopupDialogIsVisible(true);
+    this.mCurrentPopupDialog = $('.world-items-spawner-screen').createPopupDialog('Enter Script', null, null, 'add-item-via-script-dialog');
+    this.mCurrentPopupDialog.addPopupDialogOkButton(function(_dialog) {
+        var contentContainer = _dialog.findPopupDialogContentContainer();
+        var inputFields = contentContainer.find('input');
+        self.notifyBackendCheckScriptInputThenAddItem($(inputFields[0]), _dialog);
+    });
+    this.mCurrentPopupDialog.addPopupDialogCancelButton(function(_dialog) {
+        self.mCurrentPopupDialog = null;
+        _dialog.destroyPopupDialog();
+        self.notifyBackendPopupDialogIsVisible(false);
+    });
+    this.mCurrentPopupDialog.addPopupDialogContent(this.createAddItemViaScriptPopupDialogContent(this.mCurrentPopupDialog));
+
+    var okButton = this.mCurrentPopupDialog.findPopupDialogOkButton();
+    var cancelButton = this.mCurrentPopupDialog.findPopupDialogCancelButton();
+    okButton.enableButton(false);
+    okButton.changeButtonText('Add');
+    cancelButton.changeButtonText('Return');
+
+    // focus!
+    var inputFields = this.mCurrentPopupDialog.findPopupDialogContentContainer().find('input');
+    $(inputFields[0]).focus();
+};
+
+WorldItemsSpawnerScreen.prototype.createAddItemViaScriptPopupDialogContent = function (_dialog)
+{
+    var result = $('<div class="add-item-via-script-container"/>');
+
+    // create
+    var row = $('<div class="row"/>');
+    result.append(row);
+    var label = $('<div class="label text-font-normal font-color-label font-bottom-shadow">Script:</div>');
+    row.append(label);
+
+    var inputLayout = $('<div class="l-input"/>');
+    row.append(inputLayout);
+    var inputField = inputLayout.createInput('', 0, 100, 1, function (_input) {
+        _dialog.findPopupDialogOkButton().enableButton(_input.getInputTextLength() >= 1);
+    }, 'title-font-normal font-color-brother-name', function (_input) {
+        var button = _dialog.findPopupDialogOkButton();
+        if(button.isEnabled())
+            button.click();
+    });
+   
+    return result;
+};
 
 WorldItemsSpawnerScreen.prototype.destroyDIV = function()
 {
@@ -930,6 +1020,11 @@ WorldItemsSpawnerScreen.prototype.notifyBackendCloseButtonPressed = function()
     SQ.call(this.mSQHandle, 'onCloseButtonPressed');
 };
 
+WorldItemsSpawnerScreen.prototype.notifyBackendPopupDialogIsVisible = function (_visible)
+{
+    SQ.call(this.mSQHandle, 'onPopupDialogIsVisible', [_visible]);
+};
+
 WorldItemsSpawnerScreen.prototype.notifyBackendSeachItemBy = function( _text )
 {
     var self = this;
@@ -1017,6 +1112,35 @@ WorldItemsSpawnerScreen.prototype.notifyBackendRestockAllStashItem = function()
             return;
         }
         self.addStashData(_data.Stash);
+    });
+}
+
+WorldItemsSpawnerScreen.prototype.notifyBackendCheckScriptInputThenAddItem = function( _input , _dialog )
+{
+    var self = this;
+    var script = _input.getInputText();
+    _dialog.findPopupDialogOkButton().enableButton(false);
+    SQ.call(this.mSQHandle, 'onCheckScriptInputThenAddItem', script , function(_data) {
+        if (_data === undefined || _data === null || typeof _data !== 'object') {
+            if (_data === true) {
+                _input.val('Stash is Full!!!');
+                _input.shakeLeftRight(5);
+                return;
+            }
+            if (_data === false) {
+                _input.val('Invalid Script!!!');
+                _input.shakeLeftRight(5);
+                return;
+            }
+            console.error('ERROR: Failed to retrieve processed data. Invalid data result.');
+            return;
+        }
+
+        self.mStash.Data.push(_data);
+        self.createItemEntry(_data, self.mStash.Slot[_data.Index]);
+        self.updateStashLabel();
+        _input.val('Item is Added!!!');
+        _input.shakeLeftRight(5);
     });
 }
 

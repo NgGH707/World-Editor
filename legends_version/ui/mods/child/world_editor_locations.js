@@ -74,7 +74,7 @@ WorldEditorScreen.prototype.filterLocationWithData = function (_filterData)
         }
     }
 
-    this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+    this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, '.list-entry-fat'), true);
 };
 
 WorldEditorScreen.prototype.addLocationsData = function(_data, _isLoaded)
@@ -104,7 +104,7 @@ WorldEditorScreen.prototype.addLocationsData = function(_data, _isLoaded)
         if (find !== null && find.length > 0)
             this.selectLocationListEntry(find, true);
         else
-            this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+            this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, '.list-entry-fat'), true);
 
         this.mShowEntityOnMap = null;
     }
@@ -114,7 +114,7 @@ WorldEditorScreen.prototype.addLocationsData = function(_data, _isLoaded)
                 this.addLocationListEntry(this.mLocation.Data[i], i);
         }
 
-        this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+        this.selectLocationListEntry(this.mLocation.ListContainer.findListEntryByIndex(0, '.list-entry-fat'), true);
         this.mLocation.ExpandLabel.find('.label:first').html('Camps');
     }
 };

@@ -141,27 +141,11 @@ $.fn.findFirstIndexOfSelectedListEntry = function()
     });
     return result;
 };
-$.fn.findListEntryByIndex = function(_index, _class)
-{
-    if (_class === undefined || _class === null)
-        _class = 'list-entry';
-
-    var container = this.find('.scroll-container:first');
-    if (container.length > 0)
-    {
-        var entries = container.find('.' + _class);
-        if (entries.length > 0 && _index >= 0 && _index < entries.length)
-        {
-            return $(entries[_index]);
-        }
-    }
-    return null;
-};
 
 $.fn.removeListEntryByIndex = function(_index, _class)
 {
     if (_class === undefined || _class === null)
-        _class = 'list-entry';
+        _class = '.list-entry';
 
     var container = this.find('.scroll-container:first');
     if (container.length > 0)
@@ -180,12 +164,12 @@ $.fn.removeListEntryByIndex = function(_index, _class)
 $.fn.getListEntryCount = function( _class )
 {
     if (_class === undefined || _class === null)
-        _class = 'list-entry';
+        _class = '.list-entry';
     
     var container = this.find('.scroll-container:first');
     if (container.length > 0)
     {
-        var entries = container.find('.' + _class);
+        var entries = container.find(_class);
         return entries.length;
     }
     return 0;

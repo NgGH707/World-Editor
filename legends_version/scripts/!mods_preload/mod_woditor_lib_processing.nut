@@ -134,6 +134,8 @@
 	::Woditor.Stash.setResizable(true);
 	::Woditor.Stash.setID("woditor");
 	::Woditor.Items <- [];
+	::Woditor.ItemsScript <- [];
+	::Woditor.ItemsScriptShorten <- [];
 	::Woditor.PrepareItemsOnCampaignStart <- function()
 	{
 		if (::Woditor.Items.len() > 0) return;
@@ -187,6 +189,9 @@
 		};
 		foreach ( script in items )
 		{
+			::Woditor.ItemsScript.push(script);
+			::Woditor.ItemsScriptShorten.push(script.slice(prefix.len()));
+
 			if (::Const.Invalid.Items.find(script) != null) continue;
 
 			local _item = ::new(script);

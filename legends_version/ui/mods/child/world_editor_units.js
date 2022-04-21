@@ -71,7 +71,7 @@ WorldEditorScreen.prototype.filterUnitWithData = function (_filterData)
         }
     }
 
-    this.selectUnitListEntry(this.mUnit.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+    this.selectUnitListEntry(this.mUnit.ListContainer.findListEntryByIndex(0, '.list-entry-fat'), true);
 };
 
 WorldEditorScreen.prototype.addUnitsData = function(_data, _isLoaded)
@@ -89,7 +89,7 @@ WorldEditorScreen.prototype.addUnitsData = function(_data, _isLoaded)
         this.addUnitListEntry(this.mUnit.Data[i], i);
     }
 
-    this.selectUnitListEntry(this.mUnit.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+    this.selectUnitListEntry(this.mUnit.ListContainer.findListEntryByIndex(0, '.list-entry-fat'), true);
     // load back and scroll to the position where you have left to see a location
     if (this.mShowEntityOnMap !== null && this.mShowEntityOnMap.Type === 'unit') {   
         var find = null;

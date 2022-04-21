@@ -105,7 +105,7 @@ WorldEditorScreen.prototype.filterSettlementWithData = function (_filterData)
         }
     }
 
-    this.selectSettlementListEntry(this.mSettlement.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+    this.selectSettlementListEntry(this.mSettlement.ListContainer.findListEntryByIndex(0, '.list-entry-fat'), true);
 };
 
 WorldEditorScreen.prototype.addSettlementsData = function (_data, _isLoaded)
@@ -123,7 +123,7 @@ WorldEditorScreen.prototype.addSettlementsData = function (_data, _isLoaded)
         this.addSettlementListEntry(this.mSettlement.Data[i], i);
     }
 
-    this.selectSettlementListEntry(this.mSettlement.ListContainer.findListEntryByIndex(0, 'list-entry-fat'), true);
+    this.selectSettlementListEntry(this.mSettlement.ListContainer.findListEntryByIndex(0, '.list-entry-fat'), true);
     // load back and scroll to the position where you have left to see a settlement
     if (this.mShowEntityOnMap !== null && this.mShowEntityOnMap.Type === 'settlement')
     {

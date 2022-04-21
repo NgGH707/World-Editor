@@ -3226,7 +3226,7 @@ WorldEditorScreen.prototype.expandExpandableList = function (_value, _parent, _m
     if (_maxHeight === undefined || _maxHeight === null)
         _maxHeight = 55.3;
 
-    var count = _parent.ExpandableList.getListEntryCount('list-entry-for-expandable');
+    var count = _parent.ExpandableList.getListEntryCount('.list-entry-for-expandable');
     var minHeight = '4.3rem';
     var maxHeight = count <= 1 ? '8.3rem' : Math.min(count * 4.3, _maxHeight) + 'rem';
     _parent.ExpandableList.css('height', _value === true ? maxHeight : minHeight);
