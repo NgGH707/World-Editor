@@ -177,3 +177,19 @@ else
 
 
 
+local location = [
+	"scripts/entity/world/locations/battlefield_location",
+	"scripts/entity/world/locations/legendary/legend_wizard_tower",
+];
+// locations
+if (!("Locations" in ::Const.Invalid))
+{
+	::Const.Invalid.Locations <- location;
+}
+else
+{
+	::Const.Invalid.Locations.extend(location);
+}
+
+
+

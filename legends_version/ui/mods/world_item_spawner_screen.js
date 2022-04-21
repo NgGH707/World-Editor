@@ -200,7 +200,7 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
                 self.notifyBackendRerollStats(self.mSelected.Data);
             }, '', 2);
             this.mRerollButton.findButtonText().css('top', '0.2rem');
-            this.mRerollButton.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.itemspawnerrerollstats' });
+            //this.mRerollButton.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.itemspawnerrerollstats' });
 
             var lowerRow = $('<div class="row-lower with-dialog-background"/>');
             rightColumn.append(lowerRow);
@@ -1071,7 +1071,7 @@ WorldItemsSpawnerScreen.prototype.notifyBackendRemoveItemFromStash = function( _
 {
     var result = this.getStashItem(_data.Index);
     var selected = this.mSelected.Data;
-    this.mStash.Slot[data.Index].empty();
+    this.mStash.Slot[result.Item.Index].empty();
     if (result !== null) {
         this.mStash.Data.splice(result.Index, 1);
     }

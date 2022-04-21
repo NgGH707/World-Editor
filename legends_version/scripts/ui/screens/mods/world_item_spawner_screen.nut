@@ -142,7 +142,7 @@ this.world_item_spawner_screen <- {
 		return ::Woditor.Items[_filter];
 	}
 
-	function onDeleteAllStashItem( _emptyArray )
+	function onDeleteAllStashItem()
 	{
 		::World.Assets.getStash().clear();	
 	}
@@ -195,7 +195,7 @@ this.world_item_spawner_screen <- {
 
 		if (_data[1] > 1)
 		{
-			if (_item.isItemType(::Const.Items.ItemType.Supply) || _item.isItemType(::Const.Items.ItemType.Food))
+			if (_data[0].CanChangeAmount)
 			{
 				if (_data[4])
 				{
@@ -272,14 +272,14 @@ this.world_item_spawner_screen <- {
 		::World.Assets.getStash().getItemAtIndex(_data[0]).item.setAmount(_data[1]);
 	}
 
-	function onChangeAttributeOfItem( _data )
-	{
-		this.assignNewStatsToItem(_data[1], _data[2], ::World.Assets.getStash().getItemAtIndex(_data[0]).item);
-	}
-
 	function onChangeNameOfItem( _data )
 	{
 		::World.Assets.getStash().getItemAtIndex(_data[0]).item.setName(_data[1]);
+	}
+
+	function onChangeAttributeOfItem( _data )
+	{
+		this.assignNewStatsToItem(_data[1], _data[2], ::World.Assets.getStash().getItemAtIndex(_data[0]).item);
 	}
 
 	function assignNewStatsToItem( _key, _v, _item )

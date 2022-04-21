@@ -13,6 +13,47 @@
 	::Woditor.ValidBannerSprites.extend(::Const.UndeadBanners);
 	::Woditor.ValidBannerSprites.extend(::Const.NomadBanners);
 
+	// filter valid locations for woditor
+	::Woditor.Locations <- {
+		Tooltip = {},
+		Stuff = {},
+		Valid = [],
+	};
+	::Woditor.PrepareLocationsOnCampaignStart <- function()
+	{
+		if (::Woditor.Locations.Valid.len() > 0) return;
+
+		local tile = this.World.getTileSquare(1, 1);
+		local location = ::IO.enumerateFiles("scripts/entity/world/locations/");
+
+		foreach (i, script in location )
+		{
+			if (::Const.Invalid.Locations.find(script) != null) continue;
+
+			local location = ::World.spawnLocation(script, tile.Coords);
+			local info = {
+				Script = script,
+				Name = location.getName(),
+				Type = location.getTypeID(),
+				ImagePath = location.getUIImagePath(),
+				Description = location.getDescription(),
+				IsPassive = location.isLocationType(::Const.World.LocationType.Passive) && !location.isLocationType(::Const.World.LocationType.Lair),
+				IsCamp =  location.isLocationType(::Const.World.LocationType.Lair) && !location.isLocationType(::Const.World.LocationType.Unique),
+				IsLegendary = location.isLocationType(::Const.World.LocationType.Unique),
+			};
+
+			::Woditor.Locations.Valid.push(script);
+			::Woditor.Locations.Stuff[script] <- info;
+
+			if (!(location.getTypeID() in ::Woditor.Locations.Tooltip))
+			{
+				::Woditor.Locations.Tooltip[location.getTypeID()] <- info;
+			}
+
+			location.die();
+		}
+	}
+
 	// location sprites
 	::Woditor.ValidLocationSprites <- [];
 	local locations_directory = "gfx/ui/locations/";

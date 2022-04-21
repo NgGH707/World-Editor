@@ -76,6 +76,7 @@ this.world_editor_screen <- {
 		::Woditor.PrepareBuildingsOnCampaignStart();
 		::Woditor.PrepareAttachedLocationsOnCampaignStart();
 		::Woditor.PrepareSituationsOnCampaignStart();
+		::Woditor.PrepareLocationsOnCampaignStart();
 	}
 
 	function onSerialize()
