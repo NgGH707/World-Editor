@@ -152,7 +152,7 @@ WorldEditorScreen.prototype.addLocationListEntry = function(_data, _index)
         _image.removeClass('opacity-none');
     }, null, 'opacity-none');
 
-    var name = $('<div class="name title-font-normal font-bold font-color-white">' + _data['Name'] + '</div>');
+    var name = $('<div class="name title-font-normal font-bold font-color-white">' + _data.Name + '</div>');
     entry.append(name);
 
     var buttonLayout = $('<div class="distance-button"/>');
@@ -245,8 +245,7 @@ WorldEditorScreen.prototype.addTroopListEntry = function (_data, _index, _listSc
         column.append(iconLayout);
         var image = iconLayout.createImage(Path.GFX + 'ui/icons/fist.png', function(_image) {
             _image.fitImageToParent(0, 0);
-            _image.removeClass('opacity-none');
-        }, null, 'opacity-none');
+        }, null, '');
         image.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.partystrength' });
         var name = $('<div class="strength-label is-vertical-center title-font-normal font-bold ' + color + '">' + strength + '</div>');
         column.append(name);
@@ -301,11 +300,9 @@ WorldEditorScreen.prototype.addLootEntry = function(_data, _parentDiv)
         overlays.forEach(function (_imagePath) {
             if (_imagePath === '') return;
 
-            var overlayImage = imageLayout.createImage(Path.ITEMS + _imagePath, function(_image) {
+            imageLayout.createImage(Path.ITEMS + _imagePath, function(_image) {
                 _image.fitImageToParent(0, 0);
-                _image.removeClass('');
-            }, null, '');
-            overlayImage.css('pointer-events', 'none');
+            }, null, 'no-pointer-events');
         });
     }
 
@@ -481,8 +478,7 @@ WorldEditorScreen.prototype.fillLocationSearchItemResult = function(_data)
         image.data('entry', _data[i]);
 
         if (_data[i].LayerImagePath.length > 0) {
-            var overlayImage = imageLayout.createImage(Path.ITEMS + _data[i].LayerImagePath, null, null, '');
-            overlayImage.css('pointer-events', 'none');
+            imageLayout.createImage(Path.ITEMS + _data[i].LayerImagePath, null, null, 'no-pointer-events');
         }
 
         // set up event listeners
@@ -494,13 +490,10 @@ WorldEditorScreen.prototype.fillLocationSearchItemResult = function(_data)
             self.mLocation.SearchItem.bindTooltip({ contentType: 'ui-element', elementId: data.ID, elementOwner: 'woditor.searchresult' });
             
             if (data.LayerImagePath.length > 0) {
-                if (self.mLocation.SearchItemOverlay != null) {
+                if (self.mLocation.SearchItemOverlay != null)
                     self.mLocation.SearchItemOverlay.attr('src', Path.ITEMS + data.LayerImagePath);
-                }
-                else {
-                    self.mLocation.SearchItemOverlay = self.mLocation.SearchItemContainer.createImage(Path.ITEMS + data.LayerImagePath, null, null, '');
-                    self.mLocation.SearchItemOverlay.css('pointer-events', 'none');
-                }
+                else 
+                    self.mLocation.SearchItemOverlay = self.mLocation.SearchItemContainer.createImage(Path.ITEMS + data.LayerImagePath, null, null, 'no-pointer-events');
             }
             else if (self.mLocation.SearchItemOverlay != null) {
                 self.mLocation.SearchItemOverlay.remove();

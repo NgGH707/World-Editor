@@ -117,6 +117,14 @@
     margin: auto;
     position: absolute;
 }
+.world-items-spawner-screen > .l-items-spanwer-dialog-container .content .item-layout .is-selected
+{
+    /*-webkit-filter: brightness(125%);
+    background-image: url("coui://gfx/ui/skin/metal_edge_selection_70x70.png");
+    background-size: 7.0rem 7.0rem;
+    background-repeat: no-repeat;*/
+    pointer-events: none;
+}
 .world-items-spawner-screen > .l-items-spanwer-dialog-container .content .item-layout > img
 {
     width: 100%;
@@ -162,6 +170,14 @@
     height: 10.0rem;
     position: relative;
     float: left;
+}
+.world-items-spawner-screen > .l-items-spanwer-dialog-container .content .l-change-name-button
+{
+    top: 4.5rem;
+    left: 31.0rem;
+    width: 9.8rem;
+    height: 4.3rem;
+    position: absolute;
 }
 .world-items-spawner-screen > .l-items-spanwer-dialog-container .content .row
 {
@@ -324,10 +340,18 @@
     height: 29%;
     position: absolute;
 }
-.world-items-spawner-screen > .l-items-spanwer-dialog-container .content .search-button
+.world-items-spawner-screen > .l-items-spanwer-dialog-container .content .l-search-button
 {
     top: 4.7rem;
-    left: 32.0rem;
+    left: 31.0rem;
+    width: 4.5rem;
+    height: 4.1rem;
+    position: absolute;
+}
+.world-items-spawner-screen > .l-items-spanwer-dialog-container .content .l-reset-search-button
+{
+    top: 4.7rem;
+    left: 35.5rem;
     width: 4.5rem;
     height: 4.1rem;
     position: absolute;
@@ -410,8 +434,9 @@
     bottom: 0;
     width: 17.5rem;
     position: absolute;
-
     line-height: 3.0rem;
+
 }
+
 
 

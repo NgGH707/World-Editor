@@ -990,6 +990,7 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/search_icon.png', function() {
                         self.notifyBackendSeachItemBy(searchInput.getInputText());
                     }, '', 6);
+                    button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.searchbutton' });
                 }
 
                 var lowerRow = this.addRow(72);

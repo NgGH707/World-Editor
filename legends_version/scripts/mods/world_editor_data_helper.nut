@@ -924,9 +924,9 @@ this.world_editor_data_helper <- {
 		result.AmountColor <- _item.getAmountColor();
 		result.ImagePath <- "ui/items/" + _item.m.Icon;
 		result.ImageOverlayPath <- _item.getIconOverlay();
-		result.CanChangeName <- "setName" in _item;
-		result.CanChangeAmount <- "setAmount" in _item;
-		result.CanChangeStats <- _item.isItemType(this.Const.Items.ItemType.Named);
+		result.CanChangeName <- _item.isItemType(::Const.Items.ItemType.Named) || ::mods_isClass(_item, "accessory_dog") != null; //"setName" in _item;
+		result.CanChangeAmount <- _item.isItemType(::Const.Items.ItemType.Supply) || _item.isItemType(::Const.Items.ItemType.Food); //"setAmount" in _item;
+		result.CanChangeStats <- _item.isItemType(::Const.Items.ItemType.Named);
 		result.ClassName <- _item.ClassNameHash;
 		result.Attribute <- null;
 		return result;
@@ -936,7 +936,7 @@ this.world_editor_data_helper <- {
 	{
 		local result = {};
 
-		if (_item.isItemType(this.Const.Items.ItemType.Named))
+		if (_item.isItemType(::Const.Items.ItemType.Named))
 		{
 			local isShield = _item.isItemType(::Const.Items.ItemType.Shield);
 			local isMelee = _item.isItemType(::Const.Items.ItemType.MeleeWeapon);

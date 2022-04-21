@@ -28,24 +28,25 @@ var WorldItemsSpawnerScreen = function(_parent)
 
     //
     this.mSelected = {
+        Data              : null,
         Layout            : null,
         Name              : null,
         Amount            : null,
         AttributeContainer: null,
         Attribute: {
-            ConditionMax      : {Input: null, ValueMin:   1, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + Asset.ICON_REPAIR_ITEM         , TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            StaminaModifier   : {Input: null, ValueMin: -99, ValueMax:   0, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + Asset.ICON_FATIGUE             , TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            MeleeDefense      : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + Asset.ICON_MELEE_DEFENCE       , TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            RangedDefense     : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + Asset.ICON_RANGE_DEFENCE       , TooltipId: TooltipIdentifier.Assets.BusinessReputation}, 
-            RegularDamage     : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + 'ui/icons/damage_dealt_min.png', TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            RegularDamageMax  : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + 'ui/icons/damage_dealt_max.png', TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            ArmorDamageMult   : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage:  true, Postfix: '%', IconPath: Path.GFX + Asset.ICON_CRUSHING_DAMAGE    , TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            DirectDamageAdd   : {Input: null, ValueMin:   0, ValueMax: 100, Min: 0, Max: 3, IsPercentage:  true, Postfix: '%', IconPath: Path.GFX + 'ui/icons/direct_damage.png'  , TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            ShieldDamage      : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + 'ui/icons/shield_damage.png'   , TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            ChanceToHitHead   : {Input: null, ValueMin:   0, ValueMax: 100, Min: 0, Max: 3, IsPercentage:  true, Postfix: '%', IconPath: Path.GFX + Asset.ICON_CHANCE_TO_HIT_HEAD , TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            FatigueOnSkillUse : {Input: null, ValueMin: -99, ValueMax:  99, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + 'ui/icons/special.png'         , TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            AdditionalAccuracy: {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage:  true, Postfix: '%', IconPath: Path.GFX + 'ui/icons/hitchance.png'      , TooltipId: TooltipIdentifier.Assets.BusinessReputation},
-            AmmoMax           : {Input: null, ValueMin:   1, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + Asset.ICON_ASSET_AMMO          , TooltipId: TooltipIdentifier.Assets.BusinessReputation},
+            ConditionMax      : {Input: null, ValueMin:   1, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + Asset.ICON_REPAIR_ITEM         , TooltipId: 'woditor.ConditionMax'},
+            StaminaModifier   : {Input: null, ValueMin: -99, ValueMax:   0, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + Asset.ICON_FATIGUE             , TooltipId: 'woditor.StaminaModifier'},
+            MeleeDefense      : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + Asset.ICON_MELEE_DEFENCE       , TooltipId: 'woditor.MeleeDefense'},
+            RangedDefense     : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + Asset.ICON_RANGE_DEFENCE       , TooltipId: 'woditor.RangedDefense'}, 
+            RegularDamage     : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + 'ui/icons/damage_dealt_min.png', TooltipId: 'woditor.RegularDamage'},
+            RegularDamageMax  : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + 'ui/icons/damage_dealt_max.png', TooltipId: 'woditor.RegularDamageMax'},
+            ArmorDamageMult   : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage:  true, Postfix: '%', IconPath: Path.GFX + Asset.ICON_CRUSHING_DAMAGE    , TooltipId: 'woditor.ArmorDamageMult'},
+            DirectDamageAdd   : {Input: null, ValueMin:   0, ValueMax: 100, Min: 0, Max: 3, IsPercentage:  true, Postfix: '%', IconPath: Path.GFX + 'ui/icons/direct_damage.png'  , TooltipId: 'woditor.DirectDamageAdd'},
+            ShieldDamage      : {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + 'ui/icons/shield_damage.png'   , TooltipId: 'woditor.ShieldDamage'},
+            ChanceToHitHead   : {Input: null, ValueMin:   0, ValueMax: 100, Min: 0, Max: 3, IsPercentage:  true, Postfix: '%', IconPath: Path.GFX + Asset.ICON_CHANCE_TO_HIT_HEAD , TooltipId: 'woditor.ChanceToHitHead'},
+            FatigueOnSkillUse : {Input: null, ValueMin: -99, ValueMax:  99, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + 'ui/icons/special.png'         , TooltipId: 'woditor.FatigueOnSkillUse'},
+            AdditionalAccuracy: {Input: null, ValueMin:   0, ValueMax: 999, Min: 0, Max: 3, IsPercentage:  true, Postfix: '%', IconPath: Path.GFX + 'ui/icons/hitchance.png'      , TooltipId: 'woditor.AdditionalAccuracy'},
+            AmmoMax           : {Input: null, ValueMin:   1, ValueMax: 999, Min: 0, Max: 3, IsPercentage: false, Postfix: '', IconPath: Path.GFX + Asset.ICON_ASSET_AMMO          , TooltipId: 'woditor.AmmoMax'},
         },
     };
 
@@ -60,14 +61,13 @@ var WorldItemsSpawnerScreen = function(_parent)
 
     // buttons
     this.mLeaveButton  = null;
+    this.mNameButton   = null;
     this.mRerollButton = null;
     this.mAddButton    = null;
 
     // generics
     this.mIsVisible    = false;
-
-    // selected entry
-    this.mSelectedEntry = null;
+    this.mAmount       = 1;
 };
 
 WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
@@ -100,6 +100,7 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
             var button = buttonLayout.createImageButton(Path.GFX + 'ui/buttons/delete.png', function(_button) {
                 self.notifyBackendDeleteAllStashItem();
             }, '', 6);
+            button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.deletestashitems' });
 
             var buttonLayout = $('<div class="l-flex-button-174-43"/>');
             stashHeader.append(buttonLayout);
@@ -112,18 +113,21 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
             var button = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_SORT, function(_button) {
                 self.notifyBackendSortStashItem();
             }, '', 6);
+            button.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.CharacterScreen.RightPanelHeaderModule.SortButton });
 
             var buttonLayout = $('<div class="l-flex-button-45-41"/>');
             stashHeader.append(buttonLayout);
             var button = buttonLayout.createImageButton(Path.GFX + Asset.ICON_REPAIR_ITEM, function(_button) {
                 self.notifyBackendRepairAllStashItem();
             }, '', 6);
+            button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.repairallitems' });
 
             var buttonLayout = $('<div class="l-flex-button-45-41"/>');
             stashHeader.append(buttonLayout);
             var button = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_DELAY_TURN, function(_button) {
                 self.notifyBackendRestockAllStashItem();
             }, '', 6);
+            button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.restockallitems' });
         }
 
         var stashContent = $('<div class="stash-content-container"/>');
@@ -143,7 +147,6 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
             this.mSelected.Layout = $('<div class="item-layout"/>');
             itemContainer.append(this.mSelected.Layout);
             var image = this.mSelected.Layout.createImage(Path.GFX + 'ui/items/slots/inventory_slot_bag.png', null, null, '');
-            image.data('item', null);
 
             var nameContainer = $('<div class="column-is-name"/>');
             upperRow.append(nameContainer);
@@ -153,22 +156,30 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
             row.append(title);
             var inputLayout = $('<div class="l-input"/>');
             row.append(inputLayout);
-            this.mSelected.Name = inputLayout.createInput('', 0, 50, 1, function(_input) {
-            }, 'title-font-big font-bold font-color-brother-name');
+            this.mSelected.Name = inputLayout.createInput('', 0, 50, 1, null, 'title-font-big font-bold font-color-brother-name', function(_input) {
+                self.notifyBackendChangeNameOfItem(self.mSelected.Data);
+            });
+            var buttonLayout = $('<div class="l-change-name-button"/>');
+            nameContainer.append(buttonLayout);
+            this.mNameButton = buttonLayout.createTextButton('Change', function(_button) {
+                self.notifyBackendChangeNameOfItem(self.mSelected.Data);
+            }, '', 2);
+            this.mNameButton.findButtonText().css('top', '0.2rem');
+
             
             var column = $('<div class="column-is-option"/>');
             upperRow.append(column);
             var buttonLayout = $('<div class="l-add-button"/>');
             column.append(buttonLayout);
             this.mAddButton = buttonLayout.createTextButton('Add', function(_button) {
-                var imageEntry = self.mSelected.Layout.find('img:first');
-                self.notifyBackendAddItemToStash(imageEntry);
+                self.notifyBackendAddItemToStash(self.mSelected.Data, false);
             }, '', 2);
             this.mAddButton.findButtonText().css('top', '0.2rem');
             var amountContainer = $('<div class="input-amount-container"/>');
             column.append(amountContainer);
             var title = $('<div class="amount title-font-big font-align-center font-color-title">Num</div>');
             title.css('font-size', '2.0rem');
+            title.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.itemspawneramount' });
             amountContainer.append(title);
             var amountInputLayout = $('<div class="amount-input"/>');
             amountContainer.append(amountInputLayout);
@@ -185,8 +196,11 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
             }
             var buttonLayout = $('<div class="l-reroll-button"/>');
             this.mSelected.AttributeContainer.append(buttonLayout);
-            this.mRerollButton = buttonLayout.createTextButton('Reroll', null, '', 2);
+            this.mRerollButton = buttonLayout.createTextButton('Reroll', function(_image) {
+                self.notifyBackendRerollStats(self.mSelected.Data);
+            }, '', 2);
             this.mRerollButton.findButtonText().css('top', '0.2rem');
+            this.mRerollButton.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.itemspawnerrerollstats' });
 
             var lowerRow = $('<div class="row-lower with-dialog-background"/>');
             rightColumn.append(lowerRow);
@@ -211,11 +225,20 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
                 }, 'title-font-big font-bold font-color-brother-name', function(_input) {
                     self.notifyBackendSeachItemBy(_input.getInputText());
                 });
-                var buttonLayout = $('<div class="search-button"/>');
+                var buttonLayout = $('<div class="l-search-button"/>');
                 searchBarRow.append(buttonLayout);
                 var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/search_icon.png', function() {
                     self.notifyBackendSeachItemBy(self.mSearch.Input.getInputText());
                 }, '', 6);
+                button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.searchbutton' });
+
+                var buttonLayout = $('<div class="l-reset-search-button"/>');
+                searchBarRow.append(buttonLayout);
+                var button = buttonLayout.createImageButton(Path.GFX + Asset.BUTTON_DELAY_TURN, function() {
+                    self.mSearch.ListScrollContainer.empty();
+                    self.mSearch.Found.html('');
+                }, '', 6);
+                button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.clearsearchbutton' });
 
                 var searchResultRow = $('<div class="search-result-row"/>');
                 lowerRow.append(searchResultRow);
@@ -402,68 +425,8 @@ WorldItemsSpawnerScreen.prototype.createInputDIV = function(_key, _definition, _
     _definition.Input.css('background-size', '5.2rem 4.1rem');
 }
 
-WorldItemsSpawnerScreen.prototype.confirmAmountChanges = function(_input)
-{
-    if (_input.data('IsUpdated') === true)
-        return;
-
-    var self = this;
-    var value = 0;
-    var isValid = true;
-
-    if (_input.getInputTextLength() <= 0) {
-        isValid = false;
-    }
-    else {
-        value = _input.isValidInputNumber(1, 99);
-        if (value === null)
-            isValid = false;
-    }
-
-    if (isValid === true) {
-        _input.val('' + value + '');
-        _input.data('IsUpdated', true);
-        _input.data('Default', value);
-    }
-    else {
-        _input.val('' + _input.data('Default') + '');
-    }
-};
-
-WorldItemsSpawnerScreen.prototype.confirmAttributeChanges = function(_input, _keyName)
-{
-    if (_input.data('IsUpdated') === true)
-        return;
-
-    var self = this;
-    var definition = this.mSelected.Attribute[_keyName];
-    var value = 0;
-    var isValid = true;
-
-    if (_input.getInputTextLength() <= 0 || definition === null) {
-        isValid = false;
-    }
-    else {
-        value = _input.isValidInputNumber(definition.ValueMin, definition.ValueMax);
-        if (value === null)
-            isValid = false;
-    }
-
-    if (isValid === true) {
-        _input.val('' + value + '');
-        _input.data('IsUpdated', true);
-        _input.data('Default', value);
-        //this.notifyBackendUpdateAssetsPropertyValue(_keyName, value);
-    }
-    else {
-        _input.val('' + _input.data('Default') + '');
-    }
-};
-
 WorldItemsSpawnerScreen.prototype.destroyDIV = function()
 {
-	this.mSelectedEntry = null;
-
     this.mContainer.empty();
     this.mContainer.remove();
     this.mContainer = null;
@@ -548,22 +511,23 @@ WorldItemsSpawnerScreen.prototype.isVisible = function()
 
 WorldItemsSpawnerScreen.prototype.show = function(_data)
 {
+    this.mSelected.Data = null;
     this.loadFromData(_data);
-	var self = this;
-	var offset = -(this.mContainer.parent().width() + this.mContainer.width());
-	this.mContainer.css({ 'left': offset });
-	this.mContainer.velocity("finish", true).velocity({ opacity: 1, left: '0', right: '0' }, {
-		duration: Constants.SCREEN_SLIDE_IN_OUT_DELAY,
-		easing: 'swing',
-		begin: function () {
-			$(this).removeClass('display-none').addClass('display-block');
-			self.notifyBackendOnAnimating();
-		},
-		complete: function () {
-			self.mIsVisible = true;
-			self.notifyBackendOnShown();
-		}
-	});
+    var self = this;
+    var offset = -(this.mContainer.parent().width() + this.mContainer.width());
+    this.mContainer.css({ 'left': offset });
+    this.mContainer.velocity("finish", true).velocity({ opacity: 1, left: '0', right: '0' }, {
+        duration: Constants.SCREEN_SLIDE_IN_OUT_DELAY,
+        easing: 'swing',
+        begin: function () {
+            $(this).removeClass('display-none').addClass('display-block');
+            self.notifyBackendOnAnimating();
+        },
+        complete: function () {
+            self.mIsVisible = true;
+            self.notifyBackendOnShown();
+        }
+    });
 };
 
 WorldItemsSpawnerScreen.prototype.hide = function(_withSlideAnimation)
@@ -578,11 +542,72 @@ WorldItemsSpawnerScreen.prototype.hide = function(_withSlideAnimation)
             self.notifyBackendOnAnimating();
         },
         complete: function() {
-        	self.mIsVisible = false;
+            self.mIsVisible = false;
             $(this).removeClass('display-block').addClass('display-none');
             self.notifyBackendOnHidden();
         }
     });
+};
+
+WorldItemsSpawnerScreen.prototype.confirmAmountChanges = function(_input)
+{
+    if (_input.data('IsUpdated') === true)
+        return;
+
+    var self = this;
+    var value = 0;
+    var isValid = true;
+
+    if (_input.getInputTextLength() <= 0) {
+        isValid = false;
+    }
+    else {
+        value = _input.isValidInputNumber(1, 99);
+        if (value === null)
+            isValid = false;
+    }
+
+    if (isValid === true) {
+        _input.val('' + value + '');
+        _input.data('IsUpdated', true);
+        _input.data('Default', value);
+        if (typeof this.mSelected.Data.Amount !== 'string')
+            self.notifyBackendChangeAmountOfItem(this.mSelected.Data.Index, value);
+        else
+            this.mAmount = value;
+    }
+    else {
+        _input.val('' + _input.data('Default') + '');
+    }
+};
+
+WorldItemsSpawnerScreen.prototype.confirmAttributeChanges = function(_input, _keyName)
+{
+    if (_input.data('IsUpdated') === true)
+        return;
+
+    var definition = this.mSelected.Attribute[_keyName];
+    var value = 0;
+    var isValid = true;
+
+    if (_input.getInputTextLength() <= 0 || definition === null) {
+        isValid = false;
+    }
+    else {
+        value = _input.isValidInputNumber(definition.ValueMin, definition.ValueMax);
+        if (value === null)
+            isValid = false;
+    }
+
+    if (isValid === true) {
+        _input.val('' + value + '');
+        _input.data('IsUpdated', true);
+        _input.data('Default', value);
+        this.notifyBackendChangeAttributeOfItem(this.mSelected.Data.Index, _keyName, value);
+    }
+    else {
+        _input.val('' + _input.data('Default') + '');
+    }
 };
 
 WorldItemsSpawnerScreen.prototype.loadFromData = function(_data)
@@ -595,6 +620,11 @@ WorldItemsSpawnerScreen.prototype.loadFromData = function(_data)
     this.createItemContainer(_data.Slots);
     this.addStashData(_data.Stash);
     this.mStash.Label.changeButtonText('Stash: ' + _data.Stash.length + '/' + _data.Slots);
+};
+
+WorldItemsSpawnerScreen.prototype.updateStashLabel = function()
+{
+    this.mStash.Label.changeButtonText('Stash: ' + this.mStash.Data.length + '/' + this.mStash.Slot.length);
 };
 
 WorldItemsSpawnerScreen.prototype.createItemContainer = function(_slotNum)
@@ -616,7 +646,7 @@ WorldItemsSpawnerScreen.prototype.addStashData = function(_data)
     }
 };
 
-WorldItemsSpawnerScreen.prototype.createItemEntry = function(_data, _slot)
+WorldItemsSpawnerScreen.prototype.createItemEntry = function(_data, _slot, _isSelected)
 {
     var self = this;
     var itemContainer = _slot;
@@ -631,22 +661,35 @@ WorldItemsSpawnerScreen.prototype.createItemEntry = function(_data, _slot)
         overlays.forEach(function (_imagePath) {
             if (_imagePath === '') return;
 
-            var overlayImage = imageLayout.createImage(Path.ITEMS + _imagePath, null, null, '');
-            overlayImage.css('pointer-events', 'none');
+            imageLayout.createImage(Path.ITEMS + _imagePath, null, null, 'no-pointer-events');
         });
+    }
+
+    var selectedOverLay = imageLayout.createImage(Path.GFX + 'ui/skin/metal_edge_selection_70x70.png', null, null, 'is-selected opacity-none');
+
+    if (_isSelected === true) {
+        this.mSelected.Data =_data;
+        this.updateSelectedItemDetailPanel(_data);
+        selectedOverLay.showThisImg(true);
     }
 
     if (_data.ShowAmount === true) {
         var amountLabel = $('<div class="label text-font-very-small font-shadow-outline"/>'); //font-size-13
         imageLayout.append(amountLabel);
-        amountLabel.html(_data.Amount);
+        amountLabel.html('' + _data.Amount + '');
         amountLabel.css('color', _data.AmountColor);
     }
 
     // set up event listeners
     image.click(this, function(_event) {
         var element = $(this);
-        self.selectItem(element);
+        if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true) {
+            self.notifyBackendRemoveItemFromStash(element);
+        }
+        else if (selectedOverLay.hasClass('display-block') === false) {
+            selectedOverLay.showThisImg(true);
+            self.selectItem(element);
+        }
     });
     image.bindTooltip({ contentType: 'ui-item', entityId: _data.Owner, itemId: _data.ID, itemOwner: 'woditor.itemspawner'});
 };
@@ -676,15 +719,15 @@ WorldItemsSpawnerScreen.prototype.fillSearchItemResult = function(_data)
         image.data('item', _data[i]);
 
         if (_data[i].LayerImagePath.length > 0) {
-            var overlayImage = imageLayout.createImage(Path.ITEMS + _data[i].LayerImagePath, null, null, '');
-            overlayImage.css('pointer-events', 'none');
+            imageLayout.createImage(Path.ITEMS + _data[i].LayerImagePath, null, null, 'no-pointer-events');
         }
 
         // set up event listeners
         image.click(this, function(_event) {
             var element = $(this);
+            var data = element.data('item');
             if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true)
-                self.notifyBackendAddItemToStash(element, true);
+                self.notifyBackendAddItemToStash(data, true);
             else
                 self.selectItem(element);
         });
@@ -695,47 +738,75 @@ WorldItemsSpawnerScreen.prototype.fillSearchItemResult = function(_data)
 
 WorldItemsSpawnerScreen.prototype.selectItem = function(_element)
 {
-    if (_element !== null && _element.length > 0)
-    {
-        this.updateSelectedItemDetailPanel(_element);
+    var hasData = this.mSelected.Data !== null && this.mSelected.Data !== undefined;
+    var index = hasData ? this.mSelected.Data.Index : null;
+
+    if (_element !== null && _element.length > 0) {
+        this.mSelected.Data = _element.data('item');
+        this.updateSelectedItemDetailPanel(this.mSelected.Data);
     }
-    else
-    {
+    else {
+        this.mSelected.Data = null;
+        this.updateSelectedItemDetailPanel(null);
+    }
+
+    if (hasData && index !== null) {
+        var selectedOverLay = this.mStash.Slot[index].find('.is-selected:first');
+        selectedOverLay.showThisImg(false);
+    }
+};
+
+WorldItemsSpawnerScreen.prototype.deselectStashItem = function()
+{
+    var hasData = this.mSelected.Data !== null && this.mSelected.Data !== undefined;
+    var index = hasData ? this.mSelected.Data.Index : null;
+
+    if (hasData && index !== null) {
+        this.mSelected.Data = null;
+        var selectedOverLay = this.mStash.Slot[index].find('.is-selected:first');
+        selectedOverLay.showThisImg(false);
         this.updateSelectedItemDetailPanel(null);
     }
 };
 
-WorldItemsSpawnerScreen.prototype.updateSelectedItemDetailPanel = function(_element)
+WorldItemsSpawnerScreen.prototype.isFromStash = function(_element)
 {
-    if (_element === null || _element.length <= 0) {
+    if (_element === null || _element === undefined || _element.length === 0) return false;
+    if (_element.data('item') === null || _element.data('item') === undefined) return false;
+    return _element.data('item').Index !== null;
+};
+
+WorldItemsSpawnerScreen.prototype.updateSelectedItemDetailPanel = function(_data)
+{
+    if (_data === null || _data === undefined) {
         this.revertToDefault();
         return;
     }
 
     var self = this;
-    var data = _element.data('item');
-    this.updateDisplayItem(data);
+    var fromStash = _data.Index !== null;
+    this.updateDisplayItem(_data);
     this.mAddButton.enableButton(true);
+    this.mAddButton.changeButtonText(fromStash ? 'Duplicate' : 'Add');
+    this.mSelected.Amount.removeClass('no-pointer-events');
 
-    if (data.ShowAmount === true && typeof data.Amount != 'string')
-    {
-        this.mSelected.Amount.val('' + data.Amount + '');
-        this.mSelected.Amount.removeClass('no-pointer-events');
+    if (_data.ShowAmount === true && typeof _data.Amount != 'string') {
+        this.mSelected.Amount.val('' + _data.Amount + '');
     }
-    else if (this.mSelected.Amount.getInputText() === '-x-')
-    {
-        this.mSelected.Amount.val('1');
-        this.mSelected.Amount.removeClass('no-pointer-events');
+    else { //if (this.mSelected.Amount.getInputText() === '-x-') {
+        this.mSelected.Amount.val('' + this.mAmount + '');
     }
 
-    this.mSelected.Name.val(data.Name);
-    if (data.CanChangeName === true)
+    this.mSelected.Name.val(_data.Name);
+    this.mNameButton.enableButton(_data.CanChangeName);
+    if (_data.CanChangeName === true)
         this.mSelected.Name.removeClass('no-pointer-events');
     else
         this.mSelected.Name.addClass('no-pointer-events');
 
-    if (data.CanChangeStats === true) {
-        var attribute = data.Attribute;
+    this.mRerollButton.enableButton(_data.CanChangeStats && fromStash);
+    if (_data.CanChangeStats === true) {
+        var attribute = _data.Attribute;
         this.mSelected.AttributeContainer.removeClass('is-grayscale');
         $.each(this.mSelected.Attribute, function(_key, _definition) {
             var attr = self.mSelected.Attribute[_key];
@@ -763,16 +834,19 @@ WorldItemsSpawnerScreen.prototype.updateDisplayItem = function(_data)
     var self = this;
     this.mSelected.Layout.empty();
     var image = this.mSelected.Layout.createImage(Path.GFX + _data.ImagePath, null, null, '');
-    image.data('item', _data);
 
     var overlays = _data.ImageOverlayPath;
     if (overlays !== undefined && overlays !== '' && overlays.length > 0) {
         overlays.forEach(function (_imagePath) {
             if (_imagePath === '') return;
-            var overlayImage = self.mSelected.Layout.createImage(Path.ITEMS + _imagePath, null, null, '');
-            overlayImage.css('pointer-events', 'none');
+            var overlayImage = self.mSelected.Layout.createImage(Path.ITEMS + _imagePath, null, null, 'no-pointer-events');
         });
     }
+
+    if (_data.Index !== null)
+        image.bindTooltip({ contentType: 'ui-item', entityId: _data.Owner, itemId: _data.ID, itemOwner: 'woditor.itemspawner'});
+    else
+        image.bindTooltip({ contentType: 'ui-element', elementId: _data.ID, elementOwner: 'woditor.searchresult' });
 };
 
 WorldItemsSpawnerScreen.prototype.revertToDefault = function()
@@ -790,18 +864,22 @@ WorldItemsSpawnerScreen.prototype.revertToDefault = function()
     }); 
     this.mSelected.Layout.find('img').each(function(index, element) {
         var image = $(element);
-        if (index === 0)
+        if (index === 0) {
             image.attr('src', Path.GFX + 'ui/items/slots/inventory_slot_bag.png');
-        else 
+            image.unbindTooltip();
+        }
+        else {
             image.remove();
+        }
     });
 };
 
 WorldItemsSpawnerScreen.prototype.gatherAttributes = function()
 {
     var result = {};
-    $.each(this.mSelected.Attribute, function(_key, _definition) {
-        var v = parseInt(_definition.Input.getInputText());
+    var attr = this.mSelected.Attribute;
+    $.each(attr, function(_key, _definition) {
+        var v = parseInt(attr[_key].Input.getInputText());
         if (isNaN(v) === false) {
             result[_key] = v;
         } 
@@ -809,24 +887,15 @@ WorldItemsSpawnerScreen.prototype.gatherAttributes = function()
     return result;
 };
 
-WorldItemsSpawnerScreen.prototype.getStashItem = function(_id)
+WorldItemsSpawnerScreen.prototype.getStashItem = function(_index)
 {
     for (var i = 0; i < this.mStash.Data.length; i++) {
-        if (this.mStash.Data[i].ID === _id) {
+        if (this.mStash.Data[i].Index === _index) {
             return {
-                Index = i;
-                Item = this.mStash.Data[i];
+                Index: i,
+                Item: this.mStash.Data[i],
             };
         }
-    }
-    return null;
-};
-
-WorldItemsSpawnerScreen.prototype.getSelectedItem = function()
-{
-    var element = this.mSelected.Layout.find('img:first');
-    if (element.length > 0) {
-        return element;
     }
     return null;
 };
@@ -909,7 +978,9 @@ WorldItemsSpawnerScreen.prototype.notifyBackendShowAllItems = function()
 WorldItemsSpawnerScreen.prototype.notifyBackendDeleteAllStashItem = function()
 {
     this.mStash.Data = [];
+    this.deselectStashItem();
     this.createItemContainer(this.mStash.Slot.length);
+    this.updateStashLabel();
     SQ.call(this.mSQHandle, 'onDeleteAllStashItem');
 }
 
@@ -917,12 +988,11 @@ WorldItemsSpawnerScreen.prototype.notifyBackendSortStashItem = function()
 {
     var self = this;
     SQ.call(this.mSQHandle, 'onSortStashItem', [] , function(_data) {
-        if (_data === undefined || _data === null || jQuery.isArray(_data)) {
+        if (_data === undefined || _data === null || typeof _data !== 'object') {
             console.error('ERROR: Failed to retrieve sorted stash data. Invalid data result.');
             return;
         }
-
-        self.addStashData(_data);
+        self.addStashData(_data.Stash);
     });
 }
 
@@ -930,12 +1000,11 @@ WorldItemsSpawnerScreen.prototype.notifyBackendRepairAllStashItem = function()
 {
     var self = this;
     SQ.call(this.mSQHandle, 'onRepairAllStashItem', [] , function(_data) {
-        if (_data === undefined || _data === null || jQuery.isArray(_data)) {
+        if (_data === undefined || _data === null || typeof _data !== 'object') {
             console.error('ERROR: Failed to retrieve repaired stash data. Invalid data result.');
             return;
         }
-
-        self.addStashData(_data);
+        self.addStashData(_data.Stash);
     });
 }
 
@@ -943,21 +1012,19 @@ WorldItemsSpawnerScreen.prototype.notifyBackendRestockAllStashItem = function()
 {
     var self = this;
     SQ.call(this.mSQHandle, 'onRestockAllStashItem', [] , function(_data) {
-        if (_data === undefined || _data === null || jQuery.isArray(_data)) {
+        if (_data === undefined || _data === null || typeof _data !== 'object') {
             console.error('ERROR: Failed to retrieve restocked stash data. Invalid data result.');
             return;
         }
-
-        self.addStashData(_data);
+        self.addStashData(_data.Stash);
     });
 }
 
-WorldItemsSpawnerScreen.prototype.notifyBackendAddItemToStash = function( _element, isQuickAdd )
+WorldItemsSpawnerScreen.prototype.notifyBackendAddItemToStash = function( _itemData, isQuickAdd )
 {
     var self = this;
-    var data = _element.data('item');
 
-    if (data === null || data === undefined) {
+    if (_itemData === null || _itemData === undefined) {
         console.error('ERROR: Failed to add item to stash. Undefined selected data.');
         return;
     }
@@ -965,7 +1032,7 @@ WorldItemsSpawnerScreen.prototype.notifyBackendAddItemToStash = function( _eleme
     var num = isQuickAdd === true ? 1 : parseInt(this.mSelected.Amount.getInputText());
     var name = isQuickAdd === true ? '' : this.mSelected.Name.getInputText();
     var attr = isQuickAdd === true ? {} : this.gatherAttributes();
-    SQ.call(this.mSQHandle, 'onAddItemToStash', [ data, num, name, attr, isQuickAdd ] , function(_data) {
+    SQ.call(this.mSQHandle, 'onAddItemToStash', [ _itemData, num, name, attr, isQuickAdd ] , function(_data) {
         if (_data === undefined || _data === null || !jQuery.isArray(_data)) {
             console.error('ERROR: Failed to add item to stash. Invalid data result.');
             return;
@@ -975,23 +1042,75 @@ WorldItemsSpawnerScreen.prototype.notifyBackendAddItemToStash = function( _eleme
             self.mStash.Data.push(_data[i]);
             self.createItemEntry(_data[i], self.mStash.Slot[_data[i].Index]);
         }
+
+        self.updateStashLabel();
     });
 };
 
-WorldItemsSpawnerScreen.prototype.notifyBackendRemoveItemFromStash = function( _element )
+WorldItemsSpawnerScreen.prototype.notifyBackendRerollStats = function( _itemData )
 {
-    var data = _element.data('item');
-    var result = this.getStashItem(data.ID);
-    var selected = this.getSelectedItem();
+    var self = this;
+    var result = this.getStashItem(_itemData.Index);
+
+    if (_itemData === null || _itemData === undefined) {
+        console.error('ERROR: Failed to reroll named item stats. Undefined selected data.');
+        return;
+    }
+
+    SQ.call(this.mSQHandle, 'onRerollStats', _itemData.Index , function(_data) {
+        if (_data === undefined || _data === null || typeof _data !== 'object') {
+            console.error('ERROR: Failed to reroll named item stats. Invalid data result.');
+            return;
+        }
+        self.mStash.Data[result.Index] = _data;
+        self.createItemEntry(_data, self.mStash.Slot[_data.Index], true);
+    });
+};
+
+WorldItemsSpawnerScreen.prototype.notifyBackendRemoveItemFromStash = function( _data )
+{
+    var result = this.getStashItem(_data.Index);
+    var selected = this.mSelected.Data;
     this.mStash.Slot[data.Index].empty();
     if (result !== null) {
         this.mStash.Data.splice(result.Index, 1);
     }
-    if (selected !== null && selected.data('item') === result.Item.ID) {
-        this.revertToDefault();
-    }
-
+    this.deselectStashItem();
+    this.updateStashLabel();
     SQ.call(this.mSQHandle, 'onRemoveItemFromStash', result.Item.Index);
+};
+
+
+WorldItemsSpawnerScreen.prototype.notifyBackendChangeAmountOfItem = function( _index, _amount )
+{
+    if (_index === null || _index === undefined) return;
+
+    var result = this.getStashItem(_index);
+    this.mStash.Data[result.Index].Amount = _amount;
+    this.createItemEntry(this.mStash.Data[result.Index], this.mStash.Slot[result.Item.Index]);
+    var label = this.mStash.Slot[result.Item.Index].find('.label:first');
+    if (label.length > 0) {
+        label.html('' + _amount + '');
+    }
+    SQ.call(this.mSQHandle, 'onChangeAmountOfItem', [ result.Item.Index, _amount ]);
+};
+
+WorldItemsSpawnerScreen.prototype.notifyBackendChangeAttributeOfItem = function( _index, _key, _value )
+{
+    var result = this.getStashItem(_index);
+    this.mStash.Data[result.Index].Attribute[_key] = _value;
+    this.createItemEntry(this.mStash.Data[result.Index], this.mStash.Slot[result.Item.Index]);
+    SQ.call(this.mSQHandle, 'onChangeAttributeOfItem', [ result.Item.Index, _key, _value ]);
+};
+
+WorldItemsSpawnerScreen.prototype.notifyBackendChangeNameOfItem = function( _data )
+{
+    if (_data.Index === null || _data.CanChangeName === false) return;
+    var result = this.getStashItem(_data.Index);
+    var name = this.mSelected.Name.getInputText();
+    this.mStash.Data[result.Index].Name = name;
+    this.createItemEntry(this.mStash.Data[result.Index], this.mStash.Slot[result.Item.Index]);
+    SQ.call(this.mSQHandle, 'onChangeNameOfItem', [ result.Item.Index, name ]);
 };
 
 

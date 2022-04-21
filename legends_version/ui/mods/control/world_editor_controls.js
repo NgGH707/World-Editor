@@ -9,6 +9,19 @@ $.fn.addHighlighter = function()
     return this;
 }
 
+$.fn.showThisImg = function(_value)
+{
+    if (_value === true)
+    {
+        this.removeClass('opacity-none');
+    }
+    else
+    {
+        this.addClass('opacity-none');
+    }
+    return this;
+}
+
 $.fn.showThisDiv = function(_value)
 {
     if (_value === true)

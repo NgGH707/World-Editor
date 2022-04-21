@@ -91,6 +91,7 @@
 	::Woditor.ItemFilterMax <- 10;
 	::Woditor.Stash <- ::new("scripts/items/stash_container");
 	::Woditor.Stash.setResizable(true);
+	::Woditor.Stash.setID("woditor");
 	::Woditor.Items <- [];
 	::Woditor.PrepareItemsOnCampaignStart <- function()
 	{
@@ -154,7 +155,7 @@
 			if (_item.m.Icon == null || _item.m.Icon == "") continue;
 
 			// fuck it, legends fault for not adding the image of these but still leave the directory
-			if (_item.m.Icon == "helmets/icon_southern_veil_07.png" || _item.m.Icon == "helmets/icon_southern_veil_01.png") continue;
+			if (_item.m.Icon == "helmets/icon_southern_veil_07.png" || _item.m.Icon == "helmets/icon_southern_veil_01.png" || _item.m.Icon == "helmets/icon_southern_veil_06.png") continue;
 
 			if (_item.m.Name.len() == 0)
 			{
@@ -187,11 +188,12 @@
 				ImagePath = "ui/items/" + _item.m.Icon,
 				LayerImagePath = layer,
 				ImageOverlayPath = [layer],
-				CanChangeName = "setName" in _item,
-				CanChangeAmount = "setAmount" in _item,
+				CanChangeName = isNamed || ::mods_isClass(_item, "accessory_dog") != null,
+				CanChangeAmount = _item.isItemType(::Const.Items.ItemType.Supply) || _item.isItemType(::Const.Items.ItemType.Food),
 				CanChangeStats = isNamed,
 				ClassName = _item.ClassNameHash,
 				Script = ::IO.scriptFilenameByHash(_item.ClassNameHash),
+				Owner = ::Woditor.Stash.getID(),
 			};
 
 			if (isNamed)

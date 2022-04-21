@@ -350,6 +350,195 @@
 
 			switch (_elementId) 
 			{
+			case "woditor.ConditionMax":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Maximum Durability"
+				}];
+
+			case "woditor.StaminaModifier":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Fatigue Penalty"
+				}];
+
+			case "woditor.MeleeDefense":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Melee Defense"
+				}];
+
+			case "woditor.RangedDefense":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Ranged Defense"
+				}];
+
+			case "woditor.RegularDamage":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Minimum Damage"
+				}];
+
+			case "woditor.RegularDamageMax":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Maximum Damage"
+				}];
+
+			case "woditor.ArmorDamageMult":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Effectiveness against Armor"
+				}];
+
+			case "woditor.DirectDamageAdd":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Additional Armor Penetration"
+				}];
+
+			case "woditor.ShieldDamage":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Shield Damage"
+				}];
+
+			case "woditor.ChanceToHitHead":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Chance to Hit Head"
+				}];
+
+			case "woditor.FatigueOnSkillUse":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Fatigue Modifier on Skill Use"
+				}];
+
+			case "woditor.AdditionalAccuracy":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Additional Chance to Hit"
+				}];
+
+			case "woditor.AmmoMax":
+				return [{
+					id = 1,
+					type = "title",
+					text = "Maximum Amount of Ammo"
+				}];
+
+			case "woditor.deletestashitems":
+				return [
+					{
+						id = 1,
+						type = "title",
+						text = "Discard All Items"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Clear all items in your stash, make it clean"
+					},
+				];
+
+			case "woditor.repairallitems":
+				return [
+					{
+						id = 1,
+						type = "title",
+						text = "Repair All Items"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Restore the condition of all stash items back to its peak condition"
+					},
+				];
+
+			case "woditor.restockallitems":
+				return [
+					{
+						id = 1,
+						type = "title",
+						text = "Restock All Items"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Restock all the food back to 25 units and reset their expiration date"
+					},
+				];
+
+			case "woditor.itemspawneramount":
+				return [
+					{
+						id = 1,
+						type = "title",
+						text = "Number/Amount"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Shows the number of item you are about to add or duplicate. or just to show the amount of unit of a supply item"
+					},
+				];
+
+			case "woditor.itemspawnerrerollstats":
+				return [
+					{
+						id = 1,
+						type = "title",
+						text = "Reroll Stats"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Let you reroll the stats of your named item. Let the RNG god give you another chance"
+					},
+				];
+
+			case "woditor.searchbutton":
+				return [
+					{
+						id = 1,
+						type = "title",
+						text = "Search"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Start the search process with the given text input. Remember, the text input must has at least 2 words or it will clear the search result"
+					},
+				];
+
+			case "woditor.clearsearchbutton":
+				return [
+					{
+						id = 1,
+						type = "title",
+						text = "Reset Search"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Clear the search result, return it to the blank page."
+					},
+				];
+
 			case "woditor.worldentitybanner":
 				return [
 					{
