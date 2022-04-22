@@ -129,6 +129,44 @@
 						}
 					}
 				}
+
+				if (this.m.WorldScreen.getWorldMapEditorModule().isVisible())
+				{
+					return this.WorldMapEditorKeyInputHandle(_key);
+				}
+			}
+
+			return true;
+		}
+
+		obj.WorldMapEditorKeyInputHandle <- function( _key )
+		{
+			if (!this.m.MenuStack.hasBacksteps())
+ 	 		{
+				switch (_key.getKey())
+				{
+				case 20: //J to teleport
+			        if (this.m.LastTileHovered != null)
+			        {
+			        	local tilePos = this.m.LastTileHovered.Pos;
+			        	::World.State.getPlayer().setPos(tilePos);
+			        	::World.setPlayerPos(tilePos);
+			        }
+					break;
+
+				case 18: //H to spawn stuff
+			        if (this.m.LastTileHovered != null && this.m.WorldScreen.getWorldMapEditorModule().isSpawningMode())
+			        {
+			        	this.m.WorldScreen.getWorldMapEditorModule().spawn(this.m.LastTileHovered);
+			        }
+					break;
+
+				case 17: //M to move stuff
+			        /*if (this.m.LastTileHovered != null && this.m.WorldScreen.getWorldMapEditorModule().isMovingMode())
+			        {
+			        	this.m.WorldScreen.getWorldMapEditorModule().spawn(this.m.LastTileHovered);
+			        }*/	
+				}
 			}
 
 			return true;

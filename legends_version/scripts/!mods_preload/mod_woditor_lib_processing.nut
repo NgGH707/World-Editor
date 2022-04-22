@@ -18,31 +18,36 @@
 		Tooltip = {},
 		Stuff = {},
 		Valid = [],
+		All = [],
 	};
+	::Woditor.SubLocations <- ["Bandit", "Barbarian", "Nomad", "Goblin", "Orc", "Undead", "Cultist", "Legendary", "Misc"];
+	::Woditor.SubParties <- ["Caravan", "Noble", "Southern",  "Mercenary", "Bandit", "Barbarian", "Nomad", "Goblin", "Orc", "Necromancer", "Undead", "Misc"],
+	::Woditor.SubPartyFactionType <- [[2, 3, 13], [3], [13], [2, 3, 13], [5], [12], [14], [7], [6], [9], [8], [10]];
 	::Woditor.PrepareLocationsOnCampaignStart <- function()
 	{
-		if (::Woditor.Locations.Valid.len() > 0) return;
+		if (::Woditor.Locations.All.len() > 0) return;
 
 		local tile = this.World.getTileSquare(1, 1);
-		local location = ::IO.enumerateFiles("scripts/entity/world/locations/");
+		local locations = ::IO.enumerateFiles("scripts/entity/world/locations/");
 
-		foreach (i, script in location )
+		foreach (i, script in locations )
 		{
 			if (::Const.Invalid.Locations.find(script) != null) continue;
 
 			local location = ::World.spawnLocation(script, tile.Coords);
 			local info = {
-				Script = script,
 				Name = location.getName(),
 				Type = location.getTypeID(),
 				ImagePath = location.getUIImagePath(),
 				Description = location.getDescription(),
+				Script = script.slice("scripts/entity/world/locations/".len()),
 				IsPassive = location.isLocationType(::Const.World.LocationType.Passive) && !location.isLocationType(::Const.World.LocationType.Lair),
 				IsCamp =  location.isLocationType(::Const.World.LocationType.Lair) && !location.isLocationType(::Const.World.LocationType.Unique),
 				IsLegendary = location.isLocationType(::Const.World.LocationType.Unique),
 			};
 
 			::Woditor.Locations.Valid.push(script);
+			::Woditor.Locations.All.push(info);
 			::Woditor.Locations.Stuff[script] <- info;
 
 			if (!(location.getTypeID() in ::Woditor.Locations.Tooltip))
@@ -51,6 +56,119 @@
 			}
 
 			location.die();
+		}
+	}
+
+	::Woditor.Settlements <- {
+		All = [],
+		Fort = [],
+		Village = [],
+		CityState = [],
+	};
+	::Woditor.Settlements.Village.push([]);
+	::Woditor.Settlements.Village.push([]);
+	::Woditor.Settlements.Village.push([]);
+	::Woditor.Settlements.Fort.push([]);
+	::Woditor.Settlements.Fort.push([]);
+	::Woditor.Settlements.Fort.push([]);
+	::Woditor.PrepareSettlementsOnCampaignStart <- function()
+	{
+		if (::Woditor.Settlements.All.len() > 0) return;
+
+		::Woditor.Settlements.All.extend([
+			{
+				Name = "Small Village",
+				ImagePath = "ui/settlement_sprites/townhall_01.png",
+				IsSouthern = false,
+				IsVillage = true,
+				Size = 0,
+			},
+			{
+				Name = "Village",
+				ImagePath = "ui/settlement_sprites/townhall_02.png",
+				IsSouthern = false,
+				IsVillage = true,
+				Size = 1,
+			},
+			{
+				Name = "Town",
+				ImagePath = "ui/settlement_sprites/townhall_03.png",
+				IsSouthern = false,
+				IsVillage = true,
+				Size = 2,
+			},
+			{
+				Name = "Fort",
+				ImagePath = "ui/settlement_sprites/stronghold_01.png",
+				IsSouthern = false,
+				IsVillage = false,
+				Size = 0,
+			},
+			{
+				Name = "Stronghold",
+				ImagePath = "ui/settlement_sprites/stronghold_02.png",
+				IsSouthern = false,
+				IsVillage = false,
+				Size = 1,
+			},
+			{
+				Name = "Citadel",
+				ImagePath = "ui/settlement_sprites/stronghold_03.png",
+				IsSouthern = false,
+				IsVillage = false,
+				Size = 2,
+			},
+			{
+				Name = "City-State",
+				ImagePath = "ui/settlement_sprites/citystate_01.png",
+				IsSouthern = true,
+				IsVillage = false,
+				Size = 0,
+			},
+		]);
+		
+		local settlements = "scripts/entity/world/settlements/";
+		foreach ( script in ::IO.enumerateFiles(settlements) )
+		{
+			if (script.find("/situations/") != null) continue;
+			if (script.find("/buildingss/") != null) continue;
+			if (script.find("legends_") != null) continue;
+			if (::Const.Invalid.Settlements.find(script) != null) continue;
+
+			if (script.find("city_state") != null) 
+			{
+				::Woditor.Settlements.CityState.push(script);
+			}
+			else if (script.find("village") != null)
+			{
+				if (script.find("large_") != null) 
+				{
+					::Woditor.Settlements.Village[2].push(script);
+				}
+				else if (script.find("medium_") != null)
+				{
+					::Woditor.Settlements.Village[1].push(script);
+				}
+				else
+				{
+					::Woditor.Settlements.Village[0].push(script);
+				}
+			}
+			else if (script.find("fort") != null)
+			{
+				if (script.find("large_") != null) 
+				{
+					::Woditor.Settlements.Fort[2].push(script);
+				}
+				else if (script.find("medium_") != null)
+				{
+					::Woditor.Settlements.Fort[1].push(script);
+				}
+				else
+				{
+					::Woditor.Settlements.Fort[0].push(script);
+				}
+			}
 		}
 	}
 

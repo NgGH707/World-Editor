@@ -66,7 +66,70 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
-	function convertAttachedLocationEntriesToUIData( _id )
+	function convertLocationEntriesToUIData()
+	{
+		local result = {};
+
+		foreach( name in ::Woditor.SubLocations )
+		{
+			result[name] <- [];
+		}
+
+		foreach (info in ::Woditor.Locations.All)
+		{
+			local entry = clone info;
+
+			if (info.Script.find("legendary/") != null)
+			{
+				entry.FactionType <- null;
+				result.Legendary.push(entry);
+			}
+			else if (info.Script.find("bandit_") != null)
+			{
+				entry.FactionType <- ::Const.FactionType.Bandits;
+				result.Bandit.push(entry);
+			}
+			else if (info.Script.find("barbarian_") != null)
+			{
+				entry.FactionType <- ::Const.FactionType.Barbarians;
+				result.Barbarian.push(entry);
+			}
+			else if (info.Script.find("nomad_") != null)
+			{
+				entry.FactionType <- ::Const.FactionType.OrientalBandits;
+				result.Nomad.push(entry);
+			}
+			else if (info.Script.find("goblin_") != null)
+			{
+				entry.FactionType <- ::Const.FactionType.Goblins;
+				result.Goblin.push(entry);
+			}
+			else if (info.Script.find("orc_") != null)
+			{
+				entry.FactionType <- ::Const.FactionType.Orcs;
+				result.Orc.push(entry);
+			}
+			else if (info.Script.find("undead_") != null)
+			{
+				entry.FactionType <- ::Const.FactionType.Undead;
+				result.Undead.push(entry);
+			}
+			else if (info.Script.find("cultist_") != null)
+			{
+				entry.FactionType <- ::Const.FactionType.Cultists;
+				result.Cultist.push(entry);
+			}
+			else
+			{
+				entry.FactionType <- null;
+				result.Misc.push(entry);
+			}
+		}
+
+		return result;
+	}
+
+	function convertAttachedLocationEntriesToUIData()
 	{
 		local result = [];
 
@@ -76,6 +139,7 @@ this.world_editor_data_helper <- {
 
 			result.push({
 				Script = script,
+				Name = attached_location.getName(),
 				ID = attached_location.getTypeID(),
 				ImagePath = attached_location.getUIImagePath()
 			});
@@ -224,7 +288,32 @@ this.world_editor_data_helper <- {
 		return result;
 	}
 
-	function convertTroopTemplateToUIData( _type )
+	function convertPartiesEntriesToUIData()
+	{
+		local result = {};
+
+		foreach (i, name in ::Woditor.SubParties)
+		{
+			result[name] <- [];
+			local key = name.tolower();
+			local party_keys = this.convertTroopTemplateToUIData(key);
+
+			foreach (_key in party_keys)
+			{
+				local party = ::Const.World.Spawn[_key];
+				result[name].push({
+					Key = _key,
+					Name = party.Name,
+					FactionType = ::Woditor.SubPartyFactionType[i],
+					ImagePath = ("Body" in party) ? "ui/parties/" + party.Body + ".png" : "ui/images/undiscovered_opponent.png",
+				});
+			}
+		}
+
+		return result;
+	}
+
+	function convertTroopTemplateToUIData( _type = null )
 	{
 		local result = [];
 
@@ -237,6 +326,30 @@ this.world_editor_data_helper <- {
 				if (key.find("Caravan") == null) continue;
 				result.push(key);
 			}
+			break;
+
+		case "noble":
+			foreach(key, value in ::Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Noble") == null || key.find("Caravan") != null) continue;
+				result.push(key);
+			}
+			break;
+
+		case "southern":
+			foreach(key, value in ::Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Southern") == null || key.find("Caravan") != null) continue;
+				result.push(key);
+			}
+			result.extend([
+				"Slaves",
+				"NorthernSlaves",
+				"Assassins",
+				"SatoManhunters"
+			]);
 			break;
 
 		case "mercenary":
@@ -271,6 +384,15 @@ this.world_editor_data_helper <- {
 			}
 			break;
 
+		case "nomad":
+			foreach(key, value in ::Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Nomad") == null) continue;
+				result.push(key);
+			}
+			break;
+
 		case "goblin":
 			foreach(key, value in ::Const.World.Spawn)
 			{
@@ -278,13 +400,50 @@ this.world_editor_data_helper <- {
 				if (key.find("Goblin") == null) continue;
 				result.push(key);
 			}
+			result.push("GreenskinHorde");
 			break;
 
 		case "orc":
 			foreach(key, value in ::Const.World.Spawn)
 			{
 				if (typeof value != "table") continue;
-				if (key.find("Orc") == null) continue;
+				if (key.find("Orc") == null && key.find("Berserkers") == null) continue;
+				result.push(key);
+			}
+			result.push("GreenskinHorde");
+			break;
+
+		case "necromancer":
+			foreach(key, value in ::Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Zombie") == null && key.find("Ghost") == null && key.find("Necromancer") == null) continue;
+				result.push(key);
+			}
+			break;
+
+		case "undead":
+			foreach(key, value in ::Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Undead") == null && key.find("Vampire") == null && key.find("Mummi") == null) continue;
+				result.push(key);
+			}
+			break;
+
+		case "beast":
+			foreach(key, value in ::Const.World.Spawn)
+			{
+				if (typeof value != "table") continue;
+				if (key.find("Noble") == null || key.find("Southern") != null || key.find("Caravan") != null) continue;
+				if (key.find("Undead") != null || key.find("Vampire") != null || key.find("Mummi") || null) continue;
+				if (key.find("Zombie") != null || key.find("Ghost") != null || key.find("Necromancer") || null) continue;
+				if (key.find("Orc") != null || key.find("Berserkers") != null) continue;
+				if (key.find("Goblin") != null) continue;
+				if (key.find("Nomad") != null) continue;
+				if (key.find("Barbarian") != null) continue;
+				if (key.find("Bandit") != null) continue;
+				if (key.find("Company") != null) continue;
 				result.push(key);
 			}
 			break;
@@ -294,6 +453,17 @@ this.world_editor_data_helper <- {
 			{
 				if (typeof value != "table") continue;
 				result.push(key);
+			}
+		}
+
+		local exclude = ["Unit", "Troops", "TroopsMap"];
+
+		foreach (key in exclude)
+		{
+			local find = result.find(key);
+			if (find != null) 
+			{
+				result.remove(find);
 			}
 		}
 

@@ -192,4 +192,19 @@ else
 }
 
 
+local settlement = [
+	"scripts/entity/world/settlements/stronghold_hamlet",
+	"scripts/entity/world/settlements/stronghold_player_base",
+];
+// locations
+if (!("Settlements" in ::Const.Invalid))
+{
+	::Const.Invalid.Settlements <- settlement;
+}
+else
+{
+	::Const.Invalid.Settlements.extend(settlement);
+}
+
+
 

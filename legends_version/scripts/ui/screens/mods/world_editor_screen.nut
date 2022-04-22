@@ -73,6 +73,7 @@ this.world_editor_screen <- {
 		::Woditor.PrepareItemsOnCampaignStart();
 		::Woditor.PrepareContractsOnCampaignStart();
 		::Woditor.PrepareBackgroundsOnCampaignStart();
+		::Woditor.PrepareSettlementsOnCampaignStart();
 		::Woditor.PrepareBuildingsOnCampaignStart();
 		::Woditor.PrepareAttachedLocationsOnCampaignStart();
 		::Woditor.PrepareSituationsOnCampaignStart();
@@ -238,7 +239,7 @@ this.world_editor_screen <- {
 
 	function onGetAttachedLocationEntries( _id )
 	{
-		return ::Woditor.Helper.convertAttachedLocationEntriesToUIData(_id);
+		return ::Woditor.Helper.convertAttachedLocationEntriesToUIData();
 	}
 
 	function onGetSituationEntries( _id )

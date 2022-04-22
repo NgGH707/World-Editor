@@ -391,11 +391,9 @@ WorldEditorScreen.prototype.addAttachmentEntry = function (_data)
     var self = this;
     var entry = $('<div class="attach-row"/>');
     this.mSettlement.Attachments.append(entry);
-    var image = entry.createImage(Path.GFX + _data.ImagePath, function(_image)
-    {
+    var image = entry.createImage(Path.GFX + _data.ImagePath, function(_image) {
         _image.centerImageWithinParent(0, 0, 1.0);
-        _image.removeClass('opacity-none');
-    }, null, 'opacity-none');
+    }, null, '');
     image.data('ID', _data.ID);
 
     // set up event listeners
