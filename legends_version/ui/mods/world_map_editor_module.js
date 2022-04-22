@@ -72,21 +72,21 @@ WorldMapEditorModule.prototype.createDIV = function(_parentDiv)
             self.hide(true);
         }, '', 6);
 
+        var flexContainer = $('<div class="flex-container-column"/>');
+        tabColumn.append(flexContainer);
+
+        var buttonLayout = $('<div class="flex-button-39-39"/>');
+        flexContainer.append(buttonLayout)
+        var button = buttonLayout.createImageButton(Path.GFX + 'ui/icons/info.png', null, '', 10);
+        button.bindTooltip({ contentType: 'ui-element', elementId: 'woditor.worldspawnerinfo' });
+
         var buttonLayouts = [];
         for (var i = 0; i < ModMapEditor.Category.length; i++) {
-            var buttonLayout = $('<div class="l-button-45-41"/>');
-            buttonLayout.css('top', (7.5 + i * 4.1) + 'rem');
-            tabColumn.append(buttonLayout);
+            var buttonLayout = $('<div class="flex-button-45-41"/>');
+            //buttonLayout.css('top', (7.5 + i * 4.1) + 'rem');
+            flexContainer.append(buttonLayout);
             buttonLayouts.push(buttonLayout);
         }
-
-        /* terraform
-        this.mButton.Terrain    = buttonLayouts[0].createImageButton(Path.GFX + 'ui/buttons/icon_terrain.png', function() {
-            self.openTab('Terrain');
-        }, '', 6);
-        this.mButton.Scenery    = buttonLayouts[1].createImageButton(Path.GFX + Asset.BUTTON_TOGGLE_TREES_ENABLED, function() {
-            self.openTab('Scenery');
-        }, '', 6);*/
 
         // spawn stuff
         this.mButton.Settlement = buttonLayouts[0].createImageButton(Path.GFX + 'ui/buttons/icon_settlement.png', function() {
@@ -397,6 +397,41 @@ WorldMapEditorModule.prototype.selectEntry = function(_element, _type)
     }
 };
 
+WorldMapEditorModule.prototype.selectWorldEntity = function(_data) 
+{
+    var self = this;
+    this.expand(true);
+    this.mSelectedEntry = null;
+    this.mListScrollContainer.empty();
+    this.mLabelButton.enableButton(false);
+    this.mLabelButton.changeButtonText('Selected');
+    $.each(this.mButton, function (_key, _definition) {
+        self.mButton[_key].enableButton(true);
+    });
+
+    var id = _data.ID;
+    var entry = $('<div class="l-location-row is-selected"/>');
+    this.mListScrollContainer.append(entry);
+    var image = entry.createImage(Path.GFX + _data.ImagePath, function(_image) {
+        _image.centerImageWithinParent(0, 0, 1.0);
+    }, null, 'no-pointer-events');
+    var label = $('<div class="label text-font-small font-color-white font-align-center">' + _data.Name + '</div>');
+    entry.append(label);
+    entry.click(this, function(_event) {
+        if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true) {
+            self.notifyBackendShowWorldEntityOnMap(id);
+        }
+    });
+    entry.bindTooltip({ contentType: 'ui-element', elementId: _data.ID, elementOwner: 'woditor.world_entity' });
+}
+
+WorldMapEditorModule.prototype.deselectWorldEntity = function(_nothing) 
+{
+    this.expand(false);
+    this.mSelectedEntry = null;
+    this.mListScrollContainer.empty();
+}
+
 WorldMapEditorModule.prototype.addDataWithFilter = function(_isLocation) 
 {
     if (_isLocation === true) {
@@ -575,6 +610,11 @@ WorldMapEditorModule.prototype.notifyBackendPopupDialogIsVisible = function(_vis
 WorldMapEditorModule.prototype.notifyBackendRemoveSpawnSelection = function()
 {
     SQ.call(this.mSQHandle, 'onRemoveSpawnSelection');
+};
+
+WorldMapEditorModule.prototype.notifyBackendShowWorldEntityOnMap = function(_id)
+{
+    SQ.call(this.mSQHandle, 'onShowWorldEntityOnMap', _id);
 };
 
 WorldMapEditorModule.prototype.notifyBackendChangeSpawnSelection = function(_element, _type)

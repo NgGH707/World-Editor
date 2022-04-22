@@ -1,8 +1,8 @@
 this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 	m = {
 		PopupDialogVisible = false,
+		SeletedWorldEntityID = null,
 		SpawnData = null,
-		MoveData = null,
 		Mode = 0,
 	},
 	function create()
@@ -34,9 +34,9 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 		}
 	}
 
-	function isMovingMode()
+	function isSelectedEntity()
 	{
-		return this.m.MoveData != null;
+		return this.m.SeletedWorldEntityID != null;
 	}
 
 	function isSpawningMode()
@@ -83,6 +83,11 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 		return result;
 	}
 
+	function getSelectedEntity()
+	{
+		return ::World.getEntityByID(this.m.SeletedWorldEntityID);
+	}
+
 	function onRemoveSpawnSelection()
 	{
 		this.m.Mode = 0;
@@ -94,6 +99,57 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 		this.m.Mode = 2;
 		this.m.SpawnData = _data[0];
 		this.m.SpawnData.EntityType <- _data[1];
+		this.m.SeletedWorldEntityID = null;
+	}
+
+	function onShowWorldEntityOnMap( _id )
+	{
+		local world_entity = ::World.getEntityByID(_id);
+		if (world_entity == null) return;
+		local tile = world_entity.getTile();
+		world_entity.setDiscovered(true);
+		::World.uncoverFogOfWar(tile.Pos, 500.0);
+		::World.getCamera().Zoom = 1.0;
+		::World.getCamera().setPos(tile.Pos);
+	}
+
+	function select( _worldEntity )
+	{
+		if (_worldEntity.getID() == ::World.State.getPlayer().getID()) return;
+
+		this.onRemoveSpawnSelection();
+		this.m.SeletedWorldEntityID = _worldEntity.getID();
+		this.m.JSHandle.asyncCall("selectWorldEntity", {
+			ID = _worldEntity.getID(),
+			Name = _worldEntity.getName(),
+			ImagePath = _worldEntity.getUIImagePath()
+		});
+	}
+
+	function discard()
+	{
+		local world_entity = ::World.getEntityByID(this.m.SeletedWorldEntityID);
+		if (world_entity == null) return;
+
+		if (world_entity.isLocation())
+		{
+			world_entity.die();
+		}
+		else if (world_entity.isParty())
+		{
+			world_entity.onCombatLost();
+		}
+
+		this.m.SeletedWorldEntityID = null;
+		this.m.JSHandle.asyncCall("deselectWorldEntity", null);
+	}
+
+	function move( _tile )
+	{
+		local world_entity = ::World.getEntityByID(this.m.SeletedWorldEntityID);
+		if (world_entity == null) return;
+
+		world_entity.setPos(_tile.Pos);
 	}
 
 	function spawn( _tile )

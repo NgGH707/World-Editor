@@ -33,6 +33,29 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
+.world-screen .world-map-editor-module .l-tab-column .flex-container-column
+{
+    top: 7.5rem;
+    width: 4.5rem;
+    height: 88%;
+    position: absolute;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: column;
+}
+.world-screen .world-map-editor-module .flex-container-column .flex-button-45-41
+{
+    width: 4.5rem;
+    height: 4.1rem;
+    flex: 0 0 auto;
+}
+.world-screen .world-map-editor-module .flex-container-column .flex-button-39-39
+{
+    width: 3.9rem;
+    height: 3.9rem;
+    flex: 0 0 auto;
+}
 
 .world-screen .world-map-editor-module .content .l-list-container
 {
@@ -149,20 +172,6 @@
 {
     position: absolute;
     margin: auto;
-}
-
-.world-screen .world-map-editor-module .is-horizontal-center
-{
-    margin-left: auto;
-    margin-right: auto;
-    position: absolute;
-}
-
-.world-screen .world-map-editor-module .is-vertical-center
-{
-    margin-top: auto;
-    margin-bottom: auto;
-    position: absolute;
 }
 
 

@@ -145,13 +145,34 @@
  	 		{
 				switch (_key.getKey())
 				{
-				case 20: //J to teleport
-			        if (this.m.LastTileHovered != null)
-			        {
-			        	local tilePos = this.m.LastTileHovered.Pos;
-			        	::World.State.getPlayer().setPos(tilePos);
-			        	::World.setPlayerPos(tilePos);
+				case 24: //N to select stuff
+					if (this.m.LastEntityHovered != null)
+        			{
+			        	this.m.WorldScreen.getWorldMapEditorModule().select(this.m.LastEntityHovered);
 			        }
+			        break;
+
+				case 23: //M to move stuff
+			        if (this.m.LastTileHovered != null && this.m.WorldScreen.getWorldMapEditorModule().isSelectedEntity())
+			        {
+			        	this.m.WorldScreen.getWorldMapEditorModule().move(this.m.LastTileHovered);
+			        }
+			        break;
+
+			    case 21:
+			    	if (this.m.WorldScreen.getWorldMapEditorModule().isSelectedEntity())
+			    	{
+			    		this.m.WorldScreen.getWorldMapEditorModule().discard();
+			    	}
+			    	break;
+
+				case 20: //J to teleport
+					if (this.m.LastTileHovered != null)
+					{
+						local tilePos = this.m.LastTileHovered.Pos;
+		        		::World.State.getPlayer().setPos(tilePos);
+		        		::World.setPlayerPos(tilePos);
+					}
 					break;
 
 				case 18: //H to spawn stuff
@@ -160,12 +181,6 @@
 			        	this.m.WorldScreen.getWorldMapEditorModule().spawn(this.m.LastTileHovered);
 			        }
 					break;
-
-				case 17: //M to move stuff
-			        /*if (this.m.LastTileHovered != null && this.m.WorldScreen.getWorldMapEditorModule().isMovingMode())
-			        {
-			        	this.m.WorldScreen.getWorldMapEditorModule().spawn(this.m.LastTileHovered);
-			        }*/	
 				}
 			}
 

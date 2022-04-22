@@ -1332,6 +1332,45 @@
 					},
 				];
 
+			case "woditor.worldspawnerinfo":
+		       	return [
+					{
+						id = 1,
+						type = "title",
+						text = "Notes"
+					},
+					{
+						id = 2,
+						type = "description",
+						text = "Just some simple instructions. Remember that all commands below require your debug tool mod is turn off as those command keys are also used by that mod. While this tab is still visible, your party can't be attacked by the AI, your party doesn't consume supply and fog of war is removed."
+					},
+					{
+						id = 3,
+						type = "text",
+						text = "([color=#8f1e1e]J[/color]) - To teleport your company party to where your mouse is hovered."
+					},
+					{
+						id = 3,
+						type = "text",
+						text = "([color=#8f1e1e]H[/color]) - To spawn the selected world entity from the tab menu."
+					},
+					{
+						id = 4,
+						type = "text",
+						text = "([color=#8f1e1e]N[/color]) - To select a world entity on the map."
+					},
+					{
+						id = 4,
+						type = "text",
+						text = "([color=#8f1e1e]M[/color]) - To move the selected world entity to where your mouse is hovered."
+					},
+					{
+						id = 3,
+						type = "text",
+						text = "([color=#8f1e1e]K[/color]) - To delete the selected world entity."
+					},
+				];
+
 			case "woditor.troopsinfo":
 		       	return [
 					{
