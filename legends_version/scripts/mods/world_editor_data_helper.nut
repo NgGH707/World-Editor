@@ -773,14 +773,14 @@ this.world_editor_data_helper <- {
 				});
 			}
 
-			// processing draft list
+			/* processing draft list
 			foreach( draft in settlement.getDraftList() )
 			{
 				draftlist.push({
 					Key = draft,
 					ImagePath = ::Woditor.Backgrounds.Stuff[draft].Icon
 				})
-			}
+			}*/
 
 			result.push({
 				ID = settlement.getID(),
@@ -803,7 +803,7 @@ this.world_editor_data_helper <- {
 				Attachments = attached_locations,
 				Situations = situations,
 				Buildings = buildings,
-				DraftList = draftlist,
+				//DraftList = draftlist,
 				Faction = faction,
 				Owner = owner,
 			});
