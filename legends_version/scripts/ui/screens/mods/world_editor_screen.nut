@@ -72,7 +72,7 @@ this.world_editor_screen <- {
 
 		::Woditor.PrepareItemsOnCampaignStart();
 		::Woditor.PrepareContractsOnCampaignStart();
-		::Woditor.PrepareBackgroundsOnCampaignStart();
+		//::Woditor.PrepareBackgroundsOnCampaignStart();
 		::Woditor.PrepareSettlementsOnCampaignStart();
 		::Woditor.PrepareBuildingsOnCampaignStart();
 		::Woditor.PrepareAttachedLocationsOnCampaignStart();
