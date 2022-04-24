@@ -2,6 +2,13 @@
 {
 	::mods_hookExactClass("entity/world/settlement", function( obj ) 
 	{
+                obj.isCoastal = function()
+	        {
+		        if(this.hasBuilding("building.port")) return true;
+
+                        return this.m.IsCoastal;
+	        }
+
 		obj.getUIImagePath <- function()
 		{
 			return this.getImagePath();
