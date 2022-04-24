@@ -349,7 +349,7 @@ WorldEditorScreen.prototype.updateSettlementDetailsPanel = function(_element)
         this.mSettlement.SendCaravanButton.enableButton(!data.IsIsolated);
         this.updateSituationList(data.Situations);
         this.updateAttachmentList(data.Attachments);
-        this.updateDraftList(data.DraftList);
+        //this.updateDraftList(data.DraftList);
 
         var faction = this.getFaction(data.Faction);
         this.mSettlement.FactionBanner.attr('src', Path.GFX + faction.ImagePath);
