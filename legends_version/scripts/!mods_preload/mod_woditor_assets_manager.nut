@@ -10,16 +10,25 @@
 		{
 			obj.m.BaseProperties[key] <- 1.0;
 		}
+		obj.m.BaseProperties.MovementSpeedMult <- 1.0;
 
 		foreach (key in ::Woditor.AssetsProperties.Additive)
 		{
 			obj.m.BaseProperties[key] <- 0;
 		}
+		obj.m.BaseProperties.EquipmentLootChance <- 0;
 
 		local ws_resetToDefaults = obj.resetToDefaults;
 		obj.resetToDefaults = function()
 		{
 			ws_resetToDefaults();
+			
+			if ((this.World.Flags.has("MovementSpeedMult")) 
+			{
+				this.m.MovementSpeedMult *= this.World.Flags.getAsFloat("MovementSpeedMult");
+			}
+			
+			this.m.EquipmentLootChance += this.World.Flags.getAsInt("EquipmentLootChance");
 
 			foreach (key in ::Woditor.AssetsProperties.Mult)
 			{
@@ -39,6 +48,13 @@
 
 		obj.updateBaseProperties <- function()
 		{
+			if ((this.World.Flags.has("MovementSpeedMult")) 
+			{
+				this.m.BaseProperties.MovementSpeedMult = this.m.MovementSpeedMult / this.World.Flags.getAsFloat("MovementSpeedMult");
+			}
+			
+			this.m.BaseProperties.EquipmentLootChance = this.m.EquipmentLootChance - this.World.Flags.getAsInt("EquipmentLootChance");
+			
 			foreach (key in ::Woditor.AssetsProperties.Mult)
 			{
 				if (this.World.Flags.has(key)) this.m.BaseProperties[key] = this.m[key] / this.World.Flags.getAsFloat(key);
@@ -71,28 +87,6 @@
 				this.World.State.getPlayer().getSprite("body").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
 			}
 		};
-
-		/*local ws_getBrothersMax = obj.getBrothersMax;
-		obj.getBrothersMax = function()
-		{
-			if (this.World.Flags.has("RosterTier"))
-			{
-				return this.Const.Roster.getSizeForTier(this.World.Flags.getAsInt("RosterTier"));
-			}
-			
-			return ws_getBrothersMax();
-		}
-
-		local ws_getBrothersMaxInCombat = obj.getBrothersMaxInCombat;
-		obj.getBrothersMaxInCombat = function()
-		{
-			if (this.World.Flags.has("RosterTier"))
-			{
-				return this.Const.Roster.getInCombatSizeForTier(this.World.Flags.getAsInt("RosterTier"));
-			}
-
-			return ws_getBrothersMaxInCombat();
-		}*/
 	});
 
 	delete ::Woditor.hookAssetsManager;
