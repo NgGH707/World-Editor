@@ -581,6 +581,8 @@ this.world_editor_data_helper <- {
 		result.Ammo <- ::World.Assets.getAmmo();
 		result.ArmorParts <- ::World.Assets.getArmorParts();
 		result.Medicine <- ::World.Assets.getMedicine();
+		result.MovementSpeedMult <- ::Math.floor(::World.Assets.m.MovementSpeedMult * 100);
+		result.EquipmentLootChance <- ::World.Assets.m.EquipmentLootChance;
 		
 		foreach (key in ::Woditor.AssetsProperties.Mult)
 		{
