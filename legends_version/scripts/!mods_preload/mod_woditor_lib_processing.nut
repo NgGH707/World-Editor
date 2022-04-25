@@ -50,7 +50,7 @@
 			::Woditor.Locations.All.push(info);
 			::Woditor.Locations.Stuff[script] <- info;
 
-			if (!(location.getTypeID() in ::Woditor.Locations.Tooltip))
+			if (!::Woditor.Locations.Tooltip.rawin(location.getTypeID()))
 			{
 				::Woditor.Locations.Tooltip[location.getTypeID()] <- info;
 			}
@@ -564,7 +564,7 @@
 			::Woditor.Buildings.All.push(script);
 			::Woditor.Buildings.Stuff[script] <- building;
 
-			if (building.m.Tooltip != null && !(building.m.Tooltip in ::Woditor.Buildings.Tooltip))
+			if (building.m.Tooltip != null && !::Woditor.Buildings.Tooltip.rawin(building.m.Tooltip))
 			{
 				::Woditor.Buildings.Tooltip[building.m.Tooltip] <- building;
 			}
@@ -596,7 +596,7 @@
 			::Woditor.AttachedLocations.All.push(script);
 			::Woditor.AttachedLocations.Stuff[script] <- attached_location;
 
-			if (!(attached_location.getTypeID() in ::Woditor.AttachedLocations.Tooltip))
+			if (!::Woditor.AttachedLocations.Tooltip.rawin(attached_location.getTypeID()))
 			{
 				::Woditor.AttachedLocations.Tooltip[attached_location.getTypeID()] <- attached_location;
 			}
@@ -624,7 +624,7 @@
 				::Woditor.Situations.Valid.push(script);
 				::Woditor.Situations.Stuff[script] <- situation;
 
-				if (!(situation.getID() in ::Woditor.Situations.Tooltip))
+				if (!::Woditor.Situations.Tooltip.rawin(situation.getID()))
 				{
 					::Woditor.Situations.Tooltip[situation.getID()] <- situation;
 				}
