@@ -61,13 +61,6 @@ this.world_editor_screen <- {
 		this.m.Animating = false;
 		this.m.PopupDialogVisible = false;
 		this.m.JSHandle = ::UI.connect("WorldEditorScreen", this);
-		::Woditor.PrepareItemsOnCampaignStart();
-		::Woditor.PrepareContractsOnCampaignStart();
-		::Woditor.PrepareSettlementsOnCampaignStart();
-		::Woditor.PrepareBuildingsOnCampaignStart();
-		::Woditor.PrepareAttachedLocationsOnCampaignStart();
-		::Woditor.PrepareSituationsOnCampaignStart();
-		::Woditor.PrepareLocationsOnCampaignStart();
 	}
 
 	function onDeserialize()
@@ -78,7 +71,7 @@ this.world_editor_screen <- {
 		}
 
 		
-		/*::Woditor.PrepareBackgroundsOnCampaignStart();
+		/*::Woditor.PrepareBackgroundsOnCampaignStart();*/
 		::Woditor.PrepareItemsOnCampaignStart();
 		::Woditor.PrepareContractsOnCampaignStart();
 		::Woditor.PrepareSettlementsOnCampaignStart();
@@ -86,7 +79,6 @@ this.world_editor_screen <- {
 		::Woditor.PrepareAttachedLocationsOnCampaignStart();
 		::Woditor.PrepareSituationsOnCampaignStart();
 		::Woditor.PrepareLocationsOnCampaignStart();
-		*/
 	}
 
 	function onSerialize()
