@@ -61,6 +61,13 @@ this.world_editor_screen <- {
 		this.m.Animating = false;
 		this.m.PopupDialogVisible = false;
 		this.m.JSHandle = ::UI.connect("WorldEditorScreen", this);
+		::Woditor.PrepareItemsOnCampaignStart();
+		::Woditor.PrepareContractsOnCampaignStart();
+		::Woditor.PrepareSettlementsOnCampaignStart();
+		::Woditor.PrepareBuildingsOnCampaignStart();
+		::Woditor.PrepareAttachedLocationsOnCampaignStart();
+		::Woditor.PrepareSituationsOnCampaignStart();
+		::Woditor.PrepareLocationsOnCampaignStart();
 	}
 
 	function onDeserialize()
@@ -70,14 +77,16 @@ this.world_editor_screen <- {
 			::Woditor.InvalidContracts = split(::World.Flags.get("InvalidContracts"), "/");
 		}
 
+		
+		/*::Woditor.PrepareBackgroundsOnCampaignStart();
 		::Woditor.PrepareItemsOnCampaignStart();
 		::Woditor.PrepareContractsOnCampaignStart();
-		//::Woditor.PrepareBackgroundsOnCampaignStart();
 		::Woditor.PrepareSettlementsOnCampaignStart();
 		::Woditor.PrepareBuildingsOnCampaignStart();
 		::Woditor.PrepareAttachedLocationsOnCampaignStart();
 		::Woditor.PrepareSituationsOnCampaignStart();
 		::Woditor.PrepareLocationsOnCampaignStart();
+		*/
 	}
 
 	function onSerialize()
@@ -1484,10 +1493,16 @@ this.world_editor_screen <- {
 	{
 		local key = _data[0];
 		local value = _data[1];
+		
+		if (key == "MovementSpeedMult")
+		{
+			::World.Flags.set(key, value / 100);
+			return;
+		}
+		
 		local baseValue = ::World.Assets.getBaseProperties()[key];
 		local isMult = ::Woditor.AssetsProperties.Mult.find(key) != null;
 		local isAdditive = ::Woditor.AssetsProperties.Additive.find(key) != null;
-
 		if (isMult) ::World.Flags.set(key, value / (baseValue * 100));
 		else if (isAdditive) ::World.Flags.set(key, value - baseValue);
 		else ::World.Flags.set(key, value);
