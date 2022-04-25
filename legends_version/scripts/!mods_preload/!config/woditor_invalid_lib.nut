@@ -145,6 +145,7 @@ local items = [
 	"scripts/items/armor_upgrades/named/named_lindwurm_scales_upgrade",
 	"scripts/items/armor_upgrades/named/named_serpent_skin_upgrade",
 	"scripts/items/armor_upgrades/named/named_unhold_fur_upgrade",
+	"scripts/items/armor_upgrades/named/named_armor_upgrade",
 	
 	"scripts/items/armor/layer_greenskins/goblin_skirmisher_armor",
 	"scripts/items/helmets/nggh707_headgear",
