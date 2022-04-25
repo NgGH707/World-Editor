@@ -134,6 +134,7 @@ local items = [
 	"scripts/items/accessory/accessory_spider",
 	"scripts/items/accessory/legendary/luck_stone_item",
 	"scripts/items/accessory/legendary/vitality_stone_item",
+	"scripts/items/armor/layer_greenskins/goblin_skirmisher_armor",
 	"scripts/items/helmets/nggh707_headgear",
 	"scripts/items/special/scroll_of_unlimited_wisdom_item",
 	"scripts/items/weapons/nggh707_skull_of_the_dead",
