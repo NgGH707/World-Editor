@@ -23,7 +23,7 @@
 		{
 			ws_resetToDefaults();
 			
-			if ((this.World.Flags.has("MovementSpeedMult")) 
+			if (this.World.Flags.has("MovementSpeedMult")) 
 			{
 				this.m.MovementSpeedMult *= this.World.Flags.getAsFloat("MovementSpeedMult");
 			}
@@ -48,7 +48,7 @@
 
 		obj.updateBaseProperties <- function()
 		{
-			if ((this.World.Flags.has("MovementSpeedMult")) 
+			if (this.World.Flags.has("MovementSpeedMult")) 
 			{
 				this.m.BaseProperties.MovementSpeedMult = this.m.MovementSpeedMult / this.World.Flags.getAsFloat("MovementSpeedMult");
 			}
