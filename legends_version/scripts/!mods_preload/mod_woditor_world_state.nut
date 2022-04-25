@@ -186,6 +186,13 @@
 
 			return true;
 		}
+		
+		local ws_startNewCampaign = obj.startNewCampaign;
+		obj.startNewCampaign = function()
+		{
+			ws_startNewCampaign();
+			this.m.WorldEditorScreen.onDeserialize();
+		};
 
 		local ws_onSerialize = obj.onSerialize;
 		obj.onSerialize <- function( _out )
