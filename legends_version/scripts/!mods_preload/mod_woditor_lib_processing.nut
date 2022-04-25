@@ -812,7 +812,6 @@
 			"SellPriceMult",
 			"BuyPriceTradeMult",
 			"SellPriceTradeMult",
-			"MovementSpeedMult",
 			"AdvancePaymentCap",
 		],
 		Additive = [
@@ -823,7 +822,6 @@
 			"RosterSizeAdditionalMin",
 			"ChampionChanceAdditional",
 			"ExtraLootChance",
-			"EquipmentLootChance"
 		]
 	};
 
