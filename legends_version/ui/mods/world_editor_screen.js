@@ -2459,41 +2459,46 @@ WorldEditorScreen.prototype.createSliderControlDIV = function(_definition, _titl
     {
     case 'woditor.lootscale':
         _definition.Control.on("change", function () {
-            _definition.Value = parseInt(_definition.Control.val());
-            _definition.Label.text('' + _definition.Value + _definition.Postfix);
-            self.notifyBackendUpdateWorldEntityLootScale(_definition.Value);
+	    var _v = parseInt(_definition.Control.val());
+            _definition.Value = _v;
+            _definition.Label.text('' + _v + _definition.Postfix);
+            self.notifyBackendUpdateWorldEntityLootScale(_v);
         });
         break;
 
     case 'woditor.visibilitymult':
         _definition.Control.on("change", function () {
-            _definition.Value = parseInt(_definition.Control.val());
-            _definition.Label.text('' + _definition.Value + _definition.Postfix);
-            self.notifyBackendUpdateWorldEntityVisibilityMult(_definition.Value);
+            var _v = parseInt(_definition.Control.val());
+            _definition.Value = _v;
+            _definition.Label.text('' + _v + _definition.Postfix);
+            self.notifyBackendUpdateWorldEntityVisibilityMult(_v);
         });
         break;
 
     case 'woditor.basemovementspeed':
         _definition.Control.on("change", function () {
-            _definition.Value = parseInt(_definition.Control.val());
-            _definition.Label.text('' + _definition.Value + _definition.Postfix);
-            self.notifyBackendUpdateWorldEntityBaseMovementSpeed(_definition.Value);
+            var _v = parseInt(_definition.Control.val());
+            _definition.Value = _v;
+            _definition.Label.text('' + _v + _definition.Postfix);
+            self.notifyBackendUpdateWorldEntityBaseMovementSpeed(_v);
         });
         break;
 
     case 'woditor.rostertier':
         _definition.Control.on("change", function () {
-            _definition.Value = parseInt(_definition.Control.val());
-            _definition.Label.text('' + _definition.Value + _definition.Postfix);
-            self.notifyBackendUpdateRosterTier(_definition.Value);
+            var _v = parseInt(_definition.Control.val());
+            _definition.Value = _v;
+            _definition.Label.text('' + _v + _definition.Postfix);
+            self.notifyBackendUpdateRosterTier(_v);
         });
         break;
 
     case 'woditor.difficultymult':
         _definition.Control.on("change", function () {
-            _definition.Value = parseInt(_definition.Control.val());
-            _definition.Label.text('' + _definition.Value + _definition.Postfix);
-            self.notifyBackendUpdateDifficultyMult(_definition.Value);
+            var _v = parseInt(_definition.Control.val());
+            _definition.Value = _v;
+            _definition.Label.text('' + _v + _definition.Postfix);
+            self.notifyBackendUpdateDifficultyMult(_v);
         });
         break;
 
