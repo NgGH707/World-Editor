@@ -133,6 +133,25 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 
 		if (world_entity.isLocation())
 		{
+			if (world_entity.isLocationType(::Const.World.LocationType.Settlement))
+			{
+				foreach (i, h in world_entity.m.HousesTiles)
+				{
+					local tile = ::World.getTileSquare(h.X, h.Y);
+					tile.clear(::Const.World.DetailType.Houses);
+					tile.IsOccupied = false;
+				}
+
+				foreach( loc in world_entity.m.AttachedLocations )
+				{
+					loc.setSettlement(null);
+					loc.die();
+				}
+
+				world_entity.m.HousesTiles = [];
+				world_entity.m.AttachedLocations = [];
+			}
+
 			world_entity.die();
 		}
 		else if (world_entity.isParty())
@@ -254,22 +273,19 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 
 		local best = 9999;
 		local bestFaction;
+		local bestSettlementFaction;
 		local factions = ::World.FactionManager.getFactionsOfType(_data.IsSouthern ? ::Const.FactionType.OrientalCityState : ::Const.FactionType.NobleHouse);
 		local settlement = ::World.spawnLocation(script, _tile.Coords);
 		settlement.setDiscovered(true);
 		::World.uncoverFogOfWar(_tile.Pos, 2100);
 
-		foreach (s in ::World.EntityManager.getSettlements())
-		{
-			if (s.getID == settlement.getID())
-			{
-				::logInfo("settlement has been added to :World.EntityManager");
-				break;
-			}
-		}
-
 		foreach (f in factions)
 		{
+			if (bestSettlementFaction == null && f.getType() == ::Const.FactionType.Settlement && f.m.Settlements.len() == 0)
+			{
+				bestSettlementFaction = f;
+			}
+
 			foreach( s in f.m.Settlements )
 			{
 				local d = s.getTile().getDistanceTo(_tile);
@@ -282,13 +298,38 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 			}
 		}
 
-		if (bestFaction != null)
+		if (bestFaction == null)
 		{
-			bestFaction.addSettlement(settlement);
-			return;
+			bestFaction = ::MSU.Array.getRandom(::World.FactionManager.getFactionsOfType(::Const.FactionType.NobleHouse));	
 		}
 
-		::MSU.Array.getRandom(::World.FactionManager.getFactionsOfType(::Const.FactionType.NobleHouse)).addSettlement(settlement);
+		bestFaction.addSettlement(settlement);
+		best = 9999;
+
+		if (_data.IsVillage)
+		{
+			if (bestSettlementFaction != null)
+			{
+				bestFaction.addSettlement(settlement, false);
+				return;
+			}
+
+			foreach( s in bestFaction.m.Settlements )
+			{
+				local d = s.getTile().getDistanceTo(_tile);
+
+				if (d < best && s.getFactionOfType(::Const.FactionType.Settlement) != null)
+				{
+					best = d;
+					bestFaction = s.getFactionOfType(::Const.FactionType.Settlement);
+				}
+			}
+
+			if (bestFaction != null)
+			{
+				bestFaction.addSettlement(settlement, false);
+			}
+		}
 	}
 
 	function getScaledDifficultyMult()

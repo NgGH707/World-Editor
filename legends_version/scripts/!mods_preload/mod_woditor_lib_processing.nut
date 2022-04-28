@@ -12,6 +12,13 @@
 	::Woditor.ValidBannerSprites.extend(::Const.ZombieBanners);
 	::Woditor.ValidBannerSprites.extend(::Const.UndeadBanners);
 	::Woditor.ValidBannerSprites.extend(::Const.NomadBanners);
+	::Woditor.ValidBannerSprites.extend(::Const.PlayerBanners);
+	::Woditor.ValidBannerSprites.push("banner_deserters");
+
+	for (local i = 1; i < 15; ++i)
+	{
+		::Woditor.ValidBannerSprites.push("banner_noble_" + (i < 10 ? "0" + i : i));
+	}
 
 	// filter valid locations for woditor
 	::Woditor.Locations <- {
