@@ -612,31 +612,13 @@ this.world_editor_data_helper <- {
 
 			foreach( party in f.getUnits() )
 			{
-				result.push({
-					ID = party.getID(),
-					Name = party.getName(),
-					Faction = f.getID(),
-					TooltipId = party.getID(),
-					Banner = party.getUIBanner(),
-					Resources = party.getResources(),
-					Terrain = party.getTerrainImage(),
-					ImagePath = party.getUIImagePath(),
-					LootScale = ::Math.floor(party.m.LootScale * 100),
-					VisibilityMult = ::Math.floor(party.getVisibilityMult() * 100),
-					BaseMovementSpeed = ::Math.floor(party.getBaseMovementSpeed()),
-					Troops = this.convertTroopsToUIData(party),
-					Distance = playerTile.getDistanceTo(party.getTile()),
-					IsAlwaysAttackingPlayer = party.isAlwaysAttackingPlayer(),
-					IsLeavingFootprints = party.m.IsLeavingFootprints,
-					IsAttackableByAI = party.isAttackableByAI(),
-					IsSlowerAtNight = party.isSlowerAtNight(),
-					IsLooting = party.isLooting(),
-					IsCaravan = party.getFlags().get("IsCaravan"),
-					IsQuest = party.getSprite("selection").Visible,
-					IsParty = party.isParty(),
-					IsSpawningTroop = false,
-				});
+				result.push(this.convertUnitPartyToUIData(party, playerTile));
 			}
+		}
+
+		foreach( party in ::World.EntityManager.getMercenaries() )
+		{
+			result.push(this.convertUnitPartyToUIData(party, playerTile));
 		}
 
 		result.sort(this.onSortByFactionAndDistance);
@@ -970,6 +952,34 @@ this.world_editor_data_helper <- {
 		}
 
 		_result.InvalidContracts.sort(this.onSortByName);
+	}
+
+	function convertUnitPartyToUIData( _party , _playerTile )
+	{
+		return {
+			ID = _party.getID(),
+			Name = _party.getName(),
+			Faction = _party.getFaction(),
+			TooltipId = _party.getID(),
+			Banner = _party.getUIBanner(),
+			Resources = _party.getResources(),
+			Terrain = _party.getTerrainImage(),
+			ImagePath = _party.getUIImagePath(),
+			LootScale = ::Math.floor(_party.m.LootScale * 100),
+			VisibilityMult = ::Math.floor(_party.getVisibilityMult() * 100),
+			BaseMovementSpeed = ::Math.floor(_party.getBaseMovementSpeed()),
+			Troops = this.convertTroopsToUIData(_party),
+			Distance = _playerTile.getDistanceTo(_party.getTile()),
+			IsAlwaysAttackingPlayer = _party.isAlwaysAttackingPlayer(),
+			IsLeavingFootprints = _party.m.IsLeavingFootprints,
+			IsAttackableByAI = _party.isAttackableByAI(),
+			IsSlowerAtNight = _party.isSlowerAtNight(),
+			IsLooting = _party.isLooting(),
+			IsCaravan = _party.getFlags().get("IsCaravan"),
+			IsQuest = _party.getSprite("selection").Visible,
+			IsParty = _party.isParty(),
+			IsSpawningTroop = false,
+		};
 	}
 
 	function convertTroopsToUIData( _worldEntity )

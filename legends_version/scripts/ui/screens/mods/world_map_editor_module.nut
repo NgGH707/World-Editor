@@ -310,26 +310,37 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 		{
 			if (bestSettlementFaction != null)
 			{
-				bestFaction.addSettlement(settlement, false);
-				return;
+				bestSettlementFaction.addSettlement(settlement, false);
 			}
-
-			foreach( s in bestFaction.m.Settlements )
+			else
 			{
-				local d = s.getTile().getDistanceTo(_tile);
-
-				if (d < best && s.getFactionOfType(::Const.FactionType.Settlement) != null)
+				foreach( s in bestFaction.m.Settlements )
 				{
-					best = d;
-					bestFaction = s.getFactionOfType(::Const.FactionType.Settlement);
+					local d = s.getTile().getDistanceTo(_tile);
+
+					if (d < best && s.getFactionOfType(::Const.FactionType.Settlement) != null)
+					{
+						best = d;
+						bestFaction = s.getFactionOfType(::Const.FactionType.Settlement);
+					}
+				}
+
+				if (bestFaction != null)
+				{
+					bestFaction.addSettlement(settlement, false);
 				}
 			}
-
-			if (bestFaction != null)
-			{
-				bestFaction.addSettlement(settlement, false);
-			}
 		}
+
+		if (_data.IsSouthern)
+		{
+			settlement.addBuilding(::new("scripts/entity/world/settlements/buildings/crowd_oriental_building"), 5);
+			settlement.addBuilding(::new("scripts/entity/world/settlements/buildings/marketplace_oriental_building"), 2);
+			return;
+		}
+
+		settlement.addBuilding(::new("scripts/entity/world/settlements/buildings/crowd_building"), 5);
+		settlement.addBuilding(::new("scripts/entity/world/settlements/buildings/marketplace_building"), 2);
 	}
 
 	function getScaledDifficultyMult()
