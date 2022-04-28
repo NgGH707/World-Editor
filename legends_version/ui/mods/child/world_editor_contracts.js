@@ -133,7 +133,7 @@ WorldEditorScreen.prototype.addContractsData = function (_data, _isLoaded)
     }
 };
 
-WorldEditorScreen.prototype.addContractListEntry = function (_data, _index)
+WorldEditorScreen.prototype.addContractListEntry = function(_data, _index)
 {
     var result = $('<div class="contract-row"/>');
     this.mContract.ListScrollContainer.append(result);
@@ -175,45 +175,49 @@ WorldEditorScreen.prototype.addContractListEntry = function (_data, _index)
     return entry;
 };
 
-WorldEditorScreen.prototype.addInvalidContractsData = function (_data)
+WorldEditorScreen.prototype.addInvalidContractsData = function(_data)
 {
     this.mContract.BannedListScroll.empty();
     this.mIsUpdating = true;
 
     for (var i = 0; i < _data.length; i++) {
-        var data = _data[i];
-        var row = $('<div class="row"></div>');
-        row.css('padding-left', '0.5rem');
-        this.mContract.BannedListScroll.append(row);
-        var control = $('<div class="control"/>');
-        row.append(control);
-        var checkbox = $('<input type="checkbox" id="' + data.Type + '"/>');
-        control.append(checkbox);
-        var label = $('<label class="text-font-normal font-color-subtitle" for="' + data.Type + '">' + data.Name + '</label>');
-        control.append(label);
-
-        checkbox.iCheck({
-            checkboxClass: 'icheckbox_flat-orange',
-            radioClass: 'iradio_flat-orange',
-            increaseArea: '30%'
-        });
-        checkbox.on('ifChecked', null, this, function(_event) {
-            var self = _event.data;
-            if (self.mIsUpdating === false)
-                self.notifyBackendInvalidContract(data.Type, true);
-        });
-        checkbox.on('ifUnchecked', null, this, function(_event) {
-            var self = _event.data;
-            if (self.mIsUpdating === false) 
-                self.notifyBackendUpdateCheckBox(data.Type, false);
-        });
-
-        if (data.IsValid === false)
-            checkbox.iCheck('check');
+        this.addInvalidContractEntry(_data[i], i);
     }
 
     this.mIsUpdating = false;
 };
+
+WorldEditorScreen.prototype.addInvalidContractEntry = function(_data, _index)
+{
+    var row = $('<div class="row"></div>');
+    row.css('padding-left', '0.5rem');
+    this.mContract.BannedListScroll.append(row);
+    var control = $('<div class="control"/>');
+    row.append(control);
+    var checkbox = $('<input type="checkbox" id="' + _data.Type + '"/>');
+    control.append(checkbox);
+    var label = $('<label class="text-font-normal font-color-subtitle" for="' + _data.Type + '">' + _data.Name + '</label>');
+    control.append(label);
+
+    checkbox.iCheck({
+        checkboxClass: 'icheckbox_flat-orange',
+        radioClass: 'iradio_flat-orange',
+        increaseArea: '30%'
+    });
+    checkbox.on('ifChecked', null, this, function(_event) {
+        var self = _event.data;
+        if (self.mIsUpdating === false)
+            self.notifyBackendInvalidContract(_data.Type, true);
+    });
+    checkbox.on('ifUnchecked', null, this, function(_event) {
+        var self = _event.data;
+        if (self.mIsUpdating === false) 
+            self.notifyBackendUpdateCheckBox(_data.Type, false);
+    });
+
+    if (_data.IsValid === false)
+        checkbox.iCheck('check');
+}
 
 WorldEditorScreen.prototype.selectContractListEntry = function(_element, _scrollToEntry)
 {

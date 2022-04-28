@@ -805,7 +805,6 @@
 			"RepairSpeedMult",
 			"VisionRadiusMult",
 			"FootprintVision",
-			"MovementSpeedMult",
 			"RelationDecayGoodMult",
 			"RelationDecayBadMult",
 			"NegotiationAnnoyanceMult",

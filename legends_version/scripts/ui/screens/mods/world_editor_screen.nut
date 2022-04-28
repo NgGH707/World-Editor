@@ -69,7 +69,6 @@ this.world_editor_screen <- {
 		{
 			::Woditor.InvalidContracts = split(::World.Flags.get("InvalidContracts"), "/");
 		}
-
 		
 		/*::Woditor.PrepareBackgroundsOnCampaignStart();*/
 		::Woditor.PrepareItemsOnCampaignStart();
@@ -1485,19 +1484,23 @@ this.world_editor_screen <- {
 	{
 		local key = _data[0];
 		local value = _data[1];
-		
-		if (key == "MovementSpeedMult")
-		{
-			::World.Flags.set(key, value / 100);
-			return;
-		}
-		
 		local baseValue = ::World.Assets.getBaseProperties()[key];
 		local isMult = ::Woditor.AssetsProperties.Mult.find(key) != null;
 		local isAdditive = ::Woditor.AssetsProperties.Additive.find(key) != null;
-		if (isMult) ::World.Flags.set(key, value / (baseValue * 100));
-		else if (isAdditive) ::World.Flags.set(key, value - baseValue);
-		else ::World.Flags.set(key, value);
+
+		switch(true)
+		{
+		case isMult:
+			::World.Flags.set(key, value / (baseValue * 100))
+			break;
+
+		case isAdditive:
+			::World.Flags.set(key, value - baseValue);
+			break;
+
+		default:
+			::World.Flags.set(key, value);
+		}
 	}
 
 	function onUpdateRosterTier( _tier )
@@ -1507,7 +1510,7 @@ this.world_editor_screen <- {
 
 	function onUpdateDifficultyMult( _value )
 	{
-		::World.Flags.set("DifficultyMult", _value / 100);
+		::World.Flags.set("DifficultyMult", _value);
 	}
 
 	function onUpdateCombatDifficulty( _value )

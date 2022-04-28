@@ -222,13 +222,13 @@ var WorldEditorScreen = function(_parent)
         // general properties
         General:
         {
-            BusinessReputationRate  : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/asset_business_reputation.png', TooltipId: 'woditor.renown'},
-            XPMult                  : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/xp_received.png', TooltipId: 'woditor.xp'},
-            HitpointsPerHourMult    : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/days_wounded.png', TooltipId: 'woditor.hp'},
-            RepairSpeedMult         : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/repair_item.png', TooltipId: 'woditor.repair'},
-            VisionRadiusMult        : {Input: null, ValueMin: 0, ValueMax: 999 , Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/vision.png', TooltipId: 'woditor.vision'},
-            FootprintVision         : {Input: null, ValueMin: 0, ValueMax: 999 , Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/tracking_disabled.png', TooltipId: 'woditor.footprint'},
-            MovementSpeedMult       : {Input: null, ValueMin: 0, ValueMax: 999 , Min: 0, Max: 3, IsPercentage: true, IconPath: Path.GFX + 'ui/icons/boot.png', TooltipId: 'woditor.speed'},
+            BusinessReputationRate  : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage:  true, IconPath: Path.GFX + 'ui/icons/asset_business_reputation.png', TooltipId: 'woditor.renown'},
+            XPMult                  : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage:  true, IconPath: Path.GFX + 'ui/icons/xp_received.png', TooltipId: 'woditor.xp'},
+            HitpointsPerHourMult    : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage:  true, IconPath: Path.GFX + 'ui/icons/days_wounded.png', TooltipId: 'woditor.hp'},
+            RepairSpeedMult         : {Input: null, ValueMin: 0, ValueMax: 9999, Min: 0, Max: 4, IsPercentage:  true, IconPath: Path.GFX + 'ui/icons/repair_item.png', TooltipId: 'woditor.repair'},
+            VisionRadiusMult        : {Input: null, ValueMin: 0, ValueMax: 999 , Min: 0, Max: 3, IsPercentage:  true, IconPath: Path.GFX + 'ui/icons/vision.png', TooltipId: 'woditor.vision'},
+            FootprintVision         : {Input: null, ValueMin: 0, ValueMax: 999 , Min: 0, Max: 3, IsPercentage:  true, IconPath: Path.GFX + 'ui/icons/tracking_disabled.png', TooltipId: 'woditor.footprint'},
+            MovementSpeedMult       : {Input: null, ValueMin: 5, ValueMax: 999 , Min: 0, Max: 3, IsPercentage:  true, IconPath: Path.GFX + 'ui/icons/boot.png', TooltipId: 'woditor.speed'},
             FoodAdditionalDays      : {Input: null, ValueMin: 0, ValueMax: 999 , Min: 0, Max: 3, IsPercentage: false, IconPath: Path.GFX + 'ui/icons/asset_daily_food.png', TooltipId: 'woditor.fooddays'},
         },
 

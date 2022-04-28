@@ -553,7 +553,7 @@ this.world_editor_data_helper <- {
 		result.Banners.Selected = ::Const.PlayerBanners.find(::World.Assets.getBanner());
 
 		// roster and difficulty sliders
-		result.DifficultyMult <- ::Math.floor(100 * (::World.Flags.has("DifficultyMult") ? ::World.Flags.getAsFloat("DifficultyMult") : 1.0));
+		result.DifficultyMult <- ::World.Flags.has("DifficultyMult") ? ::World.Flags.getAsInt("DifficultyMult") : 100;
 		result.RosterTier <- {
 			Max = ::Const.Roster.Tier[::Const.Roster.Tier.len() - 1],
 			Value = ::World.Assets.getOrigin().getStartingRosterTier()

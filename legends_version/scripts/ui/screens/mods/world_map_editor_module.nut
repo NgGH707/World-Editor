@@ -310,7 +310,7 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 		{
 			if (bestSettlementFaction != null)
 			{
-				bestSettlementFaction.addSettlement(settlement, false);
+				bestFaction.addSettlement(settlement, false);
 			}
 			else
 			{
