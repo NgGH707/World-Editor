@@ -728,9 +728,16 @@ WorldItemsSpawnerScreen.prototype.createItemContainer = function(_slotNum)
     }
 };
 
-WorldItemsSpawnerScreen.prototype.addStashData = function(_data)
+WorldItemsSpawnerScreen.prototype.addStashData = function(_data, _reset)
 {
     this.mStash.Data = _data;
+
+    if (_reset === true) {
+        for (var i = 0; i < this.mStash.Slot.length; i++) {
+            this.mStash.Slot[i].empty();
+        }
+    }
+
     for (var i = 0; i < _data.length; i++) {
         this.createItemEntry(_data[i], this.mStash.Slot[_data[i].Index]);
     }
@@ -774,7 +781,7 @@ WorldItemsSpawnerScreen.prototype.createItemEntry = function(_data, _slot, _isSe
     image.click(this, function(_event) {
         var element = $(this);
         if (KeyModiferConstants.CtrlKey in _event && _event[KeyModiferConstants.CtrlKey] === true) {
-            self.notifyBackendRemoveItemFromStash(element);
+            self.notifyBackendRemoveItemFromStash(_data);
         }
         else if (selectedOverLay.hasClass('display-block') === false) {
             selectedOverLay.showThisImg(true);
@@ -846,12 +853,12 @@ WorldItemsSpawnerScreen.prototype.selectItem = function(_element)
     }
 };
 
-WorldItemsSpawnerScreen.prototype.deselectStashItem = function()
+WorldItemsSpawnerScreen.prototype.deselectStashItem = function(_index)
 {
     var hasData = this.mSelected.Data !== null && this.mSelected.Data !== undefined;
     var index = hasData ? this.mSelected.Data.Index : null;
 
-    if (hasData && index !== null) {
+    if (hasData && index !== null && (_index === undefined || _index === null || index === _index)) {
         this.mSelected.Data = null;
         var selectedOverLay = this.mStash.Slot[index].find('.is-selected:first');
         selectedOverLay.showThisImg(false);
@@ -1194,12 +1201,11 @@ WorldItemsSpawnerScreen.prototype.notifyBackendRerollStats = function( _itemData
 WorldItemsSpawnerScreen.prototype.notifyBackendRemoveItemFromStash = function( _data )
 {
     var result = this.getStashItem(_data.Index);
-    var selected = this.mSelected.Data;
     this.mStash.Slot[result.Item.Index].empty();
     if (result !== null) {
         this.mStash.Data.splice(result.Index, 1);
     }
-    this.deselectStashItem();
+    this.deselectStashItem(result.Item.Index);
     this.updateStashLabel();
     SQ.call(this.mSQHandle, 'onRemoveItemFromStash', result.Item.Index);
 };

@@ -341,6 +341,8 @@ this.world_item_spawner_screen <- {
 		{
 			foreach (key, _v in properties)
 			{
+				if (exclude.find(key) != null) continue;
+
 				switch (typeof _v)
 				{
 				case "instance":
@@ -373,6 +375,7 @@ this.world_item_spawner_screen <- {
 			
 				default:
 					_cloneItem.m[key] = _v;
+					exclude.push(key);
 				}
 			}
 
@@ -382,7 +385,6 @@ this.world_item_spawner_screen <- {
 
 		if (!_isUpdateAppearance) return;
 		_cloneItem.updateVariant();
-		_cloneItem.updateAppearance();
 	}
 
 };
