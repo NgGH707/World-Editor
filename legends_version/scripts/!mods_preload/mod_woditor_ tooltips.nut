@@ -215,7 +215,7 @@
 										id = 11,
 										type = "hint",
 										icon = "ui/icons/mouse_left_button_ctrl.png",
-										text = "Add to loot"
+										text = "Add"
 									}
 								];
 							}

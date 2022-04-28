@@ -138,6 +138,7 @@ local items = [
 	"scripts/items/armor_upgrades/named/legend_named_redback_cloak_upgrade",
 	"scripts/items/armor_upgrades/named/legend_named_stollwurm_scales_upgrade",
 	"scripts/items/armor_upgrades/named/legend_named_white_wolf_pelt_upgrade",
+	"scripts/items/armor_upgrades/named/named_bone_platings_upgrade",
 	"scripts/items/armor_upgrades/named/named_horn_plate_upgrade",
 	"scripts/items/armor_upgrades/named/named_direwolf_pelt_upgrade",
 	"scripts/items/armor_upgrades/named/named_hyena_fur_upgrade",
@@ -146,7 +147,7 @@ local items = [
 	"scripts/items/armor_upgrades/named/named_serpent_skin_upgrade",
 	"scripts/items/armor_upgrades/named/named_unhold_fur_upgrade",
 	"scripts/items/armor_upgrades/named/named_armor_upgrade",
-	
+
 	"scripts/items/armor/layer_greenskins/goblin_skirmisher_armor",
 	"scripts/items/helmets/nggh707_headgear",
 	"scripts/items/special/scroll_of_unlimited_wisdom_item",

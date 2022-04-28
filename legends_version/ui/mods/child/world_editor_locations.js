@@ -585,6 +585,10 @@ WorldEditorScreen.prototype.changeSearchItemFilter = function(_button, _i, _chan
 {   
     if (_change !== true) {
         this.mLocation.SearchFilter = _button.data('filter');
+        this.mLocation.SearchFilterButtons.forEach(function(_buttonDiv) {
+            _buttonDiv.enableButton(true);
+        });
+        _button.enableButton(false);
         return;
     }
 
@@ -635,4 +639,5 @@ WorldEditorScreen.prototype.changeSearchItemFilter = function(_button, _i, _chan
     _button.data('filter', index);
     _button.changeButtonImage(Path.GFX + 'ui/' + image + '.png');
     _button.bindTooltip({ contentType: 'ui-element', elementId: index, elementOwner: 'woditor.searchfilterbutton' });
+    this.mLocation.SearchFilterButtons.push(_button);
 };

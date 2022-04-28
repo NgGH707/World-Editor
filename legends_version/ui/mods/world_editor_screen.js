@@ -154,6 +154,7 @@ var WorldEditorScreen = function(_parent)
         SearchFilter       : 0,
         SearchResult       : null,
         SearchItem         : null,
+        SearchFilterButtons: [],
         SearchItemOverlay  : null,
         SearchItemContainer: null,
 
@@ -1052,6 +1053,7 @@ WorldEditorScreen.prototype.createLocationsScreenDIV = function(_parentDiv)
                     container.append(listContainerLayout);
                     var listContainer = listContainerLayout.createList(1);
                     this.mLocation.SearchResult = listContainer.findListScrollContainer();
+                    this.mLocation.SearchFilterButtons[this.mLocation.SearchFilter].enableButton(false);
                 }
             }
 

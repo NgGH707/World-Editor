@@ -58,6 +58,7 @@ var WorldItemsSpawnerScreen = function(_parent)
         Filter             : 0,
         Input              : null,
         Found              : null,
+        FilterButtons      : [],
         ListContainer      : null,
         ListScrollContainer: null,
     };
@@ -295,6 +296,7 @@ WorldItemsSpawnerScreen.prototype.createDIV = function(_parentDiv)
                 searchResultContainer.append(listContainerLayout);
                 this.mSearch.ListContainer = listContainerLayout.createList(1);
                 this.mSearch.ListScrollContainer = this.mSearch.ListContainer.findListScrollContainer();
+                this.mSearch.FilterButtons[this.mSearch.Filter].enableButton(false);
             }
         }
     }
@@ -317,6 +319,10 @@ WorldItemsSpawnerScreen.prototype.changeSearchItemFilter = function(_button, _i)
 {   
     if (_i === undefined || _i === null) {
         this.mSearch.Filter = _button.data('filter');
+        this.mSearch.FilterButtons.forEach(function(_buttonDiv) {
+            _buttonDiv.enableButton(true);
+        });
+        _button.enableButton(false);
         return;
     }
 
@@ -366,6 +372,7 @@ WorldItemsSpawnerScreen.prototype.changeSearchItemFilter = function(_button, _i)
     _button.data('filter', _i);
     _button.changeButtonImage(Path.GFX + 'ui/' + image + '.png');
     _button.bindTooltip({ contentType: 'ui-element', elementId: _i, elementOwner: 'woditor.searchfilterbutton' });
+    this.mSearch.FilterButtons.push(_button);
 };
 
 WorldItemsSpawnerScreen.prototype.createAmountInputDIV = function(_layout)
@@ -1094,7 +1101,7 @@ WorldItemsSpawnerScreen.prototype.notifyBackendSortStashItem = function()
             console.error('ERROR: Failed to retrieve sorted stash data. Invalid data result.');
             return;
         }
-        self.addStashData(_data.Stash);
+        self.addStashData(_data.Stash, true);
     });
 }
 
@@ -1106,7 +1113,7 @@ WorldItemsSpawnerScreen.prototype.notifyBackendRepairAllStashItem = function()
             console.error('ERROR: Failed to retrieve repaired stash data. Invalid data result.');
             return;
         }
-        self.addStashData(_data.Stash);
+        self.addStashData(_data.Stash, true);
     });
 }
 
@@ -1118,7 +1125,7 @@ WorldItemsSpawnerScreen.prototype.notifyBackendRestockAllStashItem = function()
             console.error('ERROR: Failed to retrieve restocked stash data. Invalid data result.');
             return;
         }
-        self.addStashData(_data.Stash);
+        self.addStashData(_data.Stash, true);
     });
 }
 
