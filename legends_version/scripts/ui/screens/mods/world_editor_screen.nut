@@ -1484,18 +1484,17 @@ this.world_editor_screen <- {
 	{
 		local key = _data[0];
 		local value = _data[1];
-		local baseValue = ::World.Assets.getBaseProperties()[key];
 		local isMult = ::Woditor.AssetsProperties.Mult.find(key) != null;
 		local isAdditive = ::Woditor.AssetsProperties.Additive.find(key) != null;
 
 		switch(true)
 		{
 		case isMult:
-			::World.Flags.set(key, value / (baseValue * 100))
+			::World.Flags.set(key, value / (::World.Assets.getBaseProperties()[key] * 100))
 			break;
 
 		case isAdditive:
-			::World.Flags.set(key, value - baseValue);
+			::World.Flags.set(key, value - ::World.Assets.getBaseProperties()[key]);
 			break;
 
 		default:

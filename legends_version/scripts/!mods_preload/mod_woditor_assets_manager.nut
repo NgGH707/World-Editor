@@ -69,21 +69,22 @@
 		obj.updateLook = function( _updateTo = -1 )
 		{
 			ws_updateLook();
+			local player = this.World.State.getPlayer();
 
 			if (this.World.Flags.has("AvatarSocket"))
 			{
-				this.World.State.getPlayer().getSprite("base").setBrush(this.World.Flags.get("AvatarSocket"));
+				player.getSprite("base").setBrush(this.World.Flags.get("AvatarSocket"));
 			}
 
 			if (this.World.Flags.has("AvatarSprite"))
 			{
-				this.World.State.getPlayer().getSprite("body").setBrush(this.World.Flags.get("AvatarSprite"));
+				player.getSprite("body").setBrush(this.World.Flags.get("AvatarSprite"));
 			}
 
 			if (this.World.Flags.has("AvatarIsFlippedHorizontally"))
 			{
-				this.World.State.getPlayer().getSprite("base").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
-				this.World.State.getPlayer().getSprite("body").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
+				player.getSprite("base").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
+				player.getSprite("body").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
 			}
 		};
 	});
