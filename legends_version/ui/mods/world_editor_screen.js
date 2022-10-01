@@ -4,7 +4,7 @@ var WorldEditor =
 {
     Screens  : ['General'   , 'Properties'      , 'Factions'   , 'Contracts'   , 'Settlements'   , 'Locations'   , 'Units'   ],
     Classes  : ['is-general', 'is-properties'   , 'is-factions', 'is-contracts', 'is-settlements', 'is-locations', 'is-units'],
-    RadioBox : ['IsGender'  , 'CombatDifficulty', 'EconomicDifficulty'],
+    RadioBox : ['GenderEquality'  , 'CombatDifficulty', 'EconomicDifficulty'],
     Locations: ['Locations' , 'Legendary'       , 'Misc'],
 };
 
@@ -287,14 +287,13 @@ var WorldEditorScreen = function(_parent)
     // configure check box
     this.mConfig = 
     {
-        IsIronman          : {Checkbox: null, Label: null, Name: 'Ironman'                      , TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.Ironman},
-        IsBleedKiller      : {Checkbox: null, Label: null, Name: 'Bleeds Count As Kills'        , TooltipId: 'mapconfig.legendbleedkiller'},
-        IsLocationScaling  : {Checkbox: null, Label: null, Name: 'Distance Scaling'             , TooltipId: 'mapconfig.legendlocationscaling'},
-        IsRecruitScaling   : {Checkbox: null, Label: null, Name: 'Recruit Scaling'              , TooltipId: 'mapconfig.legendrecruitscaling'},
-        IsWorldEconomy     : {Checkbox: null, Label: null, Name: 'World Economy'                , TooltipId: 'mapconfig.legendworldeconomy'},
-        IsBlueprintsVisible: {Checkbox: null, Label: null, Name: 'All Crafting Recipes Unlocked', TooltipId: 'mapconfig.legendallblueprints'},
+        IsIronman        : {Checkbox: null, Label: null, Name: 'Ironman'                      , TooltipId: TooltipIdentifier.MenuScreen.NewCampaign.Ironman},
+        BleedKiller      : {Checkbox: null, Label: null, Name: 'Bleeds Count As Kills'        , TooltipId: 'mapconfig.legendbleedkiller'},
+        DistanceScaling  : {Checkbox: null, Label: null, Name: 'Distance Scaling'             , TooltipId: 'mapconfig.legendlocationscaling'},
+        RecruitScaling   : {Checkbox: null, Label: null, Name: 'Recruit Scaling'              , TooltipId: 'mapconfig.legendrecruitscaling'},
+        WorldEconomy     : {Checkbox: null, Label: null, Name: 'World Economy'                , TooltipId: 'mapconfig.legendworldeconomy'},
     };
-    this.mIsGender =
+    this.mGenderEquality =
     {
         Off : {Checkbox: null, Label: null, Name: 'Disabled', TooltipId: 'mapconfig.legendgenderequality_off' },
         Low : {Checkbox: null, Label: null, Name: 'Specific', TooltipId: 'mapconfig.legendgenderequality_low' },
@@ -2308,7 +2307,7 @@ WorldEditorScreen.prototype.createGeneralScreenDIV = function (_parentDiv)
                 row.append(title);
 
                 var count = 0;
-                $.each(this.mIsGender, function(_key, _definition) {
+                $.each(this.mGenderEquality, function(_key, _definition) {
                     self.createRadioControlDIV(_definition, row, count, 'gender-control');
                     count++;
                 });
@@ -2534,7 +2533,7 @@ WorldEditorScreen.prototype.createInputDIV = function(_key, _definition, _parent
     var inputLayout = $('<div class="l-input"/>');
     inputRowLayout.append(inputLayout);
     _definition.Input = inputLayout.createInput(_definition.Value, _definition.Min, _definition.Max, null, null, 'title-font-medium font-bold font-color-brother-name', function(_input) {
-        if (_type === 'mAssets')
+        if (_type === 'mAsset')
             self.confirmAssetChanges(_input, _key);
         else
             self.confirmPropertyChanges(_input, _key);
@@ -2945,6 +2944,7 @@ WorldEditorScreen.prototype.confirmAssetChanges = function(_input, _keyName)
         _input.val('' + this.mAssetsData[_keyName] + '');
     }
 };
+
 WorldEditorScreen.prototype.confirmPropertyChanges = function(_input, _keyName)
 {
     if (_input.data('IsUpdated') === true)

@@ -69,9 +69,11 @@ this.world_editor_screen <- {
 		{
 			::Woditor.InvalidContracts = split(::World.Flags.get("InvalidContracts"), "/");
 		}
+		else
+		{
+			::Woditor.InvalidContracts = [];
+		}
 		
-		/*::Woditor.PrepareBackgroundsOnCampaignStart();*/
-		::Woditor.PrepareItemsOnCampaignStart();
 		::Woditor.PrepareContractsOnCampaignStart();
 		::Woditor.PrepareSettlementsOnCampaignStart();
 		::Woditor.PrepareBuildingsOnCampaignStart();
@@ -219,12 +221,12 @@ this.world_editor_screen <- {
 
 	function onShowAllItems( _filter )
 	{
-		return ::Woditor.Items[_filter];
+		return ::ModItemSpawner.Items[_filter];
 	}
 
 	function onSeachItemBy( _data )
 	{
-		return ::Woditor.SearchItems(_data[0], _data[1]);
+		return ::ModItemSpawner.SearchItems(_data[0], _data[1]);
 	}
 
 	function onGetWolrdEntityImagePath( _id )
@@ -337,7 +339,7 @@ this.world_editor_screen <- {
 		local faction; 
 		do
 		{
-			faction = ::MSU.Array.getRandom(factions);
+			faction = ::MSU.Array.rand(factions);
 		}
 		while(faction.getSettlements().len() == 0)
 		local settlement = faction.getSettlements()[0];
@@ -1101,7 +1103,7 @@ this.world_editor_screen <- {
 				items.extend(world_entity.m.NamedHelmetsList);
 				items.extend(world_entity.m.NamedHelmetsList);
 			}
-			if (::LegendsMod.Configs().LegendArmorsEnabled())
+			if (::Legends.Mod.ModSettings.getSetting("UnlayeredArmor").getValue() == false)
 			{
 				local weightName = ::Const.World.Common.convNameToList(items);
 				pick = ::Const.World.Common.pickHelmet(weightName);
@@ -1115,7 +1117,7 @@ this.world_editor_screen <- {
 				items.extend(world_entity.m.NamedArmorsList);
 				items.extend(world_entity.m.NamedArmorsList);
 			}
-			if (::LegendsMod.Configs().LegendArmorsEnabled())
+			if (::Legends.Mod.ModSettings.getSetting("UnlayeredArmor").getValue() == false)
 			{
 				local weightName = ::Const.World.Common.convNameToList(items);
 				pick = ::Const.World.Common.pickArmor(weightName);
@@ -1144,7 +1146,7 @@ this.world_editor_screen <- {
 		{
 			if (items.len() > 0)
 			{
-				pick = ::new("scripts/items/" + ::MSU.Array.getRandom(items));
+				pick = ::new("scripts/items/" + ::MSU.Array.rand(items));
 			}
 			else
 			{
@@ -1172,7 +1174,7 @@ this.world_editor_screen <- {
 	function onAddRandomLootItem( _id )
 	{
 		local world_entity = ::World.getEntityByID(_id);
-		local pick = ::new("scripts/items/" + ::MSU.Array.getRandom(::Const.RandomTreasure));
+		local pick = ::new("scripts/items/" + ::MSU.Array.rand(::Const.RandomTreasure));
 		local result = [];
 		world_entity.getLoot().add(pick);
 
@@ -1253,7 +1255,7 @@ this.world_editor_screen <- {
 			}
 		}
 
-		local t = clone ::Const.World.Spawn.Troops[::MSU.Array.getRandom(list)];
+		local t = clone ::Const.World.Spawn.Troops[::MSU.Array.rand(list)];
 		t.Party <- ::WeakTableRef(world_entity);
 		t.Faction <- world_entity.getFaction();
 		t.Name <- "";
@@ -1330,7 +1332,7 @@ this.world_editor_screen <- {
 				{
 					if ("NameList" in ::Const.World.Spawn.Troops[troop.Key])
 					{
-						t.Name = ::Const.World.Common.generateName(::Const.World.Spawn.Troops[troop.Key].NameList) + ((::Const.World.Spawn.Troops[troop.Key].TitleList != null) ? " " + ::MSU.Array.getRandom(::Const.World.Spawn.Troops[troop.Key].TitleList) : "");
+						t.Name = ::Const.World.Common.generateName(::Const.World.Spawn.Troops[troop.Key].NameList) + ((::Const.World.Spawn.Troops[troop.Key].TitleList != null) ? " " + ::MSU.Array.rand(::Const.World.Spawn.Troops[troop.Key].TitleList) : "");
 					}
 					else
 					{
@@ -1367,7 +1369,7 @@ this.world_editor_screen <- {
 				{
 					if ("NameList" in ::Const.World.Spawn.Troops[key])
 					{
-						t.Name = ::Const.World.Common.generateName(::Const.World.Spawn.Troops[key].NameList) + ((this.Const.World.Spawn.Troops[key].TitleList != null) ? " " + ::MSU.Array.getRandom(::Const.World.Spawn.Troops[troop.Key].TitleList) : "");
+						t.Name = ::Const.World.Common.generateName(::Const.World.Spawn.Troops[key].NameList) + ((this.Const.World.Spawn.Troops[key].TitleList != null) ? " " + ::MSU.Array.rand(::Const.World.Spawn.Troops[troop.Key].TitleList) : "");
 					}
 					else
 					{
@@ -1524,13 +1526,13 @@ this.world_editor_screen <- {
 
 	function onUpdateGenderLevel( _value )
 	{
-		::LegendsMod.Configs().m.IsGender = _value;
+		::Legends.Mod.ModSettings.getSetting("GenderEquality").set(_value);
 	}
 
 	function onUpdateAssetsCheckBox( _data )
 	{
 		if (_data[0] in ::World.Assets.m) ::World.Assets.m[_data[0]] = _data[1];
-		else ::LegendsMod.Configs().m[_data[0]] = _data[1];
+		else  ::Legends.Mod.ModSettings.getSetting(_data[0]).set(_data[1]);
 	}
 
 	function onUpdateUnitCheckBox( _data )
@@ -1558,7 +1560,7 @@ this.world_editor_screen <- {
 		local resources = _data[2];
 		local start = ::World.getEntityByID(_data[0]);
 		local destination = ::World.getEntityByID(_data[1]);
-		local faction =  ::World.FactionManager.getFaction(::MSU.Array.getRandom(start.getFactions()));
+		local faction =  ::World.FactionManager.getFaction(::MSU.Array.rand(start.getFactions()));
 
 		if (_data[3].find("Noble") != null && faction.getType() != ::Const.FactionType.NobleHouse)
 		{
@@ -1596,14 +1598,14 @@ this.world_editor_screen <- {
 		if (start.getProduce().len() == 0) start.updateProduce();
 	
 		local produce = 3
-		if(::LegendsMod.Configs().LegendWorldEconomyEnabled())
+		if(::Legends.Mod.ModSettings.getSetting("WorldEconomy").getValue())
 		{
 			produce = ::Math.max(3, 3 + ::Math.round(0.025 * resources));
 		}
 
 		for( local j = 0; j < produce; j = ++j )
 		{
-			party.addToInventory(::MSU.Array.getRandom(start.getProduce()));
+			party.addToInventory(::MSU.Array.rand(start.getProduce()));
 		}
 
 		party.getLoot().Money = ::Math.rand(0, 100);
@@ -1611,7 +1613,7 @@ this.world_editor_screen <- {
 		party.getLoot().Medicine = ::Math.rand(0, 10);
 		party.getLoot().Ammo = ::Math.rand(0, 25);
 
-		if(::LegendsMod.Configs().LegendWorldEconomyEnabled())
+		if(::Legends.Mod.ModSettings.getSetting("WorldEconomy").getValue())
 		{
 			local investment = ::Math.max(1, ::Math.round(0.033 * resources));
 			start.setResources(::Math.max(10, start.getResources() - investment));
@@ -1648,7 +1650,7 @@ this.world_editor_screen <- {
 		else
 		{
 			local supplies = ["bread_item", "roots_and_berries_item", "dried_fruits_item", "ground_grains_item"];
-			party.addToInventory("supplies/" + ::MSU.Array.getRandom(supplies));
+			party.addToInventory("supplies/" + ::MSU.Array.rand(supplies));
 		}
 
 		local c = party.getController();
@@ -1671,7 +1673,7 @@ this.world_editor_screen <- {
 		local resources = _data[2];
 		local start = ::World.getEntityByID(_data[0]);
 		local destination = ::World.getEntityByID(_data[1]);
-		local faction =  ::World.FactionManager.getFaction(::MSU.Array.getRandom(start.getFactions()));
+		local faction =  ::World.FactionManager.getFaction(::MSU.Array.rand(start.getFactions()));
 		local party = ::World.spawnEntity("scripts/entity/world/party", start.getTile().Coords);
 		party.setPos(::createVec(party.getPos().X - 50, party.getPos().Y - 50));
 		party.setDescription("A free mercenary company travelling the lands and lending their swords to the highest bidder.");
@@ -1707,8 +1709,8 @@ this.world_editor_screen <- {
 			"silver_bowl_item", "jeweled_crown_item", "ancient_amber_item", "webbed_valuables_item", "looted_valuables_item",
 			"white_pearls_item", "rainbow_scale_item", "lindwurm_hoard_item", "silverware_item",
 		];
-		party.addToInventory("supplies/" + ::MSU.Array.getRandom(supplies));
-		party.addToInventory("loot/" + ::MSU.Array.getRandom(loots));
+		party.addToInventory("supplies/" + ::MSU.Array.rand(supplies));
+		party.addToInventory("loot/" + ::MSU.Array.rand(loots));
 
 		local c = party.getController();
 		local wait1 = ::new("scripts/ai/world/orders/wait_order");
@@ -1727,7 +1729,7 @@ this.world_editor_screen <- {
 
 		while (true)
 		{
-			local name = ::MSU.Array.getRandom(::Const.Strings.MercenaryCompanyNames);
+			local name = ::MSU.Array.rand(::Const.Strings.MercenaryCompanyNames);
 
 			if (name == ::World.Assets.getName())
 			{
@@ -1756,7 +1758,7 @@ this.world_editor_screen <- {
 
 		while (true)
 		{
-			local banner = ::MSU.Array.getRandom(::Const.PlayerBanners);
+			local banner = ::MSU.Array.rand(::Const.PlayerBanners);
 
 			if (banner == ::World.Assets.getBanner())
 			{

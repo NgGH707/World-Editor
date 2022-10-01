@@ -8,8 +8,6 @@
 			init_ui();
 			this.m.WorldEditorScreen <- this.new("scripts/ui/screens/mods/world_editor_screen");
 			this.m.WorldEditorScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
-			this.m.WorldItemsSpawnerScreen <- this.new("scripts/ui/screens/mods/world_item_spawner_screen");
-			this.m.WorldItemsSpawnerScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
 			this.initLoadingScreenHandler();
 		}
 
@@ -19,8 +17,6 @@
 			destroy_ui();
 			this.m.WorldEditorScreen.destroy();
 			this.m.WorldEditorScreen = null;
-			this.m.WorldItemsSpawnerScreen.destroy();
-			this.m.WorldItemsSpawnerScreen = null;
 		}
 
 		obj.showWorldEditorScreen <- function()
@@ -42,36 +38,14 @@
 					this.m.WorldScreen.show();
 					this.m.Retinue.update();
 					this.World.Assets.updateLook();
+					this.World.Assets.resetToDefaults();
 					this.World.State.updateTopbarAssets();
 					this.World.State.getPlayer().updateStrength();
-					this.setAutoPause(false);
 					this.m.WorldEditorScreen.updateSomeShit();
+					this.setAutoPause(false);					
 				}, function()
 				{
 					return !this.m.WorldEditorScreen.isAnimating();
-				});
-			}
-		}
-
-		obj.showWorldItemsSpawnerScreen <- function()
-		{
-			if (!this.m.WorldItemsSpawnerScreen.isVisible() && !this.m.WorldItemsSpawnerScreen.isAnimating())
-			{
-				this.m.CustomZoom = this.World.getCamera().Zoom;
-				this.World.getCamera().zoomTo(1.0, 4.0);
-				this.setAutoPause(true);
-				this.m.WorldItemsSpawnerScreen.show();
-				this.m.WorldScreen.hide();
-				this.Cursor.setCursor(this.Const.UI.Cursor.Hand);
-				this.m.MenuStack.push(function()
-				{
-					this.World.getCamera().zoomTo(this.m.CustomZoom, 4.0);
-					this.m.WorldItemsSpawnerScreen.hide();
-					this.m.WorldScreen.show();
-					this.setAutoPause(false);
-				}, function()
-				{
-					return !this.m.WorldItemsSpawnerScreen.isAnimating();
 				});
 			}
 		}
@@ -88,103 +62,6 @@
 				this.showWorldEditorScreen();
 				return true;
 			}
-		}
-
-		obj.toggleWorldItemsSpawnerScreen <- function()
-		{
-			if (this.m.WorldItemsSpawnerScreen.isVisible())
-			{
-				this.m.MenuStack.pop();
-				return false;
-			}
-			else
-			{
-				this.showWorldItemsSpawnerScreen();
-				return true;
-			}
-		}
-
-		local keyHandler = obj.helper_handleContextualKeyInput;
-		obj.helper_handleContextualKeyInput = function(_key)
-		{
-			if(!keyHandler(_key) && _key.getState() == 0)
-			{
-				if (_key.getModifier() == 2) // CTRL
-				{
-					if (_key.getKey() == 23 && this.m.WorldScreen.isVisible()) // M
-					{
-						return this.m.WorldScreen.toggleWorldMapEditorModule();
-					}
-
-					if (!this.m.CharacterScreen.isVisible() && !this.m.WorldTownScreen.isVisible() && !this.m.EventScreen.isVisible() && !this.m.EventScreen.isAnimating())
-					{
-						if (_key.getKey() == 38)
-						{
-							return this.toggleWorldEditorScreen();
-						}
-
-						if (_key.getKey() == 24)
-						{
-							return this.toggleWorldItemsSpawnerScreen();
-						}
-					}
-				}
-
-				if (this.m.WorldScreen.getWorldMapEditorModule().isVisible())
-				{
-					return this.WorldMapEditorKeyInputHandle(_key);
-				}
-			}
-
-			return true;
-		}
-
-		obj.WorldMapEditorKeyInputHandle <- function( _key )
-		{
-			if (!this.m.MenuStack.hasBacksteps())
- 	 		{
-				switch (_key.getKey())
-				{
-				case 24: //N to select stuff
-					if (this.m.LastEntityHovered != null)
-        			{
-			        	this.m.WorldScreen.getWorldMapEditorModule().select(this.m.LastEntityHovered);
-			        }
-			        break;
-
-				case 23: //M to move stuff
-			        if (this.m.LastTileHovered != null && this.m.WorldScreen.getWorldMapEditorModule().isSelectedEntity())
-			        {
-			        	this.m.WorldScreen.getWorldMapEditorModule().move(this.m.LastTileHovered);
-			        }
-			        break;
-
-			    case 21:
-			    	if (this.m.WorldScreen.getWorldMapEditorModule().isSelectedEntity())
-			    	{
-			    		this.m.WorldScreen.getWorldMapEditorModule().discard();
-			    	}
-			    	break;
-
-				case 20: //J to teleport
-					if (this.m.LastTileHovered != null)
-					{
-						local tilePos = this.m.LastTileHovered.Pos;
-		        		::World.State.getPlayer().setPos(tilePos);
-		        		::World.setPlayerPos(tilePos);
-					}
-					break;
-
-				case 18: //H to spawn stuff
-			        if (this.m.LastTileHovered != null && this.m.WorldScreen.getWorldMapEditorModule().isSpawningMode())
-			        {
-			        	this.m.WorldScreen.getWorldMapEditorModule().spawn(this.m.LastTileHovered);
-			        }
-					break;
-				}
-			}
-
-			return true;
 		}
 		
 		local ws_startNewCampaign = obj.startNewCampaign;

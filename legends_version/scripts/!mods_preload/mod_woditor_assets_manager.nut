@@ -32,12 +32,18 @@
 
 			foreach (key in ::Woditor.AssetsProperties.Mult)
 			{
-				if (this.World.Flags.has(key)) this.m[key] *= this.World.Flags.getAsFloat(key); 
+				if (this.World.Flags.has(key))
+				{
+					this.m[key] *= this.World.Flags.getAsFloat(key); 
+				}
 			}
 
 			foreach (key in ::Woditor.AssetsProperties.Additive)
 			{
-				this.m[key] += this.World.Flags.getAsInt(key);
+				if (this.World.Flags.has(key))
+				{
+					this.m[key] += this.World.Flags.getAsInt(key);
+				}
 			}
 		}
 
@@ -48,15 +54,16 @@
 
 		obj.updateBaseProperties <- function()
 		{
-			foreach (key in ::Woditor.AssetsProperties.Mult)
-			{
-				if (this.World.Flags.has(key)) this.m.BaseProperties[key] = this.m[key] / this.World.Flags.getAsFloat(key);
-			}
+			//wtf necro
+			// foreach (key in ::Woditor.AssetsProperties.Mult)
+			// {
+			// 	if (this.World.Flags.has(key)) this.m.BaseProperties[key] = this.m[key] / this.World.Flags.getAsFloat(key);
+			// }
 
-			foreach (key in ::Woditor.AssetsProperties.Additive)
-			{
-				this.m.BaseProperties[key] = this.m[key] - this.World.Flags.getAsInt(key);
-			}
+			// foreach (key in ::Woditor.AssetsProperties.Additive)
+			// {
+			// 	this.m.BaseProperties[key] = this.m[key] - this.World.Flags.getAsInt(key);
+			// }
 		}
 
 		local ws_getTerrainTypeSpeedMult = obj.getTerrainTypeSpeedMult;
@@ -69,22 +76,21 @@
 		obj.updateLook = function( _updateTo = -1 )
 		{
 			ws_updateLook();
-			local player = this.World.State.getPlayer();
 
 			if (this.World.Flags.has("AvatarSocket"))
 			{
-				player.getSprite("base").setBrush(this.World.Flags.get("AvatarSocket"));
+				this.World.State.getPlayer().getSprite("base").setBrush(this.World.Flags.get("AvatarSocket"));
 			}
 
 			if (this.World.Flags.has("AvatarSprite"))
 			{
-				player.getSprite("body").setBrush(this.World.Flags.get("AvatarSprite"));
+				this.World.State.getPlayer().getSprite("body").setBrush(this.World.Flags.get("AvatarSprite"));
 			}
 
 			if (this.World.Flags.has("AvatarIsFlippedHorizontally"))
 			{
-				player.getSprite("base").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
-				player.getSprite("body").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
+				this.World.State.getPlayer().getSprite("base").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
+				this.World.State.getPlayer().getSprite("body").setHorizontalFlipping(this.World.Flags.get("AvatarIsFlippedHorizontally"));
 			}
 		};
 	});

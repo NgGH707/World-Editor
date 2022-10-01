@@ -1,11 +1,11 @@
-local version = 3.0;
-::Woditor <- {};
-::Woditor.Version <- version;
-::Woditor.Name <- "mod_world_editor_legends";
+::Woditor <- {
+	ID = "mod_world_editor_legends",
+	Version = "3.0.2",
+	Name = "NgGH's Hard Work"
+};
 
 // register CSS
 ::mods_registerCSS("world_editor_screen.css");
-::mods_registerCSS("world_item_spawner_screen.css");
 ::mods_registerCSS("world_map_editor_module.css");
 ::mods_registerCSS("control/world_editor_controls.css");
 ::mods_registerCSS("child/world_editor_factions.css");
@@ -16,7 +16,6 @@ local version = 3.0;
 
 // register JS
 ::mods_registerJS("world_editor_screen.js");
-::mods_registerJS("world_item_spawner_screen.js");
 ::mods_registerJS("world_map_editor_module.js");
 ::mods_registerJS("control/world_editor_controls.js");
 ::mods_registerJS("child/world_editor_factions.js");
@@ -27,15 +26,15 @@ local version = 3.0;
 ::mods_registerJS("child/world_editor_popup_dialogs.js");
 
 // register hooks
-::mods_registerMod(::Woditor.Name, version, "NgGH's Hard Work");
-::mods_queue(::Woditor.Name, "mod_legends,>mod_legends_PTR", function()
+::mods_registerMod(::Woditor.ID, ::Woditor.Version, "NgGH's Hard Work");
+::mods_queue(::Woditor.ID, "mod_legends,>mod_legends_PTR", function()
 {	
-	// run hooks
+	::Woditor.Mod <- ::MSU.Class.Mod(::Woditor.ID, ::Woditor.Version, "Woditor");
+	::Woditor.addKeybinds();
 	::Woditor.hookWorldScreen();
 	::Woditor.hookWorldState();
 	::Woditor.hookAssetsManager();
 	::Woditor.hookFollowers();
-	::Woditor.hookItems();
 	::Woditor.hookTooltips();
 	::Woditor.hookScenarios();
 	::Woditor.hookFaction();
@@ -47,4 +46,9 @@ local version = 3.0;
 	::Woditor.hookAttachedLocation();
 	::Woditor.createLib();
 	::Woditor.processWoditorLib();
+
+	if (::mods_getRegisteredMod("mod_item_spawner") == null)
+	{
+		::Woditor.processItemList();
+	}
 });

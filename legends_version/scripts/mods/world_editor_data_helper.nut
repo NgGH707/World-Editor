@@ -562,12 +562,11 @@ this.world_editor_data_helper <- {
 		// check box configurations
 		result.CheckBox <- {
 			IsIronman = ::World.Assets.isIronman(),
-			IsBleedKiller = ::LegendsMod.Configs().LegendBleedKillerEnabled(),
-			IsLocationScaling = ::LegendsMod.Configs().LegendLocationScalingEnabled(),
-			IsRecruitScaling = ::LegendsMod.Configs().LegendRecruitScalingEnabled(),
-			IsWorldEconomy = ::LegendsMod.Configs().LegendWorldEconomyEnabled(),
-			IsBlueprintsVisible = ::LegendsMod.Configs().LegendAllBlueprintsEnabled(),
-			IsGender = ::LegendsMod.Configs().LegendGenderLevel(),
+			BleedKiller = ::Legends.Mod.ModSettings.getSetting("BleedKiller").getValue(),
+			DistanceScaling = ::Legends.Mod.ModSettings.getSetting("DistanceScaling").getValue(),
+			RecruitScaling = ::Legends.Mod.ModSettings.getSetting("RecruitScaling").getValue(),
+			WorldEconomy = ::Legends.Mod.ModSettings.getSetting("WorldEconomy").getValue(),
+			GenderEquality = ::Legends.Mod.ModSettings.getSetting("GenderEquality").getValue(),
 			CombatDifficulty = ::World.Assets.getCombatDifficulty(),
 			EconomicDifficulty = ::World.Assets.getEconomicDifficulty(),
 		};
@@ -632,7 +631,7 @@ this.world_editor_data_helper <- {
 
 		foreach (i, location in ::World.EntityManager.getLocations())
 		{
-			if (location.isLocationType(::Const.World.LocationType.AttachedLocation) || location.m.IsBattlesite)
+			if (location.isLocationType(::Const.World.LocationType.AttachedLocation) || location.isParty() || location.m.IsBattlesite)
 			{
 				continue;
 			}

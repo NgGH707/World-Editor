@@ -203,8 +203,8 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 
 	function spawnUnit(_tile, _data)
 	{
-		local factions = ::World.FactionManager.getFactionsOfType(::MSU.Array.getRandom(_data.FactionType));
-		local faction = ::MSU.Array.getRandom(factions);
+		local factions = ::World.FactionManager.getFactionsOfType(::MSU.Array.rand(_data.FactionType));
+		local faction = ::MSU.Array.rand(factions);
 		local party = faction.spawnEntity(_tile, _data.Name, false, ::Const.World.Spawn[_data.Key], ::Math.rand(80, 120) * this.getScaledDifficultyMult() * this.getReputationToDifficultyLightMult());
 		local roam = ::new("scripts/ai/world/orders/roam_order");
 		roam.setAllTerrainAvailable();
@@ -260,15 +260,15 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 
 		if (_data.IsSouthern)
 		{
-			script = ::MSU.Array.getRandom(::Woditor.Settlements.CityState);
+			script = ::MSU.Array.rand(::Woditor.Settlements.CityState);
 		}
 		else if (!_data.IsVillage)
 		{
-			script = ::MSU.Array.getRandom(::Woditor.Settlements.Fort[_data.Size]);
+			script = ::MSU.Array.rand(::Woditor.Settlements.Fort[_data.Size]);
 		}
 		else
 		{
-			script = ::MSU.Array.getRandom(::Woditor.Settlements.Village[_data.Size]);
+			script = ::MSU.Array.rand(::Woditor.Settlements.Village[_data.Size]);
 		}
 
 		local best = 9999;
@@ -300,7 +300,7 @@ this.world_map_editor_module <- this.inherit("scripts/ui/screens/ui_module", {
 
 		if (bestFaction == null)
 		{
-			bestFaction = ::MSU.Array.getRandom(::World.FactionManager.getFactionsOfType(::Const.FactionType.NobleHouse));	
+			bestFaction = ::MSU.Array.rand(::World.FactionManager.getFactionsOfType(::Const.FactionType.NobleHouse));	
 		}
 
 		bestFaction.addSettlement(settlement);
