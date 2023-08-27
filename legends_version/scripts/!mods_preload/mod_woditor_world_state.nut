@@ -1,6 +1,6 @@
 ::Woditor.hookWorldState <- function ()
 {
-	::mods_hookNewObjectOnce("states/world_state", function( obj ) 
+	::mods_hookExactClass("states/world_state", function( obj ) 
 	{
 		local init_ui = obj.onInitUI;
 		obj.onInitUI = function()
@@ -72,7 +72,7 @@
 		};
 
 		local ws_onSerialize = obj.onSerialize;
-		obj.onSerialize <- function( _out )
+		obj.onSerialize = function( _out )
 		{
 			this.m.WorldEditorScreen.onSerialize();
 			ws_onSerialize(_out);
